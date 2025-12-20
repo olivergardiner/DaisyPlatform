@@ -13,3 +13,6 @@
 [submodule "dependencies/cycfi/infra"]
 	path = dependencies/cycfi/infra
 	url = https://github.com/cycfi/infra.git
+[submodule "dependencies/CloudSeedCore"]
+	path = dependencies/CloudSeedCore
+	url = https://github.com/GhostNoteAudio/CloudSeedCore.git
