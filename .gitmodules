@@ -10,3 +10,6 @@
 [submodule "dependencies/cycfi/q"]
 	path = dependencies/cycfi/q
 	url = https://github.com/cycfi/q.git
+[submodule "dependencies/cycfi/infra"]
+	path = dependencies/cycfi/infra
+	url = https://github.com/cycfi/infra.git
