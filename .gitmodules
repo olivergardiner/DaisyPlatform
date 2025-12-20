@@ -7,3 +7,6 @@
 [submodule "dependencies/DaisySeedGFX2"]
 	path = dependencies/DaisySeedGFX2
 	url = https://github.com/DADDesign-Projects/DaisySeedGFX2.git
+[submodule "dependencies/cycfi/q"]
+	path = dependencies/cycfi/q
+	url = https://github.com/cycfi/q.git
