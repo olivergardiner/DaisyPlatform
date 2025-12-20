@@ -1,0 +1,23 @@
+{
+    "configurations": [
+        {
+            "cStandard": "c11",
+            "compilerPath": "arm-none-eabi-g++.exe",
+            "cppStandard": "c++20",
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE",
+                "STM32H750xx"
+            ],
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/dependencies/libDaisy/**",
+                "${workspaceFolder}/dependencies/DaisySP/**",
+                "${workspaceFolder}/dependencies/DaisySeedGFX2/**"
+            ],
+            "name": "Win32",
+            "windowsSdkVersion": "10.0.17763.0"
+        }    ],
+    "version": 4
+}
