@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 
+#include "controls.h"
+
 using namespace daisy;
 
 namespace perspective {
@@ -45,6 +47,8 @@ static inline float taperFunction(float x, float ym) {
 }
 
 // Base class for effect parameters
+// NB: The index is used to map parameters to physical controls, and does not indicate the order of the parameter itself.
+// For PotentiometerParameter and EncoderParameter, index corresponds to a physical potentiometer or encoder number respectively.
 class EffectParameter {
 public:
     EffectParameter(const std::string& name, float minValue, float maxValue, float defaultValue, int index = -1);
@@ -83,6 +87,9 @@ public:
     
     // Set value with curve applied (input is 0.0 to 1.0)
     void SetNormalizedValueWithCurve(float normalizedValue);
+    
+    // Convert value to integer with configurable maximum
+    int GetValueAsInt(int maxInt) const;
     
     ParameterType GetType() const override;
 

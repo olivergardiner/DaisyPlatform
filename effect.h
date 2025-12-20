@@ -14,6 +14,9 @@ public:
     virtual ~Effect();
 
     // Initialize the effect (called once during setup)
+    // The Init method should set up any parameters to control the effect.
+    // Because different parameter types map to different physical controls,
+    // the index of different parameters will not be sequential.
     virtual void Init(float sampleRate) = 0;
 
     // Process audio - must be implemented by derived classes

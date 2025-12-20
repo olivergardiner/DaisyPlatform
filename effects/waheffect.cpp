@@ -1,4 +1,5 @@
 #include "waheffect.h"
+#include "../controls.h"
 
 using namespace perspective;
 using namespace daisysp;
@@ -17,9 +18,9 @@ void WahEffect::Init(float sampleRate) {
     wahL_.Init(sampleRate);
     wahR_.Init(sampleRate);
     
-    // Add parameters: Mix, Wah (expression pedal on pot 7)
-    AddParameter(new PotentiometerParameter("Mix", 0.0f, 1.0f, 0.5f, PotCurve::LIN, 0));
-    AddParameter(new PotentiometerParameter("Wah", 0.0f, 1.0f, 0.5f, PotCurve::LIN, 6));  // Pot 7 = index 6
+    // Add parameters: Mix, Wah (expression pedal)
+    AddParameter(new PotentiometerParameter("Mix", 0.0f, 1.0f, 0.5f, PotCurve::LIN, KNOB_1_IDX));
+    AddParameter(new PotentiometerParameter("Wah", 0.0f, 1.0f, 0.5f, PotCurve::LIN, KNOB_EXP_IDX));
     
     // Set default wah parameters
     Update();

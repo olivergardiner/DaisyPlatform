@@ -1,4 +1,5 @@
 #include "choruseffect.h"
+#include "../controls.h"
 
 using namespace perspective;
 using namespace daisysp;
@@ -17,11 +18,11 @@ void ChorusEffect::Init(float sampleRate) {
     chorusL_.Init(sampleRate);
     chorusR_.Init(sampleRate);
 
-    AddParameter(new PotentiometerParameter("Mix", 0.0f, 1.0f, 0.5f, PotCurve::LIN, 0));
-    AddParameter(new PotentiometerParameter("Depth", 0.0f, 1.0f, 0.9f, PotCurve::LIN, 1));
-    AddParameter(new PotentiometerParameter("Rate", 0.1f, 5.0f, 0.3f, PotCurve::LOG, 2));
-    AddParameter(new PotentiometerParameter("Delay", 0.1f, 5.0f, 0.75f, PotCurve::LIN, 3));
-    AddParameter(new PotentiometerParameter("Feedback", -0.95f, 0.95f, 0.0f, PotCurve::LIN, 4));
+    AddParameter(new PotentiometerParameter("Mix", 0.0f, 1.0f, 0.5f, PotCurve::LIN, KNOB_1_IDX));
+    AddParameter(new PotentiometerParameter("Depth", 0.0f, 1.0f, 0.9f, PotCurve::LIN, KNOB_2_IDX));
+    AddParameter(new PotentiometerParameter("Rate", 0.1f, 5.0f, 0.3f, PotCurve::LOG, KNOB_3_IDX));
+    AddParameter(new PotentiometerParameter("Delay", 0.1f, 5.0f, 0.75f, PotCurve::LIN, KNOB_4_IDX));
+    AddParameter(new PotentiometerParameter("Feedback", -0.95f, 0.95f, 0.0f, PotCurve::LIN, KNOB_5_IDX));
     
     // Set default chorus parameters
     Update();

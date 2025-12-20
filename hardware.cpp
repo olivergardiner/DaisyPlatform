@@ -152,6 +152,37 @@ void Hardware::ProcessControls()
                 "Encoder_" + std::to_string(i + 1)
             );
         }
+        
+        // Process encoder button (switch) events using native Encoder methods
+        if (encoders[i].RisingEdge()) {
+            // Encoder button just pressed - reset hold flag
+            encoderHoldFired_[i] = false;
+            eventHandler_->QueueButtonPressed(
+                &encoders[i],
+                i + numSwitches,  // Offset by number of switches for unique index
+                "Encoder_" + std::to_string(i + 1) + "_Button"
+            );
+        } else if (encoders[i].FallingEdge()) {
+            // Encoder button released
+            encoderHoldFired_[i] = false;
+            eventHandler_->QueueButtonReleased(
+                &encoders[i],
+                i + numSwitches,  // Offset by number of switches for unique index
+                "Encoder_" + std::to_string(i + 1) + "_Button"
+            );
+        } else if (encoders[i].Pressed()) {
+            // Encoder button is being held - check if threshold reached
+            float holdTime = encoders[i].TimeHeldMs();
+            if (!encoderHoldFired_[i] && holdTime >= BUTTON_HOLD_THRESHOLD_MS) {
+                encoderHoldFired_[i] = true;
+                eventHandler_->QueueButtonHeld(
+                    &encoders[i],
+                    i + numSwitches,  // Offset by number of switches for unique index
+                    "Encoder_" + std::to_string(i + 1) + "_Button",
+                    holdTime
+                );
+            }
+        }
     }
 
     // Update LEDs (no events needed)

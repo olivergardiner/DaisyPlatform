@@ -1,4 +1,5 @@
 #include "bandpasseffect.h"
+#include "../controls.h"
 
 using namespace perspective;
 using namespace daisysp;
@@ -17,10 +18,10 @@ void BandpassEffect::Init(float sampleRate) {
     filterL_.Init(sampleRate);
     filterR_.Init(sampleRate);
     
-    // Add parameters: Mix, Frequency, Resonance (Q)
-    AddParameter(new PotentiometerParameter("Mix", 0.0f, 1.0f, 0.5f, PotCurve::LIN, 0));
-    AddParameter(new PotentiometerParameter("Resonance", 0.5f, 20.0f, 2.0f, PotCurve::LOG, 1));
-    AddParameter(new PotentiometerParameter("Frequency", 400.0f, 2000.0f, 1000.0f, PotCurve::LOG, 6));
+    // Add parameters: Mix, Resonance, Frequency
+    AddParameter(new PotentiometerParameter("Mix", 0.0f, 1.0f, 0.5f, PotCurve::LIN, KNOB_1_IDX));
+    AddParameter(new PotentiometerParameter("Resonance", 0.5f, 20.0f, 2.0f, PotCurve::LOG, KNOB_2_IDX));
+    AddParameter(new PotentiometerParameter("Frequency", 400.0f, 2000.0f, 1000.0f, PotCurve::LOG, KNOB_EXP_IDX));
     
     // Set default filter parameters
     Update();

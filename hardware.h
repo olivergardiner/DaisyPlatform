@@ -43,6 +43,9 @@ namespace perspective {
         // Track if hold event has been fired for each switch
         bool switchHoldFired_[4] = {false, false, false, false};
         static constexpr float BUTTON_HOLD_THRESHOLD_MS = 2000.0f;
+        
+        // Track if hold event has been fired for each encoder button
+        bool encoderHoldFired_[2] = {false, false};
 
         Pin knobPins[7] = {KNOB_1_PIN, KNOB_2_PIN, KNOB_3_PIN, KNOB_4_PIN, KNOB_5_PIN, KNOB_6_PIN, KNOB_EXP_PIN};
         Pin switchPins[4] = {SWITCH_1_PIN, SWITCH_2_PIN, SWITCH_3_PIN, SWITCH_4_PIN};

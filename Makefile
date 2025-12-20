@@ -8,6 +8,7 @@ CPP_SOURCES = application.cpp hardware.cpp effectparameter.cpp effect.cpp compou
 LIBDAISY_DIR ?= dependencies/libDaisy
 DAISYSP_DIR ?= dependencies/DaisySP
 DAISYGFX2_DIR ?= dependencies/DaisySeedGFX2
+CYCFI_Q_DIR ?= dependencies/cycfi/q/q_lib
 
 USE_DAISYSP_LGPL=1
 
@@ -15,4 +16,6 @@ USE_DAISYSP_LGPL=1
 SYSTEM_FILES_DIR = $(LIBDAISY_DIR)/core
 include $(SYSTEM_FILES_DIR)/Makefile
 
+C_INCLUDES += -I$(DAISYSP_DIR)/src
 C_INCLUDES += -I$(DAISYGFX2_DIR)
+C_INCLUDES += -I$(CYCFI_Q_DIR)/include

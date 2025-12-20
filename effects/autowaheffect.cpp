@@ -1,4 +1,5 @@
 #include "autowaheffect.h"
+#include "../controls.h"
 
 using namespace perspective;
 using namespace daisysp;
@@ -18,14 +19,14 @@ void AutowahEffect::Init(float sampleRate) {
     filterL_.Init(sampleRate);
     filterR_.Init(sampleRate);
     
-    // Add parameters: Mix, Resonance, Range, Direction, Attack, Release, Frequency
-    AddParameter(new PotentiometerParameter("Mix", 0.0f, 1.0f, 0.5f, PotCurve::LIN, 0));
-    AddParameter(new PotentiometerParameter("Resonance", 0.5f, 20.0f, 2.0f, PotCurve::LOG, 1));
-    AddParameter(new PotentiometerParameter("Frequency", 400.0f, 2000.0f, 1000.0f, PotCurve::LOG, 2));
-    AddParameter(new ToggleParameter("Direction", true, 3));  // true = up, false = down
-    AddParameter(new PotentiometerParameter("Attack", 0.001f, 0.5f, 0.1f, PotCurve::LOG, 4));
-    AddParameter(new PotentiometerParameter("Release", 0.0001f, 0.1f, 0.001f, PotCurve::LOG, 5));
-    AddParameter(new PotentiometerParameter("Range", 0.0f, 3000.0f, 1600.0f, PotCurve::LIN, 6));
+    // Add parameters: Mix, Resonance, Frequency, Attack, Release, Range, Direction
+    AddParameter(new PotentiometerParameter("Mix", 0.0f, 1.0f, 0.5f, PotCurve::LIN, KNOB_1_IDX));
+    AddParameter(new PotentiometerParameter("Resonance", 0.5f, 20.0f, 2.0f, PotCurve::LOG, KNOB_2_IDX));
+    AddParameter(new PotentiometerParameter("Frequency", 400.0f, 2000.0f, 1000.0f, PotCurve::LOG, KNOB_3_IDX));
+    AddParameter(new PotentiometerParameter("Attack", 0.001f, 0.5f, 0.1f, PotCurve::LOG, KNOB_4_IDX));
+    AddParameter(new PotentiometerParameter("Release", 0.0001f, 0.1f, 0.001f, PotCurve::LOG, KNOB_5_IDX));
+    AddParameter(new PotentiometerParameter("Range", 0.0f, 3000.0f, 1600.0f, PotCurve::LIN, KNOB_6_IDX));
+    AddParameter(new ToggleParameter("Direction", true, SWITCH_1_IDX));  // true = up, false = down
     
     // Set default filter parameters
     Update();

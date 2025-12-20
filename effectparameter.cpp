@@ -80,6 +80,18 @@ ParameterType PotentiometerParameter::GetType() const {
     return ParameterType::POTENTIOMETER;
 }
 
+int PotentiometerParameter::GetValueAsInt(int maxInt) const {
+    // Get normalized value (0.0 to 1.0)
+    float normalized = GetNormalizedValue();
+    
+    // Scale to integer range (0 to maxInt)
+    // Add 0.5 for proper rounding
+    int intValue = static_cast<int>(normalized * maxInt + 0.5f);
+    
+    // Clamp to ensure we stay within bounds
+    return std::clamp(intValue, 0, maxInt);
+}
+
 float PotentiometerParameter::ApplyCurve(float normalizedValue) {
     switch (curve_) {
         case PotCurve::LIN:

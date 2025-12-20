@@ -1,4 +1,5 @@
 #include "flangereffect.h"
+#include "../controls.h"
 
 using namespace perspective;
 using namespace daisysp;
@@ -18,10 +19,10 @@ void FlangerEffect::Init(float sampleRate) {
     flangerR_.Init(sampleRate);
     
     // Add parameters: Mix, Depth, Rate, Feedback
-    AddParameter(new PotentiometerParameter("Mix", 0.0f, 1.0f, 0.5f, PotCurve::LIN, 0));
-    AddParameter(new PotentiometerParameter("Depth", 0.0f, 1.0f, 0.7f, PotCurve::LIN, 1));
-    AddParameter(new PotentiometerParameter("Rate", 0.05f, 10.0f, 0.3f, PotCurve::LOG, 2));
-    AddParameter(new PotentiometerParameter("Feedback", 0.0f, 0.95f, 0.5f, PotCurve::LIN, 3));
+    AddParameter(new PotentiometerParameter("Mix", 0.0f, 1.0f, 0.5f, PotCurve::LIN, KNOB_1_IDX));
+    AddParameter(new PotentiometerParameter("Depth", 0.0f, 1.0f, 0.7f, PotCurve::LIN, KNOB_2_IDX));
+    AddParameter(new PotentiometerParameter("Rate", 0.05f, 10.0f, 0.3f, PotCurve::LOG, KNOB_3_IDX));
+    AddParameter(new PotentiometerParameter("Feedback", 0.0f, 0.95f, 0.5f, PotCurve::LIN, KNOB_4_IDX));
     
     // Set default flanger parameters
     Update();
