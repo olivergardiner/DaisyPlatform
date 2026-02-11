@@ -1,0 +1,1424 @@
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccN12KmI.s 			page 1
+
+
+   1              		.cpu cortex-m7
+   2              		.arch armv7e-m
+   3              		.fpu fpv5-d16
+   4              		.eabi_attribute 28, 1
+   5              		.eabi_attribute 20, 1
+   6              		.eabi_attribute 21, 1
+   7              		.eabi_attribute 23, 3
+   8              		.eabi_attribute 24, 1
+   9              		.eabi_attribute 25, 1
+  10              		.eabi_attribute 26, 1
+  11              		.eabi_attribute 30, 4
+  12              		.eabi_attribute 34, 1
+  13              		.eabi_attribute 18, 4
+  14              		.file	"TFT_SPI.cpp"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.file 1 "dependencies/DaisySeedGFX2/TFT_SPI.cpp"
+  19              		.section	.text._ZN6DadGFX7TFT_SPI11SendCommandEh,"axG",%progbits,_ZN6DadGFX7TFT_SPI11SendCommandEh
+  20              		.align	1
+  21              		.weak	_ZN6DadGFX7TFT_SPI11SendCommandEh
+  22              		.syntax unified
+  23              		.thumb
+  24              		.thumb_func
+  26              	_ZN6DadGFX7TFT_SPI11SendCommandEh:
+  27              	.LVL0:
+  28              	.LFB3738:
+  29              		.file 2 "dependencies/DaisySeedGFX2/TFT_SPI.h"
+   1:dependencies/DaisySeedGFX2/TFT_SPI.h **** //------------------------------------------------------------------------
+   2:dependencies/DaisySeedGFX2/TFT_SPI.h **** // TFT_SPI.h
+   3:dependencies/DaisySeedGFX2/TFT_SPI.h **** //  Management of an SPI connection to a TFT screen
+   4:dependencies/DaisySeedGFX2/TFT_SPI.h **** // Copyright(c) 2024 Dad Design.
+   5:dependencies/DaisySeedGFX2/TFT_SPI.h **** //------------------------------------------------------------------------
+   6:dependencies/DaisySeedGFX2/TFT_SPI.h **** #pragma once
+   7:dependencies/DaisySeedGFX2/TFT_SPI.h **** #include "daisy_seed.h"
+   8:dependencies/DaisySeedGFX2/TFT_SPI.h **** #include "per/spi.h"
+   9:dependencies/DaisySeedGFX2/TFT_SPI.h **** #include "per/gpio.h"
+  10:dependencies/DaisySeedGFX2/TFT_SPI.h **** #include "sys/system.h"
+  11:dependencies/DaisySeedGFX2/TFT_SPI.h **** #include "../UserConfig.h"
+  12:dependencies/DaisySeedGFX2/TFT_SPI.h **** 
+  13:dependencies/DaisySeedGFX2/TFT_SPI.h **** // TFT Generic commands
+  14:dependencies/DaisySeedGFX2/TFT_SPI.h **** #define TFT_NOP     0x00    // No operation
+  15:dependencies/DaisySeedGFX2/TFT_SPI.h **** #define TFT_SWRST   0x01    // Software reset
+  16:dependencies/DaisySeedGFX2/TFT_SPI.h **** 
+  17:dependencies/DaisySeedGFX2/TFT_SPI.h **** #define TFT_INVOFF  0x20    // Disable inversion
+  18:dependencies/DaisySeedGFX2/TFT_SPI.h **** #define TFT_INVON   0x21    // Enable inversion
+  19:dependencies/DaisySeedGFX2/TFT_SPI.h **** 
+  20:dependencies/DaisySeedGFX2/TFT_SPI.h **** #define TFT_DISPOFF 0x28    // Turn display off
+  21:dependencies/DaisySeedGFX2/TFT_SPI.h **** #define TFT_DISPON  0x29    // Turn display on
+  22:dependencies/DaisySeedGFX2/TFT_SPI.h **** 
+  23:dependencies/DaisySeedGFX2/TFT_SPI.h **** #define TFT_CASET   0x2A    // Set column address
+  24:dependencies/DaisySeedGFX2/TFT_SPI.h **** #define TFT_RASET   0x2B    // Set row address
+  25:dependencies/DaisySeedGFX2/TFT_SPI.h **** #define TFT_RAMWR   0x2C    // Write to display RAM
+  26:dependencies/DaisySeedGFX2/TFT_SPI.h **** 
+  27:dependencies/DaisySeedGFX2/TFT_SPI.h **** #define TFT_MADCTL  0x36    // Memory access control
+  28:dependencies/DaisySeedGFX2/TFT_SPI.h **** #define TFT_MAD_MY  0x80    // Row address order
+  29:dependencies/DaisySeedGFX2/TFT_SPI.h **** #define TFT_MAD_MX  0x40    // Column address order
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccN12KmI.s 			page 2
+
+
+  30:dependencies/DaisySeedGFX2/TFT_SPI.h **** #define TFT_MAD_MV  0x20    // Row/Column exchange
+  31:dependencies/DaisySeedGFX2/TFT_SPI.h **** #define TFT_MAD_ML  0x10    // Vertical refresh order
+  32:dependencies/DaisySeedGFX2/TFT_SPI.h **** #define TFT_MAD_BGR 0x08    // Blue-Green-Red pixel order
+  33:dependencies/DaisySeedGFX2/TFT_SPI.h **** #define TFT_MAD_MH  0x04    // Horizontal refresh order
+  34:dependencies/DaisySeedGFX2/TFT_SPI.h **** #define TFT_MAD_RGB 0x00    // Red-Green-Blue pixel order
+  35:dependencies/DaisySeedGFX2/TFT_SPI.h **** 
+  36:dependencies/DaisySeedGFX2/TFT_SPI.h **** using namespace daisy;
+  37:dependencies/DaisySeedGFX2/TFT_SPI.h **** extern DaisySeed hw;
+  38:dependencies/DaisySeedGFX2/TFT_SPI.h **** 
+  39:dependencies/DaisySeedGFX2/TFT_SPI.h **** enum class SPIMode {
+  40:dependencies/DaisySeedGFX2/TFT_SPI.h ****     Mode0, // SPI Mode 0
+  41:dependencies/DaisySeedGFX2/TFT_SPI.h ****     Mode1, // SPI Mode 1
+  42:dependencies/DaisySeedGFX2/TFT_SPI.h ****     Mode2, // SPI Mode 2
+  43:dependencies/DaisySeedGFX2/TFT_SPI.h ****     Mode3  // SPI Mode 3
+  44:dependencies/DaisySeedGFX2/TFT_SPI.h **** };
+  45:dependencies/DaisySeedGFX2/TFT_SPI.h **** 
+  46:dependencies/DaisySeedGFX2/TFT_SPI.h **** enum class Rotation {
+  47:dependencies/DaisySeedGFX2/TFT_SPI.h ****     Degre_0,     // 0-degree rotation
+  48:dependencies/DaisySeedGFX2/TFT_SPI.h ****     Degre_90,    // 90-degree rotation
+  49:dependencies/DaisySeedGFX2/TFT_SPI.h ****     Degre_180,   // 180-degree rotation
+  50:dependencies/DaisySeedGFX2/TFT_SPI.h ****     Degre_270    // 270-degree rotation
+  51:dependencies/DaisySeedGFX2/TFT_SPI.h **** };
+  52:dependencies/DaisySeedGFX2/TFT_SPI.h **** 
+  53:dependencies/DaisySeedGFX2/TFT_SPI.h **** // Configuration of GPIOs used
+  54:dependencies/DaisySeedGFX2/TFT_SPI.h **** #define _TFT_SPI_PORT SpiHandle::Config::Peripheral::TFT_SPI_PORT
+  55:dependencies/DaisySeedGFX2/TFT_SPI.h **** #define _TFT_SPI_MODE SPIMode::TFT_SPI_MODE
+  56:dependencies/DaisySeedGFX2/TFT_SPI.h **** 
+  57:dependencies/DaisySeedGFX2/TFT_SPI.h **** // GPIO configurations for TFT
+  58:dependencies/DaisySeedGFX2/TFT_SPI.h **** #define _TFT_MOSI seed::TFT_MOSI  // MOSI pin
+  59:dependencies/DaisySeedGFX2/TFT_SPI.h **** #define _TFT_SCLK seed::TFT_SCLK  // Clock pin
+  60:dependencies/DaisySeedGFX2/TFT_SPI.h **** #define _TFT_DC   seed::TFT_DC    // Data/Command pin
+  61:dependencies/DaisySeedGFX2/TFT_SPI.h **** #define _TFT_RST  seed::TFT_RST   // Reset pin
+  62:dependencies/DaisySeedGFX2/TFT_SPI.h **** 
+  63:dependencies/DaisySeedGFX2/TFT_SPI.h **** namespace DadGFX {
+  64:dependencies/DaisySeedGFX2/TFT_SPI.h **** 
+  65:dependencies/DaisySeedGFX2/TFT_SPI.h **** //***********************************************************************************
+  66:dependencies/DaisySeedGFX2/TFT_SPI.h **** // TFT_SPI
+  67:dependencies/DaisySeedGFX2/TFT_SPI.h **** //  SPI management for communication with the TFT screen
+  68:dependencies/DaisySeedGFX2/TFT_SPI.h **** //*********************************************************************************** 
+  69:dependencies/DaisySeedGFX2/TFT_SPI.h **** class TFT_SPI {
+  70:dependencies/DaisySeedGFX2/TFT_SPI.h ****     public :
+  71:dependencies/DaisySeedGFX2/TFT_SPI.h **** 
+  72:dependencies/DaisySeedGFX2/TFT_SPI.h ****     // --------------------------------------------------------------------------
+  73:dependencies/DaisySeedGFX2/TFT_SPI.h ****     // Initialize SPI communication
+  74:dependencies/DaisySeedGFX2/TFT_SPI.h ****     void Init_TFT_SPI();
+  75:dependencies/DaisySeedGFX2/TFT_SPI.h **** 
+  76:dependencies/DaisySeedGFX2/TFT_SPI.h ****     // --------------------------------------------------------------------------
+  77:dependencies/DaisySeedGFX2/TFT_SPI.h ****     // Initialize the TFT screen
+  78:dependencies/DaisySeedGFX2/TFT_SPI.h ****     void Initialise();
+  79:dependencies/DaisySeedGFX2/TFT_SPI.h **** 
+  80:dependencies/DaisySeedGFX2/TFT_SPI.h ****     // --------------------------------------------------------------------------
+  81:dependencies/DaisySeedGFX2/TFT_SPI.h ****     // Change the screen orientation
+  82:dependencies/DaisySeedGFX2/TFT_SPI.h ****     void setTFTRotation(Rotation r);
+  83:dependencies/DaisySeedGFX2/TFT_SPI.h **** 
+  84:dependencies/DaisySeedGFX2/TFT_SPI.h ****     // --------------------------------------------------------------------------
+  85:dependencies/DaisySeedGFX2/TFT_SPI.h ****     // Send a command to the TFT screen
+  86:dependencies/DaisySeedGFX2/TFT_SPI.h ****     inline void SendCommand(uint8_t cmd) {
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccN12KmI.s 			page 3
+
+
+  30              		.loc 2 86 17 view -0
+  31              		.cfi_startproc
+  32              		@ args = 0, pretend = 0, frame = 8
+  33              		@ frame_needed = 0, uses_anonymous_args = 0
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(false);  // Set DC pin to command mode
+  34              		.loc 2 87 9 view .LVU1
+  86:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(false);  // Set DC pin to command mode
+  35              		.loc 2 86 17 is_stmt 0 view .LVU2
+  36 0000 13B5     		push	{r0, r1, r4, lr}
+  37              		.cfi_def_cfa_offset 16
+  38              		.cfi_offset 4, -8
+  39              		.cfi_offset 14, -4
+  86:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(false);  // Set DC pin to command mode
+  40              		.loc 2 86 17 view .LVU3
+  41 0002 0446     		mov	r4, r0
+  42 0004 8DF80710 		strb	r1, [sp, #7]
+  43              		.loc 2 87 19 view .LVU4
+  44 0008 4030     		adds	r0, r0, #64
+  45              	.LVL1:
+  46              		.loc 2 87 19 view .LVU5
+  47 000a 0021     		movs	r1, #0
+  48              	.LVL2:
+  49              		.loc 2 87 19 view .LVU6
+  50 000c FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+  51              	.LVL3:
+  88:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+  52              		.loc 2 88 9 is_stmt 1 view .LVU7
+  53              		.loc 2 88 31 is_stmt 0 view .LVU8
+  54 0010 6423     		movs	r3, #100
+  55 0012 0122     		movs	r2, #1
+  56 0014 0DF10701 		add	r1, sp, #7
+  57 0018 2046     		mov	r0, r4
+  58 001a FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+  59              	.LVL4:
+  89:dependencies/DaisySeedGFX2/TFT_SPI.h ****     }
+  60              		.loc 2 89 5 view .LVU9
+  61 001e 02B0     		add	sp, sp, #8
+  62              		.cfi_def_cfa_offset 8
+  63              		@ sp needed
+  64 0020 10BD     		pop	{r4, pc}
+  65              		.loc 2 89 5 view .LVU10
+  66              		.cfi_endproc
+  67              	.LFE3738:
+  69              		.section	.text._ZN6DadGFX7TFT_SPI8SendDataEh,"axG",%progbits,_ZN6DadGFX7TFT_SPI8SendDataEh,comdat
+  70              		.align	1
+  71              		.weak	_ZN6DadGFX7TFT_SPI8SendDataEh
+  72              		.syntax unified
+  73              		.thumb
+  74              		.thumb_func
+  76              	_ZN6DadGFX7TFT_SPI8SendDataEh:
+  77              	.LVL5:
+  78              	.LFB3739:
+  90:dependencies/DaisySeedGFX2/TFT_SPI.h **** 
+  91:dependencies/DaisySeedGFX2/TFT_SPI.h ****     // --------------------------------------------------------------------------
+  92:dependencies/DaisySeedGFX2/TFT_SPI.h ****     // Send a single data byte to the TFT screen
+  93:dependencies/DaisySeedGFX2/TFT_SPI.h ****     inline void SendData(uint8_t Data) {
+  79              		.loc 2 93 17 is_stmt 1 view -0
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccN12KmI.s 			page 4
+
+
+  80              		.cfi_startproc
+  81              		@ args = 0, pretend = 0, frame = 8
+  82              		@ frame_needed = 0, uses_anonymous_args = 0
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(true);  // Set DC pin to data mode
+  83              		.loc 2 94 9 view .LVU12
+  93:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(true);  // Set DC pin to data mode
+  84              		.loc 2 93 17 is_stmt 0 view .LVU13
+  85 0000 13B5     		push	{r0, r1, r4, lr}
+  86              		.cfi_def_cfa_offset 16
+  87              		.cfi_offset 4, -8
+  88              		.cfi_offset 14, -4
+  93:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(true);  // Set DC pin to data mode
+  89              		.loc 2 93 17 view .LVU14
+  90 0002 0446     		mov	r4, r0
+  91 0004 8DF80710 		strb	r1, [sp, #7]
+  92              		.loc 2 94 19 view .LVU15
+  93 0008 4030     		adds	r0, r0, #64
+  94              	.LVL6:
+  95              		.loc 2 94 19 view .LVU16
+  96 000a 0121     		movs	r1, #1
+  97              	.LVL7:
+  98              		.loc 2 94 19 view .LVU17
+  99 000c FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 100              	.LVL8:
+  95:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 101              		.loc 2 95 9 is_stmt 1 view .LVU18
+ 102              		.loc 2 95 31 is_stmt 0 view .LVU19
+ 103 0010 6423     		movs	r3, #100
+ 104 0012 0122     		movs	r2, #1
+ 105 0014 0DF10701 		add	r1, sp, #7
+ 106 0018 2046     		mov	r0, r4
+ 107 001a FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+ 108              	.LVL9:
+  96:dependencies/DaisySeedGFX2/TFT_SPI.h ****     }
+ 109              		.loc 2 96 5 view .LVU20
+ 110 001e 02B0     		add	sp, sp, #8
+ 111              		.cfi_def_cfa_offset 8
+ 112              		@ sp needed
+ 113 0020 10BD     		pop	{r4, pc}
+ 114              		.loc 2 96 5 view .LVU21
+ 115              		.cfi_endproc
+ 116              	.LFE3739:
+ 118              		.section	.text._ZN6DadGFX7TFT_SPI10InitialiseEv,"ax",%progbits
+ 119              		.align	1
+ 120              		.global	_ZN6DadGFX7TFT_SPI10InitialiseEv
+ 121              		.syntax unified
+ 122              		.thumb
+ 123              		.thumb_func
+ 125              	_ZN6DadGFX7TFT_SPI10InitialiseEv:
+ 126              	.LVL10:
+ 127              	.LFB3748:
+ 128              		.file 3 "dependencies/DaisySeedGFX2/ST7789_Defines.h"
+   1:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #pragma once
+   2:dependencies/DaisySeedGFX2/ST7789_Defines.h **** // --------------------------------------------------------------------------
+   3:dependencies/DaisySeedGFX2/ST7789_Defines.h **** // Initialisation de l'écran de type ST7789
+   4:dependencies/DaisySeedGFX2/ST7789_Defines.h **** //   thank:  Adafruit https://github.com/adafruit/Adafruit-ST7735-Library
+   5:dependencies/DaisySeedGFX2/ST7789_Defines.h **** //           and
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccN12KmI.s 			page 5
+
+
+   6:dependencies/DaisySeedGFX2/ST7789_Defines.h **** //           TFT_eSPI https://github.com/Bodmer/TFT_eSPI
+   7:dependencies/DaisySeedGFX2/ST7789_Defines.h **** //
+   8:dependencies/DaisySeedGFX2/ST7789_Defines.h **** 
+   9:dependencies/DaisySeedGFX2/ST7789_Defines.h **** // ST7789 specific commands used in init
+  10:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_NOP			0x00
+  11:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_SWRESET		0x01
+  12:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_RDDID		0x04
+  13:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_RDDST		0x09
+  14:dependencies/DaisySeedGFX2/ST7789_Defines.h **** 
+  15:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_RDDPM		0x0A        // Read display power mode
+  16:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_RDD_MADCTL	0x0B      // Read display MADCTL
+  17:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_RDD_COLMOD	0x0C      // Read display pixel format
+  18:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_RDDIM		0x0D        // Read display image mode
+  19:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_RDDSM		0x0E        // Read display signal mode
+  20:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_RDDSR		0x0F        // Read display self-diagnostic result (ST7789V)
+  21:dependencies/DaisySeedGFX2/ST7789_Defines.h **** 
+  22:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_SLPIN		0x10
+  23:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_SLPOUT		0x11
+  24:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_PTLON		0x12
+  25:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_NORON		0x13
+  26:dependencies/DaisySeedGFX2/ST7789_Defines.h **** 
+  27:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_INVOFF		0x20
+  28:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_INVON		0x21
+  29:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_GAMSET		0x26        // Gamma set
+  30:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_DISPOFF	        0x28
+  31:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_DISPON		0x29
+  32:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_CASET		0x2A
+  33:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_RASET		0x2B
+  34:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_RAMWR		0x2C
+  35:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_RGBSET		0x2D      // Color setting for 4096, 64K and 262K colors
+  36:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_RAMRD		0x2E
+  37:dependencies/DaisySeedGFX2/ST7789_Defines.h **** 
+  38:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_PTLAR		0x30
+  39:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_VSCRDEF		0x33      // Vertical scrolling definition (ST7789V)
+  40:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_TEOFF		0x34      // Tearing effect line off
+  41:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_TEON			0x35      // Tearing effect line on
+  42:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_MADCTL		0x36      // Memory data access control
+  43:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_VSCRSADD		0x37      // Vertical screoll address
+  44:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_IDMOFF		0x38      // Idle mode off
+  45:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_IDMON		0x39      // Idle mode on
+  46:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_RAMWRC		0x3C      // Memory write continue (ST7789V)
+  47:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_RAMRDC		0x3E      // Memory read continue (ST7789V)
+  48:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_COLMOD		0x3A
+  49:dependencies/DaisySeedGFX2/ST7789_Defines.h **** 
+  50:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_RAMCTRL		0xB0      // RAM control
+  51:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_RGBCTRL		0xB1      // RGB control
+  52:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_PORCTRL		0xB2      // Porch control
+  53:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_FRCTRL1		0xB3      // Frame rate control
+  54:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_PARCTRL		0xB5      // Partial mode control
+  55:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_GCTRL		0xB7      // Gate control
+  56:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_GTADJ		0xB8      // Gate on timing adjustment
+  57:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_DGMEN		0xBA      // Digital gamma enable
+  58:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_VCOMS		0xBB      // VCOMS setting
+  59:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_LCMCTRL		0xC0      // LCM control
+  60:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_IDSET		0xC1      // ID setting
+  61:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_VDVVRHEN		0xC2      // VDV and VRH command enable
+  62:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_VRHS			0xC3      // VRH set
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccN12KmI.s 			page 6
+
+
+  63:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_VDVSET		0xC4      // VDV setting
+  64:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_VCMOFSET		0xC5      // VCOMS offset set
+  65:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_FRCTR2		0xC6      // FR Control 2
+  66:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_CABCCTRL		0xC7      // CABC control
+  67:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_REGSEL1		0xC8      // Register value section 1
+  68:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_REGSEL2		0xCA      // Register value section 2
+  69:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_PWMFRSEL		0xCC      // PWM frequency selection
+  70:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_PWCTRL1		0xD0      // Power control 1
+  71:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_VAPVANEN		0xD2      // Enable VAP/VAN signal output
+  72:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_CMD2EN		0xDF      // Command 2 enable
+  73:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_PVGAMCTRL	0xE0      // Positive voltage gamma control
+  74:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_NVGAMCTRL	0xE1      // Negative voltage gamma control
+  75:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_DGMLUTR		0xE2      // Digital gamma look-up table for red
+  76:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_DGMLUTB		0xE3      // Digital gamma look-up table for blue
+  77:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_GATECTRL		0xE4      // Gate control
+  78:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_SPI2EN		0xE7      // SPI2 enable
+  79:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_PWCTRL2		0xE8      // Power control 2
+  80:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_EQCTRL		0xE9      // Equalize time control
+  81:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_PROMCTRL		0xEC      // Program control
+  82:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_PROMEN		0xFA      // Program mode enable
+  83:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_NVMSET		0xFC      // NVM setting
+  84:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_PROMACT		0xFE      // Program action
+  85:dependencies/DaisySeedGFX2/ST7789_Defines.h **** 
+  86:dependencies/DaisySeedGFX2/ST7789_Defines.h **** //#define TFT_MAD_COLOR_ORDER TFT_MAD_RGB
+  87:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define TFT_MAD_COLOR_ORDER TFT_MAD_BGR
+  88:dependencies/DaisySeedGFX2/ST7789_Defines.h **** 
+  89:dependencies/DaisySeedGFX2/ST7789_Defines.h **** // --------------------------------------------------------------------------
+  90:dependencies/DaisySeedGFX2/ST7789_Defines.h **** // Initialisation de l'écran de type ST7789
+  91:dependencies/DaisySeedGFX2/ST7789_Defines.h **** 
+  92:dependencies/DaisySeedGFX2/ST7789_Defines.h ****  void DadGFX::TFT_SPI::Initialise(){
+ 129              		.loc 3 92 36 is_stmt 1 view -0
+ 130              		.cfi_startproc
+ 131              		@ args = 0, pretend = 0, frame = 0
+ 132              		@ frame_needed = 0, uses_anonymous_args = 0
+  93:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     
+  94:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendCommand(ST7789_SLPOUT);   // Sleep out
+ 133              		.loc 3 94 5 view .LVU23
+  92:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     
+ 134              		.loc 3 92 36 is_stmt 0 view .LVU24
+ 135 0000 10B5     		push	{r4, lr}
+ 136              		.cfi_def_cfa_offset 8
+ 137              		.cfi_offset 4, -8
+ 138              		.cfi_offset 14, -4
+ 139              		.loc 3 94 16 view .LVU25
+ 140 0002 1121     		movs	r1, #17
+  92:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     
+ 141              		.loc 3 92 36 view .LVU26
+ 142 0004 0446     		mov	r4, r0
+ 143              		.loc 3 94 16 view .LVU27
+ 144 0006 FFF7FEFF 		bl	_ZN6DadGFX7TFT_SPI11SendCommandEh
+ 145              	.LVL11:
+  95:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     System::Delay(120);
+ 146              		.loc 3 95 5 is_stmt 1 view .LVU28
+ 147              		.loc 3 95 18 is_stmt 0 view .LVU29
+ 148 000a 7820     		movs	r0, #120
+ 149 000c FFF7FEFF 		bl	_ZN5daisy6System5DelayEm
+ 150              	.LVL12:
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccN12KmI.s 			page 7
+
+
+  96:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendCommand(ST7789_NORON);    // Normal display mode on
+ 151              		.loc 3 96 5 is_stmt 1 view .LVU30
+ 152              		.loc 3 96 16 is_stmt 0 view .LVU31
+ 153 0010 2046     		mov	r0, r4
+ 154 0012 1321     		movs	r1, #19
+ 155 0014 FFF7FEFF 		bl	_ZN6DadGFX7TFT_SPI11SendCommandEh
+ 156              	.LVL13:
+  97:dependencies/DaisySeedGFX2/ST7789_Defines.h **** 
+  98:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     //------------------------------display and color format setting-------------------------------
+  99:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendCommand(ST7789_MADCTL);
+ 157              		.loc 3 99 5 is_stmt 1 view .LVU32
+ 158              		.loc 3 99 16 is_stmt 0 view .LVU33
+ 159 0018 2046     		mov	r0, r4
+ 160 001a 3621     		movs	r1, #54
+ 161 001c FFF7FEFF 		bl	_ZN6DadGFX7TFT_SPI11SendCommandEh
+ 162              	.LVL14:
+ 100:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(TFT_MAD_COLOR_ORDER);
+ 163              		.loc 3 100 5 is_stmt 1 view .LVU34
+ 164              		.loc 3 100 13 is_stmt 0 view .LVU35
+ 165 0020 2046     		mov	r0, r4
+ 166 0022 0821     		movs	r1, #8
+ 167 0024 FFF7FEFF 		bl	_ZN6DadGFX7TFT_SPI8SendDataEh
+ 168              	.LVL15:
+ 101:dependencies/DaisySeedGFX2/ST7789_Defines.h **** 
+ 102:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     // JLX240 display datasheet
+ 103:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendCommand(0xB6);
+ 169              		.loc 3 103 5 is_stmt 1 view .LVU36
+ 170              		.loc 3 103 16 is_stmt 0 view .LVU37
+ 171 0028 2046     		mov	r0, r4
+ 172 002a B621     		movs	r1, #182
+ 173 002c FFF7FEFF 		bl	_ZN6DadGFX7TFT_SPI11SendCommandEh
+ 174              	.LVL16:
+ 104:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x0A);
+ 175              		.loc 3 104 5 is_stmt 1 view .LVU38
+ 176              		.loc 3 104 13 is_stmt 0 view .LVU39
+ 177 0030 2046     		mov	r0, r4
+ 178 0032 0A21     		movs	r1, #10
+ 179 0034 FFF7FEFF 		bl	_ZN6DadGFX7TFT_SPI8SendDataEh
+ 180              	.LVL17:
+ 105:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x82);
+ 181              		.loc 3 105 5 is_stmt 1 view .LVU40
+ 182              		.loc 3 105 13 is_stmt 0 view .LVU41
+ 183 0038 2046     		mov	r0, r4
+ 184 003a 8221     		movs	r1, #130
+ 185 003c FFF7FEFF 		bl	_ZN6DadGFX7TFT_SPI8SendDataEh
+ 186              	.LVL18:
+ 106:dependencies/DaisySeedGFX2/ST7789_Defines.h **** 
+ 107:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     //SendCommand(ST7789_RAMCTRL);
+ 108:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x00);
+ 187              		.loc 3 108 5 is_stmt 1 view .LVU42
+ 188              		.loc 3 108 13 is_stmt 0 view .LVU43
+ 189 0040 2046     		mov	r0, r4
+ 190 0042 0021     		movs	r1, #0
+ 191 0044 FFF7FEFF 		bl	_ZN6DadGFX7TFT_SPI8SendDataEh
+ 192              	.LVL19:
+ 109:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0xC0); // 5 to 6-bit conversion: r0 = r5, b0 = b5
+ 193              		.loc 3 109 5 is_stmt 1 view .LVU44
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccN12KmI.s 			page 8
+
+
+ 194              		.loc 3 109 13 is_stmt 0 view .LVU45
+ 195 0048 2046     		mov	r0, r4
+ 196 004a C021     		movs	r1, #192
+ 197 004c FFF7FEFF 		bl	_ZN6DadGFX7TFT_SPI8SendDataEh
+ 198              	.LVL20:
+ 110:dependencies/DaisySeedGFX2/ST7789_Defines.h **** 
+ 111:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendCommand(ST7789_COLMOD);
+ 199              		.loc 3 111 5 is_stmt 1 view .LVU46
+ 200              		.loc 3 111 16 is_stmt 0 view .LVU47
+ 201 0050 2046     		mov	r0, r4
+ 202 0052 3A21     		movs	r1, #58
+ 203 0054 FFF7FEFF 		bl	_ZN6DadGFX7TFT_SPI11SendCommandEh
+ 204              	.LVL21:
+ 112:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #if TFT_COLOR == 16
+ 113:dependencies/DaisySeedGFX2/ST7789_Defines.h ****         SendData(0x55);
+ 205              		.loc 3 113 9 is_stmt 1 view .LVU48
+ 206              		.loc 3 113 17 is_stmt 0 view .LVU49
+ 207 0058 5521     		movs	r1, #85
+ 208 005a 2046     		mov	r0, r4
+ 209 005c FFF7FEFF 		bl	_ZN6DadGFX7TFT_SPI8SendDataEh
+ 210              	.LVL22:
+ 114:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #else
+ 115:dependencies/DaisySeedGFX2/ST7789_Defines.h ****         SendData(0x66);
+ 116:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #endif
+ 117:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     System::Delay(10);
+ 211              		.loc 3 117 5 is_stmt 1 view .LVU50
+ 212              		.loc 3 117 18 is_stmt 0 view .LVU51
+ 213 0060 0A20     		movs	r0, #10
+ 214 0062 FFF7FEFF 		bl	_ZN5daisy6System5DelayEm
+ 215              	.LVL23:
+ 118:dependencies/DaisySeedGFX2/ST7789_Defines.h **** 
+ 119:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     //--------------------------------ST7789V Frame rate setting----------------------------------/
+ 120:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendCommand(ST7789_PORCTRL);
+ 216              		.loc 3 120 5 is_stmt 1 view .LVU52
+ 217              		.loc 3 120 16 is_stmt 0 view .LVU53
+ 218 0066 2046     		mov	r0, r4
+ 219 0068 B221     		movs	r1, #178
+ 220 006a FFF7FEFF 		bl	_ZN6DadGFX7TFT_SPI11SendCommandEh
+ 221              	.LVL24:
+ 121:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x0c);
+ 222              		.loc 3 121 5 is_stmt 1 view .LVU54
+ 223              		.loc 3 121 13 is_stmt 0 view .LVU55
+ 224 006e 2046     		mov	r0, r4
+ 225 0070 0C21     		movs	r1, #12
+ 226 0072 FFF7FEFF 		bl	_ZN6DadGFX7TFT_SPI8SendDataEh
+ 227              	.LVL25:
+ 122:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x0c);
+ 228              		.loc 3 122 5 is_stmt 1 view .LVU56
+ 229              		.loc 3 122 13 is_stmt 0 view .LVU57
+ 230 0076 2046     		mov	r0, r4
+ 231 0078 0C21     		movs	r1, #12
+ 232 007a FFF7FEFF 		bl	_ZN6DadGFX7TFT_SPI8SendDataEh
+ 233              	.LVL26:
+ 123:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x00);
+ 234              		.loc 3 123 5 is_stmt 1 view .LVU58
+ 235              		.loc 3 123 13 is_stmt 0 view .LVU59
+ 236 007e 2046     		mov	r0, r4
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccN12KmI.s 			page 9
+
+
+ 237 0080 0021     		movs	r1, #0
+ 238 0082 FFF7FEFF 		bl	_ZN6DadGFX7TFT_SPI8SendDataEh
+ 239              	.LVL27:
+ 124:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x33);
+ 240              		.loc 3 124 5 is_stmt 1 view .LVU60
+ 241              		.loc 3 124 13 is_stmt 0 view .LVU61
+ 242 0086 2046     		mov	r0, r4
+ 243 0088 3321     		movs	r1, #51
+ 244 008a FFF7FEFF 		bl	_ZN6DadGFX7TFT_SPI8SendDataEh
+ 245              	.LVL28:
+ 125:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x33);
+ 246              		.loc 3 125 5 is_stmt 1 view .LVU62
+ 247              		.loc 3 125 13 is_stmt 0 view .LVU63
+ 248 008e 2046     		mov	r0, r4
+ 249 0090 3321     		movs	r1, #51
+ 250 0092 FFF7FEFF 		bl	_ZN6DadGFX7TFT_SPI8SendDataEh
+ 251              	.LVL29:
+ 126:dependencies/DaisySeedGFX2/ST7789_Defines.h **** 
+ 127:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendCommand(ST7789_GCTRL);      // Voltages: VGH / VGL
+ 252              		.loc 3 127 5 is_stmt 1 view .LVU64
+ 253              		.loc 3 127 16 is_stmt 0 view .LVU65
+ 254 0096 2046     		mov	r0, r4
+ 255 0098 B721     		movs	r1, #183
+ 256 009a FFF7FEFF 		bl	_ZN6DadGFX7TFT_SPI11SendCommandEh
+ 257              	.LVL30:
+ 128:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x35);
+ 258              		.loc 3 128 5 is_stmt 1 view .LVU66
+ 259              		.loc 3 128 13 is_stmt 0 view .LVU67
+ 260 009e 2046     		mov	r0, r4
+ 261 00a0 3521     		movs	r1, #53
+ 262 00a2 FFF7FEFF 		bl	_ZN6DadGFX7TFT_SPI8SendDataEh
+ 263              	.LVL31:
+ 129:dependencies/DaisySeedGFX2/ST7789_Defines.h **** 
+ 130:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     //---------------------------------ST7789V Power setting--------------------------------------/
+ 131:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendCommand(ST7789_VCOMS);
+ 264              		.loc 3 131 5 is_stmt 1 view .LVU68
+ 265              		.loc 3 131 16 is_stmt 0 view .LVU69
+ 266 00a6 2046     		mov	r0, r4
+ 267 00a8 BB21     		movs	r1, #187
+ 268 00aa FFF7FEFF 		bl	_ZN6DadGFX7TFT_SPI11SendCommandEh
+ 269              	.LVL32:
+ 132:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x28);		// JLX240 display datasheet
+ 270              		.loc 3 132 5 is_stmt 1 view .LVU70
+ 271              		.loc 3 132 13 is_stmt 0 view .LVU71
+ 272 00ae 2046     		mov	r0, r4
+ 273 00b0 2821     		movs	r1, #40
+ 274 00b2 FFF7FEFF 		bl	_ZN6DadGFX7TFT_SPI8SendDataEh
+ 275              	.LVL33:
+ 133:dependencies/DaisySeedGFX2/ST7789_Defines.h **** 
+ 134:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendCommand(ST7789_LCMCTRL);
+ 276              		.loc 3 134 5 is_stmt 1 view .LVU72
+ 277              		.loc 3 134 16 is_stmt 0 view .LVU73
+ 278 00b6 2046     		mov	r0, r4
+ 279 00b8 C021     		movs	r1, #192
+ 280 00ba FFF7FEFF 		bl	_ZN6DadGFX7TFT_SPI11SendCommandEh
+ 281              	.LVL34:
+ 135:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x0C);
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccN12KmI.s 			page 10
+
+
+ 282              		.loc 3 135 5 is_stmt 1 view .LVU74
+ 283              		.loc 3 135 13 is_stmt 0 view .LVU75
+ 284 00be 2046     		mov	r0, r4
+ 285 00c0 0C21     		movs	r1, #12
+ 286 00c2 FFF7FEFF 		bl	_ZN6DadGFX7TFT_SPI8SendDataEh
+ 287              	.LVL35:
+ 136:dependencies/DaisySeedGFX2/ST7789_Defines.h **** 
+ 137:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendCommand(ST7789_VDVVRHEN);
+ 288              		.loc 3 137 5 is_stmt 1 view .LVU76
+ 289              		.loc 3 137 16 is_stmt 0 view .LVU77
+ 290 00c6 2046     		mov	r0, r4
+ 291 00c8 C221     		movs	r1, #194
+ 292 00ca FFF7FEFF 		bl	_ZN6DadGFX7TFT_SPI11SendCommandEh
+ 293              	.LVL36:
+ 138:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x01);
+ 294              		.loc 3 138 5 is_stmt 1 view .LVU78
+ 295              		.loc 3 138 13 is_stmt 0 view .LVU79
+ 296 00ce 2046     		mov	r0, r4
+ 297 00d0 0121     		movs	r1, #1
+ 298 00d2 FFF7FEFF 		bl	_ZN6DadGFX7TFT_SPI8SendDataEh
+ 299              	.LVL37:
+ 139:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0xFF);
+ 300              		.loc 3 139 5 is_stmt 1 view .LVU80
+ 301              		.loc 3 139 13 is_stmt 0 view .LVU81
+ 302 00d6 2046     		mov	r0, r4
+ 303 00d8 FF21     		movs	r1, #255
+ 304 00da FFF7FEFF 		bl	_ZN6DadGFX7TFT_SPI8SendDataEh
+ 305              	.LVL38:
+ 140:dependencies/DaisySeedGFX2/ST7789_Defines.h **** 
+ 141:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendCommand(ST7789_VRHS);       // voltage VRHS
+ 306              		.loc 3 141 5 is_stmt 1 view .LVU82
+ 307              		.loc 3 141 16 is_stmt 0 view .LVU83
+ 308 00de 2046     		mov	r0, r4
+ 309 00e0 C321     		movs	r1, #195
+ 310 00e2 FFF7FEFF 		bl	_ZN6DadGFX7TFT_SPI11SendCommandEh
+ 311              	.LVL39:
+ 142:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x10);
+ 312              		.loc 3 142 5 is_stmt 1 view .LVU84
+ 313              		.loc 3 142 13 is_stmt 0 view .LVU85
+ 314 00e6 2046     		mov	r0, r4
+ 315 00e8 1021     		movs	r1, #16
+ 316 00ea FFF7FEFF 		bl	_ZN6DadGFX7TFT_SPI8SendDataEh
+ 317              	.LVL40:
+ 143:dependencies/DaisySeedGFX2/ST7789_Defines.h **** 
+ 144:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendCommand(ST7789_VDVSET);
+ 318              		.loc 3 144 5 is_stmt 1 view .LVU86
+ 319              		.loc 3 144 16 is_stmt 0 view .LVU87
+ 320 00ee 2046     		mov	r0, r4
+ 321 00f0 C421     		movs	r1, #196
+ 322 00f2 FFF7FEFF 		bl	_ZN6DadGFX7TFT_SPI11SendCommandEh
+ 323              	.LVL41:
+ 145:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x20);
+ 324              		.loc 3 145 5 is_stmt 1 view .LVU88
+ 325              		.loc 3 145 13 is_stmt 0 view .LVU89
+ 326 00f6 2046     		mov	r0, r4
+ 327 00f8 2021     		movs	r1, #32
+ 328 00fa FFF7FEFF 		bl	_ZN6DadGFX7TFT_SPI8SendDataEh
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccN12KmI.s 			page 11
+
+
+ 329              	.LVL42:
+ 146:dependencies/DaisySeedGFX2/ST7789_Defines.h **** 
+ 147:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendCommand(ST7789_FRCTR2);
+ 330              		.loc 3 147 5 is_stmt 1 view .LVU90
+ 331              		.loc 3 147 16 is_stmt 0 view .LVU91
+ 332 00fe 2046     		mov	r0, r4
+ 333 0100 C621     		movs	r1, #198
+ 334 0102 FFF7FEFF 		bl	_ZN6DadGFX7TFT_SPI11SendCommandEh
+ 335              	.LVL43:
+ 148:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x0f);
+ 336              		.loc 3 148 5 is_stmt 1 view .LVU92
+ 337              		.loc 3 148 13 is_stmt 0 view .LVU93
+ 338 0106 2046     		mov	r0, r4
+ 339 0108 0F21     		movs	r1, #15
+ 340 010a FFF7FEFF 		bl	_ZN6DadGFX7TFT_SPI8SendDataEh
+ 341              	.LVL44:
+ 149:dependencies/DaisySeedGFX2/ST7789_Defines.h **** 
+ 150:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendCommand(ST7789_PWCTRL1);
+ 342              		.loc 3 150 5 is_stmt 1 view .LVU94
+ 343              		.loc 3 150 16 is_stmt 0 view .LVU95
+ 344 010e 2046     		mov	r0, r4
+ 345 0110 D021     		movs	r1, #208
+ 346 0112 FFF7FEFF 		bl	_ZN6DadGFX7TFT_SPI11SendCommandEh
+ 347              	.LVL45:
+ 151:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0xa4);
+ 348              		.loc 3 151 5 is_stmt 1 view .LVU96
+ 349              		.loc 3 151 13 is_stmt 0 view .LVU97
+ 350 0116 2046     		mov	r0, r4
+ 351 0118 A421     		movs	r1, #164
+ 352 011a FFF7FEFF 		bl	_ZN6DadGFX7TFT_SPI8SendDataEh
+ 353              	.LVL46:
+ 152:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0xa1);
+ 354              		.loc 3 152 5 is_stmt 1 view .LVU98
+ 355              		.loc 3 152 13 is_stmt 0 view .LVU99
+ 356 011e 2046     		mov	r0, r4
+ 357 0120 A121     		movs	r1, #161
+ 358 0122 FFF7FEFF 		bl	_ZN6DadGFX7TFT_SPI8SendDataEh
+ 359              	.LVL47:
+ 153:dependencies/DaisySeedGFX2/ST7789_Defines.h **** 
+ 154:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     //--------------------------------ST7789V gamma setting---------------------------------------/
+ 155:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendCommand(ST7789_PVGAMCTRL);
+ 360              		.loc 3 155 5 is_stmt 1 view .LVU100
+ 361              		.loc 3 155 16 is_stmt 0 view .LVU101
+ 362 0126 2046     		mov	r0, r4
+ 363 0128 E021     		movs	r1, #224
+ 364 012a FFF7FEFF 		bl	_ZN6DadGFX7TFT_SPI11SendCommandEh
+ 365              	.LVL48:
+ 156:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0xd0);
+ 366              		.loc 3 156 5 is_stmt 1 view .LVU102
+ 367              		.loc 3 156 13 is_stmt 0 view .LVU103
+ 368 012e 2046     		mov	r0, r4
+ 369 0130 D021     		movs	r1, #208
+ 370 0132 FFF7FEFF 		bl	_ZN6DadGFX7TFT_SPI8SendDataEh
+ 371              	.LVL49:
+ 157:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x00);
+ 372              		.loc 3 157 5 is_stmt 1 view .LVU104
+ 373              		.loc 3 157 13 is_stmt 0 view .LVU105
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccN12KmI.s 			page 12
+
+
+ 374 0136 2046     		mov	r0, r4
+ 375 0138 0021     		movs	r1, #0
+ 376 013a FFF7FEFF 		bl	_ZN6DadGFX7TFT_SPI8SendDataEh
+ 377              	.LVL50:
+ 158:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x02);
+ 378              		.loc 3 158 5 is_stmt 1 view .LVU106
+ 379              		.loc 3 158 13 is_stmt 0 view .LVU107
+ 380 013e 2046     		mov	r0, r4
+ 381 0140 0221     		movs	r1, #2
+ 382 0142 FFF7FEFF 		bl	_ZN6DadGFX7TFT_SPI8SendDataEh
+ 383              	.LVL51:
+ 159:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x07);
+ 384              		.loc 3 159 5 is_stmt 1 view .LVU108
+ 385              		.loc 3 159 13 is_stmt 0 view .LVU109
+ 386 0146 2046     		mov	r0, r4
+ 387 0148 0721     		movs	r1, #7
+ 388 014a FFF7FEFF 		bl	_ZN6DadGFX7TFT_SPI8SendDataEh
+ 389              	.LVL52:
+ 160:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x0a);
+ 390              		.loc 3 160 5 is_stmt 1 view .LVU110
+ 391              		.loc 3 160 13 is_stmt 0 view .LVU111
+ 392 014e 2046     		mov	r0, r4
+ 393 0150 0A21     		movs	r1, #10
+ 394 0152 FFF7FEFF 		bl	_ZN6DadGFX7TFT_SPI8SendDataEh
+ 395              	.LVL53:
+ 161:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x28);
+ 396              		.loc 3 161 5 is_stmt 1 view .LVU112
+ 397              		.loc 3 161 13 is_stmt 0 view .LVU113
+ 398 0156 2046     		mov	r0, r4
+ 399 0158 2821     		movs	r1, #40
+ 400 015a FFF7FEFF 		bl	_ZN6DadGFX7TFT_SPI8SendDataEh
+ 401              	.LVL54:
+ 162:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x32);
+ 402              		.loc 3 162 5 is_stmt 1 view .LVU114
+ 403              		.loc 3 162 13 is_stmt 0 view .LVU115
+ 404 015e 2046     		mov	r0, r4
+ 405 0160 3221     		movs	r1, #50
+ 406 0162 FFF7FEFF 		bl	_ZN6DadGFX7TFT_SPI8SendDataEh
+ 407              	.LVL55:
+ 163:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x44);
+ 408              		.loc 3 163 5 is_stmt 1 view .LVU116
+ 409              		.loc 3 163 13 is_stmt 0 view .LVU117
+ 410 0166 2046     		mov	r0, r4
+ 411 0168 4421     		movs	r1, #68
+ 412 016a FFF7FEFF 		bl	_ZN6DadGFX7TFT_SPI8SendDataEh
+ 413              	.LVL56:
+ 164:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x42);
+ 414              		.loc 3 164 5 is_stmt 1 view .LVU118
+ 415              		.loc 3 164 13 is_stmt 0 view .LVU119
+ 416 016e 2046     		mov	r0, r4
+ 417 0170 4221     		movs	r1, #66
+ 418 0172 FFF7FEFF 		bl	_ZN6DadGFX7TFT_SPI8SendDataEh
+ 419              	.LVL57:
+ 165:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x06);
+ 420              		.loc 3 165 5 is_stmt 1 view .LVU120
+ 421              		.loc 3 165 13 is_stmt 0 view .LVU121
+ 422 0176 2046     		mov	r0, r4
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccN12KmI.s 			page 13
+
+
+ 423 0178 0621     		movs	r1, #6
+ 424 017a FFF7FEFF 		bl	_ZN6DadGFX7TFT_SPI8SendDataEh
+ 425              	.LVL58:
+ 166:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x0e);
+ 426              		.loc 3 166 5 is_stmt 1 view .LVU122
+ 427              		.loc 3 166 13 is_stmt 0 view .LVU123
+ 428 017e 2046     		mov	r0, r4
+ 429 0180 0E21     		movs	r1, #14
+ 430 0182 FFF7FEFF 		bl	_ZN6DadGFX7TFT_SPI8SendDataEh
+ 431              	.LVL59:
+ 167:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x12);
+ 432              		.loc 3 167 5 is_stmt 1 view .LVU124
+ 433              		.loc 3 167 13 is_stmt 0 view .LVU125
+ 434 0186 2046     		mov	r0, r4
+ 435 0188 1221     		movs	r1, #18
+ 436 018a FFF7FEFF 		bl	_ZN6DadGFX7TFT_SPI8SendDataEh
+ 437              	.LVL60:
+ 168:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x14);
+ 438              		.loc 3 168 5 is_stmt 1 view .LVU126
+ 439              		.loc 3 168 13 is_stmt 0 view .LVU127
+ 440 018e 2046     		mov	r0, r4
+ 441 0190 1421     		movs	r1, #20
+ 442 0192 FFF7FEFF 		bl	_ZN6DadGFX7TFT_SPI8SendDataEh
+ 443              	.LVL61:
+ 169:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x17);
+ 444              		.loc 3 169 5 is_stmt 1 view .LVU128
+ 445              		.loc 3 169 13 is_stmt 0 view .LVU129
+ 446 0196 2046     		mov	r0, r4
+ 447 0198 1721     		movs	r1, #23
+ 448 019a FFF7FEFF 		bl	_ZN6DadGFX7TFT_SPI8SendDataEh
+ 449              	.LVL62:
+ 170:dependencies/DaisySeedGFX2/ST7789_Defines.h **** 
+ 171:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendCommand(ST7789_NVGAMCTRL);
+ 450              		.loc 3 171 5 is_stmt 1 view .LVU130
+ 451              		.loc 3 171 16 is_stmt 0 view .LVU131
+ 452 019e 2046     		mov	r0, r4
+ 453 01a0 E121     		movs	r1, #225
+ 454 01a2 FFF7FEFF 		bl	_ZN6DadGFX7TFT_SPI11SendCommandEh
+ 455              	.LVL63:
+ 172:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0xd0);
+ 456              		.loc 3 172 5 is_stmt 1 view .LVU132
+ 457              		.loc 3 172 13 is_stmt 0 view .LVU133
+ 458 01a6 2046     		mov	r0, r4
+ 459 01a8 D021     		movs	r1, #208
+ 460 01aa FFF7FEFF 		bl	_ZN6DadGFX7TFT_SPI8SendDataEh
+ 461              	.LVL64:
+ 173:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x00);
+ 462              		.loc 3 173 5 is_stmt 1 view .LVU134
+ 463              		.loc 3 173 13 is_stmt 0 view .LVU135
+ 464 01ae 2046     		mov	r0, r4
+ 465 01b0 0021     		movs	r1, #0
+ 466 01b2 FFF7FEFF 		bl	_ZN6DadGFX7TFT_SPI8SendDataEh
+ 467              	.LVL65:
+ 174:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x02);
+ 468              		.loc 3 174 5 is_stmt 1 view .LVU136
+ 469              		.loc 3 174 13 is_stmt 0 view .LVU137
+ 470 01b6 2046     		mov	r0, r4
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccN12KmI.s 			page 14
+
+
+ 471 01b8 0221     		movs	r1, #2
+ 472 01ba FFF7FEFF 		bl	_ZN6DadGFX7TFT_SPI8SendDataEh
+ 473              	.LVL66:
+ 175:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x07);
+ 474              		.loc 3 175 5 is_stmt 1 view .LVU138
+ 475              		.loc 3 175 13 is_stmt 0 view .LVU139
+ 476 01be 2046     		mov	r0, r4
+ 477 01c0 0721     		movs	r1, #7
+ 478 01c2 FFF7FEFF 		bl	_ZN6DadGFX7TFT_SPI8SendDataEh
+ 479              	.LVL67:
+ 176:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x0a);
+ 480              		.loc 3 176 5 is_stmt 1 view .LVU140
+ 481              		.loc 3 176 13 is_stmt 0 view .LVU141
+ 482 01c6 2046     		mov	r0, r4
+ 483 01c8 0A21     		movs	r1, #10
+ 484 01ca FFF7FEFF 		bl	_ZN6DadGFX7TFT_SPI8SendDataEh
+ 485              	.LVL68:
+ 177:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x28);
+ 486              		.loc 3 177 5 is_stmt 1 view .LVU142
+ 487              		.loc 3 177 13 is_stmt 0 view .LVU143
+ 488 01ce 2046     		mov	r0, r4
+ 489 01d0 2821     		movs	r1, #40
+ 490 01d2 FFF7FEFF 		bl	_ZN6DadGFX7TFT_SPI8SendDataEh
+ 491              	.LVL69:
+ 178:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x31);
+ 492              		.loc 3 178 5 is_stmt 1 view .LVU144
+ 493              		.loc 3 178 13 is_stmt 0 view .LVU145
+ 494 01d6 2046     		mov	r0, r4
+ 495 01d8 3121     		movs	r1, #49
+ 496 01da FFF7FEFF 		bl	_ZN6DadGFX7TFT_SPI8SendDataEh
+ 497              	.LVL70:
+ 179:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x54);
+ 498              		.loc 3 179 5 is_stmt 1 view .LVU146
+ 499              		.loc 3 179 13 is_stmt 0 view .LVU147
+ 500 01de 2046     		mov	r0, r4
+ 501 01e0 5421     		movs	r1, #84
+ 502 01e2 FFF7FEFF 		bl	_ZN6DadGFX7TFT_SPI8SendDataEh
+ 503              	.LVL71:
+ 180:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x47);
+ 504              		.loc 3 180 5 is_stmt 1 view .LVU148
+ 505              		.loc 3 180 13 is_stmt 0 view .LVU149
+ 506 01e6 2046     		mov	r0, r4
+ 507 01e8 4721     		movs	r1, #71
+ 508 01ea FFF7FEFF 		bl	_ZN6DadGFX7TFT_SPI8SendDataEh
+ 509              	.LVL72:
+ 181:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x0e);
+ 510              		.loc 3 181 5 is_stmt 1 view .LVU150
+ 511              		.loc 3 181 13 is_stmt 0 view .LVU151
+ 512 01ee 2046     		mov	r0, r4
+ 513 01f0 0E21     		movs	r1, #14
+ 514 01f2 FFF7FEFF 		bl	_ZN6DadGFX7TFT_SPI8SendDataEh
+ 515              	.LVL73:
+ 182:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x1c);
+ 516              		.loc 3 182 5 is_stmt 1 view .LVU152
+ 517              		.loc 3 182 13 is_stmt 0 view .LVU153
+ 518 01f6 2046     		mov	r0, r4
+ 519 01f8 1C21     		movs	r1, #28
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccN12KmI.s 			page 15
+
+
+ 520 01fa FFF7FEFF 		bl	_ZN6DadGFX7TFT_SPI8SendDataEh
+ 521              	.LVL74:
+ 183:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x17);
+ 522              		.loc 3 183 5 is_stmt 1 view .LVU154
+ 523              		.loc 3 183 13 is_stmt 0 view .LVU155
+ 524 01fe 2046     		mov	r0, r4
+ 525 0200 1721     		movs	r1, #23
+ 526 0202 FFF7FEFF 		bl	_ZN6DadGFX7TFT_SPI8SendDataEh
+ 527              	.LVL75:
+ 184:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x1b);
+ 528              		.loc 3 184 5 is_stmt 1 view .LVU156
+ 529              		.loc 3 184 13 is_stmt 0 view .LVU157
+ 530 0206 2046     		mov	r0, r4
+ 531 0208 1B21     		movs	r1, #27
+ 532 020a FFF7FEFF 		bl	_ZN6DadGFX7TFT_SPI8SendDataEh
+ 533              	.LVL76:
+ 185:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x1e);
+ 534              		.loc 3 185 5 is_stmt 1 view .LVU158
+ 535              		.loc 3 185 13 is_stmt 0 view .LVU159
+ 536 020e 2046     		mov	r0, r4
+ 537 0210 1E21     		movs	r1, #30
+ 538 0212 FFF7FEFF 		bl	_ZN6DadGFX7TFT_SPI8SendDataEh
+ 539              	.LVL77:
+ 186:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #ifndef INV_COLOR
+ 187:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendCommand(ST7789_INVON);
+ 540              		.loc 3 187 5 is_stmt 1 view .LVU160
+ 541              		.loc 3 187 16 is_stmt 0 view .LVU161
+ 542 0216 2046     		mov	r0, r4
+ 543 0218 2121     		movs	r1, #33
+ 544 021a FFF7FEFF 		bl	_ZN6DadGFX7TFT_SPI11SendCommandEh
+ 545              	.LVL78:
+ 188:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendCommand(ST7789_INVON);
+ 546              		.loc 3 188 5 is_stmt 1 view .LVU162
+ 547              		.loc 3 188 16 is_stmt 0 view .LVU163
+ 548 021e 2121     		movs	r1, #33
+ 549 0220 2046     		mov	r0, r4
+ 550 0222 FFF7FEFF 		bl	_ZN6DadGFX7TFT_SPI11SendCommandEh
+ 551              	.LVL79:
+ 189:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #endif
+ 190:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     System::Delay(120);
+ 552              		.loc 3 190 5 is_stmt 1 view .LVU164
+ 553              		.loc 3 190 18 is_stmt 0 view .LVU165
+ 554 0226 7820     		movs	r0, #120
+ 555 0228 FFF7FEFF 		bl	_ZN5daisy6System5DelayEm
+ 556              	.LVL80:
+ 191:dependencies/DaisySeedGFX2/ST7789_Defines.h **** 
+ 192:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendCommand(ST7789_DISPON);    //Display on
+ 557              		.loc 3 192 5 is_stmt 1 view .LVU166
+ 558              		.loc 3 192 16 is_stmt 0 view .LVU167
+ 559 022c 2046     		mov	r0, r4
+ 560 022e 2921     		movs	r1, #41
+ 561 0230 FFF7FEFF 		bl	_ZN6DadGFX7TFT_SPI11SendCommandEh
+ 562              	.LVL81:
+ 193:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     System::Delay(120);
+ 563              		.loc 3 193 5 is_stmt 1 view .LVU168
+ 564              		.loc 3 193 18 is_stmt 0 view .LVU169
+ 565 0234 7820     		movs	r0, #120
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccN12KmI.s 			page 16
+
+
+ 194:dependencies/DaisySeedGFX2/ST7789_Defines.h **** }...
+ 566              		.loc 3 194 1 view .LVU170
+ 567 0236 BDE81040 		pop	{r4, lr}
+ 568              		.cfi_restore 14
+ 569              		.cfi_restore 4
+ 570              		.cfi_def_cfa_offset 0
+ 571              	.LVL82:
+ 193:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     System::Delay(120);
+ 572              		.loc 3 193 18 view .LVU171
+ 573 023a FFF7FEBF 		b	_ZN5daisy6System5DelayEm
+ 574              	.LVL83:
+ 575              		.cfi_endproc
+ 576              	.LFE3748:
+ 578              		.section	.text._ZN6DadGFX7TFT_SPI12Init_TFT_SPIEv,"ax",%progbits
+ 579              		.align	1
+ 580              		.global	_ZN6DadGFX7TFT_SPI12Init_TFT_SPIEv
+ 581              		.syntax unified
+ 582              		.thumb
+ 583              		.thumb_func
+ 585              	_ZN6DadGFX7TFT_SPI12Init_TFT_SPIEv:
+ 586              	.LVL84:
+ 587              	.LFB3749:
+   1:dependencies/DaisySeedGFX2/TFT_SPI.cpp **** //------------------------------------------------------------------------
+   2:dependencies/DaisySeedGFX2/TFT_SPI.cpp **** // TFT_SPI.cpp
+   3:dependencies/DaisySeedGFX2/TFT_SPI.cpp **** //  Management of an SPI connection to a TFT screen
+   4:dependencies/DaisySeedGFX2/TFT_SPI.cpp **** // Copyright(c) 2024 Dad Design.
+   5:dependencies/DaisySeedGFX2/TFT_SPI.cpp **** //------------------------------------------------------------------------
+   6:dependencies/DaisySeedGFX2/TFT_SPI.cpp **** 
+   7:dependencies/DaisySeedGFX2/TFT_SPI.cpp **** #include "TFT_SPI.h"
+   8:dependencies/DaisySeedGFX2/TFT_SPI.cpp **** 
+   9:dependencies/DaisySeedGFX2/TFT_SPI.cpp **** #if TFT_CONTROLEUR_TFT == 7735
+  10:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     #include "ST7735_Defines.h"
+  11:dependencies/DaisySeedGFX2/TFT_SPI.cpp **** #elif TFT_CONTROLEUR_TFT == 7789
+  12:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     #include "ST7789_Defines.h"
+  13:dependencies/DaisySeedGFX2/TFT_SPI.cpp **** #endif
+  14:dependencies/DaisySeedGFX2/TFT_SPI.cpp **** 
+  15:dependencies/DaisySeedGFX2/TFT_SPI.cpp **** namespace DadGFX {
+  16:dependencies/DaisySeedGFX2/TFT_SPI.cpp **** 
+  17:dependencies/DaisySeedGFX2/TFT_SPI.cpp **** //***********************************************************************************
+  18:dependencies/DaisySeedGFX2/TFT_SPI.cpp **** // TFT_SPI
+  19:dependencies/DaisySeedGFX2/TFT_SPI.cpp **** //  SPI management for communication with the TFT screen
+  20:dependencies/DaisySeedGFX2/TFT_SPI.cpp **** //*********************************************************************************** 
+  21:dependencies/DaisySeedGFX2/TFT_SPI.cpp **** 
+  22:dependencies/DaisySeedGFX2/TFT_SPI.cpp **** // --------------------------------------------------------------------------
+  23:dependencies/DaisySeedGFX2/TFT_SPI.cpp **** // Initialize the SPI connection
+  24:dependencies/DaisySeedGFX2/TFT_SPI.cpp **** void TFT_SPI::Init_TFT_SPI() {
+ 588              		.loc 1 24 30 is_stmt 1 view -0
+ 589              		.cfi_startproc
+ 590              		@ args = 0, pretend = 0, frame = 0
+ 591              		@ frame_needed = 0, uses_anonymous_args = 0
+  25:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     // SPI configuration
+  26:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     m_spi_config.periph     = _TFT_SPI_PORT;                                     // Set the SPI per
+ 592              		.loc 1 26 5 view .LVU173
+  27:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     m_spi_config.mode       = SpiHandle::Config::Mode::MASTER;                   // Master mode
+ 593              		.loc 1 27 5 view .LVU174
+  28:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     m_spi_config.direction  = SpiHandle::Config::Direction::TWO_LINES_TX_ONLY;   // TX-only mode
+ 594              		.loc 1 28 5 view .LVU175
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccN12KmI.s 			page 17
+
+
+  29:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     m_spi_config.datasize   = 8;                                                 // 8-bit data size
+ 595              		.loc 1 29 5 view .LVU176
+  30:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     
+  31:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     // Configure SPI mode based on the defined settings
+  32:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     switch(_TFT_SPI_MODE) {
+ 596              		.loc 1 32 5 view .LVU177
+  33:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****         case SPIMode::Mode3:
+ 597              		.loc 1 33 9 view .LVU178
+  34:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****             m_spi_config.clock_polarity = SpiHandle::Config::ClockPolarity::HIGH;
+ 598              		.loc 1 34 13 view .LVU179
+  35:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****             m_spi_config.clock_phase    = SpiHandle::Config::ClockPhase::TWO_EDGE;
+ 599              		.loc 1 35 13 view .LVU180
+  36:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****             break;
+ 600              		.loc 1 36 13 view .LVU181
+  37:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****         case SPIMode::Mode2:
+  38:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****             m_spi_config.clock_polarity = SpiHandle::Config::ClockPolarity::LOW;
+  39:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****             m_spi_config.clock_phase    = SpiHandle::Config::ClockPhase::TWO_EDGE;
+  40:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****             break;
+  41:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****         case SPIMode::Mode1:
+  42:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****             m_spi_config.clock_polarity = SpiHandle::Config::ClockPolarity::HIGH;
+  43:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****             m_spi_config.clock_phase    = SpiHandle::Config::ClockPhase::ONE_EDGE;
+  44:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****             break;
+  45:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****         case SPIMode::Mode0:
+  46:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****         default:
+  47:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****             m_spi_config.clock_polarity = SpiHandle::Config::ClockPolarity::LOW;
+  48:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****             m_spi_config.clock_phase    = SpiHandle::Config::ClockPhase::ONE_EDGE;
+  49:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****             break;
+  50:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     }
+  51:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     
+  52:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     // Other SPI settings
+  53:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     m_spi_config.nss            = SpiHandle::Config::NSS::SOFT;                  // Software NSS
+ 601              		.loc 1 53 5 view .LVU182
+  54:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     m_spi_config.baud_prescaler = SpiHandle::Config::BaudPrescaler::TFT_SPI_BaudPrescaler;
+ 602              		.loc 1 54 5 view .LVU183
+  55:dependencies/DaisySeedGFX2/TFT_SPI.cpp **** 
+  56:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     // Pin configuration for SPI
+  57:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     m_spi_config.pin_config.sclk = _TFT_SCLK;                                    // Clock pin
+ 603              		.loc 1 57 5 view .LVU184
+ 604              		.loc 1 57 34 is_stmt 0 view .LVU185
+ 605 0000 2B4B     		ldr	r3, .L5
+ 606 0002 1B88     		ldrh	r3, [r3]	@ unaligned
+  24:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     // SPI configuration
+ 607              		.loc 1 24 30 view .LVU186
+ 608 0004 2DE9F347 		push	{r0, r1, r4, r5, r6, r7, r8, r9, r10, lr}
+ 609              		.cfi_def_cfa_offset 40
+ 610              		.cfi_offset 4, -32
+ 611              		.cfi_offset 5, -28
+ 612              		.cfi_offset 6, -24
+ 613              		.cfi_offset 7, -20
+ 614              		.cfi_offset 8, -16
+ 615              		.cfi_offset 9, -12
+ 616              		.cfi_offset 10, -8
+ 617              		.cfi_offset 14, -4
+ 618              		.loc 1 57 34 view .LVU187
+ 619 0008 8380     		strh	r3, [r0, #4]	@ unaligned
+  58:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     m_spi_config.pin_config.miso = dsy_gpio_pin();                               // MISO pin (not u
+ 620              		.loc 1 58 5 is_stmt 1 view .LVU188
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccN12KmI.s 			page 18
+
+
+  29:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     
+ 621              		.loc 1 29 29 is_stmt 0 view .LVU189
+ 622 000a 0125     		movs	r5, #1
+  59:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     m_spi_config.pin_config.mosi = _TFT_MOSI;                                    // MOSI pin
+ 623              		.loc 1 59 34 view .LVU190
+ 624 000c 294B     		ldr	r3, .L5+4
+  58:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     m_spi_config.pin_config.miso = dsy_gpio_pin();                               // MISO pin (not u
+ 625              		.loc 1 58 34 view .LVU191
+ 626 000e 0026     		movs	r6, #0
+  24:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     // SPI configuration
+ 627              		.loc 1 24 30 view .LVU192
+ 628 0010 0446     		mov	r4, r0
+  60:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     m_spi_config.pin_config.nss  = dsy_gpio_pin();                               // NSS pin (not us
+  61:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****         
+  62:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     // TFT control pin configuration
+  63:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     m_dc.Init(_TFT_DC, GPIO::Mode::OUTPUT, GPIO::Pull::NOPULL, GPIO::Speed::VERY_HIGH);     // Data
+ 629              		.loc 1 63 14 view .LVU193
+ 630 0012 00F14008 		add	r8, r0, #64
+  59:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     m_spi_config.pin_config.nss  = dsy_gpio_pin();                               // NSS pin (not us
+ 631              		.loc 1 59 34 view .LVU194
+ 632 0016 1B88     		ldrh	r3, [r3]	@ unaligned
+  57:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     m_spi_config.pin_config.miso = dsy_gpio_pin();                               // MISO pin (not u
+ 633              		.loc 1 57 34 view .LVU195
+ 634 0018 00F1040A 		add	r10, r0, #4
+  58:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     m_spi_config.pin_config.mosi = _TFT_MOSI;                                    // MOSI pin
+ 635              		.loc 1 58 34 view .LVU196
+ 636 001c C680     		strh	r6, [r0, #6]	@ movhi
+  59:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     m_spi_config.pin_config.nss  = dsy_gpio_pin();                               // NSS pin (not us
+ 637              		.loc 1 59 5 is_stmt 1 view .LVU197
+ 638              		.loc 1 63 14 is_stmt 0 view .LVU198
+ 639 001e 4FF00309 		mov	r9, #3
+  59:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     m_spi_config.pin_config.nss  = dsy_gpio_pin();                               // NSS pin (not us
+ 640              		.loc 1 59 34 view .LVU199
+ 641 0022 0381     		strh	r3, [r0, #8]	@ unaligned
+  60:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****         
+ 642              		.loc 1 60 5 is_stmt 1 view .LVU200
+  29:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     
+ 643              		.loc 1 29 29 is_stmt 0 view .LVU201
+ 644 0024 0823     		movs	r3, #8
+  60:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****         
+ 645              		.loc 1 60 34 view .LVU202
+ 646 0026 4681     		strh	r6, [r0, #10]	@ movhi
+ 647              		.loc 1 63 14 view .LVU203
+ 648 0028 2A46     		mov	r2, r5
+  53:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     m_spi_config.baud_prescaler = SpiHandle::Config::BaudPrescaler::TFT_SPI_BaudPrescaler;
+ 649              		.loc 1 53 33 view .LVU204
+ 650 002a 4662     		str	r6, [r0, #36]
+  64:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     m_reset.Init(_TFT_RST, GPIO::Mode::OUTPUT, GPIO::Pull::NOPULL, GPIO::Speed::VERY_HIGH); // Rese
+ 651              		.loc 1 64 17 view .LVU205
+ 652 002c 04F12C07 		add	r7, r4, #44
+  29:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     
+ 653              		.loc 1 29 29 view .LVU206
+ 654 0030 C0E90553 		strd	r5, r3, [r0, #20]
+  54:dependencies/DaisySeedGFX2/TFT_SPI.cpp **** 
+ 655              		.loc 1 54 33 view .LVU207
+ 656 0034 0223     		movs	r3, #2
+ 657 0036 8362     		str	r3, [r0, #40]
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccN12KmI.s 			page 19
+
+
+  63:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     m_reset.Init(_TFT_RST, GPIO::Mode::OUTPUT, GPIO::Pull::NOPULL, GPIO::Speed::VERY_HIGH); // Rese
+ 658              		.loc 1 63 5 is_stmt 1 view .LVU208
+  63:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     m_reset.Init(_TFT_RST, GPIO::Mode::OUTPUT, GPIO::Pull::NOPULL, GPIO::Speed::VERY_HIGH); // Rese
+ 659              		.loc 1 63 14 is_stmt 0 view .LVU209
+ 660 0038 1F4B     		ldr	r3, .L5+8
+  27:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     m_spi_config.direction  = SpiHandle::Config::Direction::TWO_LINES_TX_ONLY;   // TX-only mode
+ 661              		.loc 1 27 29 view .LVU210
+ 662 003a C0E90366 		strd	r6, r6, [r0, #12]
+  35:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****             break;
+ 663              		.loc 1 35 41 view .LVU211
+ 664 003e C0E90755 		strd	r5, r5, [r0, #28]
+  63:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     m_reset.Init(_TFT_RST, GPIO::Mode::OUTPUT, GPIO::Pull::NOPULL, GPIO::Speed::VERY_HIGH); // Rese
+ 665              		.loc 1 63 14 view .LVU212
+ 666 0042 1978     		ldrb	r1, [r3]	@ zero_extendqisi2
+ 667 0044 5878     		ldrb	r0, [r3, #1]	@ zero_extendqisi2
+ 668              	.LVL85:
+  63:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     m_reset.Init(_TFT_RST, GPIO::Mode::OUTPUT, GPIO::Pull::NOPULL, GPIO::Speed::VERY_HIGH); // Rese
+ 669              		.loc 1 63 14 view .LVU213
+ 670 0046 3346     		mov	r3, r6
+ 671 0048 CDF80090 		str	r9, [sp]
+ 672 004c 41EA0021 		orr	r1, r1, r0, lsl #8
+ 673 0050 4046     		mov	r0, r8
+ 674 0052 FFF7FEFF 		bl	_ZN5daisy4GPIO4InitENS_3PinENS0_4ModeENS0_4PullENS0_5SpeedE
+ 675              	.LVL86:
+ 676              		.loc 1 64 5 is_stmt 1 view .LVU214
+ 677              		.loc 1 64 17 is_stmt 0 view .LVU215
+ 678 0056 194B     		ldr	r3, .L5+12
+ 679 0058 2A46     		mov	r2, r5
+ 680 005a CDF80090 		str	r9, [sp]
+ 681 005e 5878     		ldrb	r0, [r3, #1]	@ zero_extendqisi2
+ 682 0060 1978     		ldrb	r1, [r3]	@ zero_extendqisi2
+ 683 0062 3346     		mov	r3, r6
+ 684 0064 41EA0021 		orr	r1, r1, r0, lsl #8
+ 685 0068 3846     		mov	r0, r7
+ 686 006a FFF7FEFF 		bl	_ZN5daisy4GPIO4InitENS_3PinENS0_4ModeENS0_4PullENS0_5SpeedE
+ 687              	.LVL87:
+  65:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     m_dc.Write(true);    // Set DC pin to high
+ 688              		.loc 1 65 5 is_stmt 1 view .LVU216
+ 689              		.loc 1 65 15 is_stmt 0 view .LVU217
+ 690 006e 2946     		mov	r1, r5
+ 691 0070 4046     		mov	r0, r8
+ 692 0072 FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 693              	.LVL88:
+  66:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     m_reset.Write(true); // Set Reset pin to high
+ 694              		.loc 1 66 5 is_stmt 1 view .LVU218
+ 695              		.loc 1 66 18 is_stmt 0 view .LVU219
+ 696 0076 2946     		mov	r1, r5
+ 697 0078 3846     		mov	r0, r7
+ 698 007a FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 699              	.LVL89:
+  67:dependencies/DaisySeedGFX2/TFT_SPI.cpp **** 
+  68:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     // Initialize SPI
+  69:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     m_spi.Init(m_spi_config);
+ 700              		.loc 1 69 5 is_stmt 1 view .LVU220
+ 701              		.loc 1 69 15 is_stmt 0 view .LVU221
+ 702 007e 5146     		mov	r1, r10
+ 703 0080 2046     		mov	r0, r4
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccN12KmI.s 			page 20
+
+
+ 704 0082 FFF7FEFF 		bl	_ZN5daisy9SpiHandle4InitERKNS0_6ConfigE
+ 705              	.LVL90:
+  70:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     
+  71:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     // Reset the LCD screen
+  72:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     m_reset.Write(false); // Hold Reset pin low
+ 706              		.loc 1 72 5 is_stmt 1 view .LVU222
+ 707              		.loc 1 72 18 is_stmt 0 view .LVU223
+ 708 0086 3146     		mov	r1, r6
+ 709 0088 3846     		mov	r0, r7
+ 710 008a FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 711              	.LVL91:
+  73:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     System::Delay(50);    // Delay 50 ms
+ 712              		.loc 1 73 5 is_stmt 1 view .LVU224
+ 713              		.loc 1 73 18 is_stmt 0 view .LVU225
+ 714 008e 3220     		movs	r0, #50
+ 715 0090 FFF7FEFF 		bl	_ZN5daisy6System5DelayEm
+ 716              	.LVL92:
+  74:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     m_reset.Write(true);  // Release Reset pin
+ 717              		.loc 1 74 5 is_stmt 1 view .LVU226
+ 718              		.loc 1 74 18 is_stmt 0 view .LVU227
+ 719 0094 2946     		mov	r1, r5
+ 720 0096 3846     		mov	r0, r7
+ 721 0098 FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 722              	.LVL93:
+  75:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     System::Delay(50);    // Delay 50 ms
+ 723              		.loc 1 75 5 is_stmt 1 view .LVU228
+ 724              		.loc 1 75 18 is_stmt 0 view .LVU229
+ 725 009c 3220     		movs	r0, #50
+ 726 009e FFF7FEFF 		bl	_ZN5daisy6System5DelayEm
+ 727              	.LVL94:
+  76:dependencies/DaisySeedGFX2/TFT_SPI.cpp **** 
+  77:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     // Perform additional initialization
+  78:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     Initialise();
+ 728              		.loc 1 78 5 is_stmt 1 view .LVU230
+ 729              		.loc 1 78 15 is_stmt 0 view .LVU231
+ 730 00a2 2046     		mov	r0, r4
+  79:dependencies/DaisySeedGFX2/TFT_SPI.cpp **** }
+ 731              		.loc 1 79 1 view .LVU232
+ 732 00a4 02B0     		add	sp, sp, #8
+ 733              		.cfi_def_cfa_offset 32
+ 734              		@ sp needed
+ 735 00a6 BDE8F047 		pop	{r4, r5, r6, r7, r8, r9, r10, lr}
+ 736              		.cfi_restore 14
+ 737              		.cfi_restore 10
+ 738              		.cfi_restore 9
+ 739              		.cfi_restore 8
+ 740              		.cfi_restore 7
+ 741              		.cfi_restore 6
+ 742              		.cfi_restore 5
+ 743              		.cfi_restore 4
+ 744              		.cfi_def_cfa_offset 0
+ 745              	.LVL95:
+  78:dependencies/DaisySeedGFX2/TFT_SPI.cpp **** }
+ 746              		.loc 1 78 15 view .LVU233
+ 747 00aa FFF7FEBF 		b	_ZN6DadGFX7TFT_SPI10InitialiseEv
+ 748              	.LVL96:
+ 749              	.L6:
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccN12KmI.s 			page 21
+
+
+  78:dependencies/DaisySeedGFX2/TFT_SPI.cpp **** }
+ 750              		.loc 1 78 15 view .LVU234
+ 751 00ae 00BF     		.align	2
+ 752              	.L5:
+ 753 00b0 00000000 		.word	_ZN5daisy4seedL2D8E
+ 754 00b4 00000000 		.word	_ZN5daisy4seedL3D10E
+ 755 00b8 00000000 		.word	_ZN5daisy4seedL3D12E
+ 756 00bc 00000000 		.word	_ZN5daisy4seedL3D11E
+ 757              		.cfi_endproc
+ 758              	.LFE3749:
+ 760              		.section	.text._ZN6DadGFX7TFT_SPI14setTFTRotationE8Rotation,"ax",%progbits
+ 761              		.align	1
+ 762              		.global	_ZN6DadGFX7TFT_SPI14setTFTRotationE8Rotation
+ 763              		.syntax unified
+ 764              		.thumb
+ 765              		.thumb_func
+ 767              	_ZN6DadGFX7TFT_SPI14setTFTRotationE8Rotation:
+ 768              	.LVL97:
+ 769              	.LFB3750:
+  80:dependencies/DaisySeedGFX2/TFT_SPI.cpp **** 
+  81:dependencies/DaisySeedGFX2/TFT_SPI.cpp **** // --------------------------------------------------------------------------
+  82:dependencies/DaisySeedGFX2/TFT_SPI.cpp **** // Set the display rotation (0, 90, 180, 270 degrees)
+  83:dependencies/DaisySeedGFX2/TFT_SPI.cpp **** void TFT_SPI::setTFTRotation(Rotation r) {
+ 770              		.loc 1 83 42 is_stmt 1 view -0
+ 771              		.cfi_startproc
+ 772              		@ args = 0, pretend = 0, frame = 0
+ 773              		@ frame_needed = 0, uses_anonymous_args = 0
+  84:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     // Send the memory access control command
+  85:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     SendCommand(TFT_MADCTL);
+ 774              		.loc 1 85 5 view .LVU236
+  83:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     // Send the memory access control command
+ 775              		.loc 1 83 42 is_stmt 0 view .LVU237
+ 776 0000 38B5     		push	{r3, r4, r5, lr}
+ 777              		.cfi_def_cfa_offset 16
+ 778              		.cfi_offset 3, -16
+ 779              		.cfi_offset 4, -12
+ 780              		.cfi_offset 5, -8
+ 781              		.cfi_offset 14, -4
+  83:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     // Send the memory access control command
+ 782              		.loc 1 83 42 view .LVU238
+ 783 0002 0D46     		mov	r5, r1
+ 784              		.loc 1 85 16 view .LVU239
+ 785 0004 3621     		movs	r1, #54
+ 786              	.LVL98:
+  83:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     // Send the memory access control command
+ 787              		.loc 1 83 42 view .LVU240
+ 788 0006 0446     		mov	r4, r0
+ 789              		.loc 1 85 16 view .LVU241
+ 790 0008 FFF7FEFF 		bl	_ZN6DadGFX7TFT_SPI11SendCommandEh
+ 791              	.LVL99:
+  86:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     switch (r) {
+ 792              		.loc 1 86 5 is_stmt 1 view .LVU242
+ 793 000c 032D     		cmp	r5, #3
+ 794 000e 07D8     		bhi	.L7
+ 795 0010 DFE805F0 		tbb	[pc, r5]
+ 796              	.L10:
+ 797 0014 02       		.byte	(.L13-.L10)/2
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccN12KmI.s 			page 22
+
+
+ 798 0015 07       		.byte	(.L12-.L10)/2
+ 799 0016 09       		.byte	(.L11-.L10)/2
+ 800 0017 0B       		.byte	(.L9-.L10)/2
+ 801              		.p2align 1
+ 802              	.L13:
+  87:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****         case Rotation::Degre_0: // Portrait
+ 803              		.loc 1 87 9 view .LVU243
+  88:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****             SendData(TFT_MAD_COLOR_ORDER);
+ 804              		.loc 1 88 13 view .LVU244
+ 805              		.loc 1 88 21 is_stmt 0 view .LVU245
+ 806 0018 0821     		movs	r1, #8
+ 807              	.L15:
+  89:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****             break;
+  90:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****         case Rotation::Degre_90: // Landscape (Portrait + 90 degrees)
+  91:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****             SendData(TFT_MAD_MX | TFT_MAD_MV | TFT_MAD_COLOR_ORDER);
+  92:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****             break;
+  93:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****         case Rotation::Degre_180: // Inverted portrait
+  94:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****             SendData(TFT_MAD_MX | TFT_MAD_MY | TFT_MAD_COLOR_ORDER);
+  95:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****             break;
+  96:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****         case Rotation::Degre_270: // Inverted landscape
+  97:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****             SendData(TFT_MAD_MV | TFT_MAD_MY | TFT_MAD_COLOR_ORDER);
+ 808              		.loc 1 97 21 view .LVU246
+ 809 001a 2046     		mov	r0, r4
+ 810 001c FFF7FEFF 		bl	_ZN6DadGFX7TFT_SPI8SendDataEh
+ 811              	.LVL100:
+  98:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****             break;
+ 812              		.loc 1 98 13 is_stmt 1 view .LVU247
+ 813              	.L7:
+  99:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     }
+ 100:dependencies/DaisySeedGFX2/TFT_SPI.cpp **** }
+ 814              		.loc 1 100 1 is_stmt 0 view .LVU248
+ 815 0020 38BD     		pop	{r3, r4, r5, pc}
+ 816              	.LVL101:
+ 817              	.L12:
+  90:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****             SendData(TFT_MAD_MX | TFT_MAD_MV | TFT_MAD_COLOR_ORDER);
+ 818              		.loc 1 90 9 is_stmt 1 view .LVU249
+  91:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****             break;
+ 819              		.loc 1 91 13 view .LVU250
+  91:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****             break;
+ 820              		.loc 1 91 21 is_stmt 0 view .LVU251
+ 821 0022 6821     		movs	r1, #104
+ 822 0024 F9E7     		b	.L15
+ 823              	.L11:
+  93:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****             SendData(TFT_MAD_MX | TFT_MAD_MY | TFT_MAD_COLOR_ORDER);
+ 824              		.loc 1 93 9 is_stmt 1 view .LVU252
+  94:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****             break;
+ 825              		.loc 1 94 13 view .LVU253
+  94:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****             break;
+ 826              		.loc 1 94 21 is_stmt 0 view .LVU254
+ 827 0026 C821     		movs	r1, #200
+ 828 0028 F7E7     		b	.L15
+ 829              	.L9:
+  96:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****             SendData(TFT_MAD_MV | TFT_MAD_MY | TFT_MAD_COLOR_ORDER);
+ 830              		.loc 1 96 9 is_stmt 1 view .LVU255
+  97:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****             break;
+ 831              		.loc 1 97 13 view .LVU256
+  97:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****             break;
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccN12KmI.s 			page 23
+
+
+ 832              		.loc 1 97 21 is_stmt 0 view .LVU257
+ 833 002a A821     		movs	r1, #168
+ 834 002c F5E7     		b	.L15
+ 835              		.cfi_endproc
+ 836              	.LFE3750:
+ 838              		.section	.rodata._ZN5daisy4seedL3D12E,"a"
+ 841              	_ZN5daisy4seedL3D12E:
+ 842 0000 01       		.byte	1
+ 843 0001 09       		.byte	9
+ 844              		.section	.rodata._ZN5daisy4seedL3D11E,"a"
+ 847              	_ZN5daisy4seedL3D11E:
+ 848 0000 01       		.byte	1
+ 849 0001 08       		.byte	8
+ 850              		.section	.rodata._ZN5daisy4seedL3D10E,"a"
+ 853              	_ZN5daisy4seedL3D10E:
+ 854 0000 01       		.byte	1
+ 855 0001 05       		.byte	5
+ 856              		.section	.rodata._ZN5daisy4seedL2D8E,"a"
+ 859              	_ZN5daisy4seedL2D8E:
+ 860 0000 06       		.byte	6
+ 861 0001 0B       		.byte	11
+ 862              		.text
+ 863              	.Letext0:
+ 864              		.file 4 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/ma
+ 865              		.file 5 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/sy
+ 866              		.file 6 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/st
+ 867              		.file 7 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/lib/gcc/arm-none-eabi/14
+ 868              		.file 8 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c+
+ 869              		.file 9 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c+
+ 870              		.file 10 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 871              		.file 11 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 872              		.file 12 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 873              		.file 13 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 874              		.file 14 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 875              		.file 15 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 876              		.file 16 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 877              		.file 17 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 878              		.file 18 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 879              		.file 19 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 880              		.file 20 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 881              		.file 21 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 882              		.file 22 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 883              		.file 23 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 884              		.file 24 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 885              		.file 25 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 886              		.file 26 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/s
+ 887              		.file 27 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/s
+ 888              		.file 28 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/s
+ 889              		.file 29 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/m
+ 890              		.file 30 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/s
+ 891              		.file 31 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 892              		.file 32 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 893              		.file 33 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 894              		.file 34 "dependencies/libDaisy/src/daisy_core.h"
+ 895              		.file 35 "dependencies/libDaisy/src/sys/system.h"
+ 896              		.file 36 "dependencies/libDaisy/src/per/gpio.h"
+ 897              		.file 37 "dependencies/libDaisy/src/per/spi.h"
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccN12KmI.s 			page 24
+
+
+ 898              		.file 38 "dependencies/libDaisy/src/dev/max11300.h"
+ 899              		.file 39 "dependencies/libDaisy/src/dev/sr_595.h"
+ 900              		.file 40 "dependencies/libDaisy/src/util/wav_format.h"
+ 901              		.file 41 "dependencies/libDaisy/src/daisy_seed.h"
+ 902              		.file 42 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 903              		.file 43 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/lib/gcc/arm-none-eabi/1
+ 904              		.file 44 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/s
+ 905              		.file 45 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/s
+ 906              		.file 46 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/w
+ 907              		.file 47 "dependencies/libDaisy/Middlewares/Third_Party/FatFs/src/integer.h"
+ 908              		.file 48 "dependencies/libDaisy/Middlewares/Third_Party/FatFs/src/ff.h"
+ 909              		.file 49 "<built-in>"
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccN12KmI.s 			page 25
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 TFT_SPI.cpp
+C:\Users\Oliver\AppData\Local\Temp\ccN12KmI.s:20     .text._ZN6DadGFX7TFT_SPI11SendCommandEh:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\ccN12KmI.s:26     .text._ZN6DadGFX7TFT_SPI11SendCommandEh:00000000 _ZN6DadGFX7TFT_SPI11SendCommandEh
+C:\Users\Oliver\AppData\Local\Temp\ccN12KmI.s:70     .text._ZN6DadGFX7TFT_SPI8SendDataEh:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\ccN12KmI.s:76     .text._ZN6DadGFX7TFT_SPI8SendDataEh:00000000 _ZN6DadGFX7TFT_SPI8SendDataEh
+C:\Users\Oliver\AppData\Local\Temp\ccN12KmI.s:119    .text._ZN6DadGFX7TFT_SPI10InitialiseEv:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\ccN12KmI.s:125    .text._ZN6DadGFX7TFT_SPI10InitialiseEv:00000000 _ZN6DadGFX7TFT_SPI10InitialiseEv
+C:\Users\Oliver\AppData\Local\Temp\ccN12KmI.s:579    .text._ZN6DadGFX7TFT_SPI12Init_TFT_SPIEv:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\ccN12KmI.s:585    .text._ZN6DadGFX7TFT_SPI12Init_TFT_SPIEv:00000000 _ZN6DadGFX7TFT_SPI12Init_TFT_SPIEv
+C:\Users\Oliver\AppData\Local\Temp\ccN12KmI.s:753    .text._ZN6DadGFX7TFT_SPI12Init_TFT_SPIEv:000000b0 $d
+C:\Users\Oliver\AppData\Local\Temp\ccN12KmI.s:859    .rodata._ZN5daisy4seedL2D8E:00000000 _ZN5daisy4seedL2D8E
+C:\Users\Oliver\AppData\Local\Temp\ccN12KmI.s:853    .rodata._ZN5daisy4seedL3D10E:00000000 _ZN5daisy4seedL3D10E
+C:\Users\Oliver\AppData\Local\Temp\ccN12KmI.s:841    .rodata._ZN5daisy4seedL3D12E:00000000 _ZN5daisy4seedL3D12E
+C:\Users\Oliver\AppData\Local\Temp\ccN12KmI.s:847    .rodata._ZN5daisy4seedL3D11E:00000000 _ZN5daisy4seedL3D11E
+C:\Users\Oliver\AppData\Local\Temp\ccN12KmI.s:761    .text._ZN6DadGFX7TFT_SPI14setTFTRotationE8Rotation:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\ccN12KmI.s:767    .text._ZN6DadGFX7TFT_SPI14setTFTRotationE8Rotation:00000000 _ZN6DadGFX7TFT_SPI14setTFTRotationE8Rotation
+C:\Users\Oliver\AppData\Local\Temp\ccN12KmI.s:797    .text._ZN6DadGFX7TFT_SPI14setTFTRotationE8Rotation:00000014 $d
+C:\Users\Oliver\AppData\Local\Temp\ccN12KmI.s:801    .text._ZN6DadGFX7TFT_SPI14setTFTRotationE8Rotation:00000018 $t
+
+UNDEFINED SYMBOLS
+_ZN5daisy4GPIO5WriteEb
+_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+_ZN5daisy6System5DelayEm
+_ZN5daisy4GPIO4InitENS_3PinENS0_4ModeENS0_4PullENS0_5SpeedE
+_ZN5daisy9SpiHandle4InitERKNS0_6ConfigE

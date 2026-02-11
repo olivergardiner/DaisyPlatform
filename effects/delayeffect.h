@@ -1,4 +1,5 @@
-#pragma once
+#ifndef PERSPECTIVE_DELAYEFFECT_H
+#define PERSPECTIVE_DELAYEFFECT_H
 
 #include "../effect.h"
 #include "daisysp.h"
@@ -45,3 +46,5 @@ private:
 };
 
 } // namespace perspective
+
+#endif // PERSPECTIVE_DELAYEFFECT_H

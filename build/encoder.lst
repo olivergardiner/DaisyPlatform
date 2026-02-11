@@ -1,0 +1,343 @@
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc5cuWM9.s 			page 1
+
+
+   1              		.cpu cortex-m7
+   2              		.arch armv7e-m
+   3              		.fpu fpv5-d16
+   4              		.eabi_attribute 28, 1
+   5              		.eabi_attribute 20, 1
+   6              		.eabi_attribute 21, 1
+   7              		.eabi_attribute 23, 3
+   8              		.eabi_attribute 24, 1
+   9              		.eabi_attribute 25, 1
+  10              		.eabi_attribute 26, 1
+  11              		.eabi_attribute 30, 4
+  12              		.eabi_attribute 34, 1
+  13              		.eabi_attribute 18, 4
+  14              		.file	"encoder.cpp"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.file 1 "ui/encoder.cpp"
+  19              		.section	.text._ZN11perspective7Encoder4InitEN5daisy3PinES2_S2_f,"ax",%progbits
+  20              		.align	1
+  21              		.global	_ZN11perspective7Encoder4InitEN5daisy3PinES2_S2_f
+  22              		.syntax unified
+  23              		.thumb
+  24              		.thumb_func
+  26              	_ZN11perspective7Encoder4InitEN5daisy3PinES2_S2_f:
+  27              	.LVL0:
+  28              	.LFB1585:
+   1:ui/encoder.cpp **** #include "encoder.h"
+   2:ui/encoder.cpp **** 
+   3:ui/encoder.cpp **** using namespace daisy;
+   4:ui/encoder.cpp **** using namespace perspective;
+   5:ui/encoder.cpp **** 
+   6:ui/encoder.cpp **** void Encoder::Init(Pin a, Pin b, Pin click, float update_rate)
+   7:ui/encoder.cpp **** {
+  29              		.loc 1 7 1 view -0
+  30              		.cfi_startproc
+  31              		@ args = 0, pretend = 0, frame = 16
+  32              		@ frame_needed = 0, uses_anonymous_args = 0
+   8:ui/encoder.cpp ****     last_update_  = System::GetNow();
+  33              		.loc 1 8 5 view .LVU1
+   7:ui/encoder.cpp ****     last_update_  = System::GetNow();
+  34              		.loc 1 7 1 is_stmt 0 view .LVU2
+  35 0000 30B5     		push	{r4, r5, lr}
+  36              		.cfi_def_cfa_offset 12
+  37              		.cfi_offset 4, -12
+  38              		.cfi_offset 5, -8
+  39              		.cfi_offset 14, -4
+  40 0002 2DED028B 		vpush.64	{d8}
+  41              		.cfi_def_cfa_offset 20
+  42              		.cfi_offset 80, -20
+  43              		.cfi_offset 81, -16
+  44 0006 B0EE408A 		vmov.f32	s16, s0
+  45 000a 87B0     		sub	sp, sp, #28
+  46              		.cfi_def_cfa_offset 48
+   7:ui/encoder.cpp ****     last_update_  = System::GetNow();
+  47              		.loc 1 7 1 view .LVU3
+  48 000c 0446     		mov	r4, r0
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc5cuWM9.s 			page 2
+
+
+   9:ui/encoder.cpp ****     update_rate_  = update_rate;
+  10:ui/encoder.cpp **** 
+  11:ui/encoder.cpp ****     // Init GPIO for A, and B
+  12:ui/encoder.cpp ****     hw_a_.Init(a, GPIO::Mode::INPUT, GPIO::Pull::NOPULL);
+  49              		.loc 1 12 15 view .LVU4
+  50 000e 0025     		movs	r5, #0
+   7:ui/encoder.cpp ****     last_update_  = System::GetNow();
+  51              		.loc 1 7 1 view .LVU5
+  52 0010 ADF81410 		strh	r1, [sp, #20]	@ movhi
+  53 0014 ADF81020 		strh	r2, [sp, #16]	@ movhi
+  54 0018 ADF80C30 		strh	r3, [sp, #12]	@ movhi
+   8:ui/encoder.cpp ****     update_rate_  = update_rate;
+  55              		.loc 1 8 35 view .LVU6
+  56 001c FFF7FEFF 		bl	_ZN5daisy6System6GetNowEv
+  57              	.LVL1:
+  58              		.loc 1 12 15 view .LVU7
+  59 0020 2B46     		mov	r3, r5
+   8:ui/encoder.cpp ****     update_rate_  = update_rate;
+  60              		.loc 1 8 19 discriminator 1 view .LVU8
+  61 0022 2060     		str	r0, [r4]
+   9:ui/encoder.cpp ****     update_rate_  = update_rate;
+  62              		.loc 1 9 5 is_stmt 1 view .LVU9
+  63              		.loc 1 12 15 is_stmt 0 view .LVU10
+  64 0024 2A46     		mov	r2, r5
+  65 0026 0599     		ldr	r1, [sp, #20]
+  66 0028 04F13000 		add	r0, r4, #48
+   9:ui/encoder.cpp ****     update_rate_  = update_rate;
+  67              		.loc 1 9 19 view .LVU11
+  68 002c 84ED018A 		vstr.32	s16, [r4, #4]
+  69              		.loc 1 12 5 is_stmt 1 view .LVU12
+  70              		.loc 1 12 15 is_stmt 0 view .LVU13
+  71 0030 0095     		str	r5, [sp]
+  72 0032 FFF7FEFF 		bl	_ZN5daisy4GPIO4InitENS_3PinENS0_4ModeENS0_4PullENS0_5SpeedE
+  73              	.LVL2:
+  13:ui/encoder.cpp ****     hw_b_.Init(b, GPIO::Mode::INPUT, GPIO::Pull::NOPULL);
+  74              		.loc 1 13 5 is_stmt 1 view .LVU14
+  75              		.loc 1 13 15 is_stmt 0 view .LVU15
+  76 0036 2B46     		mov	r3, r5
+  77 0038 2A46     		mov	r2, r5
+  78 003a 0499     		ldr	r1, [sp, #16]
+  79 003c 04F14400 		add	r0, r4, #68
+  80 0040 0095     		str	r5, [sp]
+  81 0042 FFF7FEFF 		bl	_ZN5daisy4GPIO4InitENS_3PinENS0_4ModeENS0_4PullENS0_5SpeedE
+  82              	.LVL3:
+  14:ui/encoder.cpp ****     
+  15:ui/encoder.cpp ****     // Default Initialization for Switch
+  16:ui/encoder.cpp ****     sw_.Init(click, update_rate);
+  83              		.loc 1 16 5 is_stmt 1 view .LVU16
+  84              		.loc 1 16 13 is_stmt 0 view .LVU17
+  85 0046 B0EE480A 		vmov.f32	s0, s16
+  86 004a 0399     		ldr	r1, [sp, #12]
+  87 004c 04F10800 		add	r0, r4, #8
+  88 0050 FFF7FEFF 		bl	_ZN11perspective6Switch4InitEN5daisy3PinEf
+  89              	.LVL4:
+  17:ui/encoder.cpp ****     
+  18:ui/encoder.cpp ****     // Set initial states, etc.
+  19:ui/encoder.cpp ****     inc_ = 0;
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc5cuWM9.s 			page 3
+
+
+  90              		.loc 1 19 5 is_stmt 1 view .LVU18
+  20:ui/encoder.cpp ****     a_ = b_ = 0xff;
+  91              		.loc 1 20 8 is_stmt 0 view .LVU19
+  92 0054 4FF6FF73 		movw	r3, #65535
+  19:ui/encoder.cpp ****     a_ = b_ = 0xff;
+  93              		.loc 1 19 10 view .LVU20
+  94 0058 E565     		str	r5, [r4, #92]
+  95              		.loc 1 20 5 is_stmt 1 view .LVU21
+  96              		.loc 1 20 8 is_stmt 0 view .LVU22
+  97 005a A4F85830 		strh	r3, [r4, #88]	@ movhi
+  21:ui/encoder.cpp **** }
+  98              		.loc 1 21 1 view .LVU23
+  99 005e 07B0     		add	sp, sp, #28
+ 100              		.cfi_def_cfa_offset 20
+ 101              		@ sp needed
+ 102 0060 BDEC028B 		vldm	sp!, {d8}
+ 103              		.cfi_restore 80
+ 104              		.cfi_restore 81
+ 105              		.cfi_def_cfa_offset 12
+ 106              	.LVL5:
+ 107              		.loc 1 21 1 view .LVU24
+ 108 0064 30BD     		pop	{r4, r5, pc}
+ 109              		.loc 1 21 1 view .LVU25
+ 110              		.cfi_endproc
+ 111              	.LFE1585:
+ 113              		.section	.text._ZN11perspective7Encoder7ProcessEv,"ax",%progbits
+ 114              		.align	1
+ 115              		.global	_ZN11perspective7Encoder7ProcessEv
+ 116              		.syntax unified
+ 117              		.thumb
+ 118              		.thumb_func
+ 120              	_ZN11perspective7Encoder7ProcessEv:
+ 121              	.LVL6:
+ 122              	.LFB1586:
+  22:ui/encoder.cpp **** 
+  23:ui/encoder.cpp **** void Encoder::Process()
+  24:ui/encoder.cpp **** {
+ 123              		.loc 1 24 1 is_stmt 1 view -0
+ 124              		.cfi_startproc
+ 125              		@ args = 0, pretend = 0, frame = 0
+ 126              		@ frame_needed = 0, uses_anonymous_args = 0
+  25:ui/encoder.cpp ****     // update no faster than 1kHz
+  26:ui/encoder.cpp ****     uint32_t now = System::GetNow();
+ 127              		.loc 1 26 5 view .LVU27
+  24:ui/encoder.cpp ****     // update no faster than 1kHz
+ 128              		.loc 1 24 1 is_stmt 0 view .LVU28
+ 129 0000 38B5     		push	{r3, r4, r5, lr}
+ 130              		.cfi_def_cfa_offset 16
+ 131              		.cfi_offset 3, -16
+ 132              		.cfi_offset 4, -12
+ 133              		.cfi_offset 5, -8
+ 134              		.cfi_offset 14, -4
+  24:ui/encoder.cpp ****     // update no faster than 1kHz
+ 135              		.loc 1 24 1 view .LVU29
+ 136 0002 0446     		mov	r4, r0
+ 137              		.loc 1 26 34 view .LVU30
+ 138 0004 FFF7FEFF 		bl	_ZN5daisy6System6GetNowEv
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc5cuWM9.s 			page 4
+
+
+ 139              	.LVL7:
+  27:ui/encoder.cpp **** 
+  28:ui/encoder.cpp ****     if(now - last_update_ >= 1)
+ 140              		.loc 1 28 5 is_stmt 1 view .LVU31
+ 141 0008 2368     		ldr	r3, [r4]
+ 142 000a 8342     		cmp	r3, r0
+ 143 000c 24D0     		beq	.L2
+  29:ui/encoder.cpp ****     {
+  30:ui/encoder.cpp ****         last_update_ = now;
+ 144              		.loc 1 30 9 view .LVU32
+  31:ui/encoder.cpp **** 
+  32:ui/encoder.cpp ****         // Read raw hardware states and shift into debounced state
+  33:ui/encoder.cpp ****         a_ = (a_ << 1) | hw_a_.Read();
+ 145              		.loc 1 33 24 is_stmt 0 view .LVU33
+ 146 000e 94F85850 		ldrb	r5, [r4, #88]	@ zero_extendqisi2
+  30:ui/encoder.cpp **** 
+ 147              		.loc 1 30 22 view .LVU34
+ 148 0012 2060     		str	r0, [r4]
+ 149              		.loc 1 33 9 is_stmt 1 view .LVU35
+ 150              		.loc 1 33 36 is_stmt 0 view .LVU36
+ 151 0014 04F13000 		add	r0, r4, #48
+ 152              	.LVL8:
+ 153              		.loc 1 33 24 view .LVU37
+ 154 0018 6D00     		lsls	r5, r5, #1
+ 155              		.loc 1 33 36 view .LVU38
+ 156 001a FFF7FEFF 		bl	_ZN5daisy4GPIO4ReadEv
+ 157              	.LVL9:
+ 158              		.loc 1 33 24 view .LVU39
+ 159 001e 6DB2     		sxtb	r5, r5
+ 160              		.loc 1 33 24 discriminator 1 view .LVU40
+ 161 0020 0543     		orrs	r5, r5, r0
+  34:ui/encoder.cpp ****         b_ = (b_ << 1) | hw_b_.Read();
+ 162              		.loc 1 34 36 view .LVU41
+ 163 0022 04F14400 		add	r0, r4, #68
+  33:ui/encoder.cpp ****         b_ = (b_ << 1) | hw_b_.Read();
+ 164              		.loc 1 33 12 discriminator 1 view .LVU42
+ 165 0026 84F85850 		strb	r5, [r4, #88]
+ 166              		.loc 1 34 9 is_stmt 1 view .LVU43
+ 167              		.loc 1 34 24 is_stmt 0 view .LVU44
+ 168 002a 94F85950 		ldrb	r5, [r4, #89]	@ zero_extendqisi2
+ 169              		.loc 1 34 36 view .LVU45
+ 170 002e FFF7FEFF 		bl	_ZN5daisy4GPIO4ReadEv
+ 171              	.LVL10:
+  35:ui/encoder.cpp **** 
+  36:ui/encoder.cpp ****         // infer increment direction
+  37:ui/encoder.cpp ****         inc_ = 0;
+ 172              		.loc 1 37 14 view .LVU46
+ 173 0032 0023     		movs	r3, #0
+  34:ui/encoder.cpp **** 
+ 174              		.loc 1 34 24 view .LVU47
+ 175 0034 6D00     		lsls	r5, r5, #1
+ 176              		.loc 1 37 14 view .LVU48
+ 177 0036 E365     		str	r3, [r4, #92]
+  34:ui/encoder.cpp **** 
+ 178              		.loc 1 34 24 view .LVU49
+ 179 0038 6DB2     		sxtb	r5, r5
+ 180 003a 94F85830 		ldrb	r3, [r4, #88]	@ zero_extendqisi2
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc5cuWM9.s 			page 5
+
+
+  34:ui/encoder.cpp **** 
+ 181              		.loc 1 34 24 discriminator 1 view .LVU50
+ 182 003e 2843     		orrs	r0, r0, r5
+ 183 0040 03F00303 		and	r3, r3, #3
+ 184 0044 40B2     		sxtb	r0, r0
+  38:ui/encoder.cpp ****         if((a_ & 0x03) == 0x02 && (b_ & 0x03) == 0x00)
+ 185              		.loc 1 38 9 view .LVU51
+ 186 0046 022B     		cmp	r3, #2
+  34:ui/encoder.cpp **** 
+ 187              		.loc 1 34 12 discriminator 1 view .LVU52
+ 188 0048 84F85900 		strb	r0, [r4, #89]
+  37:ui/encoder.cpp ****         if((a_ & 0x03) == 0x02 && (b_ & 0x03) == 0x00)
+ 189              		.loc 1 37 9 is_stmt 1 view .LVU53
+ 190              		.loc 1 38 9 view .LVU54
+ 191 004c 00F00300 		and	r0, r0, #3
+ 192 0050 03D1     		bne	.L5
+ 193              		.loc 1 38 32 is_stmt 0 discriminator 1 view .LVU55
+ 194 0052 08B9     		cbnz	r0, .L2
+  39:ui/encoder.cpp ****         {
+  40:ui/encoder.cpp ****             inc_ = 1;
+ 195              		.loc 1 40 13 is_stmt 1 view .LVU56
+ 196              		.loc 1 40 18 is_stmt 0 view .LVU57
+ 197 0054 0123     		movs	r3, #1
+ 198              	.L7:
+  41:ui/encoder.cpp ****         }
+  42:ui/encoder.cpp ****         else if((b_ & 0x03) == 0x02 && (a_ & 0x03) == 0x00)
+  43:ui/encoder.cpp ****         {
+  44:ui/encoder.cpp ****             inc_ = -1;
+ 199              		.loc 1 44 18 view .LVU58
+ 200 0056 E365     		str	r3, [r4, #92]
+ 201              	.L2:
+  45:ui/encoder.cpp ****         }
+  46:ui/encoder.cpp ****     }
+  47:ui/encoder.cpp **** }...
+ 202              		.loc 1 47 1 view .LVU59
+ 203 0058 38BD     		pop	{r3, r4, r5, pc}
+ 204              	.LVL11:
+ 205              	.L5:
+  42:ui/encoder.cpp ****         else if((b_ & 0x03) == 0x02 && (a_ & 0x03) == 0x00)
+ 206              		.loc 1 42 14 is_stmt 1 view .LVU60
+ 207 005a 0228     		cmp	r0, #2
+ 208 005c FCD1     		bne	.L2
+  42:ui/encoder.cpp ****         else if((b_ & 0x03) == 0x02 && (a_ & 0x03) == 0x00)
+ 209              		.loc 1 42 37 is_stmt 0 discriminator 1 view .LVU61
+ 210 005e 002B     		cmp	r3, #0
+ 211 0060 FAD1     		bne	.L2
+  44:ui/encoder.cpp ****             inc_ = -1;
+ 212              		.loc 1 44 13 is_stmt 1 view .LVU62
+  44:ui/encoder.cpp ****             inc_ = -1;
+ 213              		.loc 1 44 18 is_stmt 0 view .LVU63
+ 214 0062 4FF0FF33 		mov	r3, #-1
+ 215 0066 F6E7     		b	.L7
+ 216              		.cfi_endproc
+ 217              	.LFE1586:
+ 219              		.text
+ 220              	.Letext0:
+ 221              		.file 2 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/ma
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc5cuWM9.s 			page 6
+
+
+ 222              		.file 3 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/sy
+ 223              		.file 4 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/st
+ 224              		.file 5 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/lib/gcc/arm-none-eabi/14
+ 225              		.file 6 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c+
+ 226              		.file 7 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c+
+ 227              		.file 8 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c+
+ 228              		.file 9 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c+
+ 229              		.file 10 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 230              		.file 11 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 231              		.file 12 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 232              		.file 13 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 233              		.file 14 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 234              		.file 15 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 235              		.file 16 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 236              		.file 17 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 237              		.file 18 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/m
+ 238              		.file 19 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/s
+ 239              		.file 20 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 240              		.file 21 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 241              		.file 22 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 242              		.file 23 "dependencies/libDaisy/src/daisy_core.h"
+ 243              		.file 24 "dependencies/libDaisy/src/per/gpio.h"
+ 244              		.file 25 "dependencies/libDaisy/src/sys/system.h"
+ 245              		.file 26 "ui/switch.h"
+ 246              		.file 27 "ui/encoder.h"
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc5cuWM9.s 			page 7
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 encoder.cpp
+C:\Users\Oliver\AppData\Local\Temp\cc5cuWM9.s:20     .text._ZN11perspective7Encoder4InitEN5daisy3PinES2_S2_f:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\cc5cuWM9.s:26     .text._ZN11perspective7Encoder4InitEN5daisy3PinES2_S2_f:00000000 _ZN11perspective7Encoder4InitEN5daisy3PinES2_S2_f
+C:\Users\Oliver\AppData\Local\Temp\cc5cuWM9.s:114    .text._ZN11perspective7Encoder7ProcessEv:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\cc5cuWM9.s:120    .text._ZN11perspective7Encoder7ProcessEv:00000000 _ZN11perspective7Encoder7ProcessEv
+
+UNDEFINED SYMBOLS
+_ZN5daisy6System6GetNowEv
+_ZN5daisy4GPIO4InitENS_3PinENS0_4ModeENS0_4PullENS0_5SpeedE
+_ZN11perspective6Switch4InitEN5daisy3PinEf
+_ZN5daisy4GPIO4ReadEv

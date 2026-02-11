@@ -1,0 +1,3188 @@
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s 			page 1
+
+
+   1              		.cpu cortex-m7
+   2              		.arch armv7e-m
+   3              		.fpu fpv5-d16
+   4              		.eabi_attribute 28, 1
+   5              		.eabi_attribute 20, 1
+   6              		.eabi_attribute 21, 1
+   7              		.eabi_attribute 23, 3
+   8              		.eabi_attribute 24, 1
+   9              		.eabi_attribute 25, 1
+  10              		.eabi_attribute 26, 1
+  11              		.eabi_attribute 30, 4
+  12              		.eabi_attribute 34, 1
+  13              		.eabi_attribute 18, 4
+  14              		.file	"GFX.cpp"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.file 1 "dependencies/DaisySeedGFX2/GFX.cpp"
+  19              		.section	.text._ZN6DadGFX5cFont4InitEPKNS_8GFXCFontE,"ax",%progbits
+  20              		.align	1
+  21              		.global	_ZN6DadGFX5cFont4InitEPKNS_8GFXCFontE
+  22              		.syntax unified
+  23              		.thumb
+  24              		.thumb_func
+  26              	_ZN6DadGFX5cFont4InitEPKNS_8GFXCFontE:
+  27              	.LVL0:
+  28              	.LFB1543:
+   1:dependencies/DaisySeedGFX2/GFX.cpp **** //====================================================================================
+   2:dependencies/DaisySeedGFX2/GFX.cpp **** // GFX.cpp
+   3:dependencies/DaisySeedGFX2/GFX.cpp **** //  
+   4:dependencies/DaisySeedGFX2/GFX.cpp **** // Features:
+   5:dependencies/DaisySeedGFX2/GFX.cpp **** //   - Provides a set of graphics drawing utilities for rendering shapes, text, 
+   6:dependencies/DaisySeedGFX2/GFX.cpp **** //     and bitmaps on graphical displays.
+   7:dependencies/DaisySeedGFX2/GFX.cpp **** //   - Abstract base class for graphics operations, to be implemented by derived classes.
+   8:dependencies/DaisySeedGFX2/GFX.cpp **** //
+   9:dependencies/DaisySeedGFX2/GFX.cpp **** // Inspired by:
+  10:dependencies/DaisySeedGFX2/GFX.cpp **** //   - Adafruit-GFX-Library: https://github.com/adafruit/Adafruit-GFX-Library
+  11:dependencies/DaisySeedGFX2/GFX.cpp **** //   - eSPI: https://github.com/Bodmer/TFT_eSPI
+  12:dependencies/DaisySeedGFX2/GFX.cpp **** //
+  13:dependencies/DaisySeedGFX2/GFX.cpp **** // Copyright (c) 2025 Dad Design. All rights reserved.
+  14:dependencies/DaisySeedGFX2/GFX.cpp **** //
+  15:dependencies/DaisySeedGFX2/GFX.cpp **** //====================================================================================
+  16:dependencies/DaisySeedGFX2/GFX.cpp **** 
+  17:dependencies/DaisySeedGFX2/GFX.cpp **** #include "GFX.h"
+  18:dependencies/DaisySeedGFX2/GFX.cpp **** namespace DadGFX {
+  19:dependencies/DaisySeedGFX2/GFX.cpp **** 
+  20:dependencies/DaisySeedGFX2/GFX.cpp **** //***********************************************************************************
+  21:dependencies/DaisySeedGFX2/GFX.cpp **** // CFont
+  22:dependencies/DaisySeedGFX2/GFX.cpp **** // Character font management
+  23:dependencies/DaisySeedGFX2/GFX.cpp **** //
+  24:dependencies/DaisySeedGFX2/GFX.cpp **** // Fonts can be generated using the TTF2Bitmap tool. 
+  25:dependencies/DaisySeedGFX2/GFX.cpp **** // See https://github.com/DADDesign-Projects/TrueType-to-Bitmap-Converter
+  26:dependencies/DaisySeedGFX2/GFX.cpp **** //
+  27:dependencies/DaisySeedGFX2/GFX.cpp **** //***********************************************************************************
+  28:dependencies/DaisySeedGFX2/GFX.cpp **** 
+  29:dependencies/DaisySeedGFX2/GFX.cpp **** // --------------------------------------------------------------------------
+  30:dependencies/DaisySeedGFX2/GFX.cpp **** // Class Initalisation
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s 			page 2
+
+
+  31:dependencies/DaisySeedGFX2/GFX.cpp **** void cFont::Init(const GFXCFont *pFont)
+  32:dependencies/DaisySeedGFX2/GFX.cpp **** {
+  29              		.loc 1 32 1 view -0
+  30              		.cfi_startproc
+  31              		@ args = 0, pretend = 0, frame = 0
+  32              		@ frame_needed = 0, uses_anonymous_args = 0
+  33:dependencies/DaisySeedGFX2/GFX.cpp ****     
+  34:dependencies/DaisySeedGFX2/GFX.cpp ****     m_pFont = pFont;         // Pointer to the font descriptor
+  33              		.loc 1 34 5 view .LVU1
+  35:dependencies/DaisySeedGFX2/GFX.cpp ****     m_pTable = pFont->glyph; // Pointer to the glyph descriptor table
+  36:dependencies/DaisySeedGFX2/GFX.cpp **** 
+  37:dependencies/DaisySeedGFX2/GFX.cpp ****     // Iterate through all characters to determine the maximum character heights
+  38:dependencies/DaisySeedGFX2/GFX.cpp ****     // Outputs:
+  39:dependencies/DaisySeedGFX2/GFX.cpp ****     //    m_NegHeight = height below the cursor line;
+  40:dependencies/DaisySeedGFX2/GFX.cpp ****     //    m_PosHeight = height above the cursor line;
+  41:dependencies/DaisySeedGFX2/GFX.cpp ****     GFXglyph *pTable = m_pTable;
+  42:dependencies/DaisySeedGFX2/GFX.cpp ****     uint16_t SizeTable = 1 + pFont->last - pFont->first;
+  34              		.loc 1 42 14 is_stmt 0 view .LVU2
+  35 0000 4B89     		ldrh	r3, [r1, #10]
+  35:dependencies/DaisySeedGFX2/GFX.cpp ****     m_pTable = pFont->glyph; // Pointer to the glyph descriptor table
+  36              		.loc 1 35 23 view .LVU3
+  37 0002 4A68     		ldr	r2, [r1, #4]
+  38              		.loc 1 42 14 view .LVU4
+  39 0004 0133     		adds	r3, r3, #1
+  32:dependencies/DaisySeedGFX2/GFX.cpp ****     
+  40              		.loc 1 32 1 view .LVU5
+  41 0006 30B5     		push	{r4, r5, lr}
+  42              		.cfi_def_cfa_offset 12
+  43              		.cfi_offset 4, -12
+  44              		.cfi_offset 5, -8
+  45              		.cfi_offset 14, -4
+  34:dependencies/DaisySeedGFX2/GFX.cpp ****     m_pTable = pFont->glyph; // Pointer to the glyph descriptor table
+  46              		.loc 1 34 13 view .LVU6
+  47 0008 0160     		str	r1, [r0]
+  35:dependencies/DaisySeedGFX2/GFX.cpp ****     m_pTable = pFont->glyph; // Pointer to the glyph descriptor table
+  48              		.loc 1 35 5 is_stmt 1 view .LVU7
+  49              		.loc 1 42 14 is_stmt 0 view .LVU8
+  50 000a 0989     		ldrh	r1, [r1, #8]
+  51              	.LVL1:
+  35:dependencies/DaisySeedGFX2/GFX.cpp ****     m_pTable = pFont->glyph; // Pointer to the glyph descriptor table
+  52              		.loc 1 35 14 view .LVU9
+  53 000c 4260     		str	r2, [r0, #4]
+  41:dependencies/DaisySeedGFX2/GFX.cpp ****     uint16_t SizeTable = 1 + pFont->last - pFont->first;
+  54              		.loc 1 41 5 is_stmt 1 view .LVU10
+  55              	.LVL2:
+  56              		.loc 1 42 5 view .LVU11
+  57              		.loc 1 42 14 is_stmt 0 view .LVU12
+  58 000e 5B1A     		subs	r3, r3, r1
+  43:dependencies/DaisySeedGFX2/GFX.cpp ****     m_NegHeight = 0;
+  44:dependencies/DaisySeedGFX2/GFX.cpp ****     m_PosHeight = 0;
+  59              		.loc 1 44 17 view .LVU13
+  60 0010 0021     		movs	r1, #0
+  42:dependencies/DaisySeedGFX2/GFX.cpp ****     m_NegHeight = 0;
+  61              		.loc 1 42 14 view .LVU14
+  62 0012 9BB2     		uxth	r3, r3
+  63              	.LVL3:
+  43:dependencies/DaisySeedGFX2/GFX.cpp ****     m_NegHeight = 0;
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s 			page 3
+
+
+  64              		.loc 1 43 5 is_stmt 1 view .LVU15
+  65              		.loc 1 44 5 view .LVU16
+  66              		.loc 1 44 17 is_stmt 0 view .LVU17
+  67 0014 0181     		strh	r1, [r0, #8]	@ movhi
+  45:dependencies/DaisySeedGFX2/GFX.cpp ****     for (uint16_t index = 0; index < SizeTable; index++)
+  68              		.loc 1 45 5 is_stmt 1 view .LVU18
+  69              	.LVL4:
+  70              		.loc 1 45 5 is_stmt 0 view .LVU19
+  71 0016 02EBC303 		add	r3, r2, r3, lsl #3
+  72              	.LVL5:
+  73              	.L2:
+  74              	.LBB10:
+  75              		.loc 1 45 36 is_stmt 1 discriminator 1 view .LVU20
+  76 001a 9A42     		cmp	r2, r3
+  77 001c 00D1     		bne	.L5
+  78              		.loc 1 45 36 is_stmt 0 discriminator 1 view .LVU21
+  79              	.LBE10:
+  46:dependencies/DaisySeedGFX2/GFX.cpp ****     {
+  47:dependencies/DaisySeedGFX2/GFX.cpp ****         int8_t Offset = pTable->yOffset;
+  48:dependencies/DaisySeedGFX2/GFX.cpp ****         int8_t NegHeight = pTable->height + Offset;
+  49:dependencies/DaisySeedGFX2/GFX.cpp ****         if (NegHeight > m_NegHeight)
+  50:dependencies/DaisySeedGFX2/GFX.cpp ****         {
+  51:dependencies/DaisySeedGFX2/GFX.cpp ****             m_NegHeight = NegHeight;
+  52:dependencies/DaisySeedGFX2/GFX.cpp ****         }
+  53:dependencies/DaisySeedGFX2/GFX.cpp ****         if (Offset < m_PosHeight)
+  54:dependencies/DaisySeedGFX2/GFX.cpp ****         {
+  55:dependencies/DaisySeedGFX2/GFX.cpp ****             m_PosHeight = Offset;
+  56:dependencies/DaisySeedGFX2/GFX.cpp ****         }
+  57:dependencies/DaisySeedGFX2/GFX.cpp ****         pTable++;
+  58:dependencies/DaisySeedGFX2/GFX.cpp ****     }
+  59:dependencies/DaisySeedGFX2/GFX.cpp **** }
+  80              		.loc 1 59 1 view .LVU22
+  81 001e 30BD     		pop	{r4, r5, pc}
+  82              	.L5:
+  83              	.LBB12:
+  84              	.LBB11:
+  47:dependencies/DaisySeedGFX2/GFX.cpp ****         int8_t NegHeight = pTable->height + Offset;
+  85              		.loc 1 47 9 is_stmt 1 view .LVU23
+  47:dependencies/DaisySeedGFX2/GFX.cpp ****         int8_t NegHeight = pTable->height + Offset;
+  86              		.loc 1 47 16 is_stmt 0 view .LVU24
+  87 0020 92F90640 		ldrsb	r4, [r2, #6]
+  88              	.LVL6:
+  48:dependencies/DaisySeedGFX2/GFX.cpp ****         if (NegHeight > m_NegHeight)
+  89              		.loc 1 48 9 is_stmt 1 view .LVU25
+  57:dependencies/DaisySeedGFX2/GFX.cpp ****     }
+  90              		.loc 1 57 15 is_stmt 0 view .LVU26
+  91 0024 0832     		adds	r2, r2, #8
+  92              	.LVL7:
+  48:dependencies/DaisySeedGFX2/GFX.cpp ****         if (NegHeight > m_NegHeight)
+  93              		.loc 1 48 43 view .LVU27
+  94 0026 12F8051C 		ldrb	r1, [r2, #-5]	@ zero_extendqisi2
+  49:dependencies/DaisySeedGFX2/GFX.cpp ****         {
+  95              		.loc 1 49 9 view .LVU28
+  96 002a 90F90950 		ldrsb	r5, [r0, #9]
+  48:dependencies/DaisySeedGFX2/GFX.cpp ****         if (NegHeight > m_NegHeight)
+  97              		.loc 1 48 43 view .LVU29
+  98 002e 2144     		add	r1, r1, r4
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s 			page 4
+
+
+  48:dependencies/DaisySeedGFX2/GFX.cpp ****         if (NegHeight > m_NegHeight)
+  99              		.loc 1 48 16 view .LVU30
+ 100 0030 49B2     		sxtb	r1, r1
+ 101              	.LVL8:
+  49:dependencies/DaisySeedGFX2/GFX.cpp ****         {
+ 102              		.loc 1 49 9 is_stmt 1 view .LVU31
+ 103 0032 8D42     		cmp	r5, r1
+  51:dependencies/DaisySeedGFX2/GFX.cpp ****         }
+ 104              		.loc 1 51 13 view .LVU32
+  51:dependencies/DaisySeedGFX2/GFX.cpp ****         }
+ 105              		.loc 1 51 25 is_stmt 0 view .LVU33
+ 106 0034 B8BF     		it	lt
+ 107 0036 4172     		strblt	r1, [r0, #9]
+  53:dependencies/DaisySeedGFX2/GFX.cpp ****         {
+ 108              		.loc 1 53 9 is_stmt 1 view .LVU34
+ 109 0038 90F90810 		ldrsb	r1, [r0, #8]
+ 110              	.LVL9:
+  53:dependencies/DaisySeedGFX2/GFX.cpp ****         {
+ 111              		.loc 1 53 9 is_stmt 0 view .LVU35
+ 112 003c A142     		cmp	r1, r4
+  55:dependencies/DaisySeedGFX2/GFX.cpp ****         }
+ 113              		.loc 1 55 13 is_stmt 1 view .LVU36
+  55:dependencies/DaisySeedGFX2/GFX.cpp ****         }
+ 114              		.loc 1 55 25 is_stmt 0 view .LVU37
+ 115 003e C8BF     		it	gt
+ 116 0040 0472     		strbgt	r4, [r0, #8]
+  57:dependencies/DaisySeedGFX2/GFX.cpp ****     }
+ 117              		.loc 1 57 9 is_stmt 1 view .LVU38
+ 118              	.LVL10:
+  57:dependencies/DaisySeedGFX2/GFX.cpp ****     }
+ 119              		.loc 1 57 9 is_stmt 0 view .LVU39
+ 120              	.LBE11:
+  45:dependencies/DaisySeedGFX2/GFX.cpp ****     {
+ 121              		.loc 1 45 5 is_stmt 1 discriminator 2 view .LVU40
+ 122 0042 EAE7     		b	.L2
+ 123              	.LBE12:
+ 124              		.cfi_endproc
+ 125              	.LFE1543:
+ 127              		.section	.text._ZN6DadGFX5cFontC2EPNS_10GFXBinFontE,"ax",%progbits
+ 128              		.align	1
+ 129              		.global	_ZN6DadGFX5cFontC2EPNS_10GFXBinFontE
+ 130              		.syntax unified
+ 131              		.thumb
+ 132              		.thumb_func
+ 134              	_ZN6DadGFX5cFontC2EPNS_10GFXBinFontE:
+ 135              	.LVL11:
+ 136              	.LFB1545:
+  60:dependencies/DaisySeedGFX2/GFX.cpp **** 
+  61:dependencies/DaisySeedGFX2/GFX.cpp **** // --------------------------------------------------------------------------
+  62:dependencies/DaisySeedGFX2/GFX.cpp **** // Constructor for Binary
+  63:dependencies/DaisySeedGFX2/GFX.cpp **** cFont::cFont(GFXBinFont *pFont)
+ 137              		.loc 1 63 1 view -0
+ 138              		.cfi_startproc
+ 139              		@ args = 0, pretend = 0, frame = 0
+ 140              		@ frame_needed = 0, uses_anonymous_args = 0
+ 141              	.LBB13:
+  64:dependencies/DaisySeedGFX2/GFX.cpp **** {
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s 			page 5
+
+
+  65:dependencies/DaisySeedGFX2/GFX.cpp ****     uint8_t * pData;
+ 142              		.loc 1 65 5 view .LVU42
+  66:dependencies/DaisySeedGFX2/GFX.cpp ****     pData = (uint8_t *) pFont;
+ 143              		.loc 1 66 5 view .LVU43
+  67:dependencies/DaisySeedGFX2/GFX.cpp ****     
+  68:dependencies/DaisySeedGFX2/GFX.cpp ****     m_Font.first = pFont->first;
+ 144              		.loc 1 68 5 view .LVU44
+  69:dependencies/DaisySeedGFX2/GFX.cpp ****     m_Font.last = pFont->last;
+ 145              		.loc 1 69 5 view .LVU45
+  70:dependencies/DaisySeedGFX2/GFX.cpp ****     m_Font.yAdvance = pFont->yAdvance;
+ 146              		.loc 1 70 5 view .LVU46
+ 147              	.LBE13:
+  63:dependencies/DaisySeedGFX2/GFX.cpp **** {
+ 148              		.loc 1 63 1 is_stmt 0 view .LVU47
+ 149 0000 10B5     		push	{r4, lr}
+ 150              		.cfi_def_cfa_offset 8
+ 151              		.cfi_offset 4, -8
+ 152              		.cfi_offset 14, -4
+ 153              	.LBB14:
+ 154              		.loc 1 70 30 view .LVU48
+ 155 0002 0A7B     		ldrb	r2, [r1, #12]	@ zero_extendqisi2
+  68:dependencies/DaisySeedGFX2/GFX.cpp ****     m_Font.last = pFont->last;
+ 156              		.loc 1 68 18 view .LVU49
+ 157 0004 8C68     		ldr	r4, [r1, #8]
+ 158              		.loc 1 70 21 view .LVU50
+ 159 0006 0276     		strb	r2, [r0, #24]
+  71:dependencies/DaisySeedGFX2/GFX.cpp ****     m_Font.bitmap = pData + pFont->bitmap;
+ 160              		.loc 1 71 5 is_stmt 1 view .LVU51
+ 161              		.loc 1 71 27 is_stmt 0 view .LVU52
+ 162 0008 0A68     		ldr	r2, [r1]
+  68:dependencies/DaisySeedGFX2/GFX.cpp ****     m_Font.last = pFont->last;
+ 163              		.loc 1 68 18 view .LVU53
+ 164 000a 4461     		str	r4, [r0, #20]
+ 165              		.loc 1 71 27 view .LVU54
+ 166 000c 0A44     		add	r2, r2, r1
+ 167              		.loc 1 71 19 view .LVU55
+ 168 000e C260     		str	r2, [r0, #12]
+  72:dependencies/DaisySeedGFX2/GFX.cpp ****     m_Font.glyph = (GFXglyph *) (pData + pFont->glyph);
+ 169              		.loc 1 72 5 is_stmt 1 view .LVU56
+ 170              		.loc 1 72 40 is_stmt 0 view .LVU57
+ 171 0010 4A68     		ldr	r2, [r1, #4]
+ 172 0012 1144     		add	r1, r1, r2
+ 173              	.LVL12:
+ 174              		.loc 1 72 18 view .LVU58
+ 175 0014 0161     		str	r1, [r0, #16]
+  73:dependencies/DaisySeedGFX2/GFX.cpp ****     Init(&m_Font);
+ 176              		.loc 1 73 5 is_stmt 1 view .LVU59
+ 177              		.loc 1 73 9 is_stmt 0 view .LVU60
+ 178 0016 00F10C01 		add	r1, r0, #12
+ 179 001a FFF7FEFF 		bl	_ZN6DadGFX5cFont4InitEPKNS_8GFXCFontE
+ 180              	.LVL13:
+ 181              	.LBE14:
+  74:dependencies/DaisySeedGFX2/GFX.cpp **** }
+ 182              		.loc 1 74 1 view .LVU61
+ 183 001e 10BD     		pop	{r4, pc}
+ 184              		.cfi_endproc
+ 185              	.LFE1545:
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s 			page 6
+
+
+ 187              		.global	_ZN6DadGFX5cFontC1EPNS_10GFXBinFontE
+ 188              		.thumb_set _ZN6DadGFX5cFontC1EPNS_10GFXBinFontE,_ZN6DadGFX5cFontC2EPNS_10GFXBinFontE
+ 189              		.section	.text._ZN6DadGFX5cFont12getTextWidthEPKc,"ax",%progbits
+ 190              		.align	1
+ 191              		.global	_ZN6DadGFX5cFont12getTextWidthEPKc
+ 192              		.syntax unified
+ 193              		.thumb
+ 194              		.thumb_func
+ 196              	_ZN6DadGFX5cFont12getTextWidthEPKc:
+ 197              	.LVL14:
+ 198              	.LFB1547:
+  75:dependencies/DaisySeedGFX2/GFX.cpp **** 
+  76:dependencies/DaisySeedGFX2/GFX.cpp **** 
+  77:dependencies/DaisySeedGFX2/GFX.cpp **** // --------------------------------------------------------------------------
+  78:dependencies/DaisySeedGFX2/GFX.cpp **** // Reads the width of a string
+  79:dependencies/DaisySeedGFX2/GFX.cpp **** uint16_t cFont::getTextWidth(const char *Text)
+  80:dependencies/DaisySeedGFX2/GFX.cpp **** {
+ 199              		.loc 1 80 1 is_stmt 1 view -0
+ 200              		.cfi_startproc
+ 201              		@ args = 0, pretend = 0, frame = 0
+ 202              		@ frame_needed = 0, uses_anonymous_args = 0
+  81:dependencies/DaisySeedGFX2/GFX.cpp ****     const char *pText = Text;
+ 203              		.loc 1 81 5 view .LVU63
+  82:dependencies/DaisySeedGFX2/GFX.cpp ****     uint16_t result = 0;
+ 204              		.loc 1 82 5 view .LVU64
+  83:dependencies/DaisySeedGFX2/GFX.cpp ****     while (*pText != '\0')
+ 205              		.loc 1 83 5 view .LVU65
+  80:dependencies/DaisySeedGFX2/GFX.cpp ****     const char *pText = Text;
+ 206              		.loc 1 80 1 is_stmt 0 view .LVU66
+ 207 0000 0246     		mov	r2, r0
+ 208 0002 0139     		subs	r1, r1, #1
+ 209              	.LVL15:
+  82:dependencies/DaisySeedGFX2/GFX.cpp ****     uint16_t result = 0;
+ 210              		.loc 1 82 14 view .LVU67
+ 211 0004 0020     		movs	r0, #0
+ 212              	.LVL16:
+  80:dependencies/DaisySeedGFX2/GFX.cpp ****     const char *pText = Text;
+ 213              		.loc 1 80 1 view .LVU68
+ 214 0006 30B5     		push	{r4, r5, lr}
+ 215              		.cfi_def_cfa_offset 12
+ 216              		.cfi_offset 4, -12
+ 217              		.cfi_offset 5, -8
+ 218              		.cfi_offset 14, -4
+ 219              	.LVL17:
+ 220              	.L8:
+ 221              		.loc 1 83 19 is_stmt 1 view .LVU69
+ 222              		.loc 1 83 12 is_stmt 0 view .LVU70
+ 223 0008 11F8013F 		ldrb	r3, [r1, #1]!	@ zero_extendqisi2
+ 224              	.LVL18:
+ 225              		.loc 1 83 19 view .LVU71
+ 226 000c 03B9     		cbnz	r3, .L9
+  84:dependencies/DaisySeedGFX2/GFX.cpp ****     {
+  85:dependencies/DaisySeedGFX2/GFX.cpp ****         result += getCharWidth(*pText++);
+  86:dependencies/DaisySeedGFX2/GFX.cpp ****     }
+  87:dependencies/DaisySeedGFX2/GFX.cpp ****     return result;
+ 227              		.loc 1 87 5 is_stmt 1 view .LVU72
+  88:dependencies/DaisySeedGFX2/GFX.cpp **** }
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s 			page 7
+
+
+ 228              		.loc 1 88 1 is_stmt 0 view .LVU73
+ 229 000e 30BD     		pop	{r4, r5, pc}
+ 230              	.L9:
+  85:dependencies/DaisySeedGFX2/GFX.cpp ****     }
+ 231              		.loc 1 85 9 is_stmt 1 view .LVU74
+ 232              	.LVL19:
+  85:dependencies/DaisySeedGFX2/GFX.cpp ****     }
+ 233              		.loc 1 85 9 is_stmt 0 view .LVU75
+ 234 0010 1468     		ldr	r4, [r2]
+ 235              	.LVL20:
+ 236              	.LBB17:
+ 237              	.LBI17:
+ 238              		.file 2 "dependencies/DaisySeedGFX2/GFX.h"
+   1:dependencies/DaisySeedGFX2/GFX.h **** //====================================================================================
+   2:dependencies/DaisySeedGFX2/GFX.h **** // GFX.h
+   3:dependencies/DaisySeedGFX2/GFX.h **** //  
+   4:dependencies/DaisySeedGFX2/GFX.h **** // Features:
+   5:dependencies/DaisySeedGFX2/GFX.h **** //   - Provides a set of graphics drawing utilities for rendering shapes, text, 
+   6:dependencies/DaisySeedGFX2/GFX.h **** //     and bitmaps on graphical displays.
+   7:dependencies/DaisySeedGFX2/GFX.h **** //   - Abstract base class for graphics operations, to be implemented by derived classes.
+   8:dependencies/DaisySeedGFX2/GFX.h **** //
+   9:dependencies/DaisySeedGFX2/GFX.h **** // Inspired by:
+  10:dependencies/DaisySeedGFX2/GFX.h **** //   - Adafruit-GFX-Library: https://github.com/adafruit/Adafruit-GFX-Library
+  11:dependencies/DaisySeedGFX2/GFX.h **** //   - eSPI: https://github.com/Bodmer/TFT_eSPI
+  12:dependencies/DaisySeedGFX2/GFX.h **** //
+  13:dependencies/DaisySeedGFX2/GFX.h **** // Copyright (c) 2025 Dad Design. All rights reserved.
+  14:dependencies/DaisySeedGFX2/GFX.h **** //
+  15:dependencies/DaisySeedGFX2/GFX.h **** //====================================================================================
+  16:dependencies/DaisySeedGFX2/GFX.h **** 
+  17:dependencies/DaisySeedGFX2/GFX.h **** #pragma once // Ensure this file is only included once during compilation
+  18:dependencies/DaisySeedGFX2/GFX.h **** #include "stdint.h"
+  19:dependencies/DaisySeedGFX2/GFX.h **** #include "GFXFont.h"
+  20:dependencies/DaisySeedGFX2/GFX.h **** 
+  21:dependencies/DaisySeedGFX2/GFX.h **** 
+  22:dependencies/DaisySeedGFX2/GFX.h **** namespace DadGFX {
+  23:dependencies/DaisySeedGFX2/GFX.h **** 
+  24:dependencies/DaisySeedGFX2/GFX.h **** //***********************************************************************************
+  25:dependencies/DaisySeedGFX2/GFX.h **** // Constants
+  26:dependencies/DaisySeedGFX2/GFX.h **** //***********************************************************************************
+  27:dependencies/DaisySeedGFX2/GFX.h **** constexpr float __PI = 3.14159265358979;   // Value of π
+  28:dependencies/DaisySeedGFX2/GFX.h **** constexpr float __PI_2 = 1.57079632679489; // Value of π/2
+  29:dependencies/DaisySeedGFX2/GFX.h **** 
+  30:dependencies/DaisySeedGFX2/GFX.h **** //***********************************************************************************
+  31:dependencies/DaisySeedGFX2/GFX.h **** // Enumerations
+  32:dependencies/DaisySeedGFX2/GFX.h **** //***********************************************************************************
+  33:dependencies/DaisySeedGFX2/GFX.h **** // --------------------------------------------------------------------------
+  34:dependencies/DaisySeedGFX2/GFX.h **** // Error codes for graphics operations
+  35:dependencies/DaisySeedGFX2/GFX.h **** enum class DAD_GFX_ERROR {
+  36:dependencies/DaisySeedGFX2/GFX.h ****     OK,            // Operation successful
+  37:dependencies/DaisySeedGFX2/GFX.h ****     DMA2D_Error,   // Error in DMA2D hardware operation
+  38:dependencies/DaisySeedGFX2/GFX.h ****     Size_Error,    // Size exceeds bounds or invalid dimensions
+  39:dependencies/DaisySeedGFX2/GFX.h ****     Memory_Error   // Memory allocation or access error
+  40:dependencies/DaisySeedGFX2/GFX.h **** };
+  41:dependencies/DaisySeedGFX2/GFX.h **** 
+  42:dependencies/DaisySeedGFX2/GFX.h **** //***********************************************************************************
+  43:dependencies/DaisySeedGFX2/GFX.h **** // sColor 
+  44:dependencies/DaisySeedGFX2/GFX.h **** //   Stores a color in the A8R8G8B8 format
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s 			page 8
+
+
+  45:dependencies/DaisySeedGFX2/GFX.h **** //***********************************************************************************
+  46:dependencies/DaisySeedGFX2/GFX.h **** struct sColor {
+  47:dependencies/DaisySeedGFX2/GFX.h ****     union {
+  48:dependencies/DaisySeedGFX2/GFX.h ****         struct {
+  49:dependencies/DaisySeedGFX2/GFX.h ****             uint8_t m_B;  // BLUE channel (8-bit)
+  50:dependencies/DaisySeedGFX2/GFX.h ****             uint8_t m_G;  // GREEN channel (8-bit)
+  51:dependencies/DaisySeedGFX2/GFX.h ****             uint8_t m_R;  // RED channel (8-bit)
+  52:dependencies/DaisySeedGFX2/GFX.h ****             uint8_t m_A;  // ALPHA channel (8-bit, transparency)
+  53:dependencies/DaisySeedGFX2/GFX.h ****         };
+  54:dependencies/DaisySeedGFX2/GFX.h ****         uint32_t m_ARGB;  // 32-bit representation of the color
+  55:dependencies/DaisySeedGFX2/GFX.h ****     };
+  56:dependencies/DaisySeedGFX2/GFX.h **** 
+  57:dependencies/DaisySeedGFX2/GFX.h ****     // --------------------------------------------------------------------------
+  58:dependencies/DaisySeedGFX2/GFX.h ****     // Constructor
+  59:dependencies/DaisySeedGFX2/GFX.h ****     // Initializes the default color
+  60:dependencies/DaisySeedGFX2/GFX.h ****     sColor(){}
+  61:dependencies/DaisySeedGFX2/GFX.h **** 
+  62:dependencies/DaisySeedGFX2/GFX.h ****     // --------------------------------------------------------------------------
+  63:dependencies/DaisySeedGFX2/GFX.h ****     // Constructor
+  64:dependencies/DaisySeedGFX2/GFX.h ****     // Initializes the color using red, green, blue, and optional alpha values
+  65:dependencies/DaisySeedGFX2/GFX.h ****     sColor(uint8_t R, uint8_t G, uint8_t B, uint8_t Alpha = 255)
+  66:dependencies/DaisySeedGFX2/GFX.h ****         : m_B(B), m_G(G), m_R(R), m_A(Alpha) {}
+  67:dependencies/DaisySeedGFX2/GFX.h **** 
+  68:dependencies/DaisySeedGFX2/GFX.h ****     // --------------------------------------------------------------------------
+  69:dependencies/DaisySeedGFX2/GFX.h ****     // Set a new color value
+  70:dependencies/DaisySeedGFX2/GFX.h ****     // Updates the red, green, blue, and alpha channels
+  71:dependencies/DaisySeedGFX2/GFX.h ****     inline void set(uint8_t R, uint8_t G, uint8_t B, uint8_t Alpha = 255) {
+  72:dependencies/DaisySeedGFX2/GFX.h ****         m_R = R;
+  73:dependencies/DaisySeedGFX2/GFX.h ****         m_G = G;
+  74:dependencies/DaisySeedGFX2/GFX.h ****         m_B = B;
+  75:dependencies/DaisySeedGFX2/GFX.h ****         m_A = Alpha;
+  76:dependencies/DaisySeedGFX2/GFX.h ****     }
+  77:dependencies/DaisySeedGFX2/GFX.h **** 
+  78:dependencies/DaisySeedGFX2/GFX.h ****     // --------------------------------------------------------------------------
+  79:dependencies/DaisySeedGFX2/GFX.h ****     // Conversion operator to uint32_t
+  80:dependencies/DaisySeedGFX2/GFX.h ****     // Allows the structure to be used directly as a 32-bit ARGB value
+  81:dependencies/DaisySeedGFX2/GFX.h ****     inline operator uint32_t() const {
+  82:dependencies/DaisySeedGFX2/GFX.h ****         return m_ARGB;
+  83:dependencies/DaisySeedGFX2/GFX.h ****     }
+  84:dependencies/DaisySeedGFX2/GFX.h **** };
+  85:dependencies/DaisySeedGFX2/GFX.h **** 
+  86:dependencies/DaisySeedGFX2/GFX.h **** //***********************************************************************************
+  87:dependencies/DaisySeedGFX2/GFX.h **** // CFont
+  88:dependencies/DaisySeedGFX2/GFX.h **** // Character font management
+  89:dependencies/DaisySeedGFX2/GFX.h **** //
+  90:dependencies/DaisySeedGFX2/GFX.h **** // Fonts can be generated using the TTF2Bitmap tool. 
+  91:dependencies/DaisySeedGFX2/GFX.h **** // See https://github.com/DADDesign-Projects/TrueType-to-Bitmap-Converter
+  92:dependencies/DaisySeedGFX2/GFX.h **** //
+  93:dependencies/DaisySeedGFX2/GFX.h **** //***********************************************************************************
+  94:dependencies/DaisySeedGFX2/GFX.h **** 
+  95:dependencies/DaisySeedGFX2/GFX.h **** //***********************************************************************************
+  96:dependencies/DaisySeedGFX2/GFX.h **** // CFont
+  97:dependencies/DaisySeedGFX2/GFX.h **** class cFont {
+  98:dependencies/DaisySeedGFX2/GFX.h **** public:
+  99:dependencies/DaisySeedGFX2/GFX.h ****     // --------------------------------------------------------------------------
+ 100:dependencies/DaisySeedGFX2/GFX.h ****     // Constructor use for C font
+ 101:dependencies/DaisySeedGFX2/GFX.h ****     cFont(const GFXCFont *pFont){
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s 			page 9
+
+
+ 102:dependencies/DaisySeedGFX2/GFX.h ****         Init(pFont);
+ 103:dependencies/DaisySeedGFX2/GFX.h ****     }
+ 104:dependencies/DaisySeedGFX2/GFX.h **** 
+ 105:dependencies/DaisySeedGFX2/GFX.h ****     // --------------------------------------------------------------------------
+ 106:dependencies/DaisySeedGFX2/GFX.h ****     // Constructor use for Binary font
+ 107:dependencies/DaisySeedGFX2/GFX.h ****     cFont(GFXBinFont *pFont);
+ 108:dependencies/DaisySeedGFX2/GFX.h **** 
+ 109:dependencies/DaisySeedGFX2/GFX.h ****     // --------------------------------------------------------------------------
+ 110:dependencies/DaisySeedGFX2/GFX.h ****     // Reads the width of character c
+ 111:dependencies/DaisySeedGFX2/GFX.h ****     inline uint8_t getCharWidth(char c){
+ 239              		.loc 2 111 20 is_stmt 1 view .LVU76
+ 240              	.LBB18:
+ 112:dependencies/DaisySeedGFX2/GFX.h ****         return ((m_pFont->glyph) + (c - m_pFont->first))->xAdvance;
+ 241              		.loc 2 112 9 view .LVU77
+ 242              		.loc 2 112 50 is_stmt 0 view .LVU78
+ 243 0012 2589     		ldrh	r5, [r4, #8]
+ 244              		.loc 2 112 59 view .LVU79
+ 245 0014 6468     		ldr	r4, [r4, #4]
+ 246              		.loc 2 112 39 view .LVU80
+ 247 0016 5B1B     		subs	r3, r3, r5
+ 248              		.loc 2 112 59 view .LVU81
+ 249 0018 04EBC303 		add	r3, r4, r3, lsl #3
+ 250              	.LBE18:
+ 251              	.LBE17:
+  85:dependencies/DaisySeedGFX2/GFX.cpp ****     }
+ 252              		.loc 1 85 16 discriminator 1 view .LVU82
+ 253 001c 1B79     		ldrb	r3, [r3, #4]	@ zero_extendqisi2
+ 254 001e 0344     		add	r3, r3, r0
+ 255 0020 98B2     		uxth	r0, r3
+ 256              	.LVL21:
+  85:dependencies/DaisySeedGFX2/GFX.cpp ****     }
+ 257              		.loc 1 85 16 discriminator 1 view .LVU83
+ 258 0022 F1E7     		b	.L8
+ 259              		.cfi_endproc
+ 260              	.LFE1547:
+ 262              		.section	.text._ZN6DadGFX4cGFX8drawRectEtttttRKNS_6sColorE,"ax",%progbits
+ 263              		.align	1
+ 264              		.global	_ZN6DadGFX4cGFX8drawRectEtttttRKNS_6sColorE
+ 265              		.syntax unified
+ 266              		.thumb
+ 267              		.thumb_func
+ 269              	_ZN6DadGFX4cGFX8drawRectEtttttRKNS_6sColorE:
+ 270              	.LVL22:
+ 271              	.LFB1548:
+  89:dependencies/DaisySeedGFX2/GFX.cpp **** 
+  90:dependencies/DaisySeedGFX2/GFX.cpp **** //***********************************************************************************
+  91:dependencies/DaisySeedGFX2/GFX.cpp **** // cGFX
+  92:dependencies/DaisySeedGFX2/GFX.cpp **** // Graphics rendering class
+  93:dependencies/DaisySeedGFX2/GFX.cpp **** //***********************************************************************************
+  94:dependencies/DaisySeedGFX2/GFX.cpp **** 
+  95:dependencies/DaisySeedGFX2/GFX.cpp **** // ==========================================================================
+  96:dependencies/DaisySeedGFX2/GFX.cpp **** // Shape Drawing Methods
+  97:dependencies/DaisySeedGFX2/GFX.cpp **** // ==========================================================================
+  98:dependencies/DaisySeedGFX2/GFX.cpp **** 
+  99:dependencies/DaisySeedGFX2/GFX.cpp **** // --------------------------------------------------------------------------
+ 100:dependencies/DaisySeedGFX2/GFX.cpp **** // Draw an empty rectangle
+ 101:dependencies/DaisySeedGFX2/GFX.cpp **** void cGFX::drawRect(uint16_t x, uint16_t y, uint16_t Width, uint16_t Height, uint16_t strokeWidth, 
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s 			page 10
+
+
+ 272              		.loc 1 101 121 is_stmt 1 view -0
+ 273              		.cfi_startproc
+ 274              		@ args = 12, pretend = 0, frame = 0
+ 275              		@ frame_needed = 0, uses_anonymous_args = 0
+ 102:dependencies/DaisySeedGFX2/GFX.cpp ****     setRectangle(x, y, Width, strokeWidth, Color);                                                 
+ 276              		.loc 1 102 5 view .LVU85
+ 101:dependencies/DaisySeedGFX2/GFX.cpp ****     setRectangle(x, y, Width, strokeWidth, Color);                                                 
+ 277              		.loc 1 101 121 is_stmt 0 view .LVU86
+ 278 0000 2DE9F74F 		push	{r0, r1, r2, r4, r5, r6, r7, r8, r9, r10, fp, lr}
+ 279              		.cfi_def_cfa_offset 48
+ 280              		.cfi_offset 4, -36
+ 281              		.cfi_offset 5, -32
+ 282              		.cfi_offset 6, -28
+ 283              		.cfi_offset 7, -24
+ 284              		.cfi_offset 8, -20
+ 285              		.cfi_offset 9, -16
+ 286              		.cfi_offset 10, -12
+ 287              		.cfi_offset 11, -8
+ 288              		.cfi_offset 14, -4
+ 101:dependencies/DaisySeedGFX2/GFX.cpp ****     setRectangle(x, y, Width, strokeWidth, Color);                                                 
+ 289              		.loc 1 101 121 view .LVU87
+ 290 0004 DDF838A0 		ldr	r10, [sp, #56]
+ 291 0008 0446     		mov	r4, r0
+ 292 000a BDF83460 		ldrh	r6, [sp, #52]
+ 293 000e 8846     		mov	r8, r1
+ 294              		.loc 1 102 17 view .LVU88
+ 295 0010 0768     		ldr	r7, [r0]
+ 101:dependencies/DaisySeedGFX2/GFX.cpp ****     setRectangle(x, y, Width, strokeWidth, Color);                                                 
+ 296              		.loc 1 101 121 view .LVU89
+ 297 0012 1546     		mov	r5, r2
+ 298 0014 BDF830B0 		ldrh	fp, [sp, #48]
+ 299 0018 9946     		mov	r9, r3
+ 300              		.loc 1 102 17 view .LVU90
+ 301 001a CDE9006A 		strd	r6, r10, [sp]
+ 302 001e 7F68     		ldr	r7, [r7, #4]
+ 303 0020 B847     		blx	r7
+ 304              	.LVL23:
+ 103:dependencies/DaisySeedGFX2/GFX.cpp ****     setRectangle(x, y + Height - strokeWidth, Width, strokeWidth, Color);                          
+ 305              		.loc 1 103 5 is_stmt 1 view .LVU91
+ 306 0022 ABEB0602 		sub	r2, fp, r6
+ 307              		.loc 1 103 17 is_stmt 0 view .LVU92
+ 308 0026 2368     		ldr	r3, [r4]
+ 309 0028 4146     		mov	r1, r8
+ 310 002a 97B2     		uxth	r7, r2
+ 311 002c 15FA82F2 		uxtah	r2, r5, r2
+ 104:dependencies/DaisySeedGFX2/GFX.cpp ****     setRectangle(x, y + strokeWidth, strokeWidth, Height - (2 * strokeWidth), Color);              
+ 312              		.loc 1 104 17 view .LVU93
+ 313 0030 3544     		add	r5, r5, r6
+ 314              	.LVL24:
+ 103:dependencies/DaisySeedGFX2/GFX.cpp ****     setRectangle(x, y + Height - strokeWidth, Width, strokeWidth, Color);                          
+ 315              		.loc 1 103 17 view .LVU94
+ 316 0032 2046     		mov	r0, r4
+ 317              		.loc 1 104 17 view .LVU95
+ 318 0034 BF1B     		subs	r7, r7, r6
+ 103:dependencies/DaisySeedGFX2/GFX.cpp ****     setRectangle(x, y + Height - strokeWidth, Width, strokeWidth, Color);                          
+ 319              		.loc 1 103 17 view .LVU96
+ 320 0036 92B2     		uxth	r2, r2
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s 			page 11
+
+
+ 321              		.loc 1 104 17 view .LVU97
+ 322 0038 ADB2     		uxth	r5, r5
+ 323 003a BFB2     		uxth	r7, r7
+ 103:dependencies/DaisySeedGFX2/GFX.cpp ****     setRectangle(x, y + Height - strokeWidth, Width, strokeWidth, Color);                          
+ 324              		.loc 1 103 17 view .LVU98
+ 325 003c CDE9006A 		strd	r6, r10, [sp]
+ 326 0040 D3F804B0 		ldr	fp, [r3, #4]
+ 327 0044 4B46     		mov	r3, r9
+ 328 0046 D847     		blx	fp
+ 329              	.LVL25:
+ 330              		.loc 1 104 5 is_stmt 1 view .LVU99
+ 331              		.loc 1 104 17 is_stmt 0 view .LVU100
+ 332 0048 2368     		ldr	r3, [r4]
+ 333 004a 2A46     		mov	r2, r5
+ 334 004c 4146     		mov	r1, r8
+ 335 004e 2046     		mov	r0, r4
+ 105:dependencies/DaisySeedGFX2/GFX.cpp ****     setRectangle(x + Width - strokeWidth, y + strokeWidth, strokeWidth, Height - (2 * strokeWidth),
+ 336              		.loc 1 105 17 view .LVU101
+ 337 0050 A9EB0609 		sub	r9, r9, r6
+ 338              	.LVL26:
+ 104:dependencies/DaisySeedGFX2/GFX.cpp ****     setRectangle(x, y + strokeWidth, strokeWidth, Height - (2 * strokeWidth), Color);              
+ 339              		.loc 1 104 17 view .LVU102
+ 340 0054 CDE9007A 		strd	r7, r10, [sp]
+ 341 0058 D3F804B0 		ldr	fp, [r3, #4]
+ 342 005c 3346     		mov	r3, r6
+ 343 005e D847     		blx	fp
+ 344              	.LVL27:
+ 345              		.loc 1 105 5 is_stmt 1 view .LVU103
+ 346              		.loc 1 105 17 is_stmt 0 view .LVU104
+ 347 0060 2368     		ldr	r3, [r4]
+ 348 0062 08EB0901 		add	r1, r8, r9
+ 349 0066 2A46     		mov	r2, r5
+ 350 0068 2046     		mov	r0, r4
+ 351 006a 89B2     		uxth	r1, r1
+ 352 006c CDE90C7A 		strd	r7, r10, [sp, #48]
+ 353              	.LVL28:
+ 354              		.loc 1 105 17 view .LVU105
+ 355 0070 5F68     		ldr	r7, [r3, #4]
+ 356 0072 3346     		mov	r3, r6
+ 357 0074 BC46     		mov	ip, r7
+ 106:dependencies/DaisySeedGFX2/GFX.cpp **** }
+ 358              		.loc 1 106 1 view .LVU106
+ 359 0076 03B0     		add	sp, sp, #12
+ 360              		.cfi_def_cfa_offset 36
+ 361              		@ sp needed
+ 362 0078 BDE8F04F 		pop	{r4, r5, r6, r7, r8, r9, r10, fp, lr}
+ 363              		.cfi_restore 14
+ 364              		.cfi_restore 11
+ 365              		.cfi_restore 10
+ 366              		.cfi_restore 9
+ 367              		.cfi_restore 8
+ 368              		.cfi_restore 7
+ 369              		.cfi_restore 6
+ 370              		.cfi_restore 5
+ 371              		.cfi_restore 4
+ 372              		.cfi_def_cfa_offset 0
+ 373              	.LVL29:
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s 			page 12
+
+
+ 105:dependencies/DaisySeedGFX2/GFX.cpp ****     setRectangle(x + Width - strokeWidth, y + strokeWidth, strokeWidth, Height - (2 * strokeWidth),
+ 374              		.loc 1 105 17 view .LVU107
+ 375 007c 6047     		bx	ip
+ 376              	.LVL30:
+ 105:dependencies/DaisySeedGFX2/GFX.cpp ****     setRectangle(x + Width - strokeWidth, y + strokeWidth, strokeWidth, Height - (2 * strokeWidth),
+ 377              		.loc 1 105 17 view .LVU108
+ 378              		.cfi_endproc
+ 379              	.LFE1548:
+ 381              		.section	.text._ZN6DadGFX4cGFX8drawLineEttttRKNS_6sColorE,"ax",%progbits
+ 382              		.align	1
+ 383              		.global	_ZN6DadGFX4cGFX8drawLineEttttRKNS_6sColorE
+ 384              		.syntax unified
+ 385              		.thumb
+ 386              		.thumb_func
+ 388              	_ZN6DadGFX4cGFX8drawLineEttttRKNS_6sColorE:
+ 389              	.LVL31:
+ 390              	.LFB1549:
+ 107:dependencies/DaisySeedGFX2/GFX.cpp **** 
+ 108:dependencies/DaisySeedGFX2/GFX.cpp **** // --------------------------------------------------------------------------
+ 109:dependencies/DaisySeedGFX2/GFX.cpp **** // Draw a line using Bresenham's line algorithm
+ 110:dependencies/DaisySeedGFX2/GFX.cpp **** void cGFX::drawLine(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, const sColor& Color) {
+ 391              		.loc 1 110 94 is_stmt 1 view -0
+ 392              		.cfi_startproc
+ 393              		@ args = 8, pretend = 0, frame = 16
+ 394              		@ frame_needed = 0, uses_anonymous_args = 0
+ 395              		.loc 1 110 94 is_stmt 0 view .LVU110
+ 396 0000 2DE9F04F 		push	{r4, r5, r6, r7, r8, r9, r10, fp, lr}
+ 397              		.cfi_def_cfa_offset 36
+ 398              		.cfi_offset 4, -36
+ 399              		.cfi_offset 5, -32
+ 400              		.cfi_offset 6, -28
+ 401              		.cfi_offset 7, -24
+ 402              		.cfi_offset 8, -20
+ 403              		.cfi_offset 9, -16
+ 404              		.cfi_offset 10, -12
+ 405              		.cfi_offset 11, -8
+ 406              		.cfi_offset 14, -4
+ 407 0004 1F46     		mov	r7, r3
+ 408 0006 85B0     		sub	sp, sp, #20
+ 409              		.cfi_def_cfa_offset 56
+ 410              		.loc 1 110 94 view .LVU111
+ 411 0008 0646     		mov	r6, r0
+ 111:dependencies/DaisySeedGFX2/GFX.cpp ****     int16_t dx = x1 - x0; // Delta x
+ 412              		.loc 1 111 5 is_stmt 1 view .LVU112
+ 413              		.loc 1 111 21 is_stmt 0 view .LVU113
+ 414 000a 781A     		subs	r0, r7, r1
+ 415              	.LVL32:
+ 110:dependencies/DaisySeedGFX2/GFX.cpp ****     int16_t dx = x1 - x0; // Delta x
+ 416              		.loc 1 110 94 view .LVU114
+ 417 000c BDF83880 		ldrh	r8, [sp, #56]
+ 418 0010 0F9B     		ldr	r3, [sp, #60]
+ 419              	.LVL33:
+ 420              		.loc 1 111 13 view .LVU115
+ 421 0012 00B2     		sxth	r0, r0
+ 422              	.LVL34:
+ 112:dependencies/DaisySeedGFX2/GFX.cpp ****     int16_t dy = y1 - y0; // Delta y
+ 423              		.loc 1 112 5 is_stmt 1 view .LVU116
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s 			page 13
+
+
+ 424              		.loc 1 112 21 is_stmt 0 view .LVU117
+ 425 0014 A8EB020C 		sub	ip, r8, r2
+ 113:dependencies/DaisySeedGFX2/GFX.cpp **** 
+ 114:dependencies/DaisySeedGFX2/GFX.cpp ****     int16_t incX = dx < 0 ? -1 : (dx > 0 ? 1 : 0); // X increment direction
+ 426              		.loc 1 114 13 view .LVU118
+ 427 0018 0028     		cmp	r0, #0
+ 112:dependencies/DaisySeedGFX2/GFX.cpp ****     int16_t dy = y1 - y0; // Delta y
+ 428              		.loc 1 112 13 view .LVU119
+ 429 001a 0FFA8CFC 		sxth	ip, ip
+ 430              	.LVL35:
+ 431              		.loc 1 114 5 is_stmt 1 view .LVU120
+ 432              		.loc 1 114 13 is_stmt 0 view .LVU121
+ 433 001e 1EDB     		blt	.L28
+ 434              		.loc 1 114 13 discriminator 1 view .LVU122
+ 435 0020 B0F10009 		subs	r9, r0, #0
+ 436 0024 18BF     		it	ne
+ 437 0026 4FF00109 		movne	r9, #1
+ 438              	.L12:
+ 439              	.LVL36:
+ 115:dependencies/DaisySeedGFX2/GFX.cpp ****     int16_t incY = dy < 0 ? -1 : (dy > 0 ? 1 : 0); // Y increment direction
+ 440              		.loc 1 115 5 is_stmt 1 view .LVU123
+ 441              		.loc 1 115 13 is_stmt 0 view .LVU124
+ 442 002a BCF1000F 		cmp	ip, #0
+ 443 002e 6CDB     		blt	.L13
+ 444              		.loc 1 115 13 discriminator 1 view .LVU125
+ 445 0030 BCF1000A 		subs	r10, ip, #0
+ 446 0034 18BF     		it	ne
+ 447 0036 4FF0010A 		movne	r10, #1
+ 448              	.LVL37:
+ 116:dependencies/DaisySeedGFX2/GFX.cpp ****     if (dx < 0) dx = -dx; // Absolute value of dx
+ 449              		.loc 1 116 5 is_stmt 1 view .LVU126
+ 450 003a 0028     		cmp	r0, #0
+ 451 003c 01DA     		bge	.L14
+ 452              		.loc 1 116 17 discriminator 1 view .LVU127
+ 453              		.loc 1 116 20 is_stmt 0 discriminator 1 view .LVU128
+ 454 003e C81B     		subs	r0, r1, r7
+ 455              	.LVL38:
+ 456              		.loc 1 116 20 discriminator 1 view .LVU129
+ 457 0040 00B2     		sxth	r0, r0
+ 458              	.LVL39:
+ 117:dependencies/DaisySeedGFX2/GFX.cpp ****     if (dy < 0) dy = -dy; // Absolute value of dy
+ 459              		.loc 1 117 5 is_stmt 1 view .LVU130
+ 460              	.L14:
+ 118:dependencies/DaisySeedGFX2/GFX.cpp **** 
+ 119:dependencies/DaisySeedGFX2/GFX.cpp ****     // Horizontal line optimization
+ 120:dependencies/DaisySeedGFX2/GFX.cpp ****     if (dx == 0) {
+ 461              		.loc 1 120 5 view .LVU131
+ 462              	.LBB19:
+ 463 0042 78B9     		cbnz	r0, .L15
+ 121:dependencies/DaisySeedGFX2/GFX.cpp ****         setRectangle(x0, y0, 1, dy, Color);
+ 464              		.loc 1 121 9 view .LVU132
+ 465              		.loc 1 121 21 is_stmt 0 view .LVU133
+ 466 0044 3068     		ldr	r0, [r6]
+ 467 0046 0F93     		str	r3, [sp, #60]
+ 468              	.LVL40:
+ 469              		.loc 1 121 21 view .LVU134
+ 470 0048 1FFA8CF3 		uxth	r3, ip
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s 			page 14
+
+
+ 471 004c 0E93     		str	r3, [sp, #56]
+ 472              	.LVL41:
+ 473              		.loc 1 121 21 view .LVU135
+ 474 004e 0123     		movs	r3, #1
+ 475 0050 4468     		ldr	r4, [r0, #4]
+ 476              	.L29:
+ 477              	.LBB20:
+ 122:dependencies/DaisySeedGFX2/GFX.cpp ****     }
+ 123:dependencies/DaisySeedGFX2/GFX.cpp **** 
+ 124:dependencies/DaisySeedGFX2/GFX.cpp ****     // Vertical line optimization
+ 125:dependencies/DaisySeedGFX2/GFX.cpp ****     else if (dy == 0) {
+ 126:dependencies/DaisySeedGFX2/GFX.cpp ****         setRectangle(x0, y0, dx, 1, Color);
+ 478              		.loc 1 126 21 view .LVU136
+ 479 0052 3046     		mov	r0, r6
+ 480 0054 A446     		mov	ip, r4
+ 481              	.LVL42:
+ 482              		.loc 1 126 21 view .LVU137
+ 483              	.LBE20:
+ 484              	.LBE19:
+ 127:dependencies/DaisySeedGFX2/GFX.cpp ****     }
+ 128:dependencies/DaisySeedGFX2/GFX.cpp **** 
+ 129:dependencies/DaisySeedGFX2/GFX.cpp ****     // Line is more horizontal than vertical
+ 130:dependencies/DaisySeedGFX2/GFX.cpp ****     else if (dx >= dy) {
+ 131:dependencies/DaisySeedGFX2/GFX.cpp ****         int slope = 2 * dy;       // Slope adjustment
+ 132:dependencies/DaisySeedGFX2/GFX.cpp ****         int error = -dx;         // Error accumulator
+ 133:dependencies/DaisySeedGFX2/GFX.cpp ****         int errorInc = -2 * dx;  // Error increment
+ 134:dependencies/DaisySeedGFX2/GFX.cpp ****         int y = y0;
+ 135:dependencies/DaisySeedGFX2/GFX.cpp **** 
+ 136:dependencies/DaisySeedGFX2/GFX.cpp ****         for (int x = x0; x != x1 + incX; x += incX) {
+ 137:dependencies/DaisySeedGFX2/GFX.cpp ****             setPixel(x, y, Color);
+ 138:dependencies/DaisySeedGFX2/GFX.cpp ****             error += slope;
+ 139:dependencies/DaisySeedGFX2/GFX.cpp **** 
+ 140:dependencies/DaisySeedGFX2/GFX.cpp ****             if (error >= 0) {
+ 141:dependencies/DaisySeedGFX2/GFX.cpp ****                 y += incY;
+ 142:dependencies/DaisySeedGFX2/GFX.cpp ****                 error += errorInc;
+ 143:dependencies/DaisySeedGFX2/GFX.cpp ****             }
+ 144:dependencies/DaisySeedGFX2/GFX.cpp ****         }
+ 145:dependencies/DaisySeedGFX2/GFX.cpp ****     }
+ 146:dependencies/DaisySeedGFX2/GFX.cpp **** 
+ 147:dependencies/DaisySeedGFX2/GFX.cpp ****     // Line is more vertical than horizontal
+ 148:dependencies/DaisySeedGFX2/GFX.cpp ****     else {
+ 149:dependencies/DaisySeedGFX2/GFX.cpp ****         int slope = 2 * dx;       // Slope adjustment
+ 150:dependencies/DaisySeedGFX2/GFX.cpp ****         int error = -dy;          // Error accumulator
+ 151:dependencies/DaisySeedGFX2/GFX.cpp ****         int errorInc = -2 * dy;   // Error increment
+ 152:dependencies/DaisySeedGFX2/GFX.cpp ****         int x = x0;
+ 153:dependencies/DaisySeedGFX2/GFX.cpp **** 
+ 154:dependencies/DaisySeedGFX2/GFX.cpp ****         for (int y = y0; y != y1 + incY; y += incY) {
+ 155:dependencies/DaisySeedGFX2/GFX.cpp ****             setPixel(x, y, Color);
+ 156:dependencies/DaisySeedGFX2/GFX.cpp ****             error += slope;
+ 157:dependencies/DaisySeedGFX2/GFX.cpp **** 
+ 158:dependencies/DaisySeedGFX2/GFX.cpp ****             if (error >= 0) {
+ 159:dependencies/DaisySeedGFX2/GFX.cpp ****                 x += incX;
+ 160:dependencies/DaisySeedGFX2/GFX.cpp ****                 error += errorInc;
+ 161:dependencies/DaisySeedGFX2/GFX.cpp ****             }
+ 162:dependencies/DaisySeedGFX2/GFX.cpp ****         }
+ 163:dependencies/DaisySeedGFX2/GFX.cpp ****     }
+ 164:dependencies/DaisySeedGFX2/GFX.cpp **** }
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s 			page 15
+
+
+ 485              		.loc 1 164 1 view .LVU138
+ 486 0056 05B0     		add	sp, sp, #20
+ 487              		.cfi_remember_state
+ 488              		.cfi_def_cfa_offset 36
+ 489              		@ sp needed
+ 490 0058 BDE8F04F 		pop	{r4, r5, r6, r7, r8, r9, r10, fp, lr}
+ 491              		.cfi_restore 14
+ 492              		.cfi_restore 11
+ 493              		.cfi_restore 10
+ 494              		.cfi_restore 9
+ 495              		.cfi_restore 8
+ 496              		.cfi_restore 7
+ 497              		.cfi_restore 6
+ 498              		.cfi_restore 5
+ 499              		.cfi_restore 4
+ 500              		.cfi_def_cfa_offset 0
+ 501              	.LVL43:
+ 502              	.LBB35:
+ 503              	.LBB31:
+ 126:dependencies/DaisySeedGFX2/GFX.cpp ****     }
+ 504              		.loc 1 126 21 view .LVU139
+ 505 005c 6047     		bx	ip
+ 506              	.LVL44:
+ 507              	.L28:
+ 508              		.cfi_restore_state
+ 126:dependencies/DaisySeedGFX2/GFX.cpp ****     }
+ 509              		.loc 1 126 21 view .LVU140
+ 510              	.LBE31:
+ 511              	.LBE35:
+ 114:dependencies/DaisySeedGFX2/GFX.cpp ****     int16_t incY = dy < 0 ? -1 : (dy > 0 ? 1 : 0); // Y increment direction
+ 512              		.loc 1 114 13 discriminator 2 view .LVU141
+ 513 005e 4FF0FF39 		mov	r9, #-1
+ 514 0062 E2E7     		b	.L12
+ 515              	.LVL45:
+ 516              	.L15:
+ 125:dependencies/DaisySeedGFX2/GFX.cpp ****         setRectangle(x0, y0, dx, 1, Color);
+ 517              		.loc 1 125 10 is_stmt 1 view .LVU142
+ 518              	.LBB36:
+ 519              	.LBB32:
+ 520 0064 BCF1000F 		cmp	ip, #0
+ 521 0068 06D1     		bne	.L16
+ 126:dependencies/DaisySeedGFX2/GFX.cpp ****     }
+ 522              		.loc 1 126 9 view .LVU143
+ 126:dependencies/DaisySeedGFX2/GFX.cpp ****     }
+ 523              		.loc 1 126 21 is_stmt 0 view .LVU144
+ 524 006a 3468     		ldr	r4, [r6]
+ 525 006c 0F93     		str	r3, [sp, #60]
+ 526              	.LVL46:
+ 126:dependencies/DaisySeedGFX2/GFX.cpp ****     }
+ 527              		.loc 1 126 21 view .LVU145
+ 528 006e 0123     		movs	r3, #1
+ 529 0070 0E93     		str	r3, [sp, #56]
+ 530              	.LVL47:
+ 126:dependencies/DaisySeedGFX2/GFX.cpp ****     }
+ 531              		.loc 1 126 21 view .LVU146
+ 532 0072 83B2     		uxth	r3, r0
+ 533 0074 6468     		ldr	r4, [r4, #4]
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s 			page 16
+
+
+ 534 0076 ECE7     		b	.L29
+ 535              	.LVL48:
+ 536              	.L16:
+ 126:dependencies/DaisySeedGFX2/GFX.cpp ****     }
+ 537              		.loc 1 126 21 view .LVU147
+ 538              	.LBE32:
+ 539              	.LBE36:
+ 130:dependencies/DaisySeedGFX2/GFX.cpp ****         int slope = 2 * dy;       // Slope adjustment
+ 540              		.loc 1 130 10 is_stmt 1 view .LVU148
+ 541              	.LBB37:
+ 542              	.LBB33:
+ 543              	.LBB21:
+ 544 0078 8445     		cmp	ip, r0
+ 545              	.LBB22:
+ 134:dependencies/DaisySeedGFX2/GFX.cpp **** 
+ 546              		.loc 1 134 13 is_stmt 0 view .LVU149
+ 547 007a 1546     		mov	r5, r2
+ 548              	.LBB23:
+ 136:dependencies/DaisySeedGFX2/GFX.cpp ****             setPixel(x, y, Color);
+ 549              		.loc 1 136 18 view .LVU150
+ 550 007c 0191     		str	r1, [sp, #4]
+ 551              	.LBE23:
+ 552              	.LBE22:
+ 130:dependencies/DaisySeedGFX2/GFX.cpp ****         int slope = 2 * dy;       // Slope adjustment
+ 553              		.loc 1 130 10 view .LVU151
+ 554 007e 23DC     		bgt	.L17
+ 555              	.LBB26:
+ 131:dependencies/DaisySeedGFX2/GFX.cpp ****         int error = -dx;         // Error accumulator
+ 556              		.loc 1 131 9 is_stmt 1 view .LVU152
+ 132:dependencies/DaisySeedGFX2/GFX.cpp ****         int errorInc = -2 * dx;  // Error increment
+ 557              		.loc 1 132 13 is_stmt 0 view .LVU153
+ 558 0080 C0F10008 		rsb	r8, r0, #0
+ 133:dependencies/DaisySeedGFX2/GFX.cpp ****         int y = y0;
+ 559              		.loc 1 133 13 view .LVU154
+ 560 0084 C0EBC070 		rsb	r0, r0, r0, lsl #31
+ 131:dependencies/DaisySeedGFX2/GFX.cpp ****         int error = -dx;         // Error accumulator
+ 561              		.loc 1 131 13 view .LVU155
+ 562 0088 4FEA4C0B 		lsl	fp, ip, #1
+ 563              	.LVL49:
+ 132:dependencies/DaisySeedGFX2/GFX.cpp ****         int errorInc = -2 * dx;  // Error increment
+ 564              		.loc 1 132 9 is_stmt 1 view .LVU156
+ 133:dependencies/DaisySeedGFX2/GFX.cpp ****         int y = y0;
+ 565              		.loc 1 133 9 view .LVU157
+ 133:dependencies/DaisySeedGFX2/GFX.cpp ****         int y = y0;
+ 566              		.loc 1 133 13 is_stmt 0 view .LVU158
+ 567 008c 4200     		lsls	r2, r0, #1
+ 568              	.LVL50:
+ 133:dependencies/DaisySeedGFX2/GFX.cpp ****         int y = y0;
+ 569              		.loc 1 133 13 view .LVU159
+ 570 008e 0292     		str	r2, [sp, #8]
+ 571              	.LVL51:
+ 134:dependencies/DaisySeedGFX2/GFX.cpp **** 
+ 572              		.loc 1 134 9 is_stmt 1 view .LVU160
+ 136:dependencies/DaisySeedGFX2/GFX.cpp ****             setPixel(x, y, Color);
+ 573              		.loc 1 136 9 view .LVU161
+ 574              	.L18:
+ 575              	.LBB24:
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s 			page 17
+
+
+ 136:dependencies/DaisySeedGFX2/GFX.cpp ****             setPixel(x, y, Color);
+ 576              		.loc 1 136 28 discriminator 1 view .LVU162
+ 136:dependencies/DaisySeedGFX2/GFX.cpp ****             setPixel(x, y, Color);
+ 577              		.loc 1 136 34 is_stmt 0 discriminator 1 view .LVU163
+ 578 0090 07EB0902 		add	r2, r7, r9
+ 136:dependencies/DaisySeedGFX2/GFX.cpp ****             setPixel(x, y, Color);
+ 579              		.loc 1 136 28 discriminator 1 view .LVU164
+ 580 0094 0199     		ldr	r1, [sp, #4]
+ 581 0096 8A42     		cmp	r2, r1
+ 582 0098 02D1     		bne	.L20
+ 583              	.LVL52:
+ 584              	.L11:
+ 136:dependencies/DaisySeedGFX2/GFX.cpp ****             setPixel(x, y, Color);
+ 585              		.loc 1 136 28 discriminator 1 view .LVU165
+ 586              	.LBE24:
+ 587              	.LBE26:
+ 588              	.LBE21:
+ 589              	.LBE33:
+ 590              	.LBE37:
+ 591              		.loc 1 164 1 view .LVU166
+ 592 009a 05B0     		add	sp, sp, #20
+ 593              		.cfi_remember_state
+ 594              		.cfi_def_cfa_offset 36
+ 595              		@ sp needed
+ 596 009c BDE8F08F 		pop	{r4, r5, r6, r7, r8, r9, r10, fp, pc}
+ 597              	.LVL53:
+ 598              	.L20:
+ 599              		.cfi_restore_state
+ 600              	.LBB38:
+ 601              	.LBB34:
+ 602              	.LBB30:
+ 603              	.LBB27:
+ 604              	.LBB25:
+ 137:dependencies/DaisySeedGFX2/GFX.cpp ****             error += slope;
+ 605              		.loc 1 137 13 is_stmt 1 view .LVU167
+ 137:dependencies/DaisySeedGFX2/GFX.cpp ****             error += slope;
+ 606              		.loc 1 137 21 is_stmt 0 view .LVU168
+ 607 00a0 3268     		ldr	r2, [r6]
+ 608 00a2 3046     		mov	r0, r6
+ 609 00a4 0393     		str	r3, [sp, #12]
+ 610 00a6 1268     		ldr	r2, [r2]
+ 611 00a8 BDF80410 		ldrh	r1, [sp, #4]
+ 612              	.LVL54:
+ 137:dependencies/DaisySeedGFX2/GFX.cpp ****             error += slope;
+ 613              		.loc 1 137 21 view .LVU169
+ 614 00ac 1446     		mov	r4, r2
+ 615 00ae AAB2     		uxth	r2, r5
+ 616 00b0 A047     		blx	r4
+ 617              	.LVL55:
+ 138:dependencies/DaisySeedGFX2/GFX.cpp **** 
+ 618              		.loc 1 138 13 is_stmt 1 view .LVU170
+ 140:dependencies/DaisySeedGFX2/GFX.cpp ****                 y += incY;
+ 619              		.loc 1 140 13 view .LVU171
+ 620 00b2 18EB0B08 		adds	r8, r8, fp
+ 621              	.LVL56:
+ 140:dependencies/DaisySeedGFX2/GFX.cpp ****                 y += incY;
+ 622              		.loc 1 140 13 is_stmt 0 view .LVU172
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s 			page 18
+
+
+ 623 00b6 039B     		ldr	r3, [sp, #12]
+ 141:dependencies/DaisySeedGFX2/GFX.cpp ****                 error += errorInc;
+ 624              		.loc 1 141 17 is_stmt 1 view .LVU173
+ 142:dependencies/DaisySeedGFX2/GFX.cpp ****             }
+ 625              		.loc 1 142 23 is_stmt 0 view .LVU174
+ 626 00b8 5EBF     		ittt	pl
+ 627 00ba 029A     		ldrpl	r2, [sp, #8]
+ 141:dependencies/DaisySeedGFX2/GFX.cpp ****                 error += errorInc;
+ 628              		.loc 1 141 19 view .LVU175
+ 629 00bc 5544     		addpl	r5, r5, r10
+ 630              	.LVL57:
+ 142:dependencies/DaisySeedGFX2/GFX.cpp ****             }
+ 631              		.loc 1 142 17 is_stmt 1 view .LVU176
+ 142:dependencies/DaisySeedGFX2/GFX.cpp ****             }
+ 632              		.loc 1 142 23 is_stmt 0 view .LVU177
+ 633 00be 9044     		addpl	r8, r8, r2
+ 634              	.LVL58:
+ 136:dependencies/DaisySeedGFX2/GFX.cpp ****             setPixel(x, y, Color);
+ 635              		.loc 1 136 9 is_stmt 1 discriminator 2 view .LVU178
+ 136:dependencies/DaisySeedGFX2/GFX.cpp ****             setPixel(x, y, Color);
+ 636              		.loc 1 136 44 is_stmt 0 discriminator 2 view .LVU179
+ 637 00c0 019A     		ldr	r2, [sp, #4]
+ 638 00c2 4A44     		add	r2, r2, r9
+ 639 00c4 0192     		str	r2, [sp, #4]
+ 640              	.LVL59:
+ 136:dependencies/DaisySeedGFX2/GFX.cpp ****             setPixel(x, y, Color);
+ 641              		.loc 1 136 44 discriminator 2 view .LVU180
+ 642 00c6 E3E7     		b	.L18
+ 643              	.LVL60:
+ 644              	.L17:
+ 136:dependencies/DaisySeedGFX2/GFX.cpp ****             setPixel(x, y, Color);
+ 645              		.loc 1 136 44 discriminator 2 view .LVU181
+ 646              	.LBE25:
+ 647              	.LBE27:
+ 648              	.LBB28:
+ 149:dependencies/DaisySeedGFX2/GFX.cpp ****         int error = -dy;          // Error accumulator
+ 649              		.loc 1 149 9 is_stmt 1 view .LVU182
+ 150:dependencies/DaisySeedGFX2/GFX.cpp ****         int errorInc = -2 * dy;   // Error increment
+ 650              		.loc 1 150 13 is_stmt 0 view .LVU183
+ 651 00c8 CCF10007 		rsb	r7, ip, #0
+ 151:dependencies/DaisySeedGFX2/GFX.cpp ****         int x = x0;
+ 652              		.loc 1 151 13 view .LVU184
+ 653 00cc CCEBCC7C 		rsb	ip, ip, ip, lsl #31
+ 654              	.LVL61:
+ 149:dependencies/DaisySeedGFX2/GFX.cpp ****         int error = -dy;          // Error accumulator
+ 655              		.loc 1 149 13 view .LVU185
+ 656 00d0 4FEA400B 		lsl	fp, r0, #1
+ 657              	.LVL62:
+ 150:dependencies/DaisySeedGFX2/GFX.cpp ****         int errorInc = -2 * dy;   // Error increment
+ 658              		.loc 1 150 9 is_stmt 1 view .LVU186
+ 151:dependencies/DaisySeedGFX2/GFX.cpp ****         int x = x0;
+ 659              		.loc 1 151 9 view .LVU187
+ 151:dependencies/DaisySeedGFX2/GFX.cpp ****         int x = x0;
+ 660              		.loc 1 151 13 is_stmt 0 view .LVU188
+ 661 00d4 4FEA4C02 		lsl	r2, ip, #1
+ 662              	.LVL63:
+ 151:dependencies/DaisySeedGFX2/GFX.cpp ****         int x = x0;
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s 			page 19
+
+
+ 663              		.loc 1 151 13 view .LVU189
+ 664 00d8 0292     		str	r2, [sp, #8]
+ 665              	.LVL64:
+ 152:dependencies/DaisySeedGFX2/GFX.cpp **** 
+ 666              		.loc 1 152 9 is_stmt 1 view .LVU190
+ 154:dependencies/DaisySeedGFX2/GFX.cpp ****             setPixel(x, y, Color);
+ 667              		.loc 1 154 9 view .LVU191
+ 668              	.L22:
+ 669              	.LBB29:
+ 154:dependencies/DaisySeedGFX2/GFX.cpp ****             setPixel(x, y, Color);
+ 670              		.loc 1 154 28 discriminator 1 view .LVU192
+ 154:dependencies/DaisySeedGFX2/GFX.cpp ****             setPixel(x, y, Color);
+ 671              		.loc 1 154 34 is_stmt 0 discriminator 1 view .LVU193
+ 672 00da 08EB0A02 		add	r2, r8, r10
+ 154:dependencies/DaisySeedGFX2/GFX.cpp ****             setPixel(x, y, Color);
+ 673              		.loc 1 154 28 discriminator 1 view .LVU194
+ 674 00de AA42     		cmp	r2, r5
+ 675 00e0 DBD0     		beq	.L11
+ 155:dependencies/DaisySeedGFX2/GFX.cpp ****             error += slope;
+ 676              		.loc 1 155 13 is_stmt 1 view .LVU195
+ 155:dependencies/DaisySeedGFX2/GFX.cpp ****             error += slope;
+ 677              		.loc 1 155 21 is_stmt 0 view .LVU196
+ 678 00e2 3268     		ldr	r2, [r6]
+ 679 00e4 3046     		mov	r0, r6
+ 680 00e6 0393     		str	r3, [sp, #12]
+ 681 00e8 1268     		ldr	r2, [r2]
+ 682 00ea BDF80410 		ldrh	r1, [sp, #4]
+ 683 00ee 1446     		mov	r4, r2
+ 684 00f0 AAB2     		uxth	r2, r5
+ 685 00f2 A047     		blx	r4
+ 686              	.LVL65:
+ 156:dependencies/DaisySeedGFX2/GFX.cpp **** 
+ 687              		.loc 1 156 13 is_stmt 1 view .LVU197
+ 158:dependencies/DaisySeedGFX2/GFX.cpp ****                 x += incX;
+ 688              		.loc 1 158 13 view .LVU198
+ 689 00f4 17EB0B07 		adds	r7, r7, fp
+ 690              	.LVL66:
+ 158:dependencies/DaisySeedGFX2/GFX.cpp ****                 x += incX;
+ 691              		.loc 1 158 13 is_stmt 0 view .LVU199
+ 692 00f8 039B     		ldr	r3, [sp, #12]
+ 693 00fa 04D4     		bmi	.L23
+ 159:dependencies/DaisySeedGFX2/GFX.cpp ****                 error += errorInc;
+ 694              		.loc 1 159 17 is_stmt 1 view .LVU200
+ 159:dependencies/DaisySeedGFX2/GFX.cpp ****                 error += errorInc;
+ 695              		.loc 1 159 19 is_stmt 0 view .LVU201
+ 696 00fc 019A     		ldr	r2, [sp, #4]
+ 697 00fe 4A44     		add	r2, r2, r9
+ 698 0100 0192     		str	r2, [sp, #4]
+ 699              	.LVL67:
+ 160:dependencies/DaisySeedGFX2/GFX.cpp ****             }
+ 700              		.loc 1 160 17 is_stmt 1 view .LVU202
+ 160:dependencies/DaisySeedGFX2/GFX.cpp ****             }
+ 701              		.loc 1 160 23 is_stmt 0 view .LVU203
+ 702 0102 029A     		ldr	r2, [sp, #8]
+ 703              	.LVL68:
+ 160:dependencies/DaisySeedGFX2/GFX.cpp ****             }
+ 704              		.loc 1 160 23 view .LVU204
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s 			page 20
+
+
+ 705 0104 1744     		add	r7, r7, r2
+ 706              	.LVL69:
+ 707              	.L23:
+ 154:dependencies/DaisySeedGFX2/GFX.cpp ****             setPixel(x, y, Color);
+ 708              		.loc 1 154 9 is_stmt 1 discriminator 2 view .LVU205
+ 154:dependencies/DaisySeedGFX2/GFX.cpp ****             setPixel(x, y, Color);
+ 709              		.loc 1 154 44 is_stmt 0 discriminator 2 view .LVU206
+ 710 0106 5544     		add	r5, r5, r10
+ 711              	.LVL70:
+ 154:dependencies/DaisySeedGFX2/GFX.cpp ****             setPixel(x, y, Color);
+ 712              		.loc 1 154 44 discriminator 2 view .LVU207
+ 713 0108 E7E7     		b	.L22
+ 714              	.LVL71:
+ 715              	.L13:
+ 154:dependencies/DaisySeedGFX2/GFX.cpp ****             setPixel(x, y, Color);
+ 716              		.loc 1 154 44 discriminator 2 view .LVU208
+ 717              	.LBE29:
+ 718              	.LBE28:
+ 719              	.LBE30:
+ 720              	.LBE34:
+ 721              	.LBE38:
+ 116:dependencies/DaisySeedGFX2/GFX.cpp ****     if (dy < 0) dy = -dy; // Absolute value of dy
+ 722              		.loc 1 116 5 is_stmt 1 view .LVU209
+ 723 010a 0028     		cmp	r0, #0
+ 724 010c 01DA     		bge	.L27
+ 116:dependencies/DaisySeedGFX2/GFX.cpp ****     if (dy < 0) dy = -dy; // Absolute value of dy
+ 725              		.loc 1 116 17 discriminator 1 view .LVU210
+ 116:dependencies/DaisySeedGFX2/GFX.cpp ****     if (dy < 0) dy = -dy; // Absolute value of dy
+ 726              		.loc 1 116 20 is_stmt 0 discriminator 1 view .LVU211
+ 727 010e C81B     		subs	r0, r1, r7
+ 728              	.LVL72:
+ 116:dependencies/DaisySeedGFX2/GFX.cpp ****     if (dy < 0) dy = -dy; // Absolute value of dy
+ 729              		.loc 1 116 20 discriminator 1 view .LVU212
+ 730 0110 00B2     		sxth	r0, r0
+ 731              	.LVL73:
+ 117:dependencies/DaisySeedGFX2/GFX.cpp **** 
+ 732              		.loc 1 117 5 is_stmt 1 view .LVU213
+ 733              	.L27:
+ 117:dependencies/DaisySeedGFX2/GFX.cpp **** 
+ 734              		.loc 1 117 17 discriminator 1 view .LVU214
+ 117:dependencies/DaisySeedGFX2/GFX.cpp **** 
+ 735              		.loc 1 117 20 is_stmt 0 discriminator 1 view .LVU215
+ 736 0112 A2EB080C 		sub	ip, r2, r8
+ 737              	.LVL74:
+ 117:dependencies/DaisySeedGFX2/GFX.cpp **** 
+ 738              		.loc 1 117 20 discriminator 1 view .LVU216
+ 739 0116 4FF0FF3A 		mov	r10, #-1
+ 740 011a 0FFA8CFC 		sxth	ip, ip
+ 741              	.LVL75:
+ 117:dependencies/DaisySeedGFX2/GFX.cpp **** 
+ 742              		.loc 1 117 20 discriminator 1 view .LVU217
+ 743 011e 90E7     		b	.L14
+ 744              		.cfi_endproc
+ 745              	.LFE1549:
+ 747              		.section	.text._ZN6DadGFX4cGFX10drawCircleEtttRKNS_6sColorE,"ax",%progbits
+ 748              		.align	1
+ 749              		.global	_ZN6DadGFX4cGFX10drawCircleEtttRKNS_6sColorE
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s 			page 21
+
+
+ 750              		.syntax unified
+ 751              		.thumb
+ 752              		.thumb_func
+ 754              	_ZN6DadGFX4cGFX10drawCircleEtttRKNS_6sColorE:
+ 755              	.LVL76:
+ 756              	.LFB1550:
+ 165:dependencies/DaisySeedGFX2/GFX.cpp **** 
+ 166:dependencies/DaisySeedGFX2/GFX.cpp **** // --------------------------------------------------------------------------   
+ 167:dependencies/DaisySeedGFX2/GFX.cpp **** // Draw an empty circle
+ 168:dependencies/DaisySeedGFX2/GFX.cpp **** // Uses Bresenham's circle algorithm
+ 169:dependencies/DaisySeedGFX2/GFX.cpp **** void cGFX::drawCircle(uint16_t centerX, uint16_t centerY, uint16_t radius, const sColor& Color) {
+ 757              		.loc 1 169 97 is_stmt 1 view -0
+ 758              		.cfi_startproc
+ 759              		@ args = 4, pretend = 0, frame = 16
+ 760              		@ frame_needed = 0, uses_anonymous_args = 0
+ 170:dependencies/DaisySeedGFX2/GFX.cpp ****     int16_t x = 0;
+ 761              		.loc 1 170 5 view .LVU219
+ 171:dependencies/DaisySeedGFX2/GFX.cpp ****     int16_t y = radius;
+ 762              		.loc 1 171 5 view .LVU220
+ 169:dependencies/DaisySeedGFX2/GFX.cpp ****     int16_t x = 0;
+ 763              		.loc 1 169 97 is_stmt 0 view .LVU221
+ 764 0000 2DE9F04F 		push	{r4, r5, r6, r7, r8, r9, r10, fp, lr}
+ 765              		.cfi_def_cfa_offset 36
+ 766              		.cfi_offset 4, -36
+ 767              		.cfi_offset 5, -32
+ 768              		.cfi_offset 6, -28
+ 769              		.cfi_offset 7, -24
+ 770              		.cfi_offset 8, -20
+ 771              		.cfi_offset 9, -16
+ 772              		.cfi_offset 10, -12
+ 773              		.cfi_offset 11, -8
+ 774              		.cfi_offset 14, -4
+ 172:dependencies/DaisySeedGFX2/GFX.cpp ****     int16_t m = 5 - 4 * radius;
+ 775              		.loc 1 172 19 view .LVU222
+ 776 0004 9D00     		lsls	r5, r3, #2
+ 169:dependencies/DaisySeedGFX2/GFX.cpp ****     int16_t x = 0;
+ 777              		.loc 1 169 97 view .LVU223
+ 778 0006 85B0     		sub	sp, sp, #20
+ 779              		.cfi_def_cfa_offset 56
+ 169:dependencies/DaisySeedGFX2/GFX.cpp ****     int16_t x = 0;
+ 780              		.loc 1 169 97 view .LVU224
+ 781 0008 0446     		mov	r4, r0
+ 173:dependencies/DaisySeedGFX2/GFX.cpp **** 
+ 174:dependencies/DaisySeedGFX2/GFX.cpp ****     while (x <= y) {
+ 782              		.loc 1 174 5 view .LVU225
+ 783 000a 4FF00008 		mov	r8, #0
+ 172:dependencies/DaisySeedGFX2/GFX.cpp ****     int16_t m = 5 - 4 * radius;
+ 784              		.loc 1 172 19 view .LVU226
+ 785 000e C5F10505 		rsb	r5, r5, #5
+ 169:dependencies/DaisySeedGFX2/GFX.cpp ****     int16_t x = 0;
+ 786              		.loc 1 169 97 view .LVU227
+ 787 0012 0E9E     		ldr	r6, [sp, #56]
+ 788 0014 CDE90112 		strd	r1, r2, [sp, #4]
+ 172:dependencies/DaisySeedGFX2/GFX.cpp ****     int16_t m = 5 - 4 * radius;
+ 789              		.loc 1 172 13 view .LVU228
+ 790 0018 2DB2     		sxth	r5, r5
+ 171:dependencies/DaisySeedGFX2/GFX.cpp ****     int16_t m = 5 - 4 * radius;
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s 			page 22
+
+
+ 791              		.loc 1 171 13 view .LVU229
+ 792 001a 1AB2     		sxth	r2, r3
+ 793              	.LVL77:
+ 171:dependencies/DaisySeedGFX2/GFX.cpp ****     int16_t m = 5 - 4 * radius;
+ 794              		.loc 1 171 13 view .LVU230
+ 795 001c 0092     		str	r2, [sp]
+ 796              	.LVL78:
+ 172:dependencies/DaisySeedGFX2/GFX.cpp **** 
+ 797              		.loc 1 172 5 is_stmt 1 view .LVU231
+ 798              		.loc 1 174 5 view .LVU232
+ 799              	.L31:
+ 800              		.loc 1 174 14 view .LVU233
+ 801 001e 0FFA88F3 		sxth	r3, r8
+ 802 0022 009A     		ldr	r2, [sp]
+ 803 0024 9A42     		cmp	r2, r3
+ 804 0026 02DA     		bge	.L33
+ 175:dependencies/DaisySeedGFX2/GFX.cpp ****         // Draw the 8 symmetrical points of the circle
+ 176:dependencies/DaisySeedGFX2/GFX.cpp ****         setPixel(centerX + x, centerY + y, Color);
+ 177:dependencies/DaisySeedGFX2/GFX.cpp ****         setPixel(centerX + x, centerY - y, Color);
+ 178:dependencies/DaisySeedGFX2/GFX.cpp ****         setPixel(centerX - x, centerY + y, Color);
+ 179:dependencies/DaisySeedGFX2/GFX.cpp ****         setPixel(centerX - x, centerY - y, Color);
+ 180:dependencies/DaisySeedGFX2/GFX.cpp ****         setPixel(centerX + y, centerY + x, Color);
+ 181:dependencies/DaisySeedGFX2/GFX.cpp ****         setPixel(centerX + y, centerY - x, Color);
+ 182:dependencies/DaisySeedGFX2/GFX.cpp ****         setPixel(centerX - y, centerY + x, Color);
+ 183:dependencies/DaisySeedGFX2/GFX.cpp ****         setPixel(centerX - y, centerY - x, Color);
+ 184:dependencies/DaisySeedGFX2/GFX.cpp **** 
+ 185:dependencies/DaisySeedGFX2/GFX.cpp ****         if (m > 0) {
+ 186:dependencies/DaisySeedGFX2/GFX.cpp ****             y--;
+ 187:dependencies/DaisySeedGFX2/GFX.cpp ****             m -= 8 * y;
+ 188:dependencies/DaisySeedGFX2/GFX.cpp ****         }
+ 189:dependencies/DaisySeedGFX2/GFX.cpp ****         x++;
+ 190:dependencies/DaisySeedGFX2/GFX.cpp ****         m += 8 * x + 4;
+ 191:dependencies/DaisySeedGFX2/GFX.cpp ****     }
+ 192:dependencies/DaisySeedGFX2/GFX.cpp **** }
+ 805              		.loc 1 192 1 is_stmt 0 view .LVU234
+ 806 0028 05B0     		add	sp, sp, #20
+ 807              		.cfi_remember_state
+ 808              		.cfi_def_cfa_offset 36
+ 809              	.LVL79:
+ 810              		.loc 1 192 1 view .LVU235
+ 811              		@ sp needed
+ 812 002a BDE8F08F 		pop	{r4, r5, r6, r7, r8, r9, r10, fp, pc}
+ 813              	.LVL80:
+ 814              	.L33:
+ 815              		.cfi_restore_state
+ 176:dependencies/DaisySeedGFX2/GFX.cpp ****         setPixel(centerX + x, centerY - y, Color);
+ 816              		.loc 1 176 9 is_stmt 1 view .LVU236
+ 176:dependencies/DaisySeedGFX2/GFX.cpp ****         setPixel(centerX + x, centerY - y, Color);
+ 817              		.loc 1 176 17 is_stmt 0 view .LVU237
+ 818 002e 019B     		ldr	r3, [sp, #4]
+ 819 0030 2046     		mov	r0, r4
+ 820 0032 029A     		ldr	r2, [sp, #8]
+ 821 0034 13FA88F1 		uxtah	r1, r3, r8
+ 822 0038 009B     		ldr	r3, [sp]
+ 823 003a BDF80070 		ldrh	r7, [sp]
+ 824 003e 12FA83FA 		uxtah	r10, r2, r3
+ 825 0042 89B2     		uxth	r1, r1
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s 			page 23
+
+
+ 826 0044 2368     		ldr	r3, [r4]
+ 827 0046 1FFA8AFA 		uxth	r10, r10
+ 828 004a 0391     		str	r1, [sp, #12]
+ 829 004c D3F80090 		ldr	r9, [r3]
+ 830 0050 3346     		mov	r3, r6
+ 831 0052 5246     		mov	r2, r10
+ 832 0054 C847     		blx	r9
+ 833              	.LVL81:
+ 177:dependencies/DaisySeedGFX2/GFX.cpp ****         setPixel(centerX - x, centerY + y, Color);
+ 834              		.loc 1 177 9 is_stmt 1 view .LVU238
+ 177:dependencies/DaisySeedGFX2/GFX.cpp ****         setPixel(centerX - x, centerY + y, Color);
+ 835              		.loc 1 177 17 is_stmt 0 view .LVU239
+ 836 0056 029B     		ldr	r3, [sp, #8]
+ 837 0058 0399     		ldr	r1, [sp, #12]
+ 838 005a 2046     		mov	r0, r4
+ 839 005c A3EB0709 		sub	r9, r3, r7
+ 840 0060 2368     		ldr	r3, [r4]
+ 841 0062 1FFA89F9 		uxth	r9, r9
+ 842 0066 D3F800B0 		ldr	fp, [r3]
+ 843 006a 3346     		mov	r3, r6
+ 844 006c 4A46     		mov	r2, r9
+ 845 006e D847     		blx	fp
+ 846              	.LVL82:
+ 178:dependencies/DaisySeedGFX2/GFX.cpp ****         setPixel(centerX - x, centerY - y, Color);
+ 847              		.loc 1 178 9 is_stmt 1 view .LVU240
+ 178:dependencies/DaisySeedGFX2/GFX.cpp ****         setPixel(centerX - x, centerY - y, Color);
+ 848              		.loc 1 178 17 is_stmt 0 view .LVU241
+ 849 0070 019B     		ldr	r3, [sp, #4]
+ 850 0072 1FFA88F2 		uxth	r2, r8
+ 851 0076 2046     		mov	r0, r4
+ 852 0078 991A     		subs	r1, r3, r2
+ 853 007a 2368     		ldr	r3, [r4]
+ 854 007c 5246     		mov	r2, r10
+ 855 007e 89B2     		uxth	r1, r1
+ 856 0080 D3F800B0 		ldr	fp, [r3]
+ 857 0084 3346     		mov	r3, r6
+ 858 0086 0391     		str	r1, [sp, #12]
+ 859 0088 D847     		blx	fp
+ 860              	.LVL83:
+ 179:dependencies/DaisySeedGFX2/GFX.cpp ****         setPixel(centerX + y, centerY + x, Color);
+ 861              		.loc 1 179 9 is_stmt 1 view .LVU242
+ 179:dependencies/DaisySeedGFX2/GFX.cpp ****         setPixel(centerX + y, centerY + x, Color);
+ 862              		.loc 1 179 17 is_stmt 0 view .LVU243
+ 863 008a 2368     		ldr	r3, [r4]
+ 864 008c 4A46     		mov	r2, r9
+ 865 008e 0399     		ldr	r1, [sp, #12]
+ 866 0090 D3F800A0 		ldr	r10, [r3]
+ 867 0094 2046     		mov	r0, r4
+ 868 0096 3346     		mov	r3, r6
+ 869 0098 D047     		blx	r10
+ 870              	.LVL84:
+ 180:dependencies/DaisySeedGFX2/GFX.cpp ****         setPixel(centerX + y, centerY - x, Color);
+ 871              		.loc 1 180 9 is_stmt 1 view .LVU244
+ 180:dependencies/DaisySeedGFX2/GFX.cpp ****         setPixel(centerX + y, centerY - x, Color);
+ 872              		.loc 1 180 17 is_stmt 0 view .LVU245
+ 873 009a 019B     		ldr	r3, [sp, #4]
+ 874 009c 029A     		ldr	r2, [sp, #8]
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s 			page 24
+
+
+ 875 009e 2046     		mov	r0, r4
+ 876 00a0 F918     		adds	r1, r7, r3
+ 877 00a2 1FFA88F3 		uxth	r3, r8
+ 878 00a6 03EB020A 		add	r10, r3, r2
+ 879 00aa 89B2     		uxth	r1, r1
+ 880 00ac 2368     		ldr	r3, [r4]
+ 881 00ae 1FFA8AFA 		uxth	r10, r10
+ 882 00b2 0391     		str	r1, [sp, #12]
+ 883 00b4 D3F80090 		ldr	r9, [r3]
+ 884 00b8 3346     		mov	r3, r6
+ 885 00ba 5246     		mov	r2, r10
+ 886 00bc C847     		blx	r9
+ 887              	.LVL85:
+ 181:dependencies/DaisySeedGFX2/GFX.cpp ****         setPixel(centerX - y, centerY + x, Color);
+ 888              		.loc 1 181 9 is_stmt 1 view .LVU246
+ 181:dependencies/DaisySeedGFX2/GFX.cpp ****         setPixel(centerX - y, centerY + x, Color);
+ 889              		.loc 1 181 17 is_stmt 0 view .LVU247
+ 890 00be 029B     		ldr	r3, [sp, #8]
+ 891 00c0 1FFA88F2 		uxth	r2, r8
+ 892 00c4 0399     		ldr	r1, [sp, #12]
+ 893 00c6 2046     		mov	r0, r4
+ 894 00c8 A3EB0209 		sub	r9, r3, r2
+ 895 00cc 2368     		ldr	r3, [r4]
+ 896 00ce 1FFA89F9 		uxth	r9, r9
+ 897 00d2 D3F800B0 		ldr	fp, [r3]
+ 898 00d6 3346     		mov	r3, r6
+ 899 00d8 4A46     		mov	r2, r9
+ 900 00da D847     		blx	fp
+ 901              	.LVL86:
+ 182:dependencies/DaisySeedGFX2/GFX.cpp ****         setPixel(centerX - y, centerY - x, Color);
+ 902              		.loc 1 182 9 is_stmt 1 view .LVU248
+ 182:dependencies/DaisySeedGFX2/GFX.cpp ****         setPixel(centerX - y, centerY - x, Color);
+ 903              		.loc 1 182 17 is_stmt 0 view .LVU249
+ 904 00dc 019B     		ldr	r3, [sp, #4]
+ 905 00de 5246     		mov	r2, r10
+ 906 00e0 2046     		mov	r0, r4
+ 907 00e2 D91B     		subs	r1, r3, r7
+ 908 00e4 2368     		ldr	r3, [r4]
+ 909 00e6 89B2     		uxth	r1, r1
+ 910 00e8 D3F800B0 		ldr	fp, [r3]
+ 911 00ec 3346     		mov	r3, r6
+ 912 00ee 0391     		str	r1, [sp, #12]
+ 913 00f0 D847     		blx	fp
+ 914              	.LVL87:
+ 183:dependencies/DaisySeedGFX2/GFX.cpp **** 
+ 915              		.loc 1 183 9 is_stmt 1 view .LVU250
+ 183:dependencies/DaisySeedGFX2/GFX.cpp **** 
+ 916              		.loc 1 183 17 is_stmt 0 view .LVU251
+ 917 00f2 2368     		ldr	r3, [r4]
+ 918 00f4 4A46     		mov	r2, r9
+ 919 00f6 0399     		ldr	r1, [sp, #12]
+ 920 00f8 D3F800A0 		ldr	r10, [r3]
+ 921 00fc 2046     		mov	r0, r4
+ 922 00fe 3346     		mov	r3, r6
+ 923 0100 D047     		blx	r10
+ 924              	.LVL88:
+ 185:dependencies/DaisySeedGFX2/GFX.cpp ****             y--;
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s 			page 25
+
+
+ 925              		.loc 1 185 9 is_stmt 1 view .LVU252
+ 926 0102 002D     		cmp	r5, #0
+ 927 0104 06DD     		ble	.L32
+ 186:dependencies/DaisySeedGFX2/GFX.cpp ****             m -= 8 * y;
+ 928              		.loc 1 186 13 view .LVU253
+ 186:dependencies/DaisySeedGFX2/GFX.cpp ****             m -= 8 * y;
+ 929              		.loc 1 186 14 is_stmt 0 view .LVU254
+ 930 0106 013F     		subs	r7, r7, #1
+ 931 0108 BBB2     		uxth	r3, r7
+ 932 010a 3AB2     		sxth	r2, r7
+ 187:dependencies/DaisySeedGFX2/GFX.cpp ****         }
+ 933              		.loc 1 187 15 view .LVU255
+ 934 010c A5EBC303 		sub	r3, r5, r3, lsl #3
+ 186:dependencies/DaisySeedGFX2/GFX.cpp ****             m -= 8 * y;
+ 935              		.loc 1 186 14 view .LVU256
+ 936 0110 0092     		str	r2, [sp]
+ 937              	.LVL89:
+ 187:dependencies/DaisySeedGFX2/GFX.cpp ****         }
+ 938              		.loc 1 187 13 is_stmt 1 view .LVU257
+ 187:dependencies/DaisySeedGFX2/GFX.cpp ****         }
+ 939              		.loc 1 187 15 is_stmt 0 view .LVU258
+ 940 0112 1DB2     		sxth	r5, r3
+ 941              	.LVL90:
+ 942              	.L32:
+ 189:dependencies/DaisySeedGFX2/GFX.cpp ****         m += 8 * x + 4;
+ 943              		.loc 1 189 9 is_stmt 1 view .LVU259
+ 190:dependencies/DaisySeedGFX2/GFX.cpp ****     }
+ 944              		.loc 1 190 9 view .LVU260
+ 190:dependencies/DaisySeedGFX2/GFX.cpp ****     }
+ 945              		.loc 1 190 11 is_stmt 0 view .LVU261
+ 946 0114 1FFA88F3 		uxth	r3, r8
+ 947 0118 08F10108 		add	r8, r8, #1
+ 948              	.LVL91:
+ 190:dependencies/DaisySeedGFX2/GFX.cpp ****     }
+ 949              		.loc 1 190 11 view .LVU262
+ 950 011c 05EBC303 		add	r3, r5, r3, lsl #3
+ 951 0120 0C33     		adds	r3, r3, #12
+ 952 0122 1DB2     		sxth	r5, r3
+ 953              	.LVL92:
+ 190:dependencies/DaisySeedGFX2/GFX.cpp ****     }
+ 954              		.loc 1 190 11 view .LVU263
+ 955 0124 7BE7     		b	.L31
+ 956              		.cfi_endproc
+ 957              	.LFE1550:
+ 959              		.section	.text._ZN6DadGFX4cGFX14drawFillCircleEtttRKNS_6sColorE,"ax",%progbits
+ 960              		.align	1
+ 961              		.global	_ZN6DadGFX4cGFX14drawFillCircleEtttRKNS_6sColorE
+ 962              		.syntax unified
+ 963              		.thumb
+ 964              		.thumb_func
+ 966              	_ZN6DadGFX4cGFX14drawFillCircleEtttRKNS_6sColorE:
+ 967              	.LVL93:
+ 968              	.LFB1551:
+ 193:dependencies/DaisySeedGFX2/GFX.cpp **** 
+ 194:dependencies/DaisySeedGFX2/GFX.cpp **** // --------------------------------------------------------------------------   
+ 195:dependencies/DaisySeedGFX2/GFX.cpp **** // Draw a filled circle
+ 196:dependencies/DaisySeedGFX2/GFX.cpp **** // Uses Bresenham's circle algorithm
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s 			page 26
+
+
+ 197:dependencies/DaisySeedGFX2/GFX.cpp **** void cGFX::drawFillCircle(uint16_t centerX, uint16_t centerY, uint16_t radius, const sColor& Color)
+ 969              		.loc 1 197 101 is_stmt 1 view -0
+ 970              		.cfi_startproc
+ 971              		@ args = 4, pretend = 0, frame = 16
+ 972              		@ frame_needed = 0, uses_anonymous_args = 0
+ 198:dependencies/DaisySeedGFX2/GFX.cpp ****     int32_t x = 0;
+ 973              		.loc 1 198 5 view .LVU265
+ 199:dependencies/DaisySeedGFX2/GFX.cpp ****     int32_t dx = 1;
+ 974              		.loc 1 199 5 view .LVU266
+ 200:dependencies/DaisySeedGFX2/GFX.cpp ****     int32_t dy = radius + radius;
+ 975              		.loc 1 200 5 view .LVU267
+ 197:dependencies/DaisySeedGFX2/GFX.cpp ****     int32_t x = 0;
+ 976              		.loc 1 197 101 is_stmt 0 view .LVU268
+ 977 0000 2DE9F04F 		push	{r4, r5, r6, r7, r8, r9, r10, fp, lr}
+ 978              		.cfi_def_cfa_offset 36
+ 979              		.cfi_offset 4, -36
+ 980              		.cfi_offset 5, -32
+ 981              		.cfi_offset 6, -28
+ 982              		.cfi_offset 7, -24
+ 983              		.cfi_offset 8, -20
+ 984              		.cfi_offset 9, -16
+ 985              		.cfi_offset 10, -12
+ 986              		.cfi_offset 11, -8
+ 987              		.cfi_offset 14, -4
+ 201:dependencies/DaisySeedGFX2/GFX.cpp ****     int32_t p = -(radius >> 1);
+ 988              		.loc 1 201 17 view .LVU269
+ 989 0004 5E08     		lsrs	r6, r3, #1
+ 197:dependencies/DaisySeedGFX2/GFX.cpp ****     int32_t x = 0;
+ 990              		.loc 1 197 101 view .LVU270
+ 991 0006 87B0     		sub	sp, sp, #28
+ 992              		.cfi_def_cfa_offset 64
+ 197:dependencies/DaisySeedGFX2/GFX.cpp ****     int32_t x = 0;
+ 993              		.loc 1 197 101 view .LVU271
+ 994 0008 1C46     		mov	r4, r3
+ 995 000a 8846     		mov	r8, r1
+ 200:dependencies/DaisySeedGFX2/GFX.cpp ****     int32_t dy = radius + radius;
+ 996              		.loc 1 200 13 view .LVU272
+ 997 000c 4FEA430B 		lsl	fp, r3, #1
+ 998              	.LVL94:
+ 999              		.loc 1 201 5 is_stmt 1 view .LVU273
+ 1000              		.loc 1 201 13 is_stmt 0 view .LVU274
+ 1001 0010 7342     		rsbs	r3, r6, #0
+ 1002              	.LVL95:
+ 202:dependencies/DaisySeedGFX2/GFX.cpp **** 
+ 203:dependencies/DaisySeedGFX2/GFX.cpp ****     uint16_t x1 = centerX - radius;
+ 204:dependencies/DaisySeedGFX2/GFX.cpp ****     uint16_t x2 = x1 + dy + 1;
+ 205:dependencies/DaisySeedGFX2/GFX.cpp ****     uint16_t y1 = centerY;
+ 206:dependencies/DaisySeedGFX2/GFX.cpp **** 
+ 207:dependencies/DaisySeedGFX2/GFX.cpp ****     // Fill the initial horizontal line
+ 208:dependencies/DaisySeedGFX2/GFX.cpp ****     setRectangle(x1, y1, x2 - x1, 1, Color); 
+ 1003              		.loc 1 208 17 view .LVU275
+ 1004 0012 109F     		ldr	r7, [sp, #64]
+ 203:dependencies/DaisySeedGFX2/GFX.cpp ****     uint16_t x2 = x1 + dy + 1;
+ 1005              		.loc 1 203 14 view .LVU276
+ 1006 0014 091B     		subs	r1, r1, r4
+ 1007              	.LVL96:
+ 201:dependencies/DaisySeedGFX2/GFX.cpp ****     int32_t p = -(radius >> 1);
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s 			page 27
+
+
+ 1008              		.loc 1 201 13 view .LVU277
+ 1009 0016 0393     		str	r3, [sp, #12]
+ 1010              	.LVL97:
+ 203:dependencies/DaisySeedGFX2/GFX.cpp ****     uint16_t x2 = x1 + dy + 1;
+ 1011              		.loc 1 203 5 is_stmt 1 view .LVU278
+ 204:dependencies/DaisySeedGFX2/GFX.cpp ****     uint16_t y1 = centerY;
+ 1012              		.loc 1 204 5 view .LVU279
+ 205:dependencies/DaisySeedGFX2/GFX.cpp **** 
+ 1013              		.loc 1 205 5 view .LVU280
+ 1014              		.loc 1 208 17 is_stmt 0 view .LVU281
+ 1015 0018 A4EB0803 		sub	r3, r4, r8
+ 1016              	.LVL98:
+ 1017              		.loc 1 208 17 view .LVU282
+ 1018 001c 0197     		str	r7, [sp, #4]
+ 1019 001e 0127     		movs	r7, #1
+ 1020 0020 0133     		adds	r3, r3, #1
+ 197:dependencies/DaisySeedGFX2/GFX.cpp ****     int32_t x = 0;
+ 1021              		.loc 1 197 101 view .LVU283
+ 1022 0022 0546     		mov	r5, r0
+ 1023              		.loc 1 208 17 view .LVU284
+ 1024 0024 0097     		str	r7, [sp]
+ 197:dependencies/DaisySeedGFX2/GFX.cpp ****     int32_t x = 0;
+ 1025              		.loc 1 197 101 view .LVU285
+ 1026 0026 9146     		mov	r9, r2
+ 1027              	.LVL99:
+ 1028              		.loc 1 208 5 is_stmt 1 view .LVU286
+ 1029              		.loc 1 208 17 is_stmt 0 view .LVU287
+ 1030 0028 13FA81F3 		uxtah	r3, r3, r1
+ 1031 002c 0768     		ldr	r7, [r0]
+ 1032 002e 89B2     		uxth	r1, r1
+ 1033              		.loc 1 208 17 view .LVU288
+ 1034 0030 03EB4403 		add	r3, r3, r4, lsl #1
+ 1035 0034 7F68     		ldr	r7, [r7, #4]
+ 1036 0036 9BB2     		uxth	r3, r3
+ 1037 0038 B847     		blx	r7
+ 1038              	.LVL100:
+ 209:dependencies/DaisySeedGFX2/GFX.cpp **** 
+ 210:dependencies/DaisySeedGFX2/GFX.cpp ****     while (x < radius) {
+ 1039              		.loc 1 210 5 is_stmt 1 view .LVU289
+ 198:dependencies/DaisySeedGFX2/GFX.cpp ****     int32_t dx = 1;
+ 1040              		.loc 1 198 13 is_stmt 0 view .LVU290
+ 1041 003a 0027     		movs	r7, #0
+ 1042              	.LVL101:
+ 1043              	.L35:
+ 1044              		.loc 1 210 14 is_stmt 1 view .LVU291
+ 1045 003c BC42     		cmp	r4, r7
+ 1046 003e 02DC     		bgt	.L37
+ 211:dependencies/DaisySeedGFX2/GFX.cpp ****         if (p >= 0) {
+ 212:dependencies/DaisySeedGFX2/GFX.cpp ****             x1 = centerX - x;
+ 213:dependencies/DaisySeedGFX2/GFX.cpp ****             x2 = x1 + dx;
+ 214:dependencies/DaisySeedGFX2/GFX.cpp ****             y1 = centerY + radius;
+ 215:dependencies/DaisySeedGFX2/GFX.cpp ****             setRectangle(x1, y1, x2 - x1, 1, Color); // Top line segment
+ 216:dependencies/DaisySeedGFX2/GFX.cpp ****             y1 = centerY - radius;
+ 217:dependencies/DaisySeedGFX2/GFX.cpp ****             setRectangle(x1, y1, x2 - x1, 1, Color); // Bottom line segment
+ 218:dependencies/DaisySeedGFX2/GFX.cpp ****             dy -= 2;
+ 219:dependencies/DaisySeedGFX2/GFX.cpp ****             p -= dy;
+ 220:dependencies/DaisySeedGFX2/GFX.cpp ****             radius--;
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s 			page 28
+
+
+ 221:dependencies/DaisySeedGFX2/GFX.cpp ****         }
+ 222:dependencies/DaisySeedGFX2/GFX.cpp ****         dx += 2;
+ 223:dependencies/DaisySeedGFX2/GFX.cpp ****         p += dx;
+ 224:dependencies/DaisySeedGFX2/GFX.cpp ****         x++;
+ 225:dependencies/DaisySeedGFX2/GFX.cpp **** 
+ 226:dependencies/DaisySeedGFX2/GFX.cpp ****         x1 = centerX - radius;
+ 227:dependencies/DaisySeedGFX2/GFX.cpp ****         x2 = x1 + dy + 1;
+ 228:dependencies/DaisySeedGFX2/GFX.cpp ****         y1 = centerY + x;
+ 229:dependencies/DaisySeedGFX2/GFX.cpp ****         setRectangle(x1, y1, x2 - x1, 1, Color); // Right segment
+ 230:dependencies/DaisySeedGFX2/GFX.cpp ****         y1 = centerY - x;
+ 231:dependencies/DaisySeedGFX2/GFX.cpp ****         setRectangle(x1, y1, x2 - x1, 1, Color); // Left segment
+ 232:dependencies/DaisySeedGFX2/GFX.cpp ****     }        
+ 233:dependencies/DaisySeedGFX2/GFX.cpp **** }
+ 1047              		.loc 1 233 1 is_stmt 0 view .LVU292
+ 1048 0040 07B0     		add	sp, sp, #28
+ 1049              		.cfi_remember_state
+ 1050              		.cfi_def_cfa_offset 36
+ 1051              		@ sp needed
+ 1052 0042 BDE8F08F 		pop	{r4, r5, r6, r7, r8, r9, r10, fp, pc}
+ 1053              	.LVL102:
+ 1054              	.L37:
+ 1055              		.cfi_restore_state
+ 211:dependencies/DaisySeedGFX2/GFX.cpp ****         if (p >= 0) {
+ 1056              		.loc 1 211 9 is_stmt 1 view .LVU293
+ 1057 0046 039B     		ldr	r3, [sp, #12]
+ 1058 0048 002B     		cmp	r3, #0
+ 1059 004a 2BDB     		blt	.L36
+ 212:dependencies/DaisySeedGFX2/GFX.cpp ****             x2 = x1 + dx;
+ 1060              		.loc 1 212 13 view .LVU294
+ 1061 004c BBB2     		uxth	r3, r7
+ 215:dependencies/DaisySeedGFX2/GFX.cpp ****             y1 = centerY - radius;
+ 1062              		.loc 1 215 25 is_stmt 0 view .LVU295
+ 1063 004e 2868     		ldr	r0, [r5]
+ 1064 0050 109E     		ldr	r6, [sp, #64]
+ 1065 0052 4FF0010A 		mov	r10, #1
+ 212:dependencies/DaisySeedGFX2/GFX.cpp ****             x2 = x1 + dx;
+ 1066              		.loc 1 212 16 view .LVU296
+ 1067 0056 A8EB0301 		sub	r1, r8, r3
+ 1068 005a 5B00     		lsls	r3, r3, #1
+ 215:dependencies/DaisySeedGFX2/GFX.cpp ****             y1 = centerY - radius;
+ 1069              		.loc 1 215 25 view .LVU297
+ 1070 005c 0196     		str	r6, [sp, #4]
+ 214:dependencies/DaisySeedGFX2/GFX.cpp ****             setRectangle(x1, y1, x2 - x1, 1, Color); // Top line segment
+ 1071              		.loc 1 214 16 view .LVU298
+ 1072 005e 04EB0902 		add	r2, r4, r9
+ 1073 0062 0133     		adds	r3, r3, #1
+ 212:dependencies/DaisySeedGFX2/GFX.cpp ****             x2 = x1 + dx;
+ 1074              		.loc 1 212 16 view .LVU299
+ 1075 0064 89B2     		uxth	r1, r1
+ 1076              	.LVL103:
+ 213:dependencies/DaisySeedGFX2/GFX.cpp ****             y1 = centerY + radius;
+ 1077              		.loc 1 213 13 is_stmt 1 view .LVU300
+ 215:dependencies/DaisySeedGFX2/GFX.cpp ****             y1 = centerY - radius;
+ 1078              		.loc 1 215 25 is_stmt 0 view .LVU301
+ 1079 0066 CDF800A0 		str	r10, [sp]
+ 1080 006a 92B2     		uxth	r2, r2
+ 1081 006c 9BB2     		uxth	r3, r3
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s 			page 29
+
+
+ 1082              	.LVL104:
+ 214:dependencies/DaisySeedGFX2/GFX.cpp ****             setRectangle(x1, y1, x2 - x1, 1, Color); // Top line segment
+ 1083              		.loc 1 214 13 is_stmt 1 view .LVU302
+ 215:dependencies/DaisySeedGFX2/GFX.cpp ****             y1 = centerY - radius;
+ 1084              		.loc 1 215 13 view .LVU303
+ 215:dependencies/DaisySeedGFX2/GFX.cpp ****             y1 = centerY - radius;
+ 1085              		.loc 1 215 25 is_stmt 0 view .LVU304
+ 1086 006e 4068     		ldr	r0, [r0, #4]
+ 1087 0070 0491     		str	r1, [sp, #16]
+ 218:dependencies/DaisySeedGFX2/GFX.cpp ****             p -= dy;
+ 1088              		.loc 1 218 16 view .LVU305
+ 1089 0072 ABF1020B 		sub	fp, fp, #2
+ 1090              	.LVL105:
+ 215:dependencies/DaisySeedGFX2/GFX.cpp ****             y1 = centerY - radius;
+ 1091              		.loc 1 215 25 view .LVU306
+ 1092 0076 0646     		mov	r6, r0
+ 1093 0078 0593     		str	r3, [sp, #20]
+ 1094 007a 2846     		mov	r0, r5
+ 1095 007c B047     		blx	r6
+ 1096              	.LVL106:
+ 216:dependencies/DaisySeedGFX2/GFX.cpp ****             setRectangle(x1, y1, x2 - x1, 1, Color); // Bottom line segment
+ 1097              		.loc 1 216 13 is_stmt 1 view .LVU307
+ 217:dependencies/DaisySeedGFX2/GFX.cpp ****             dy -= 2;
+ 1098              		.loc 1 217 13 view .LVU308
+ 217:dependencies/DaisySeedGFX2/GFX.cpp ****             dy -= 2;
+ 1099              		.loc 1 217 25 is_stmt 0 view .LVU309
+ 1100 007e 2868     		ldr	r0, [r5]
+ 1101 0080 109B     		ldr	r3, [sp, #64]
+ 216:dependencies/DaisySeedGFX2/GFX.cpp ****             setRectangle(x1, y1, x2 - x1, 1, Color); // Bottom line segment
+ 1102              		.loc 1 216 16 view .LVU310
+ 1103 0082 A9EB0402 		sub	r2, r9, r4
+ 217:dependencies/DaisySeedGFX2/GFX.cpp ****             dy -= 2;
+ 1104              		.loc 1 217 25 view .LVU311
+ 1105 0086 0499     		ldr	r1, [sp, #16]
+ 220:dependencies/DaisySeedGFX2/GFX.cpp ****         }
+ 1106              		.loc 1 220 19 view .LVU312
+ 1107 0088 013C     		subs	r4, r4, #1
+ 1108              	.LVL107:
+ 217:dependencies/DaisySeedGFX2/GFX.cpp ****             dy -= 2;
+ 1109              		.loc 1 217 25 view .LVU313
+ 1110 008a 92B2     		uxth	r2, r2
+ 220:dependencies/DaisySeedGFX2/GFX.cpp ****         }
+ 1111              		.loc 1 220 19 view .LVU314
+ 1112 008c A4B2     		uxth	r4, r4
+ 1113              	.LVL108:
+ 217:dependencies/DaisySeedGFX2/GFX.cpp ****             dy -= 2;
+ 1114              		.loc 1 217 25 view .LVU315
+ 1115 008e CDE900A3 		strd	r10, r3, [sp]
+ 1116 0092 059B     		ldr	r3, [sp, #20]
+ 1117 0094 D0F804A0 		ldr	r10, [r0, #4]
+ 1118 0098 2846     		mov	r0, r5
+ 1119 009a D047     		blx	r10
+ 1120              	.LVL109:
+ 218:dependencies/DaisySeedGFX2/GFX.cpp ****             p -= dy;
+ 1121              		.loc 1 218 13 is_stmt 1 view .LVU316
+ 219:dependencies/DaisySeedGFX2/GFX.cpp ****             radius--;
+ 1122              		.loc 1 219 13 view .LVU317
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s 			page 30
+
+
+ 219:dependencies/DaisySeedGFX2/GFX.cpp ****             radius--;
+ 1123              		.loc 1 219 15 is_stmt 0 view .LVU318
+ 1124 009c 039B     		ldr	r3, [sp, #12]
+ 1125 009e A3EB0B03 		sub	r3, r3, fp
+ 1126 00a2 0393     		str	r3, [sp, #12]
+ 1127              	.LVL110:
+ 220:dependencies/DaisySeedGFX2/GFX.cpp ****         }
+ 1128              		.loc 1 220 13 is_stmt 1 view .LVU319
+ 1129              	.L36:
+ 222:dependencies/DaisySeedGFX2/GFX.cpp ****         p += dx;
+ 1130              		.loc 1 222 9 view .LVU320
+ 223:dependencies/DaisySeedGFX2/GFX.cpp ****         x++;
+ 1131              		.loc 1 223 9 view .LVU321
+ 222:dependencies/DaisySeedGFX2/GFX.cpp ****         p += dx;
+ 1132              		.loc 1 222 12 is_stmt 0 view .LVU322
+ 1133 00a4 039B     		ldr	r3, [sp, #12]
+ 229:dependencies/DaisySeedGFX2/GFX.cpp ****         y1 = centerY - x;
+ 1134              		.loc 1 229 21 view .LVU323
+ 1135 00a6 4FF0010A 		mov	r10, #1
+ 1136 00aa 2868     		ldr	r0, [r5]
+ 226:dependencies/DaisySeedGFX2/GFX.cpp ****         x2 = x1 + dy + 1;
+ 1137              		.loc 1 226 12 view .LVU324
+ 1138 00ac A8EB0401 		sub	r1, r8, r4
+ 222:dependencies/DaisySeedGFX2/GFX.cpp ****         p += dx;
+ 1139              		.loc 1 222 12 view .LVU325
+ 1140 00b0 03EB4706 		add	r6, r3, r7, lsl #1
+ 224:dependencies/DaisySeedGFX2/GFX.cpp **** 
+ 1141              		.loc 1 224 10 view .LVU326
+ 1142 00b4 0137     		adds	r7, r7, #1
+ 1143              	.LVL111:
+ 229:dependencies/DaisySeedGFX2/GFX.cpp ****         y1 = centerY - x;
+ 1144              		.loc 1 229 21 view .LVU327
+ 1145 00b6 CDF800A0 		str	r10, [sp]
+ 226:dependencies/DaisySeedGFX2/GFX.cpp ****         x2 = x1 + dy + 1;
+ 1146              		.loc 1 226 12 view .LVU328
+ 1147 00ba 89B2     		uxth	r1, r1
+ 223:dependencies/DaisySeedGFX2/GFX.cpp ****         x++;
+ 1148              		.loc 1 223 11 view .LVU329
+ 1149 00bc F31C     		adds	r3, r6, #3
+ 229:dependencies/DaisySeedGFX2/GFX.cpp ****         y1 = centerY - x;
+ 1150              		.loc 1 229 21 view .LVU330
+ 1151 00be 109E     		ldr	r6, [sp, #64]
+ 228:dependencies/DaisySeedGFX2/GFX.cpp ****         setRectangle(x1, y1, x2 - x1, 1, Color); // Right segment
+ 1152              		.loc 1 228 12 view .LVU331
+ 1153 00c0 19FA87F2 		uxtah	r2, r9, r7
+ 229:dependencies/DaisySeedGFX2/GFX.cpp ****         y1 = centerY - x;
+ 1154              		.loc 1 229 21 view .LVU332
+ 1155 00c4 0491     		str	r1, [sp, #16]
+ 223:dependencies/DaisySeedGFX2/GFX.cpp ****         x++;
+ 1156              		.loc 1 223 11 view .LVU333
+ 1157 00c6 0393     		str	r3, [sp, #12]
+ 1158              	.LVL112:
+ 224:dependencies/DaisySeedGFX2/GFX.cpp **** 
+ 1159              		.loc 1 224 9 is_stmt 1 view .LVU334
+ 226:dependencies/DaisySeedGFX2/GFX.cpp ****         x2 = x1 + dy + 1;
+ 1160              		.loc 1 226 9 view .LVU335
+ 227:dependencies/DaisySeedGFX2/GFX.cpp ****         y1 = centerY + x;
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s 			page 31
+
+
+ 1161              		.loc 1 227 9 view .LVU336
+ 228:dependencies/DaisySeedGFX2/GFX.cpp ****         setRectangle(x1, y1, x2 - x1, 1, Color); // Right segment
+ 1162              		.loc 1 228 9 view .LVU337
+ 229:dependencies/DaisySeedGFX2/GFX.cpp ****         y1 = centerY - x;
+ 1163              		.loc 1 229 9 view .LVU338
+ 229:dependencies/DaisySeedGFX2/GFX.cpp ****         y1 = centerY - x;
+ 1164              		.loc 1 229 21 is_stmt 0 view .LVU339
+ 1165 00c8 0BF10103 		add	r3, fp, #1
+ 1166              	.LVL113:
+ 229:dependencies/DaisySeedGFX2/GFX.cpp ****         y1 = centerY - x;
+ 1167              		.loc 1 229 21 view .LVU340
+ 1168 00cc 0196     		str	r6, [sp, #4]
+ 1169 00ce 92B2     		uxth	r2, r2
+ 1170 00d0 9BB2     		uxth	r3, r3
+ 1171 00d2 4068     		ldr	r0, [r0, #4]
+ 1172 00d4 0593     		str	r3, [sp, #20]
+ 1173 00d6 0646     		mov	r6, r0
+ 1174 00d8 2846     		mov	r0, r5
+ 1175 00da B047     		blx	r6
+ 1176              	.LVL114:
+ 230:dependencies/DaisySeedGFX2/GFX.cpp ****         setRectangle(x1, y1, x2 - x1, 1, Color); // Left segment
+ 1177              		.loc 1 230 9 is_stmt 1 view .LVU341
+ 231:dependencies/DaisySeedGFX2/GFX.cpp ****     }        
+ 1178              		.loc 1 231 9 view .LVU342
+ 231:dependencies/DaisySeedGFX2/GFX.cpp ****     }        
+ 1179              		.loc 1 231 21 is_stmt 0 view .LVU343
+ 1180 00dc 2868     		ldr	r0, [r5]
+ 230:dependencies/DaisySeedGFX2/GFX.cpp ****         setRectangle(x1, y1, x2 - x1, 1, Color); // Left segment
+ 1181              		.loc 1 230 12 view .LVU344
+ 1182 00de BBB2     		uxth	r3, r7
+ 231:dependencies/DaisySeedGFX2/GFX.cpp ****     }        
+ 1183              		.loc 1 231 21 view .LVU345
+ 1184 00e0 0499     		ldr	r1, [sp, #16]
+ 230:dependencies/DaisySeedGFX2/GFX.cpp ****         setRectangle(x1, y1, x2 - x1, 1, Color); // Left segment
+ 1185              		.loc 1 230 12 view .LVU346
+ 1186 00e2 A9EB0302 		sub	r2, r9, r3
+ 231:dependencies/DaisySeedGFX2/GFX.cpp ****     }        
+ 1187              		.loc 1 231 21 view .LVU347
+ 1188 00e6 109B     		ldr	r3, [sp, #64]
+ 1189 00e8 92B2     		uxth	r2, r2
+ 1190 00ea CDE900A3 		strd	r10, r3, [sp]
+ 1191 00ee 059B     		ldr	r3, [sp, #20]
+ 1192 00f0 D0F804A0 		ldr	r10, [r0, #4]
+ 1193 00f4 2846     		mov	r0, r5
+ 1194 00f6 D047     		blx	r10
+ 1195              	.LVL115:
+ 1196 00f8 A0E7     		b	.L35
+ 1197              		.cfi_endproc
+ 1198              	.LFE1551:
+ 1200              		.section	.text._ZN6DadGFX4cGFX7drawArcEtttttRKNS_6sColorE,"ax",%progbits
+ 1201              		.align	1
+ 1202              		.global	_ZN6DadGFX4cGFX7drawArcEtttttRKNS_6sColorE
+ 1203              		.syntax unified
+ 1204              		.thumb
+ 1205              		.thumb_func
+ 1207              	_ZN6DadGFX4cGFX7drawArcEtttttRKNS_6sColorE:
+ 1208              	.LVL116:
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s 			page 32
+
+
+ 1209              	.LFB1552:
+ 234:dependencies/DaisySeedGFX2/GFX.cpp **** 
+ 235:dependencies/DaisySeedGFX2/GFX.cpp **** // --------------------------------------------------------------------------  
+ 236:dependencies/DaisySeedGFX2/GFX.cpp **** // Draw an arc
+ 237:dependencies/DaisySeedGFX2/GFX.cpp **** void cGFX::drawArc(uint16_t centerX, uint16_t centerY, uint16_t radius, uint16_t AlphaIn, uint16_t 
+ 1210              		.loc 1 237 131 is_stmt 1 view -0
+ 1211              		.cfi_startproc
+ 1212              		@ args = 12, pretend = 0, frame = 40
+ 1213              		@ frame_needed = 0, uses_anonymous_args = 0
+ 238:dependencies/DaisySeedGFX2/GFX.cpp ****     bool Inv = false;
+ 1214              		.loc 1 238 5 view .LVU349
+ 239:dependencies/DaisySeedGFX2/GFX.cpp ****     if (AlphaIn > AlphaOut) {
+ 1215              		.loc 1 239 5 view .LVU350
+ 237:dependencies/DaisySeedGFX2/GFX.cpp ****     bool Inv = false;
+ 1216              		.loc 1 237 131 is_stmt 0 view .LVU351
+ 1217 0000 2DE9F04F 		push	{r4, r5, r6, r7, r8, r9, r10, fp, lr}
+ 1218              		.cfi_def_cfa_offset 36
+ 1219              		.cfi_offset 4, -36
+ 1220              		.cfi_offset 5, -32
+ 1221              		.cfi_offset 6, -28
+ 1222              		.cfi_offset 7, -24
+ 1223              		.cfi_offset 8, -20
+ 1224              		.cfi_offset 9, -16
+ 1225              		.cfi_offset 10, -12
+ 1226              		.cfi_offset 11, -8
+ 1227              		.cfi_offset 14, -4
+ 240:dependencies/DaisySeedGFX2/GFX.cpp ****         // Swap angles if needed and invert logic
+ 241:dependencies/DaisySeedGFX2/GFX.cpp ****         uint16_t Temp = AlphaIn;
+ 242:dependencies/DaisySeedGFX2/GFX.cpp ****         AlphaIn = AlphaOut;
+ 243:dependencies/DaisySeedGFX2/GFX.cpp ****         AlphaOut = Temp;
+ 244:dependencies/DaisySeedGFX2/GFX.cpp ****         Inv = true;
+ 245:dependencies/DaisySeedGFX2/GFX.cpp ****     }
+ 246:dependencies/DaisySeedGFX2/GFX.cpp **** 
+ 247:dependencies/DaisySeedGFX2/GFX.cpp ****     int16_t x = 0;
+ 248:dependencies/DaisySeedGFX2/GFX.cpp ****     int16_t y = radius;
+ 1228              		.loc 1 248 13 view .LVU352
+ 1229 0004 1EB2     		sxth	r6, r3
+ 237:dependencies/DaisySeedGFX2/GFX.cpp ****     bool Inv = false;
+ 1230              		.loc 1 237 131 view .LVU353
+ 1231 0006 8BB0     		sub	sp, sp, #44
+ 1232              		.cfi_def_cfa_offset 80
+ 249:dependencies/DaisySeedGFX2/GFX.cpp ****     int16_t m = 5 - 4 * radius;
+ 1233              		.loc 1 249 19 view .LVU354
+ 1234 0008 9B00     		lsls	r3, r3, #2
+ 1235              	.LVL117:
+ 237:dependencies/DaisySeedGFX2/GFX.cpp ****     bool Inv = false;
+ 1236              		.loc 1 237 131 view .LVU355
+ 1237 000a 9246     		mov	r10, r2
+ 1238 000c BDF85070 		ldrh	r7, [sp, #80]
+ 1239 0010 0446     		mov	r4, r0
+ 1240 0012 BDF85480 		ldrh	r8, [sp, #84]
+ 1241              		.loc 1 249 19 view .LVU356
+ 1242 0016 C3F10503 		rsb	r3, r3, #5
+ 237:dependencies/DaisySeedGFX2/GFX.cpp ****     bool Inv = false;
+ 1243              		.loc 1 237 131 view .LVU357
+ 1244 001a 0191     		str	r1, [sp, #4]
+ 1245              	.LBB39:
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s 			page 33
+
+
+ 239:dependencies/DaisySeedGFX2/GFX.cpp ****         // Swap angles if needed and invert logic
+ 1246              		.loc 1 239 5 view .LVU358
+ 1247 001c 4745     		cmp	r7, r8
+ 1248              	.LBE39:
+ 1249              		.loc 1 249 13 view .LVU359
+ 1250 001e 1BB2     		sxth	r3, r3
+ 237:dependencies/DaisySeedGFX2/GFX.cpp ****     bool Inv = false;
+ 1251              		.loc 1 237 131 view .LVU360
+ 1252 0020 DDF85890 		ldr	r9, [sp, #88]
+ 1253              	.LBB42:
+ 239:dependencies/DaisySeedGFX2/GFX.cpp ****         // Swap angles if needed and invert logic
+ 1254              		.loc 1 239 5 view .LVU361
+ 1255 0024 98BF     		it	ls
+ 1256 0026 4246     		movls	r2, r8
+ 1257              	.LVL118:
+ 239:dependencies/DaisySeedGFX2/GFX.cpp ****         // Swap angles if needed and invert logic
+ 1258              		.loc 1 239 5 view .LVU362
+ 1259              	.LBE42:
+ 1260              		.loc 1 249 13 view .LVU363
+ 1261 0028 0693     		str	r3, [sp, #24]
+ 250:dependencies/DaisySeedGFX2/GFX.cpp **** 
+ 251:dependencies/DaisySeedGFX2/GFX.cpp ****     while (x <= y) {
+ 1262              		.loc 1 251 5 view .LVU364
+ 1263 002a 019B     		ldr	r3, [sp, #4]
+ 1264              	.LBB43:
+ 239:dependencies/DaisySeedGFX2/GFX.cpp ****         // Swap angles if needed and invert logic
+ 1265              		.loc 1 239 5 view .LVU365
+ 1266 002c 97BF     		itett	ls
+ 1267 002e B846     		movls	r8, r7
+ 1268              	.LBB40:
+ 244:dependencies/DaisySeedGFX2/GFX.cpp ****     }
+ 1269              		.loc 1 244 13 view .LVU366
+ 1270 0030 0122     		movhi	r2, #1
+ 1271              	.LBE40:
+ 239:dependencies/DaisySeedGFX2/GFX.cpp ****         // Swap angles if needed and invert logic
+ 1272              		.loc 1 239 5 view .LVU367
+ 1273 0032 1746     		movls	r7, r2
+ 1274              	.LBE43:
+ 238:dependencies/DaisySeedGFX2/GFX.cpp ****     if (AlphaIn > AlphaOut) {
+ 1275              		.loc 1 238 10 view .LVU368
+ 1276 0034 0022     		movls	r2, #0
+ 1277              		.loc 1 251 5 view .LVU369
+ 1278 0036 CDE9023A 		strd	r3, r10, [sp, #8]
+ 1279 003a CDE904A3 		strd	r10, r3, [sp, #16]
+ 1280 003e 0023     		movs	r3, #0
+ 1281              	.LBB44:
+ 1282              	.LBB41:
+ 244:dependencies/DaisySeedGFX2/GFX.cpp ****     }
+ 1283              		.loc 1 244 13 view .LVU370
+ 1284 0040 0892     		str	r2, [sp, #32]
+ 1285              	.LVL119:
+ 244:dependencies/DaisySeedGFX2/GFX.cpp ****     }
+ 1286              		.loc 1 244 13 view .LVU371
+ 1287              	.LBE41:
+ 1288              	.LBE44:
+ 247:dependencies/DaisySeedGFX2/GFX.cpp ****     int16_t y = radius;
+ 1289              		.loc 1 247 5 is_stmt 1 view .LVU372
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s 			page 34
+
+
+ 248:dependencies/DaisySeedGFX2/GFX.cpp ****     int16_t m = 5 - 4 * radius;
+ 1290              		.loc 1 248 5 view .LVU373
+ 249:dependencies/DaisySeedGFX2/GFX.cpp **** 
+ 1291              		.loc 1 249 5 view .LVU374
+ 1292              		.loc 1 251 5 view .LVU375
+ 1293 0042 0793     		str	r3, [sp, #28]
+ 1294              	.LVL120:
+ 1295              	.L40:
+ 1296              		.loc 1 251 5 is_stmt 0 view .LVU376
+ 1297 0044 BDF81C30 		ldrh	r3, [sp, #28]
+ 1298 0048 0993     		str	r3, [sp, #36]
+ 1299 004a BDF91C30 		ldrsh	r3, [sp, #28]
+ 1300              	.LVL121:
+ 1301              		.loc 1 251 14 is_stmt 1 view .LVU377
+ 1302 004e 9E42     		cmp	r6, r3
+ 1303 0050 02DA     		bge	.L67
+ 252:dependencies/DaisySeedGFX2/GFX.cpp ****         uint16_t angle = atan2((float)y, (float)x) * 180 / __PI; // Convert radians to degrees
+ 253:dependencies/DaisySeedGFX2/GFX.cpp **** 
+ 254:dependencies/DaisySeedGFX2/GFX.cpp ****         if (Inv) {
+ 255:dependencies/DaisySeedGFX2/GFX.cpp ****             // Handle inverted angle logic
+ 256:dependencies/DaisySeedGFX2/GFX.cpp ****             uint16_t angle1 = 90 - angle;
+ 257:dependencies/DaisySeedGFX2/GFX.cpp ****             if (!((angle1 >= AlphaIn) && (angle1 <= AlphaOut))) setPixel(centerX + x, centerY - y, 
+ 258:dependencies/DaisySeedGFX2/GFX.cpp ****             uint16_t angle2 = angle;
+ 259:dependencies/DaisySeedGFX2/GFX.cpp ****             if (!((angle2 >= AlphaIn) && (angle2 <= AlphaOut))) setPixel(centerX + y, centerY - x, 
+ 260:dependencies/DaisySeedGFX2/GFX.cpp ****             angle1 += 90;
+ 261:dependencies/DaisySeedGFX2/GFX.cpp ****             if (!((angle1 >= AlphaIn) && (angle1 <= AlphaOut))) setPixel(centerX + y, centerY + x, 
+ 262:dependencies/DaisySeedGFX2/GFX.cpp ****             angle2 += 90;
+ 263:dependencies/DaisySeedGFX2/GFX.cpp ****             if (!((angle2 >= AlphaIn) && (angle2 <= AlphaOut))) setPixel(centerX + x, centerY + y, 
+ 264:dependencies/DaisySeedGFX2/GFX.cpp ****             angle1 += 90;
+ 265:dependencies/DaisySeedGFX2/GFX.cpp ****             if (!((angle1 >= AlphaIn) && (angle1 <= AlphaOut))) setPixel(centerX - x, centerY + y, 
+ 266:dependencies/DaisySeedGFX2/GFX.cpp ****             angle2 += 90;
+ 267:dependencies/DaisySeedGFX2/GFX.cpp ****             if (!((angle2 >= AlphaIn) && (angle2 <= AlphaOut))) setPixel(centerX - y, centerY + x, 
+ 268:dependencies/DaisySeedGFX2/GFX.cpp ****             angle1 += 90;
+ 269:dependencies/DaisySeedGFX2/GFX.cpp ****             if (!((angle1 >= AlphaIn) && (angle1 <= AlphaOut))) setPixel(centerX - y, centerY - x, 
+ 270:dependencies/DaisySeedGFX2/GFX.cpp ****             angle2 += 90;
+ 271:dependencies/DaisySeedGFX2/GFX.cpp ****             if (!((angle2 >= AlphaIn) && (angle2 <= AlphaOut))) setPixel(centerX - x, centerY - y, 
+ 272:dependencies/DaisySeedGFX2/GFX.cpp ****         } else {
+ 273:dependencies/DaisySeedGFX2/GFX.cpp ****             // Handle normal angle logic
+ 274:dependencies/DaisySeedGFX2/GFX.cpp ****             uint16_t angle1 = 90 - angle;
+ 275:dependencies/DaisySeedGFX2/GFX.cpp ****             if (((angle1 >= AlphaIn) && (angle1 <= AlphaOut))) setPixel(centerX + x, centerY - y, C
+ 276:dependencies/DaisySeedGFX2/GFX.cpp ****             uint16_t angle2 = angle;
+ 277:dependencies/DaisySeedGFX2/GFX.cpp ****             if (((angle2 >= AlphaIn) && (angle2 <= AlphaOut))) setPixel(centerX + y, centerY - x, C
+ 278:dependencies/DaisySeedGFX2/GFX.cpp ****             angle1 += 90;
+ 279:dependencies/DaisySeedGFX2/GFX.cpp ****             if (((angle1 >= AlphaIn) && (angle1 <= AlphaOut))) setPixel(centerX + y, centerY + x, C
+ 280:dependencies/DaisySeedGFX2/GFX.cpp ****             angle2 += 90;
+ 281:dependencies/DaisySeedGFX2/GFX.cpp ****             if (((angle2 >= AlphaIn) && (angle2 <= AlphaOut))) setPixel(centerX + x, centerY + y, C
+ 282:dependencies/DaisySeedGFX2/GFX.cpp ****             angle1 += 90;
+ 283:dependencies/DaisySeedGFX2/GFX.cpp ****             if (((angle1 >= AlphaIn) && (angle1 <= AlphaOut))) setPixel(centerX - x, centerY + y, C
+ 284:dependencies/DaisySeedGFX2/GFX.cpp ****             angle2 += 90;
+ 285:dependencies/DaisySeedGFX2/GFX.cpp ****             if (((angle2 >= AlphaIn) && (angle2 <= AlphaOut))) setPixel(centerX - y, centerY + x, C
+ 286:dependencies/DaisySeedGFX2/GFX.cpp ****             angle1 += 90;
+ 287:dependencies/DaisySeedGFX2/GFX.cpp ****             if (((angle1 >= AlphaIn) && (angle1 <= AlphaOut))) setPixel(centerX - y, centerY - x, C
+ 288:dependencies/DaisySeedGFX2/GFX.cpp ****             angle2 += 90;
+ 289:dependencies/DaisySeedGFX2/GFX.cpp ****             if (((angle2 >= AlphaIn) && (angle2 <= AlphaOut))) setPixel(centerX - x, centerY - y, C
+ 290:dependencies/DaisySeedGFX2/GFX.cpp ****         }
+ 291:dependencies/DaisySeedGFX2/GFX.cpp **** 
+ 292:dependencies/DaisySeedGFX2/GFX.cpp ****         if (m > 0) {
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s 			page 35
+
+
+ 293:dependencies/DaisySeedGFX2/GFX.cpp ****             y--;
+ 294:dependencies/DaisySeedGFX2/GFX.cpp ****             m -= 8 * y;
+ 295:dependencies/DaisySeedGFX2/GFX.cpp ****         }
+ 296:dependencies/DaisySeedGFX2/GFX.cpp ****         x++;
+ 297:dependencies/DaisySeedGFX2/GFX.cpp ****         m += 8 * x + 4;
+ 298:dependencies/DaisySeedGFX2/GFX.cpp ****     }
+ 299:dependencies/DaisySeedGFX2/GFX.cpp **** }
+ 1304              		.loc 1 299 1 is_stmt 0 view .LVU378
+ 1305 0052 0BB0     		add	sp, sp, #44
+ 1306              		.cfi_remember_state
+ 1307              		.cfi_def_cfa_offset 36
+ 1308              		@ sp needed
+ 1309 0054 BDE8F08F 		pop	{r4, r5, r6, r7, r8, r9, r10, fp, pc}
+ 1310              	.LVL122:
+ 1311              	.L67:
+ 1312              		.cfi_restore_state
+ 1313              	.LBB45:
+ 252:dependencies/DaisySeedGFX2/GFX.cpp ****         uint16_t angle = atan2((float)y, (float)x) * 180 / __PI; // Convert radians to degrees
+ 1314              		.loc 1 252 9 is_stmt 1 view .LVU379
+ 1315              	.LBB46:
+ 1316              	.LBI46:
+ 1317              		.file 3 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c+
+   1:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** // -*- C++ -*- C forwarding header.
+   2:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** 
+   3:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** // Copyright (C) 1997-2024 Free Software Foundation, Inc.
+   4:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** //
+   5:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** // This file is part of the GNU ISO C++ Library.  This library is free
+   6:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** // software; you can redistribute it and/or modify it under the
+   7:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** // terms of the GNU General Public License as published by the
+   8:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** // Free Software Foundation; either version 3, or (at your option)
+   9:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** // any later version.
+  10:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** 
+  11:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** // This library is distributed in the hope that it will be useful,
+  12:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** // but WITHOUT ANY WARRANTY; without even the implied warranty of
+  13:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  14:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** // GNU General Public License for more details.
+  15:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** 
+  16:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** // Under Section 7 of GPL version 3, you are granted additional
+  17:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** // permissions described in the GCC Runtime Library Exception, version
+  18:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** // 3.1, as published by the Free Software Foundation.
+  19:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** 
+  20:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** // You should have received a copy of the GNU General Public License and
+  21:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** // a copy of the GCC Runtime Library Exception along with this program;
+  22:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** // see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
+  23:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** // <http://www.gnu.org/licenses/>.
+  24:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** 
+  25:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** /** @file include/cmath
+  26:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath ****  *  This is a Standard C++ Library file.  You should @c \#include this file
+  27:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath ****  *  in your programs, rather than any of the @a *.h implementation files.
+  28:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath ****  *
+  29:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath ****  *  This is the C++ version of the Standard C Library header @c math.h,
+  30:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath ****  *  and its contents are (mostly) the same as that header, but are all
+  31:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath ****  *  contained in the namespace @c std (except for names which are defined
+  32:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath ****  *  as macros in C).
+  33:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath ****  */
+  34:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** 
+  35:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** //
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s 			page 36
+
+
+  36:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** // ISO C++ 14882: 26.5  C library
+  37:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** //
+  38:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** 
+  39:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** #pragma GCC system_header
+  40:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** 
+  41:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** #include <bits/requires_hosted.h>
+  42:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** 
+  43:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** #include <bits/c++config.h>
+  44:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** #include <bits/cpp_type_traits.h>
+  45:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** #include <ext/type_traits.h>
+  46:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** #define _GLIBCXX_INCLUDE_NEXT_C_HEADERS
+  47:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** #include_next <math.h>
+  48:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** #undef _GLIBCXX_INCLUDE_NEXT_C_HEADERS
+  49:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** #include <bits/std_abs.h>
+  50:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** 
+  51:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** #ifndef _GLIBCXX_CMATH
+  52:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** #define _GLIBCXX_CMATH 1
+  53:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** 
+  54:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** #define __glibcxx_want_hypot
+  55:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** #define __glibcxx_want_interpolate
+  56:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** #include <bits/version.h>
+  57:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** 
+  58:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** // Get rid of those macros defined in <math.h> in lieu of real functions.
+  59:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** #undef div
+  60:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** #undef acos
+  61:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** #undef asin
+  62:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** #undef atan
+  63:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** #undef atan2
+  64:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** #undef ceil
+  65:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** #undef cos
+  66:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** #undef cosh
+  67:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** #undef exp
+  68:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** #undef fabs
+  69:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** #undef floor
+  70:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** #undef fmod
+  71:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** #undef frexp
+  72:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** #undef ldexp
+  73:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** #undef log
+  74:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** #undef log10
+  75:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** #undef modf
+  76:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** #undef pow
+  77:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** #undef sin
+  78:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** #undef sinh
+  79:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** #undef sqrt
+  80:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** #undef tan
+  81:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** #undef tanh
+  82:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** 
+  83:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** extern "C++"
+  84:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** {
+  85:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** namespace std _GLIBCXX_VISIBILITY(default)
+  86:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** {
+  87:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** _GLIBCXX_BEGIN_NAMESPACE_VERSION
+  88:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** 
+  89:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath ****   using ::acos;
+  90:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** 
+  91:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** #ifndef __CORRECT_ISO_CPP_MATH_H_PROTO
+  92:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath ****   inline _GLIBCXX_CONSTEXPR float
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s 			page 37
+
+
+  93:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath ****   acos(float __x)
+  94:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath ****   { return __builtin_acosf(__x); }
+  95:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** 
+  96:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath ****   inline _GLIBCXX_CONSTEXPR long double
+  97:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath ****   acos(long double __x)
+  98:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath ****   { return __builtin_acosl(__x); }
+  99:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** #endif
+ 100:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** 
+ 101:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath ****   template<typename _Tp>
+ 102:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath ****     inline _GLIBCXX_CONSTEXPR
+ 103:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath ****     typename __gnu_cxx::__enable_if<__is_integer<_Tp>::__value, 
+ 104:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath ****                                     double>::__type
+ 105:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath ****     acos(_Tp __x)
+ 106:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath ****     { return __builtin_acos(__x); }
+ 107:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** 
+ 108:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath ****   using ::asin;
+ 109:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** 
+ 110:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** #ifndef __CORRECT_ISO_CPP_MATH_H_PROTO
+ 111:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath ****   inline _GLIBCXX_CONSTEXPR float
+ 112:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath ****   asin(float __x)
+ 113:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath ****   { return __builtin_asinf(__x); }
+ 114:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** 
+ 115:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath ****   inline _GLIBCXX_CONSTEXPR long double
+ 116:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath ****   asin(long double __x)
+ 117:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath ****   { return __builtin_asinl(__x); }
+ 118:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** #endif
+ 119:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** 
+ 120:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath ****   template<typename _Tp>
+ 121:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath ****     inline _GLIBCXX_CONSTEXPR
+ 122:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath ****     typename __gnu_cxx::__enable_if<__is_integer<_Tp>::__value,
+ 123:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath ****                                     double>::__type
+ 124:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath ****     asin(_Tp __x)
+ 125:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath ****     { return __builtin_asin(__x); }
+ 126:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** 
+ 127:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath ****   using ::atan;
+ 128:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** 
+ 129:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** #ifndef __CORRECT_ISO_CPP_MATH_H_PROTO
+ 130:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath ****   inline _GLIBCXX_CONSTEXPR float
+ 131:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath ****   atan(float __x)
+ 132:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath ****   { return __builtin_atanf(__x); }
+ 133:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** 
+ 134:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath ****   inline _GLIBCXX_CONSTEXPR long double
+ 135:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath ****   atan(long double __x)
+ 136:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath ****   { return __builtin_atanl(__x); }
+ 137:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** #endif
+ 138:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** 
+ 139:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath ****   template<typename _Tp>
+ 140:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath ****     inline _GLIBCXX_CONSTEXPR
+ 141:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath ****     typename __gnu_cxx::__enable_if<__is_integer<_Tp>::__value,
+ 142:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath ****                                     double>::__type
+ 143:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath ****     atan(_Tp __x)
+ 144:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath ****     { return __builtin_atan(__x); }
+ 145:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** 
+ 146:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath ****   using ::atan2;
+ 147:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** 
+ 148:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath **** #ifndef __CORRECT_ISO_CPP_MATH_H_PROTO
+ 149:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath ****   inline _GLIBCXX_CONSTEXPR float
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s 			page 38
+
+
+ 150:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath ****   atan2(float __y, float __x)
+ 1318              		.loc 3 150 3 view .LVU380
+ 1319              	.LBB47:
+ 151:C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c++/14.3.1\cmath ****   { return __builtin_atan2f(__y, __x); }
+ 1320              		.loc 3 151 5 view .LVU381
+ 1321              		.loc 3 151 28 is_stmt 0 view .LVU382
+ 1322 0058 07EE903A 		vmov	s15, r3	@ int
+ 1323 005c F8EEE70A 		vcvt.f32.s32	s1, s15
+ 1324 0060 07EE906A 		vmov	s15, r6	@ int
+ 1325 0064 B8EEE70A 		vcvt.f32.s32	s0, s15
+ 1326 0068 FFF7FEFF 		bl	atan2f
+ 1327              	.LVL123:
+ 1328              		.loc 3 151 28 view .LVU383
+ 1329              	.LBE47:
+ 1330              	.LBE46:
+ 252:dependencies/DaisySeedGFX2/GFX.cpp ****         uint16_t angle = atan2((float)y, (float)x) * 180 / __PI; // Convert radians to degrees
+ 1331              		.loc 1 252 52 discriminator 1 view .LVU384
+ 1332 006c DFED9A7A 		vldr.32	s15, .L71
+ 252:dependencies/DaisySeedGFX2/GFX.cpp ****         uint16_t angle = atan2((float)y, (float)x) * 180 / __PI; // Convert radians to degrees
+ 1333              		.loc 1 252 58 discriminator 1 view .LVU385
+ 1334 0070 9FED9A7A 		vldr.32	s14, .L71+4
+ 252:dependencies/DaisySeedGFX2/GFX.cpp ****         uint16_t angle = atan2((float)y, (float)x) * 180 / __PI; // Convert radians to degrees
+ 1335              		.loc 1 252 52 discriminator 1 view .LVU386
+ 1336 0074 20EE270A 		vmul.f32	s0, s0, s15
+ 1337              	.LBB48:
+ 254:dependencies/DaisySeedGFX2/GFX.cpp ****             // Handle inverted angle logic
+ 1338              		.loc 1 254 9 view .LVU387
+ 1339 0078 089A     		ldr	r2, [sp, #32]
+ 1340              	.LBE48:
+ 252:dependencies/DaisySeedGFX2/GFX.cpp **** 
+ 1341              		.loc 1 252 58 discriminator 1 view .LVU388
+ 1342 007a C0EE077A 		vdiv.f32	s15, s0, s14
+ 252:dependencies/DaisySeedGFX2/GFX.cpp **** 
+ 1343              		.loc 1 252 60 discriminator 1 view .LVU389
+ 1344 007e FCEEE77A 		vcvt.u32.f32	s15, s15
+ 1345 0082 17EE903A 		vmov	r3, s15	@ int
+ 1346 0086 9DB2     		uxth	r5, r3
+ 1347              	.LVL124:
+ 254:dependencies/DaisySeedGFX2/GFX.cpp ****             // Handle inverted angle logic
+ 1348              		.loc 1 254 9 is_stmt 1 view .LVU390
+ 1349              	.LBB52:
+ 1350              	.LBB49:
+ 256:dependencies/DaisySeedGFX2/GFX.cpp ****             if (!((angle1 >= AlphaIn) && (angle1 <= AlphaOut))) setPixel(centerX + x, centerY - y, 
+ 1351              		.loc 1 256 22 is_stmt 0 view .LVU391
+ 1352 0088 C5F15A03 		rsb	r3, r5, #90
+ 1353 008c 9BB2     		uxth	r3, r3
+ 1354              	.LBE49:
+ 254:dependencies/DaisySeedGFX2/GFX.cpp ****             // Handle inverted angle logic
+ 1355              		.loc 1 254 9 view .LVU392
+ 1356 008e 002A     		cmp	r2, #0
+ 1357 0090 00F08380 		beq	.L41
+ 1358              	.LBB50:
+ 256:dependencies/DaisySeedGFX2/GFX.cpp ****             if (!((angle1 >= AlphaIn) && (angle1 <= AlphaOut))) setPixel(centerX + x, centerY - y, 
+ 1359              		.loc 1 256 13 is_stmt 1 view .LVU393
+ 1360              	.LVL125:
+ 257:dependencies/DaisySeedGFX2/GFX.cpp ****             uint16_t angle2 = angle;
+ 1361              		.loc 1 257 13 view .LVU394
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s 			page 39
+
+
+ 1362 0094 9845     		cmp	r8, r3
+ 1363 0096 01D8     		bhi	.L42
+ 257:dependencies/DaisySeedGFX2/GFX.cpp ****             uint16_t angle2 = angle;
+ 1364              		.loc 1 257 17 is_stmt 0 discriminator 2 view .LVU395
+ 1365 0098 9F42     		cmp	r7, r3
+ 1366 009a 09D2     		bcs	.L43
+ 1367              	.L42:
+ 257:dependencies/DaisySeedGFX2/GFX.cpp ****             uint16_t angle2 = angle;
+ 1368              		.loc 1 257 65 is_stmt 1 discriminator 3 view .LVU396
+ 257:dependencies/DaisySeedGFX2/GFX.cpp ****             uint16_t angle2 = angle;
+ 1369              		.loc 1 257 73 is_stmt 0 discriminator 3 view .LVU397
+ 1370 009c 2368     		ldr	r3, [r4]
+ 1371 009e AAEB0602 		sub	r2, r10, r6
+ 1372 00a2 0299     		ldr	r1, [sp, #8]
+ 1373 00a4 2046     		mov	r0, r4
+ 1374 00a6 D3F800B0 		ldr	fp, [r3]
+ 1375 00aa 92B2     		uxth	r2, r2
+ 1376 00ac 4B46     		mov	r3, r9
+ 1377 00ae D847     		blx	fp
+ 1378              	.LVL126:
+ 1379              	.L43:
+ 258:dependencies/DaisySeedGFX2/GFX.cpp ****             if (!((angle2 >= AlphaIn) && (angle2 <= AlphaOut))) setPixel(centerX + y, centerY - x, 
+ 1380              		.loc 1 258 13 is_stmt 1 view .LVU398
+ 259:dependencies/DaisySeedGFX2/GFX.cpp ****             angle1 += 90;
+ 1381              		.loc 1 259 13 view .LVU399
+ 1382 00b0 A845     		cmp	r8, r5
+ 1383 00b2 01D8     		bhi	.L44
+ 259:dependencies/DaisySeedGFX2/GFX.cpp ****             angle1 += 90;
+ 1384              		.loc 1 259 17 is_stmt 0 discriminator 2 view .LVU400
+ 1385 00b4 AF42     		cmp	r7, r5
+ 1386 00b6 09D2     		bcs	.L45
+ 1387              	.L44:
+ 259:dependencies/DaisySeedGFX2/GFX.cpp ****             angle1 += 90;
+ 1388              		.loc 1 259 65 is_stmt 1 discriminator 3 view .LVU401
+ 259:dependencies/DaisySeedGFX2/GFX.cpp ****             angle1 += 90;
+ 1389              		.loc 1 259 73 is_stmt 0 discriminator 3 view .LVU402
+ 1390 00b8 019B     		ldr	r3, [sp, #4]
+ 1391 00ba 2046     		mov	r0, r4
+ 1392 00bc 049A     		ldr	r2, [sp, #16]
+ 1393 00be 9919     		adds	r1, r3, r6
+ 1394 00c0 2368     		ldr	r3, [r4]
+ 1395 00c2 89B2     		uxth	r1, r1
+ 1396 00c4 D3F800B0 		ldr	fp, [r3]
+ 1397 00c8 4B46     		mov	r3, r9
+ 1398 00ca D847     		blx	fp
+ 1399              	.LVL127:
+ 1400              	.L45:
+ 260:dependencies/DaisySeedGFX2/GFX.cpp ****             if (!((angle1 >= AlphaIn) && (angle1 <= AlphaOut))) setPixel(centerX + y, centerY + x, 
+ 1401              		.loc 1 260 13 is_stmt 1 view .LVU403
+ 260:dependencies/DaisySeedGFX2/GFX.cpp ****             if (!((angle1 >= AlphaIn) && (angle1 <= AlphaOut))) setPixel(centerX + y, centerY + x, 
+ 1402              		.loc 1 260 20 is_stmt 0 view .LVU404
+ 1403 00cc C5F1B403 		rsb	r3, r5, #180
+ 1404 00d0 9BB2     		uxth	r3, r3
+ 1405              	.LVL128:
+ 261:dependencies/DaisySeedGFX2/GFX.cpp ****             angle2 += 90;
+ 1406              		.loc 1 261 13 is_stmt 1 view .LVU405
+ 1407 00d2 9845     		cmp	r8, r3
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s 			page 40
+
+
+ 1408 00d4 01D8     		bhi	.L46
+ 261:dependencies/DaisySeedGFX2/GFX.cpp ****             angle2 += 90;
+ 1409              		.loc 1 261 17 is_stmt 0 discriminator 2 view .LVU406
+ 1410 00d6 9F42     		cmp	r7, r3
+ 1411 00d8 09D2     		bcs	.L47
+ 1412              	.L46:
+ 261:dependencies/DaisySeedGFX2/GFX.cpp ****             angle2 += 90;
+ 1413              		.loc 1 261 65 is_stmt 1 discriminator 3 view .LVU407
+ 261:dependencies/DaisySeedGFX2/GFX.cpp ****             angle2 += 90;
+ 1414              		.loc 1 261 73 is_stmt 0 discriminator 3 view .LVU408
+ 1415 00da 019B     		ldr	r3, [sp, #4]
+ 1416              	.LVL129:
+ 261:dependencies/DaisySeedGFX2/GFX.cpp ****             angle2 += 90;
+ 1417              		.loc 1 261 73 discriminator 3 view .LVU409
+ 1418 00dc 2046     		mov	r0, r4
+ 1419 00de 039A     		ldr	r2, [sp, #12]
+ 1420 00e0 9919     		adds	r1, r3, r6
+ 1421 00e2 2368     		ldr	r3, [r4]
+ 1422 00e4 89B2     		uxth	r1, r1
+ 1423 00e6 D3F800B0 		ldr	fp, [r3]
+ 1424 00ea 4B46     		mov	r3, r9
+ 1425 00ec D847     		blx	fp
+ 1426              	.LVL130:
+ 1427              	.L47:
+ 262:dependencies/DaisySeedGFX2/GFX.cpp ****             if (!((angle2 >= AlphaIn) && (angle2 <= AlphaOut))) setPixel(centerX + x, centerY + y, 
+ 1428              		.loc 1 262 13 is_stmt 1 view .LVU410
+ 262:dependencies/DaisySeedGFX2/GFX.cpp ****             if (!((angle2 >= AlphaIn) && (angle2 <= AlphaOut))) setPixel(centerX + x, centerY + y, 
+ 1429              		.loc 1 262 20 is_stmt 0 view .LVU411
+ 1430 00ee 05F15A03 		add	r3, r5, #90
+ 1431 00f2 9BB2     		uxth	r3, r3
+ 1432              	.LVL131:
+ 263:dependencies/DaisySeedGFX2/GFX.cpp ****             angle1 += 90;
+ 1433              		.loc 1 263 13 is_stmt 1 view .LVU412
+ 1434 00f4 9845     		cmp	r8, r3
+ 1435 00f6 01D8     		bhi	.L48
+ 263:dependencies/DaisySeedGFX2/GFX.cpp ****             angle1 += 90;
+ 1436              		.loc 1 263 17 is_stmt 0 discriminator 2 view .LVU413
+ 1437 00f8 9F42     		cmp	r7, r3
+ 1438 00fa 09D2     		bcs	.L49
+ 1439              	.L48:
+ 263:dependencies/DaisySeedGFX2/GFX.cpp ****             angle1 += 90;
+ 1440              		.loc 1 263 65 is_stmt 1 discriminator 3 view .LVU414
+ 263:dependencies/DaisySeedGFX2/GFX.cpp ****             angle1 += 90;
+ 1441              		.loc 1 263 73 is_stmt 0 discriminator 3 view .LVU415
+ 1442 00fc 2368     		ldr	r3, [r4]
+ 1443              	.LVL132:
+ 263:dependencies/DaisySeedGFX2/GFX.cpp ****             angle1 += 90;
+ 1444              		.loc 1 263 73 discriminator 3 view .LVU416
+ 1445 00fe 0AEB0602 		add	r2, r10, r6
+ 1446 0102 0299     		ldr	r1, [sp, #8]
+ 1447 0104 2046     		mov	r0, r4
+ 1448 0106 D3F800B0 		ldr	fp, [r3]
+ 1449 010a 92B2     		uxth	r2, r2
+ 1450 010c 4B46     		mov	r3, r9
+ 1451 010e D847     		blx	fp
+ 1452              	.LVL133:
+ 1453              	.L49:
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s 			page 41
+
+
+ 264:dependencies/DaisySeedGFX2/GFX.cpp ****             if (!((angle1 >= AlphaIn) && (angle1 <= AlphaOut))) setPixel(centerX - x, centerY + y, 
+ 1454              		.loc 1 264 13 is_stmt 1 view .LVU417
+ 264:dependencies/DaisySeedGFX2/GFX.cpp ****             if (!((angle1 >= AlphaIn) && (angle1 <= AlphaOut))) setPixel(centerX - x, centerY + y, 
+ 1455              		.loc 1 264 20 is_stmt 0 view .LVU418
+ 1456 0110 C5F58773 		rsb	r3, r5, #270
+ 1457 0114 9BB2     		uxth	r3, r3
+ 1458              	.LVL134:
+ 265:dependencies/DaisySeedGFX2/GFX.cpp ****             angle2 += 90;
+ 1459              		.loc 1 265 13 is_stmt 1 view .LVU419
+ 1460 0116 9845     		cmp	r8, r3
+ 1461 0118 01D8     		bhi	.L50
+ 265:dependencies/DaisySeedGFX2/GFX.cpp ****             angle2 += 90;
+ 1462              		.loc 1 265 17 is_stmt 0 discriminator 2 view .LVU420
+ 1463 011a 9F42     		cmp	r7, r3
+ 1464 011c 09D2     		bcs	.L51
+ 1465              	.L50:
+ 265:dependencies/DaisySeedGFX2/GFX.cpp ****             angle2 += 90;
+ 1466              		.loc 1 265 65 is_stmt 1 discriminator 3 view .LVU421
+ 265:dependencies/DaisySeedGFX2/GFX.cpp ****             angle2 += 90;
+ 1467              		.loc 1 265 73 is_stmt 0 discriminator 3 view .LVU422
+ 1468 011e 2368     		ldr	r3, [r4]
+ 1469              	.LVL135:
+ 265:dependencies/DaisySeedGFX2/GFX.cpp ****             angle2 += 90;
+ 1470              		.loc 1 265 73 discriminator 3 view .LVU423
+ 1471 0120 0AEB0602 		add	r2, r10, r6
+ 1472 0124 0599     		ldr	r1, [sp, #20]
+ 1473 0126 2046     		mov	r0, r4
+ 1474 0128 D3F800B0 		ldr	fp, [r3]
+ 1475 012c 92B2     		uxth	r2, r2
+ 1476 012e 4B46     		mov	r3, r9
+ 1477 0130 D847     		blx	fp
+ 1478              	.LVL136:
+ 1479              	.L51:
+ 266:dependencies/DaisySeedGFX2/GFX.cpp ****             if (!((angle2 >= AlphaIn) && (angle2 <= AlphaOut))) setPixel(centerX - y, centerY + x, 
+ 1480              		.loc 1 266 13 is_stmt 1 view .LVU424
+ 266:dependencies/DaisySeedGFX2/GFX.cpp ****             if (!((angle2 >= AlphaIn) && (angle2 <= AlphaOut))) setPixel(centerX - y, centerY + x, 
+ 1481              		.loc 1 266 20 is_stmt 0 view .LVU425
+ 1482 0132 05F1B403 		add	r3, r5, #180
+ 1483 0136 9BB2     		uxth	r3, r3
+ 1484              	.LVL137:
+ 267:dependencies/DaisySeedGFX2/GFX.cpp ****             angle1 += 90;
+ 1485              		.loc 1 267 13 is_stmt 1 view .LVU426
+ 1486 0138 9845     		cmp	r8, r3
+ 1487 013a 01D8     		bhi	.L52
+ 267:dependencies/DaisySeedGFX2/GFX.cpp ****             angle1 += 90;
+ 1488              		.loc 1 267 17 is_stmt 0 discriminator 2 view .LVU427
+ 1489 013c 9F42     		cmp	r7, r3
+ 1490 013e 09D2     		bcs	.L53
+ 1491              	.L52:
+ 267:dependencies/DaisySeedGFX2/GFX.cpp ****             angle1 += 90;
+ 1492              		.loc 1 267 65 is_stmt 1 discriminator 3 view .LVU428
+ 267:dependencies/DaisySeedGFX2/GFX.cpp ****             angle1 += 90;
+ 1493              		.loc 1 267 73 is_stmt 0 discriminator 3 view .LVU429
+ 1494 0140 019B     		ldr	r3, [sp, #4]
+ 1495              	.LVL138:
+ 267:dependencies/DaisySeedGFX2/GFX.cpp ****             angle1 += 90;
+ 1496              		.loc 1 267 73 discriminator 3 view .LVU430
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s 			page 42
+
+
+ 1497 0142 2046     		mov	r0, r4
+ 1498 0144 039A     		ldr	r2, [sp, #12]
+ 1499 0146 991B     		subs	r1, r3, r6
+ 1500 0148 2368     		ldr	r3, [r4]
+ 1501 014a 89B2     		uxth	r1, r1
+ 1502 014c D3F800B0 		ldr	fp, [r3]
+ 1503 0150 4B46     		mov	r3, r9
+ 1504 0152 D847     		blx	fp
+ 1505              	.LVL139:
+ 1506              	.L53:
+ 268:dependencies/DaisySeedGFX2/GFX.cpp ****             if (!((angle1 >= AlphaIn) && (angle1 <= AlphaOut))) setPixel(centerX - y, centerY - x, 
+ 1507              		.loc 1 268 13 is_stmt 1 view .LVU431
+ 268:dependencies/DaisySeedGFX2/GFX.cpp ****             if (!((angle1 >= AlphaIn) && (angle1 <= AlphaOut))) setPixel(centerX - y, centerY - x, 
+ 1508              		.loc 1 268 20 is_stmt 0 view .LVU432
+ 1509 0154 C5F5B473 		rsb	r3, r5, #360
+ 1510 0158 9BB2     		uxth	r3, r3
+ 1511              	.LVL140:
+ 269:dependencies/DaisySeedGFX2/GFX.cpp ****             angle2 += 90;
+ 1512              		.loc 1 269 13 is_stmt 1 view .LVU433
+ 1513 015a 9845     		cmp	r8, r3
+ 1514 015c 01D8     		bhi	.L54
+ 269:dependencies/DaisySeedGFX2/GFX.cpp ****             angle2 += 90;
+ 1515              		.loc 1 269 17 is_stmt 0 discriminator 2 view .LVU434
+ 1516 015e 9F42     		cmp	r7, r3
+ 1517 0160 09D2     		bcs	.L55
+ 1518              	.L54:
+ 269:dependencies/DaisySeedGFX2/GFX.cpp ****             angle2 += 90;
+ 1519              		.loc 1 269 65 is_stmt 1 discriminator 3 view .LVU435
+ 269:dependencies/DaisySeedGFX2/GFX.cpp ****             angle2 += 90;
+ 1520              		.loc 1 269 73 is_stmt 0 discriminator 3 view .LVU436
+ 1521 0162 019B     		ldr	r3, [sp, #4]
+ 1522              	.LVL141:
+ 269:dependencies/DaisySeedGFX2/GFX.cpp ****             angle2 += 90;
+ 1523              		.loc 1 269 73 discriminator 3 view .LVU437
+ 1524 0164 2046     		mov	r0, r4
+ 1525 0166 049A     		ldr	r2, [sp, #16]
+ 1526 0168 991B     		subs	r1, r3, r6
+ 1527 016a 2368     		ldr	r3, [r4]
+ 1528 016c 89B2     		uxth	r1, r1
+ 1529 016e D3F800B0 		ldr	fp, [r3]
+ 1530 0172 4B46     		mov	r3, r9
+ 1531 0174 D847     		blx	fp
+ 1532              	.LVL142:
+ 1533              	.L55:
+ 270:dependencies/DaisySeedGFX2/GFX.cpp ****             if (!((angle2 >= AlphaIn) && (angle2 <= AlphaOut))) setPixel(centerX - x, centerY - y, 
+ 1534              		.loc 1 270 13 is_stmt 1 view .LVU438
+ 270:dependencies/DaisySeedGFX2/GFX.cpp ****             if (!((angle2 >= AlphaIn) && (angle2 <= AlphaOut))) setPixel(centerX - x, centerY - y, 
+ 1535              		.loc 1 270 20 is_stmt 0 view .LVU439
+ 1536 0176 05F58775 		add	r5, r5, #270
+ 1537              	.LVL143:
+ 270:dependencies/DaisySeedGFX2/GFX.cpp ****             if (!((angle2 >= AlphaIn) && (angle2 <= AlphaOut))) setPixel(centerX - x, centerY - y, 
+ 1538              		.loc 1 270 20 view .LVU440
+ 1539 017a ADB2     		uxth	r5, r5
+ 1540              	.LVL144:
+ 271:dependencies/DaisySeedGFX2/GFX.cpp ****         } else {
+ 1541              		.loc 1 271 13 is_stmt 1 view .LVU441
+ 1542 017c A845     		cmp	r8, r5
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s 			page 43
+
+
+ 1543 017e 02D8     		bhi	.L70
+ 271:dependencies/DaisySeedGFX2/GFX.cpp ****         } else {
+ 1544              		.loc 1 271 17 is_stmt 0 discriminator 2 view .LVU442
+ 1545 0180 AF42     		cmp	r7, r5
+ 1546 0182 80F08380 		bcs	.L57
+ 1547              	.LVL145:
+ 1548              	.L70:
+ 271:dependencies/DaisySeedGFX2/GFX.cpp ****         } else {
+ 1549              		.loc 1 271 17 discriminator 2 view .LVU443
+ 1550              	.LBE50:
+ 1551              	.LBB51:
+ 289:dependencies/DaisySeedGFX2/GFX.cpp ****         }
+ 1552              		.loc 1 289 64 is_stmt 1 discriminator 2 view .LVU444
+ 289:dependencies/DaisySeedGFX2/GFX.cpp ****         }
+ 1553              		.loc 1 289 72 is_stmt 0 discriminator 2 view .LVU445
+ 1554 0186 2368     		ldr	r3, [r4]
+ 1555 0188 AAEB0602 		sub	r2, r10, r6
+ 1556 018c 0599     		ldr	r1, [sp, #20]
+ 1557 018e 2046     		mov	r0, r4
+ 1558 0190 1D68     		ldr	r5, [r3]
+ 1559 0192 92B2     		uxth	r2, r2
+ 1560 0194 4B46     		mov	r3, r9
+ 1561 0196 A847     		blx	r5
+ 1562              	.LVL146:
+ 1563 0198 78E0     		b	.L57
+ 1564              	.LVL147:
+ 1565              	.L41:
+ 274:dependencies/DaisySeedGFX2/GFX.cpp ****             if (((angle1 >= AlphaIn) && (angle1 <= AlphaOut))) setPixel(centerX + x, centerY - y, C
+ 1566              		.loc 1 274 13 is_stmt 1 view .LVU446
+ 275:dependencies/DaisySeedGFX2/GFX.cpp ****             uint16_t angle2 = angle;
+ 1567              		.loc 1 275 13 view .LVU447
+ 1568 019a 9845     		cmp	r8, r3
+ 1569 019c 0BD8     		bhi	.L58
+ 275:dependencies/DaisySeedGFX2/GFX.cpp ****             uint16_t angle2 = angle;
+ 1570              		.loc 1 275 38 is_stmt 0 discriminator 1 view .LVU448
+ 1571 019e 9F42     		cmp	r7, r3
+ 1572 01a0 09D3     		bcc	.L58
+ 275:dependencies/DaisySeedGFX2/GFX.cpp ****             uint16_t angle2 = angle;
+ 1573              		.loc 1 275 64 is_stmt 1 discriminator 2 view .LVU449
+ 275:dependencies/DaisySeedGFX2/GFX.cpp ****             uint16_t angle2 = angle;
+ 1574              		.loc 1 275 72 is_stmt 0 discriminator 2 view .LVU450
+ 1575 01a2 2368     		ldr	r3, [r4]
+ 1576 01a4 AAEB0602 		sub	r2, r10, r6
+ 1577 01a8 0299     		ldr	r1, [sp, #8]
+ 1578 01aa 2046     		mov	r0, r4
+ 1579 01ac D3F800B0 		ldr	fp, [r3]
+ 1580 01b0 92B2     		uxth	r2, r2
+ 1581 01b2 4B46     		mov	r3, r9
+ 1582 01b4 D847     		blx	fp
+ 1583              	.LVL148:
+ 1584              	.L58:
+ 276:dependencies/DaisySeedGFX2/GFX.cpp ****             if (((angle2 >= AlphaIn) && (angle2 <= AlphaOut))) setPixel(centerX + y, centerY - x, C
+ 1585              		.loc 1 276 13 is_stmt 1 view .LVU451
+ 277:dependencies/DaisySeedGFX2/GFX.cpp ****             angle1 += 90;
+ 1586              		.loc 1 277 13 view .LVU452
+ 1587 01b6 A845     		cmp	r8, r5
+ 1588 01b8 0BD8     		bhi	.L59
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s 			page 44
+
+
+ 277:dependencies/DaisySeedGFX2/GFX.cpp ****             angle1 += 90;
+ 1589              		.loc 1 277 38 is_stmt 0 discriminator 1 view .LVU453
+ 1590 01ba AF42     		cmp	r7, r5
+ 1591 01bc 09D3     		bcc	.L59
+ 277:dependencies/DaisySeedGFX2/GFX.cpp ****             angle1 += 90;
+ 1592              		.loc 1 277 64 is_stmt 1 discriminator 2 view .LVU454
+ 277:dependencies/DaisySeedGFX2/GFX.cpp ****             angle1 += 90;
+ 1593              		.loc 1 277 72 is_stmt 0 discriminator 2 view .LVU455
+ 1594 01be 019B     		ldr	r3, [sp, #4]
+ 1595 01c0 2046     		mov	r0, r4
+ 1596 01c2 049A     		ldr	r2, [sp, #16]
+ 1597 01c4 9919     		adds	r1, r3, r6
+ 1598 01c6 2368     		ldr	r3, [r4]
+ 1599 01c8 89B2     		uxth	r1, r1
+ 1600 01ca D3F800B0 		ldr	fp, [r3]
+ 1601 01ce 4B46     		mov	r3, r9
+ 1602 01d0 D847     		blx	fp
+ 1603              	.LVL149:
+ 1604              	.L59:
+ 278:dependencies/DaisySeedGFX2/GFX.cpp ****             if (((angle1 >= AlphaIn) && (angle1 <= AlphaOut))) setPixel(centerX + y, centerY + x, C
+ 1605              		.loc 1 278 13 is_stmt 1 view .LVU456
+ 278:dependencies/DaisySeedGFX2/GFX.cpp ****             if (((angle1 >= AlphaIn) && (angle1 <= AlphaOut))) setPixel(centerX + y, centerY + x, C
+ 1606              		.loc 1 278 20 is_stmt 0 view .LVU457
+ 1607 01d2 C5F1B403 		rsb	r3, r5, #180
+ 1608 01d6 9BB2     		uxth	r3, r3
+ 1609              	.LVL150:
+ 279:dependencies/DaisySeedGFX2/GFX.cpp ****             angle2 += 90;
+ 1610              		.loc 1 279 13 is_stmt 1 view .LVU458
+ 1611 01d8 9845     		cmp	r8, r3
+ 1612 01da 0BD8     		bhi	.L60
+ 279:dependencies/DaisySeedGFX2/GFX.cpp ****             angle2 += 90;
+ 1613              		.loc 1 279 38 is_stmt 0 discriminator 1 view .LVU459
+ 1614 01dc 9F42     		cmp	r7, r3
+ 1615 01de 09D3     		bcc	.L60
+ 279:dependencies/DaisySeedGFX2/GFX.cpp ****             angle2 += 90;
+ 1616              		.loc 1 279 64 is_stmt 1 discriminator 2 view .LVU460
+ 279:dependencies/DaisySeedGFX2/GFX.cpp ****             angle2 += 90;
+ 1617              		.loc 1 279 72 is_stmt 0 discriminator 2 view .LVU461
+ 1618 01e0 019B     		ldr	r3, [sp, #4]
+ 1619              	.LVL151:
+ 279:dependencies/DaisySeedGFX2/GFX.cpp ****             angle2 += 90;
+ 1620              		.loc 1 279 72 discriminator 2 view .LVU462
+ 1621 01e2 2046     		mov	r0, r4
+ 1622 01e4 039A     		ldr	r2, [sp, #12]
+ 1623 01e6 9919     		adds	r1, r3, r6
+ 1624 01e8 2368     		ldr	r3, [r4]
+ 1625 01ea 89B2     		uxth	r1, r1
+ 1626 01ec D3F800B0 		ldr	fp, [r3]
+ 1627 01f0 4B46     		mov	r3, r9
+ 1628 01f2 D847     		blx	fp
+ 1629              	.LVL152:
+ 1630              	.L60:
+ 280:dependencies/DaisySeedGFX2/GFX.cpp ****             if (((angle2 >= AlphaIn) && (angle2 <= AlphaOut))) setPixel(centerX + x, centerY + y, C
+ 1631              		.loc 1 280 13 is_stmt 1 view .LVU463
+ 280:dependencies/DaisySeedGFX2/GFX.cpp ****             if (((angle2 >= AlphaIn) && (angle2 <= AlphaOut))) setPixel(centerX + x, centerY + y, C
+ 1632              		.loc 1 280 20 is_stmt 0 view .LVU464
+ 1633 01f4 05F15A03 		add	r3, r5, #90
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s 			page 45
+
+
+ 1634 01f8 9BB2     		uxth	r3, r3
+ 1635              	.LVL153:
+ 281:dependencies/DaisySeedGFX2/GFX.cpp ****             angle1 += 90;
+ 1636              		.loc 1 281 13 is_stmt 1 view .LVU465
+ 1637 01fa 9845     		cmp	r8, r3
+ 1638 01fc 0BD8     		bhi	.L61
+ 281:dependencies/DaisySeedGFX2/GFX.cpp ****             angle1 += 90;
+ 1639              		.loc 1 281 38 is_stmt 0 discriminator 1 view .LVU466
+ 1640 01fe 9F42     		cmp	r7, r3
+ 1641 0200 09D3     		bcc	.L61
+ 281:dependencies/DaisySeedGFX2/GFX.cpp ****             angle1 += 90;
+ 1642              		.loc 1 281 64 is_stmt 1 discriminator 2 view .LVU467
+ 281:dependencies/DaisySeedGFX2/GFX.cpp ****             angle1 += 90;
+ 1643              		.loc 1 281 72 is_stmt 0 discriminator 2 view .LVU468
+ 1644 0202 2368     		ldr	r3, [r4]
+ 1645              	.LVL154:
+ 281:dependencies/DaisySeedGFX2/GFX.cpp ****             angle1 += 90;
+ 1646              		.loc 1 281 72 discriminator 2 view .LVU469
+ 1647 0204 0AEB0602 		add	r2, r10, r6
+ 1648 0208 0299     		ldr	r1, [sp, #8]
+ 1649 020a 2046     		mov	r0, r4
+ 1650 020c D3F800B0 		ldr	fp, [r3]
+ 1651 0210 92B2     		uxth	r2, r2
+ 1652 0212 4B46     		mov	r3, r9
+ 1653 0214 D847     		blx	fp
+ 1654              	.LVL155:
+ 1655              	.L61:
+ 282:dependencies/DaisySeedGFX2/GFX.cpp ****             if (((angle1 >= AlphaIn) && (angle1 <= AlphaOut))) setPixel(centerX - x, centerY + y, C
+ 1656              		.loc 1 282 13 is_stmt 1 view .LVU470
+ 282:dependencies/DaisySeedGFX2/GFX.cpp ****             if (((angle1 >= AlphaIn) && (angle1 <= AlphaOut))) setPixel(centerX - x, centerY + y, C
+ 1657              		.loc 1 282 20 is_stmt 0 view .LVU471
+ 1658 0216 C5F58773 		rsb	r3, r5, #270
+ 1659 021a 9BB2     		uxth	r3, r3
+ 1660              	.LVL156:
+ 283:dependencies/DaisySeedGFX2/GFX.cpp ****             angle2 += 90;
+ 1661              		.loc 1 283 13 is_stmt 1 view .LVU472
+ 1662 021c 9845     		cmp	r8, r3
+ 1663 021e 0BD8     		bhi	.L62
+ 283:dependencies/DaisySeedGFX2/GFX.cpp ****             angle2 += 90;
+ 1664              		.loc 1 283 38 is_stmt 0 discriminator 1 view .LVU473
+ 1665 0220 9F42     		cmp	r7, r3
+ 1666 0222 09D3     		bcc	.L62
+ 283:dependencies/DaisySeedGFX2/GFX.cpp ****             angle2 += 90;
+ 1667              		.loc 1 283 64 is_stmt 1 discriminator 2 view .LVU474
+ 283:dependencies/DaisySeedGFX2/GFX.cpp ****             angle2 += 90;
+ 1668              		.loc 1 283 72 is_stmt 0 discriminator 2 view .LVU475
+ 1669 0224 2368     		ldr	r3, [r4]
+ 1670              	.LVL157:
+ 283:dependencies/DaisySeedGFX2/GFX.cpp ****             angle2 += 90;
+ 1671              		.loc 1 283 72 discriminator 2 view .LVU476
+ 1672 0226 0AEB0602 		add	r2, r10, r6
+ 1673 022a 0599     		ldr	r1, [sp, #20]
+ 1674 022c 2046     		mov	r0, r4
+ 1675 022e D3F800B0 		ldr	fp, [r3]
+ 1676 0232 92B2     		uxth	r2, r2
+ 1677 0234 4B46     		mov	r3, r9
+ 1678 0236 D847     		blx	fp
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s 			page 46
+
+
+ 1679              	.LVL158:
+ 1680              	.L62:
+ 284:dependencies/DaisySeedGFX2/GFX.cpp ****             if (((angle2 >= AlphaIn) && (angle2 <= AlphaOut))) setPixel(centerX - y, centerY + x, C
+ 1681              		.loc 1 284 13 is_stmt 1 view .LVU477
+ 284:dependencies/DaisySeedGFX2/GFX.cpp ****             if (((angle2 >= AlphaIn) && (angle2 <= AlphaOut))) setPixel(centerX - y, centerY + x, C
+ 1682              		.loc 1 284 20 is_stmt 0 view .LVU478
+ 1683 0238 05F1B403 		add	r3, r5, #180
+ 1684 023c 9BB2     		uxth	r3, r3
+ 1685              	.LVL159:
+ 285:dependencies/DaisySeedGFX2/GFX.cpp ****             angle1 += 90;
+ 1686              		.loc 1 285 13 is_stmt 1 view .LVU479
+ 1687 023e 9845     		cmp	r8, r3
+ 1688 0240 0BD8     		bhi	.L63
+ 285:dependencies/DaisySeedGFX2/GFX.cpp ****             angle1 += 90;
+ 1689              		.loc 1 285 38 is_stmt 0 discriminator 1 view .LVU480
+ 1690 0242 9F42     		cmp	r7, r3
+ 1691 0244 09D3     		bcc	.L63
+ 285:dependencies/DaisySeedGFX2/GFX.cpp ****             angle1 += 90;
+ 1692              		.loc 1 285 64 is_stmt 1 discriminator 2 view .LVU481
+ 285:dependencies/DaisySeedGFX2/GFX.cpp ****             angle1 += 90;
+ 1693              		.loc 1 285 72 is_stmt 0 discriminator 2 view .LVU482
+ 1694 0246 019B     		ldr	r3, [sp, #4]
+ 1695              	.LVL160:
+ 285:dependencies/DaisySeedGFX2/GFX.cpp ****             angle1 += 90;
+ 1696              		.loc 1 285 72 discriminator 2 view .LVU483
+ 1697 0248 2046     		mov	r0, r4
+ 1698 024a 039A     		ldr	r2, [sp, #12]
+ 1699 024c 991B     		subs	r1, r3, r6
+ 1700 024e 2368     		ldr	r3, [r4]
+ 1701 0250 89B2     		uxth	r1, r1
+ 1702 0252 D3F800B0 		ldr	fp, [r3]
+ 1703 0256 4B46     		mov	r3, r9
+ 1704 0258 D847     		blx	fp
+ 1705              	.LVL161:
+ 1706              	.L63:
+ 286:dependencies/DaisySeedGFX2/GFX.cpp ****             if (((angle1 >= AlphaIn) && (angle1 <= AlphaOut))) setPixel(centerX - y, centerY - x, C
+ 1707              		.loc 1 286 13 is_stmt 1 view .LVU484
+ 286:dependencies/DaisySeedGFX2/GFX.cpp ****             if (((angle1 >= AlphaIn) && (angle1 <= AlphaOut))) setPixel(centerX - y, centerY - x, C
+ 1708              		.loc 1 286 20 is_stmt 0 view .LVU485
+ 1709 025a C5F5B473 		rsb	r3, r5, #360
+ 1710 025e 9BB2     		uxth	r3, r3
+ 1711              	.LVL162:
+ 287:dependencies/DaisySeedGFX2/GFX.cpp ****             angle2 += 90;
+ 1712              		.loc 1 287 13 is_stmt 1 view .LVU486
+ 1713 0260 9845     		cmp	r8, r3
+ 1714 0262 0BD8     		bhi	.L64
+ 287:dependencies/DaisySeedGFX2/GFX.cpp ****             angle2 += 90;
+ 1715              		.loc 1 287 38 is_stmt 0 discriminator 1 view .LVU487
+ 1716 0264 9F42     		cmp	r7, r3
+ 1717 0266 09D3     		bcc	.L64
+ 287:dependencies/DaisySeedGFX2/GFX.cpp ****             angle2 += 90;
+ 1718              		.loc 1 287 64 is_stmt 1 discriminator 2 view .LVU488
+ 287:dependencies/DaisySeedGFX2/GFX.cpp ****             angle2 += 90;
+ 1719              		.loc 1 287 72 is_stmt 0 discriminator 2 view .LVU489
+ 1720 0268 019B     		ldr	r3, [sp, #4]
+ 1721              	.LVL163:
+ 287:dependencies/DaisySeedGFX2/GFX.cpp ****             angle2 += 90;
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s 			page 47
+
+
+ 1722              		.loc 1 287 72 discriminator 2 view .LVU490
+ 1723 026a 2046     		mov	r0, r4
+ 1724 026c 049A     		ldr	r2, [sp, #16]
+ 1725 026e 991B     		subs	r1, r3, r6
+ 1726 0270 2368     		ldr	r3, [r4]
+ 1727 0272 89B2     		uxth	r1, r1
+ 1728 0274 D3F800B0 		ldr	fp, [r3]
+ 1729 0278 4B46     		mov	r3, r9
+ 1730 027a D847     		blx	fp
+ 1731              	.LVL164:
+ 1732              	.L64:
+ 288:dependencies/DaisySeedGFX2/GFX.cpp ****             if (((angle2 >= AlphaIn) && (angle2 <= AlphaOut))) setPixel(centerX - x, centerY - y, C
+ 1733              		.loc 1 288 13 is_stmt 1 view .LVU491
+ 288:dependencies/DaisySeedGFX2/GFX.cpp ****             if (((angle2 >= AlphaIn) && (angle2 <= AlphaOut))) setPixel(centerX - x, centerY - y, C
+ 1734              		.loc 1 288 20 is_stmt 0 view .LVU492
+ 1735 027c 05F58775 		add	r5, r5, #270
+ 1736              	.LVL165:
+ 288:dependencies/DaisySeedGFX2/GFX.cpp ****             if (((angle2 >= AlphaIn) && (angle2 <= AlphaOut))) setPixel(centerX - x, centerY - y, C
+ 1737              		.loc 1 288 20 view .LVU493
+ 1738 0280 ADB2     		uxth	r5, r5
+ 1739              	.LVL166:
+ 289:dependencies/DaisySeedGFX2/GFX.cpp ****         }
+ 1740              		.loc 1 289 13 is_stmt 1 view .LVU494
+ 1741 0282 A845     		cmp	r8, r5
+ 1742 0284 02D8     		bhi	.L57
+ 289:dependencies/DaisySeedGFX2/GFX.cpp ****         }
+ 1743              		.loc 1 289 38 is_stmt 0 discriminator 1 view .LVU495
+ 1744 0286 AF42     		cmp	r7, r5
+ 1745 0288 BFF47DAF 		bcs	.L70
+ 1746              	.LVL167:
+ 1747              	.L57:
+ 289:dependencies/DaisySeedGFX2/GFX.cpp ****         }
+ 1748              		.loc 1 289 38 discriminator 1 view .LVU496
+ 1749              	.LBE51:
+ 1750              	.LBE52:
+ 292:dependencies/DaisySeedGFX2/GFX.cpp ****             y--;
+ 1751              		.loc 1 292 9 is_stmt 1 view .LVU497
+ 1752 028c 069B     		ldr	r3, [sp, #24]
+ 1753 028e 002B     		cmp	r3, #0
+ 1754 0290 07DD     		ble	.L66
+ 293:dependencies/DaisySeedGFX2/GFX.cpp ****             m -= 8 * y;
+ 1755              		.loc 1 293 13 view .LVU498
+ 293:dependencies/DaisySeedGFX2/GFX.cpp ****             m -= 8 * y;
+ 1756              		.loc 1 293 14 is_stmt 0 view .LVU499
+ 1757 0292 013E     		subs	r6, r6, #1
+ 1758              	.LVL168:
+ 294:dependencies/DaisySeedGFX2/GFX.cpp ****         }
+ 1759              		.loc 1 294 15 view .LVU500
+ 1760 0294 069A     		ldr	r2, [sp, #24]
+ 293:dependencies/DaisySeedGFX2/GFX.cpp ****             m -= 8 * y;
+ 1761              		.loc 1 293 14 view .LVU501
+ 1762 0296 B3B2     		uxth	r3, r6
+ 1763 0298 36B2     		sxth	r6, r6
+ 1764              	.LVL169:
+ 294:dependencies/DaisySeedGFX2/GFX.cpp ****         }
+ 1765              		.loc 1 294 13 is_stmt 1 view .LVU502
+ 294:dependencies/DaisySeedGFX2/GFX.cpp ****         }
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s 			page 48
+
+
+ 1766              		.loc 1 294 15 is_stmt 0 view .LVU503
+ 1767 029a A2EBC303 		sub	r3, r2, r3, lsl #3
+ 1768 029e 1BB2     		sxth	r3, r3
+ 1769 02a0 0693     		str	r3, [sp, #24]
+ 1770              	.LVL170:
+ 1771              	.L66:
+ 296:dependencies/DaisySeedGFX2/GFX.cpp ****         m += 8 * x + 4;
+ 1772              		.loc 1 296 9 is_stmt 1 view .LVU504
+ 297:dependencies/DaisySeedGFX2/GFX.cpp ****     }
+ 1773              		.loc 1 297 9 view .LVU505
+ 297:dependencies/DaisySeedGFX2/GFX.cpp ****     }
+ 1774              		.loc 1 297 11 is_stmt 0 view .LVU506
+ 1775 02a2 069B     		ldr	r3, [sp, #24]
+ 1776 02a4 099A     		ldr	r2, [sp, #36]
+ 1777 02a6 03EBC203 		add	r3, r3, r2, lsl #3
+ 1778 02aa 0C33     		adds	r3, r3, #12
+ 1779 02ac 1BB2     		sxth	r3, r3
+ 1780 02ae 0693     		str	r3, [sp, #24]
+ 1781              	.LVL171:
+ 297:dependencies/DaisySeedGFX2/GFX.cpp ****     }
+ 1782              		.loc 1 297 11 view .LVU507
+ 1783 02b0 079B     		ldr	r3, [sp, #28]
+ 1784 02b2 0133     		adds	r3, r3, #1
+ 1785 02b4 0793     		str	r3, [sp, #28]
+ 1786 02b6 059B     		ldr	r3, [sp, #20]
+ 1787 02b8 013B     		subs	r3, r3, #1
+ 1788 02ba 9BB2     		uxth	r3, r3
+ 1789 02bc 0593     		str	r3, [sp, #20]
+ 1790 02be 049B     		ldr	r3, [sp, #16]
+ 1791 02c0 013B     		subs	r3, r3, #1
+ 1792 02c2 9BB2     		uxth	r3, r3
+ 1793 02c4 0493     		str	r3, [sp, #16]
+ 1794 02c6 039B     		ldr	r3, [sp, #12]
+ 1795 02c8 0133     		adds	r3, r3, #1
+ 1796 02ca 9BB2     		uxth	r3, r3
+ 1797 02cc 0393     		str	r3, [sp, #12]
+ 1798 02ce 029B     		ldr	r3, [sp, #8]
+ 1799 02d0 0133     		adds	r3, r3, #1
+ 1800 02d2 9BB2     		uxth	r3, r3
+ 1801 02d4 0293     		str	r3, [sp, #8]
+ 1802 02d6 B5E6     		b	.L40
+ 1803              	.L72:
+ 1804              		.align	2
+ 1805              	.L71:
+ 1806 02d8 00003443 		.word	1127481344
+ 1807 02dc DB0F4940 		.word	1078530011
+ 1808              	.LBE45:
+ 1809              		.cfi_endproc
+ 1810              	.LFE1552:
+ 1812              		.section	.text._ZN6DadGFX4cGFX8drawCharEc,"ax",%progbits
+ 1813              		.align	1
+ 1814              		.global	_ZN6DadGFX4cGFX8drawCharEc
+ 1815              		.syntax unified
+ 1816              		.thumb
+ 1817              		.thumb_func
+ 1819              	_ZN6DadGFX4cGFX8drawCharEc:
+ 1820              	.LVL172:
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s 			page 49
+
+
+ 1821              	.LFB1553:
+ 300:dependencies/DaisySeedGFX2/GFX.cpp **** 
+ 301:dependencies/DaisySeedGFX2/GFX.cpp **** // ==========================================================================
+ 302:dependencies/DaisySeedGFX2/GFX.cpp **** // Draw text
+ 303:dependencies/DaisySeedGFX2/GFX.cpp **** // ==========================================================================
+ 304:dependencies/DaisySeedGFX2/GFX.cpp **** 
+ 305:dependencies/DaisySeedGFX2/GFX.cpp **** //-----------------------------------------------------------------------------------
+ 306:dependencies/DaisySeedGFX2/GFX.cpp **** // Draw a single character
+ 307:dependencies/DaisySeedGFX2/GFX.cpp **** void cGFX::drawChar(const char c) {
+ 1822              		.loc 1 307 35 is_stmt 1 view -0
+ 1823              		.cfi_startproc
+ 1824              		@ args = 0, pretend = 0, frame = 0
+ 1825              		@ frame_needed = 0, uses_anonymous_args = 0
+ 308:dependencies/DaisySeedGFX2/GFX.cpp ****     const GFXglyph *pTable = m_pFont->getGFXglyph(c);
+ 1826              		.loc 1 308 5 view .LVU509
+ 1827              		.loc 1 308 30 is_stmt 0 view .LVU510
+ 1828 0000 8368     		ldr	r3, [r0, #8]
+ 1829              	.LVL173:
+ 1830              	.LBB57:
+ 1831              	.LBI57:
+ 113:dependencies/DaisySeedGFX2/GFX.h ****     }
+ 114:dependencies/DaisySeedGFX2/GFX.h **** 
+ 115:dependencies/DaisySeedGFX2/GFX.h ****     // --------------------------------------------------------------------------
+ 116:dependencies/DaisySeedGFX2/GFX.h ****     // Reads the width of a string
+ 117:dependencies/DaisySeedGFX2/GFX.h ****     uint16_t getTextWidth(const char *Text);
+ 118:dependencies/DaisySeedGFX2/GFX.h **** 
+ 119:dependencies/DaisySeedGFX2/GFX.h ****     // --------------------------------------------------------------------------
+ 120:dependencies/DaisySeedGFX2/GFX.h ****     // Reads the maximum font height
+ 121:dependencies/DaisySeedGFX2/GFX.h ****     inline uint8_t getHeight(){
+ 122:dependencies/DaisySeedGFX2/GFX.h ****         return m_NegHeight - m_PosHeight;
+ 123:dependencies/DaisySeedGFX2/GFX.h ****     }
+ 124:dependencies/DaisySeedGFX2/GFX.h **** 
+ 125:dependencies/DaisySeedGFX2/GFX.h ****     // --------------------------------------------------------------------------
+ 126:dependencies/DaisySeedGFX2/GFX.h ****     // Reads the maximum font height above the cursor line
+ 127:dependencies/DaisySeedGFX2/GFX.h ****     inline uint8_t getPosHeight(){
+ 128:dependencies/DaisySeedGFX2/GFX.h ****         return -m_PosHeight;
+ 129:dependencies/DaisySeedGFX2/GFX.h ****     }
+ 130:dependencies/DaisySeedGFX2/GFX.h **** 
+ 131:dependencies/DaisySeedGFX2/GFX.h ****     // --------------------------------------------------------------------------
+ 132:dependencies/DaisySeedGFX2/GFX.h ****     // Reads the maximum font height below the cursor line
+ 133:dependencies/DaisySeedGFX2/GFX.h ****     inline uint8_t getNegHeight(){
+ 134:dependencies/DaisySeedGFX2/GFX.h ****         return m_NegHeight;
+ 135:dependencies/DaisySeedGFX2/GFX.h ****     }
+ 136:dependencies/DaisySeedGFX2/GFX.h **** 
+ 137:dependencies/DaisySeedGFX2/GFX.h ****     // --------------------------------------------------------------------------
+ 138:dependencies/DaisySeedGFX2/GFX.h ****     // Returns the address of the font descriptor
+ 139:dependencies/DaisySeedGFX2/GFX.h ****     inline const GFXCFont *getGFXfont() { return m_pFont; }
+ 140:dependencies/DaisySeedGFX2/GFX.h **** 
+ 141:dependencies/DaisySeedGFX2/GFX.h ****     // --------------------------------------------------------------------------
+ 142:dependencies/DaisySeedGFX2/GFX.h ****     // Returns the address of the glyph descriptor table
+ 143:dependencies/DaisySeedGFX2/GFX.h ****     inline const GFXglyph *getGFXglyph() { return m_pTable; }
+ 144:dependencies/DaisySeedGFX2/GFX.h **** 
+ 145:dependencies/DaisySeedGFX2/GFX.h ****     // --------------------------------------------------------------------------
+ 146:dependencies/DaisySeedGFX2/GFX.h ****     // Returns the address of the glyph descriptor for character c
+ 147:dependencies/DaisySeedGFX2/GFX.h ****     inline const GFXglyph *getGFXglyph(char c){
+ 1832              		.loc 2 147 28 is_stmt 1 view .LVU511
+ 1833              	.LBB58:
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s 			page 50
+
+
+ 148:dependencies/DaisySeedGFX2/GFX.h ****         return m_pTable + (c - m_pFont->first);
+ 1834              		.loc 2 148 9 view .LVU512
+ 1835              		.loc 2 148 32 is_stmt 0 view .LVU513
+ 1836 0002 1A68     		ldr	r2, [r3]
+ 1837              		.loc 2 148 46 view .LVU514
+ 1838 0004 5B68     		ldr	r3, [r3, #4]
+ 1839              	.LVL174:
+ 1840              		.loc 2 148 46 view .LVU515
+ 1841              	.LBE58:
+ 1842              	.LBE57:
+ 307:dependencies/DaisySeedGFX2/GFX.cpp ****     const GFXglyph *pTable = m_pFont->getGFXglyph(c);
+ 1843              		.loc 1 307 35 view .LVU516
+ 1844 0006 F0B5     		push	{r4, r5, r6, r7, lr}
+ 1845              		.cfi_def_cfa_offset 20
+ 1846              		.cfi_offset 4, -20
+ 1847              		.cfi_offset 5, -16
+ 1848              		.cfi_offset 6, -12
+ 1849              		.cfi_offset 7, -8
+ 1850              		.cfi_offset 14, -4
+ 1851              	.LBB62:
+ 1852              	.LBB59:
+ 1853              		.loc 2 148 41 view .LVU517
+ 1854 0008 1589     		ldrh	r5, [r2, #8]
+ 1855              	.LBE59:
+ 1856              	.LBE62:
+ 307:dependencies/DaisySeedGFX2/GFX.cpp ****     const GFXglyph *pTable = m_pFont->getGFXglyph(c);
+ 1857              		.loc 1 307 35 view .LVU518
+ 1858 000a 85B0     		sub	sp, sp, #20
+ 1859              		.cfi_def_cfa_offset 40
+ 1860              	.LBB63:
+ 1861              	.LBB64:
+ 149:dependencies/DaisySeedGFX2/GFX.h ****     }
+ 150:dependencies/DaisySeedGFX2/GFX.h **** 
+ 151:dependencies/DaisySeedGFX2/GFX.h ****     // --------------------------------------------------------------------------
+ 152:dependencies/DaisySeedGFX2/GFX.h ****     // Returns the address of the bitmap representing character c
+ 153:dependencies/DaisySeedGFX2/GFX.h ****     inline const uint8_t *getBitmap(char c){
+ 154:dependencies/DaisySeedGFX2/GFX.h ****         return &m_pFont->bitmap[m_pTable[c - m_pFont->first].bitmapOffset];
+ 1862              		.loc 2 154 74 view .LVU519
+ 1863 000c 1768     		ldr	r7, [r2]
+ 1864              	.LBE64:
+ 1865              	.LBE63:
+ 307:dependencies/DaisySeedGFX2/GFX.cpp ****     const GFXglyph *pTable = m_pFont->getGFXglyph(c);
+ 1866              		.loc 1 307 35 view .LVU520
+ 1867 000e 0446     		mov	r4, r0
+ 1868              	.LBB66:
+ 1869              	.LBB60:
+ 148:dependencies/DaisySeedGFX2/GFX.h ****     }
+ 1870              		.loc 2 148 30 view .LVU521
+ 1871 0010 491B     		subs	r1, r1, r5
+ 1872              	.LVL175:
+ 148:dependencies/DaisySeedGFX2/GFX.h ****     }
+ 1873              		.loc 2 148 30 view .LVU522
+ 1874              	.LBE60:
+ 1875              	.LBE66:
+ 309:dependencies/DaisySeedGFX2/GFX.cpp **** 
+ 310:dependencies/DaisySeedGFX2/GFX.cpp ****     // Draw the character using a bitmap, applying the font glyph offsets
+ 311:dependencies/DaisySeedGFX2/GFX.cpp ****     fillRectWithBitmap(m_xCursor + pTable->xOffset, m_yCursor + pTable->yOffset,
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s 			page 51
+
+
+ 1876              		.loc 1 311 23 view .LVU523
+ 1877 0012 8688     		ldrh	r6, [r0, #4]
+ 1878              	.LBB67:
+ 1879              	.LBB61:
+ 148:dependencies/DaisySeedGFX2/GFX.h ****     }
+ 1880              		.loc 2 148 46 view .LVU524
+ 1881 0014 03EBC105 		add	r5, r3, r1, lsl #3
+ 1882              	.LVL176:
+ 148:dependencies/DaisySeedGFX2/GFX.h ****     }
+ 1883              		.loc 2 148 46 view .LVU525
+ 1884              	.LBE61:
+ 1885              	.LBE67:
+ 1886              		.loc 1 311 5 is_stmt 1 view .LVU526
+ 1887              	.LBB68:
+ 1888              	.LBI63:
+ 153:dependencies/DaisySeedGFX2/GFX.h ****         return &m_pFont->bitmap[m_pTable[c - m_pFont->first].bitmapOffset];
+ 1889              		.loc 2 153 27 view .LVU527
+ 1890              	.LBB65:
+ 1891              		.loc 2 154 9 view .LVU528
+ 1892              		.loc 2 154 62 is_stmt 0 view .LVU529
+ 1893 0018 33F83130 		ldrh	r3, [r3, r1, lsl #3]
+ 1894              	.LBE65:
+ 1895              	.LBE68:
+ 1896              		.loc 1 311 23 view .LVU530
+ 1897 001c C188     		ldrh	r1, [r0, #6]
+ 1898              		.loc 1 311 73 view .LVU531
+ 1899 001e 95F90620 		ldrsb	r2, [r5, #6]
+ 1900              		.loc 1 311 23 view .LVU532
+ 1901 0022 3B44     		add	r3, r3, r7
+ 1902 0024 0A44     		add	r2, r2, r1
+ 1903              		.loc 1 311 44 view .LVU533
+ 1904 0026 95F90510 		ldrsb	r1, [r5, #5]
+ 1905              		.loc 1 311 23 view .LVU534
+ 1906 002a 3144     		add	r1, r1, r6
+ 1907 002c 0646     		mov	r6, r0
+ 1908 002e 92B2     		uxth	r2, r2
+ 1909 0030 56F810CB 		ldr	ip, [r6], #16
+ 1910 0034 89B2     		uxth	r1, r1
+ 1911 0036 0396     		str	r6, [sp, #12]
+ 312:dependencies/DaisySeedGFX2/GFX.cpp ****                     m_pFont->getBitmap(c), 
+ 313:dependencies/DaisySeedGFX2/GFX.cpp ****                     pTable->width, pTable->height,
+ 314:dependencies/DaisySeedGFX2/GFX.cpp ****                     m_TextFrontColor, m_TextBackColor);
+ 1912              		.loc 1 314 21 view .LVU535
+ 1913 0038 00F10C06 		add	r6, r0, #12
+ 311:dependencies/DaisySeedGFX2/GFX.cpp ****                     m_pFont->getBitmap(c), 
+ 1914              		.loc 1 311 23 view .LVU536
+ 1915 003c 0296     		str	r6, [sp, #8]
+ 1916 003e EE78     		ldrb	r6, [r5, #3]	@ zero_extendqisi2
+ 1917 0040 0196     		str	r6, [sp, #4]
+ 1918 0042 AE78     		ldrb	r6, [r5, #2]	@ zero_extendqisi2
+ 1919 0044 0096     		str	r6, [sp]
+ 1920 0046 DCF80860 		ldr	r6, [ip, #8]
+ 1921 004a B047     		blx	r6
+ 1922              	.LVL177:
+ 315:dependencies/DaisySeedGFX2/GFX.cpp **** 
+ 316:dependencies/DaisySeedGFX2/GFX.cpp ****     // Advance the cursor based on the glyph's xAdvance value
+ 317:dependencies/DaisySeedGFX2/GFX.cpp ****     m_xCursor += pTable->xAdvance;
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s 			page 52
+
+
+ 1923              		.loc 1 317 5 is_stmt 1 view .LVU537
+ 1924              		.loc 1 317 26 is_stmt 0 view .LVU538
+ 1925 004c 2B79     		ldrb	r3, [r5, #4]	@ zero_extendqisi2
+ 1926              		.loc 1 317 15 view .LVU539
+ 1927 004e A288     		ldrh	r2, [r4, #4]
+ 1928 0050 1344     		add	r3, r3, r2
+ 1929 0052 A380     		strh	r3, [r4, #4]	@ movhi
+ 318:dependencies/DaisySeedGFX2/GFX.cpp **** }
+ 1930              		.loc 1 318 1 view .LVU540
+ 1931 0054 05B0     		add	sp, sp, #20
+ 1932              		.cfi_def_cfa_offset 20
+ 1933              		@ sp needed
+ 1934 0056 F0BD     		pop	{r4, r5, r6, r7, pc}
+ 1935              		.loc 1 318 1 view .LVU541
+ 1936              		.cfi_endproc
+ 1937              	.LFE1553:
+ 1939              		.section	.text._ZN6DadGFX4cGFX8drawTextEPKc,"ax",%progbits
+ 1940              		.align	1
+ 1941              		.global	_ZN6DadGFX4cGFX8drawTextEPKc
+ 1942              		.syntax unified
+ 1943              		.thumb
+ 1944              		.thumb_func
+ 1946              	_ZN6DadGFX4cGFX8drawTextEPKc:
+ 1947              	.LVL178:
+ 1948              	.LFB1554:
+ 319:dependencies/DaisySeedGFX2/GFX.cpp **** 
+ 320:dependencies/DaisySeedGFX2/GFX.cpp **** //-----------------------------------------------------------------------------------
+ 321:dependencies/DaisySeedGFX2/GFX.cpp **** // Draw a string of text
+ 322:dependencies/DaisySeedGFX2/GFX.cpp **** void cGFX::drawText(const char *Text) {
+ 1949              		.loc 1 322 39 is_stmt 1 view -0
+ 1950              		.cfi_startproc
+ 1951              		@ args = 0, pretend = 0, frame = 0
+ 1952              		@ frame_needed = 0, uses_anonymous_args = 0
+ 323:dependencies/DaisySeedGFX2/GFX.cpp ****     const char *pText = Text;
+ 1953              		.loc 1 323 5 view .LVU543
+ 324:dependencies/DaisySeedGFX2/GFX.cpp ****     // Iterate through each character in the string and draw it
+ 325:dependencies/DaisySeedGFX2/GFX.cpp ****     while (*pText != '\0') {
+ 1954              		.loc 1 325 5 view .LVU544
+ 322:dependencies/DaisySeedGFX2/GFX.cpp ****     const char *pText = Text;
+ 1955              		.loc 1 322 39 is_stmt 0 view .LVU545
+ 1956 0000 38B5     		push	{r3, r4, r5, lr}
+ 1957              		.cfi_def_cfa_offset 16
+ 1958              		.cfi_offset 3, -16
+ 1959              		.cfi_offset 4, -12
+ 1960              		.cfi_offset 5, -8
+ 1961              		.cfi_offset 14, -4
+ 322:dependencies/DaisySeedGFX2/GFX.cpp ****     const char *pText = Text;
+ 1962              		.loc 1 322 39 view .LVU546
+ 1963 0002 0546     		mov	r5, r0
+ 1964 0004 4C1E     		subs	r4, r1, #1
+ 1965              	.LVL179:
+ 1966              	.L75:
+ 1967              		.loc 1 325 19 is_stmt 1 view .LVU547
+ 1968              		.loc 1 325 12 is_stmt 0 view .LVU548
+ 1969 0006 14F8011F 		ldrb	r1, [r4, #1]!	@ zero_extendqisi2
+ 1970              	.LVL180:
+ 1971              		.loc 1 325 19 view .LVU549
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s 			page 53
+
+
+ 1972 000a 01B9     		cbnz	r1, .L76
+ 326:dependencies/DaisySeedGFX2/GFX.cpp ****         drawChar(*pText++);
+ 327:dependencies/DaisySeedGFX2/GFX.cpp ****     }
+ 328:dependencies/DaisySeedGFX2/GFX.cpp **** }
+ 1973              		.loc 1 328 1 view .LVU550
+ 1974 000c 38BD     		pop	{r3, r4, r5, pc}
+ 1975              	.LVL181:
+ 1976              	.L76:
+ 326:dependencies/DaisySeedGFX2/GFX.cpp ****         drawChar(*pText++);
+ 1977              		.loc 1 326 9 is_stmt 1 view .LVU551
+ 326:dependencies/DaisySeedGFX2/GFX.cpp ****         drawChar(*pText++);
+ 1978              		.loc 1 326 17 is_stmt 0 view .LVU552
+ 1979 000e 2846     		mov	r0, r5
+ 1980 0010 FFF7FEFF 		bl	_ZN6DadGFX4cGFX8drawCharEc
+ 1981              	.LVL182:
+ 1982 0014 F7E7     		b	.L75
+ 1983              		.cfi_endproc
+ 1984              	.LFE1554:
+ 1986              		.text
+ 1987              	.Letext0:
+ 1988              		.file 4 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/ma
+ 1989              		.file 5 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/sy
+ 1990              		.file 6 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c+
+ 1991              		.file 7 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c+
+ 1992              		.file 8 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c+
+ 1993              		.file 9 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c+
+ 1994              		.file 10 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 1995              		.file 11 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 1996              		.file 12 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 1997              		.file 13 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 1998              		.file 14 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 1999              		.file 15 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/m
+ 2000              		.file 16 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 2001              		.file 17 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 2002              		.file 18 "dependencies/DaisySeedGFX2/GFXFont.h"
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s 			page 54
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 GFX.cpp
+C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s:20     .text._ZN6DadGFX5cFont4InitEPKNS_8GFXCFontE:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s:26     .text._ZN6DadGFX5cFont4InitEPKNS_8GFXCFontE:00000000 _ZN6DadGFX5cFont4InitEPKNS_8GFXCFontE
+C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s:128    .text._ZN6DadGFX5cFontC2EPNS_10GFXBinFontE:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s:134    .text._ZN6DadGFX5cFontC2EPNS_10GFXBinFontE:00000000 _ZN6DadGFX5cFontC2EPNS_10GFXBinFontE
+C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s:134    .text._ZN6DadGFX5cFontC2EPNS_10GFXBinFontE:00000000 _ZN6DadGFX5cFontC1EPNS_10GFXBinFontE
+C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s:190    .text._ZN6DadGFX5cFont12getTextWidthEPKc:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s:196    .text._ZN6DadGFX5cFont12getTextWidthEPKc:00000000 _ZN6DadGFX5cFont12getTextWidthEPKc
+C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s:263    .text._ZN6DadGFX4cGFX8drawRectEtttttRKNS_6sColorE:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s:269    .text._ZN6DadGFX4cGFX8drawRectEtttttRKNS_6sColorE:00000000 _ZN6DadGFX4cGFX8drawRectEtttttRKNS_6sColorE
+C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s:382    .text._ZN6DadGFX4cGFX8drawLineEttttRKNS_6sColorE:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s:388    .text._ZN6DadGFX4cGFX8drawLineEttttRKNS_6sColorE:00000000 _ZN6DadGFX4cGFX8drawLineEttttRKNS_6sColorE
+C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s:748    .text._ZN6DadGFX4cGFX10drawCircleEtttRKNS_6sColorE:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s:754    .text._ZN6DadGFX4cGFX10drawCircleEtttRKNS_6sColorE:00000000 _ZN6DadGFX4cGFX10drawCircleEtttRKNS_6sColorE
+C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s:960    .text._ZN6DadGFX4cGFX14drawFillCircleEtttRKNS_6sColorE:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s:966    .text._ZN6DadGFX4cGFX14drawFillCircleEtttRKNS_6sColorE:00000000 _ZN6DadGFX4cGFX14drawFillCircleEtttRKNS_6sColorE
+C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s:1201   .text._ZN6DadGFX4cGFX7drawArcEtttttRKNS_6sColorE:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s:1207   .text._ZN6DadGFX4cGFX7drawArcEtttttRKNS_6sColorE:00000000 _ZN6DadGFX4cGFX7drawArcEtttttRKNS_6sColorE
+C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s:1806   .text._ZN6DadGFX4cGFX7drawArcEtttttRKNS_6sColorE:000002d8 $d
+C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s:1813   .text._ZN6DadGFX4cGFX8drawCharEc:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s:1819   .text._ZN6DadGFX4cGFX8drawCharEc:00000000 _ZN6DadGFX4cGFX8drawCharEc
+C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s:1940   .text._ZN6DadGFX4cGFX8drawTextEPKc:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\ccClnnCL.s:1946   .text._ZN6DadGFX4cGFX8drawTextEPKc:00000000 _ZN6DadGFX4cGFX8drawTextEPKc
+
+UNDEFINED SYMBOLS
+atan2f

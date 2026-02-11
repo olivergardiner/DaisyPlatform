@@ -1,4 +1,5 @@
-#pragma once
+#ifndef PERSPECTIVE_PHASEREFFECT_H
+#define PERSPECTIVE_PHASEREFFECT_H
 
 #include "../effect.h"
 #include "daisysp.h"
@@ -23,3 +24,5 @@ private:
 };
 
 } // namespace perspective
+
+#endif // PERSPECTIVE_PHASEREFFECT_H

@@ -1,0 +1,326 @@
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccBbcgtv.s 			page 1
+
+
+   1              		.cpu cortex-m7
+   2              		.arch armv7e-m
+   3              		.fpu fpv5-d16
+   4              		.eabi_attribute 28, 1
+   5              		.eabi_attribute 20, 1
+   6              		.eabi_attribute 21, 1
+   7              		.eabi_attribute 23, 3
+   8              		.eabi_attribute 24, 1
+   9              		.eabi_attribute 25, 1
+  10              		.eabi_attribute 26, 1
+  11              		.eabi_attribute 30, 4
+  12              		.eabi_attribute 34, 1
+  13              		.eabi_attribute 18, 4
+  14              		.file	"switch.cpp"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.file 1 "ui/switch.cpp"
+  19              		.section	.text._ZN11perspective6Switch4InitEN5daisy3PinEfNS0_4TypeENS0_8PolarityENS1_4GPIO4PullE,"
+  20              		.align	1
+  21              		.global	_ZN11perspective6Switch4InitEN5daisy3PinEfNS0_4TypeENS0_8PolarityENS1_4GPIO4PullE
+  22              		.syntax unified
+  23              		.thumb
+  24              		.thumb_func
+  26              	_ZN11perspective6Switch4InitEN5daisy3PinEfNS0_4TypeENS0_8PolarityENS1_4GPIO4PullE:
+  27              	.LVL0:
+  28              	.LFB1572:
+   1:ui/switch.cpp **** #include "switch.h"
+   2:ui/switch.cpp **** 
+   3:ui/switch.cpp **** using namespace daisy;
+   4:ui/switch.cpp **** using namespace perspective;
+   5:ui/switch.cpp **** 
+   6:ui/switch.cpp **** void Switch::Init(Pin        pin,
+   7:ui/switch.cpp ****                   float      update_rate,
+   8:ui/switch.cpp ****                   Type       t,
+   9:ui/switch.cpp ****                   Polarity   pol,
+  10:ui/switch.cpp ****                   GPIO::Pull pu)
+  11:ui/switch.cpp **** {
+  29              		.loc 1 11 1 view -0
+  30              		.cfi_startproc
+  31              		@ args = 4, pretend = 0, frame = 8
+  32              		@ frame_needed = 0, uses_anonymous_args = 0
+  12:ui/switch.cpp ****     last_update_  = System::GetUs();
+  33              		.loc 1 12 5 view .LVU1
+  11:ui/switch.cpp ****     last_update_  = System::GetUs();
+  34              		.loc 1 11 1 is_stmt 0 view .LVU2
+  35 0000 F0B5     		push	{r4, r5, r6, r7, lr}
+  36              		.cfi_def_cfa_offset 20
+  37              		.cfi_offset 4, -20
+  38              		.cfi_offset 5, -16
+  39              		.cfi_offset 6, -12
+  40              		.cfi_offset 7, -8
+  41              		.cfi_offset 14, -4
+  42 0002 1D46     		mov	r5, r3
+  43 0004 0446     		mov	r4, r0
+  44 0006 1646     		mov	r6, r2
+  45 0008 2DED028B 		vpush.64	{d8}
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccBbcgtv.s 			page 2
+
+
+  46              		.cfi_def_cfa_offset 28
+  47              		.cfi_offset 80, -28
+  48              		.cfi_offset 81, -24
+  49 000c 83B0     		sub	sp, sp, #12
+  50              		.cfi_def_cfa_offset 40
+  11:ui/switch.cpp ****     last_update_  = System::GetUs();
+  51              		.loc 1 11 1 view .LVU3
+  52 000e B0EE408A 		vmov.f32	s16, s0
+  53 0012 0A9F     		ldr	r7, [sp, #40]
+  54 0014 ADF80410 		strh	r1, [sp, #4]	@ movhi
+  55              		.loc 1 12 34 view .LVU4
+  56 0018 FFF7FEFF 		bl	_ZN5daisy6System5GetUsEv
+  57              	.LVL1:
+  13:ui/switch.cpp ****     update_rate_  = update_rate;
+  14:ui/switch.cpp ****     state_        = 0x00;
+  15:ui/switch.cpp ****     t_            = t;
+  16:ui/switch.cpp ****     // Flip may seem opposite to logical direction,
+  17:ui/switch.cpp ****     // but here 1 is pressed, 0 is not.
+  18:ui/switch.cpp ****     flip_ = pol == POLARITY_INVERTED ? true : false;
+  58              		.loc 1 18 38 view .LVU5
+  59 001c 6B1E     		subs	r3, r5, #1
+  14:ui/switch.cpp ****     t_            = t;
+  60              		.loc 1 14 19 view .LVU6
+  61 001e 0022     		movs	r2, #0
+  12:ui/switch.cpp ****     update_rate_  = update_rate;
+  62              		.loc 1 12 19 discriminator 1 view .LVU7
+  63 0020 2060     		str	r0, [r4]
+  13:ui/switch.cpp ****     update_rate_  = update_rate;
+  64              		.loc 1 13 5 is_stmt 1 view .LVU8
+  19:ui/switch.cpp ****     hw_gpio_.Init(pin, GPIO::Mode::INPUT, pu);
+  65              		.loc 1 19 18 is_stmt 0 view .LVU9
+  66 0022 04F10C00 		add	r0, r4, #12
+  18:ui/switch.cpp ****     hw_gpio_.Init(pin, GPIO::Mode::INPUT, pu);
+  67              		.loc 1 18 38 view .LVU10
+  68 0026 5D42     		rsbs	r5, r3, #0
+  69              	.LVL2:
+  14:ui/switch.cpp ****     t_            = t;
+  70              		.loc 1 14 19 view .LVU11
+  71 0028 84F82020 		strb	r2, [r4, #32]
+  72              		.loc 1 19 18 view .LVU12
+  73 002c 0199     		ldr	r1, [sp, #4]
+  18:ui/switch.cpp ****     hw_gpio_.Init(pin, GPIO::Mode::INPUT, pu);
+  74              		.loc 1 18 38 view .LVU13
+  75 002e 5D41     		adcs	r5, r5, r3
+  76              		.loc 1 19 18 view .LVU14
+  77 0030 3B46     		mov	r3, r7
+  78              	.LVL3:
+  13:ui/switch.cpp ****     state_        = 0x00;
+  79              		.loc 1 13 19 view .LVU15
+  80 0032 84ED018A 		vstr.32	s16, [r4, #4]
+  14:ui/switch.cpp ****     t_            = t;
+  81              		.loc 1 14 5 is_stmt 1 view .LVU16
+  15:ui/switch.cpp ****     // Flip may seem opposite to logical direction,
+  82              		.loc 1 15 5 view .LVU17
+  15:ui/switch.cpp ****     // Flip may seem opposite to logical direction,
+  83              		.loc 1 15 19 is_stmt 0 view .LVU18
+  84 0036 2672     		strb	r6, [r4, #8]
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccBbcgtv.s 			page 3
+
+
+  18:ui/switch.cpp ****     hw_gpio_.Init(pin, GPIO::Mode::INPUT, pu);
+  85              		.loc 1 18 5 is_stmt 1 view .LVU19
+  18:ui/switch.cpp ****     hw_gpio_.Init(pin, GPIO::Mode::INPUT, pu);
+  86              		.loc 1 18 38 is_stmt 0 view .LVU20
+  87 0038 84F82150 		strb	r5, [r4, #33]
+  88              		.loc 1 19 5 is_stmt 1 view .LVU21
+  89              		.loc 1 19 18 is_stmt 0 view .LVU22
+  90 003c 0A92     		str	r2, [sp, #40]
+  91              	.LVL4:
+  20:ui/switch.cpp **** }
+  92              		.loc 1 20 1 view .LVU23
+  93 003e 03B0     		add	sp, sp, #12
+  94              		.cfi_def_cfa_offset 28
+  95              		@ sp needed
+  96 0040 BDEC028B 		vldm	sp!, {d8}
+  97              		.cfi_restore 80
+  98              		.cfi_restore 81
+  99              		.cfi_def_cfa_offset 20
+ 100              	.LVL5:
+ 101              		.loc 1 20 1 view .LVU24
+ 102 0044 BDE8F040 		pop	{r4, r5, r6, r7, lr}
+ 103              		.cfi_restore 14
+ 104              		.cfi_restore 7
+ 105              		.cfi_restore 6
+ 106              		.cfi_restore 5
+ 107              		.cfi_restore 4
+ 108              		.cfi_def_cfa_offset 0
+ 109              	.LVL6:
+  19:ui/switch.cpp **** }
+ 110              		.loc 1 19 18 view .LVU25
+ 111 0048 FFF7FEBF 		b	_ZN5daisy4GPIO4InitENS_3PinENS0_4ModeENS0_4PullENS0_5SpeedE
+ 112              	.LVL7:
+  19:ui/switch.cpp **** }
+ 113              		.loc 1 19 18 view .LVU26
+ 114              		.cfi_endproc
+ 115              	.LFE1572:
+ 117              		.section	.text._ZN11perspective6Switch4InitEN5daisy3PinEf,"ax",%progbits
+ 118              		.align	1
+ 119              		.global	_ZN11perspective6Switch4InitEN5daisy3PinEf
+ 120              		.syntax unified
+ 121              		.thumb
+ 122              		.thumb_func
+ 124              	_ZN11perspective6Switch4InitEN5daisy3PinEf:
+ 125              	.LVL8:
+ 126              	.LFB1573:
+  21:ui/switch.cpp **** 
+  22:ui/switch.cpp **** void Switch::Init(Pin pin, float update_rate)
+  23:ui/switch.cpp **** {
+ 127              		.loc 1 23 1 is_stmt 1 view -0
+ 128              		.cfi_startproc
+ 129              		@ args = 0, pretend = 0, frame = 8
+ 130              		@ frame_needed = 0, uses_anonymous_args = 0
+  24:ui/switch.cpp ****     Init(pin,
+ 131              		.loc 1 24 5 view .LVU28
+  23:ui/switch.cpp ****     Init(pin,
+ 132              		.loc 1 23 1 is_stmt 0 view .LVU29
+ 133 0000 1FB5     		push	{r0, r1, r2, r3, r4, lr}
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccBbcgtv.s 			page 4
+
+
+ 134              		.cfi_def_cfa_offset 24
+ 135              		.cfi_offset 14, -4
+ 136              		.loc 1 24 9 view .LVU30
+ 137 0002 0023     		movs	r3, #0
+  23:ui/switch.cpp ****     Init(pin,
+ 138              		.loc 1 23 1 view .LVU31
+ 139 0004 ADF80C10 		strh	r1, [sp, #12]	@ movhi
+ 140              		.loc 1 24 9 view .LVU32
+ 141 0008 0399     		ldr	r1, [sp, #12]
+ 142 000a 0093     		str	r3, [sp]
+ 143 000c 0123     		movs	r3, #1
+ 144 000e 1A46     		mov	r2, r3
+ 145 0010 FFF7FEFF 		bl	_ZN11perspective6Switch4InitEN5daisy3PinEfNS0_4TypeENS0_8PolarityENS1_4GPIO4PullE
+ 146              	.LVL9:
+  25:ui/switch.cpp ****          update_rate,
+  26:ui/switch.cpp ****          TYPE_MOMENTARY,
+  27:ui/switch.cpp ****          POLARITY_INVERTED,
+  28:ui/switch.cpp ****          GPIO::Pull::NOPULL);
+  29:ui/switch.cpp **** }
+ 147              		.loc 1 29 1 view .LVU33
+ 148 0014 05B0     		add	sp, sp, #20
+ 149              		.cfi_def_cfa_offset 4
+ 150              		@ sp needed
+ 151 0016 5DF804FB 		ldr	pc, [sp], #4
+ 152              		.cfi_endproc
+ 153              	.LFE1573:
+ 155              		.section	.text._ZN11perspective6Switch7ProcessEv,"ax",%progbits
+ 156              		.align	1
+ 157              		.global	_ZN11perspective6Switch7ProcessEv
+ 158              		.syntax unified
+ 159              		.thumb
+ 160              		.thumb_func
+ 162              	_ZN11perspective6Switch7ProcessEv:
+ 163              	.LVL10:
+ 164              	.LFB1574:
+  30:ui/switch.cpp **** 
+  31:ui/switch.cpp **** void Switch::Process()
+  32:ui/switch.cpp **** {
+ 165              		.loc 1 32 1 is_stmt 1 view -0
+ 166              		.cfi_startproc
+ 167              		@ args = 0, pretend = 0, frame = 0
+ 168              		@ frame_needed = 0, uses_anonymous_args = 0
+  33:ui/switch.cpp ****     // Read the raw hardware state and shift into debounced state
+  34:ui/switch.cpp ****     const bool new_val = hw_gpio_.Read();
+ 169              		.loc 1 34 5 view .LVU35
+  32:ui/switch.cpp ****     // Read the raw hardware state and shift into debounced state
+ 170              		.loc 1 32 1 is_stmt 0 view .LVU36
+ 171 0000 10B5     		push	{r4, lr}
+ 172              		.cfi_def_cfa_offset 8
+ 173              		.cfi_offset 4, -8
+ 174              		.cfi_offset 14, -4
+  32:ui/switch.cpp ****     // Read the raw hardware state and shift into debounced state
+ 175              		.loc 1 32 1 view .LVU37
+ 176 0002 0446     		mov	r4, r0
+ 177              		.loc 1 34 39 view .LVU38
+ 178 0004 0C30     		adds	r0, r0, #12
+ 179              	.LVL11:
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccBbcgtv.s 			page 5
+
+
+ 180              		.loc 1 34 39 view .LVU39
+ 181 0006 FFF7FEFF 		bl	_ZN5daisy4GPIO4ReadEv
+ 182              	.LVL12:
+  35:ui/switch.cpp ****     state_ = (state_ << 1) | (flip_ ? !new_val : new_val);
+ 183              		.loc 1 35 5 is_stmt 1 view .LVU40
+ 184              		.loc 1 35 28 is_stmt 0 view .LVU41
+ 185 000a 94F82130 		ldrb	r3, [r4, #33]	@ zero_extendqisi2
+ 186 000e 94F82020 		ldrb	r2, [r4, #32]	@ zero_extendqisi2
+ 187 0012 4340     		eors	r3, r3, r0
+ 188              		.loc 1 35 28 discriminator 4 view .LVU42
+ 189 0014 43EA4203 		orr	r3, r3, r2, lsl #1
+ 190 0018 DBB2     		uxtb	r3, r3
+  36:ui/switch.cpp ****     
+  37:ui/switch.cpp ****     // Set time at which button was pressed
+  38:ui/switch.cpp ****     if(state_ == 0x7f)
+ 191              		.loc 1 38 5 view .LVU43
+ 192 001a 7F2B     		cmp	r3, #127
+  35:ui/switch.cpp ****     state_ = (state_ << 1) | (flip_ ? !new_val : new_val);
+ 193              		.loc 1 35 12 discriminator 4 view .LVU44
+ 194 001c 84F82030 		strb	r3, [r4, #32]
+ 195              		.loc 1 38 5 is_stmt 1 view .LVU45
+ 196 0020 02D1     		bne	.L3
+  39:ui/switch.cpp ****         rising_edge_time_ = System::GetNow();
+ 197              		.loc 1 39 9 view .LVU46
+ 198              		.loc 1 39 43 is_stmt 0 view .LVU47
+ 199 0022 FFF7FEFF 		bl	_ZN5daisy6System6GetNowEv
+ 200              	.LVL13:
+ 201              		.loc 1 39 27 discriminator 1 view .LVU48
+ 202 0026 6062     		str	r0, [r4, #36]
+ 203              	.L3:
+  40:ui/switch.cpp **** }
+ 204              		.loc 1 40 1 view .LVU49
+ 205 0028 10BD     		pop	{r4, pc}
+ 206              		.loc 1 40 1 view .LVU50
+ 207              		.cfi_endproc
+ 208              	.LFE1574:
+ 210              		.text
+ 211              	.Letext0:
+ 212              		.file 2 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/ma
+ 213              		.file 3 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/sy
+ 214              		.file 4 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/st
+ 215              		.file 5 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/lib/gcc/arm-none-eabi/14
+ 216              		.file 6 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c+
+ 217              		.file 7 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c+
+ 218              		.file 8 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c+
+ 219              		.file 9 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c+
+ 220              		.file 10 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 221              		.file 11 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 222              		.file 12 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 223              		.file 13 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 224              		.file 14 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 225              		.file 15 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 226              		.file 16 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 227              		.file 17 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 228              		.file 18 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/m
+ 229              		.file 19 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/s
+ 230              		.file 20 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccBbcgtv.s 			page 6
+
+
+ 231              		.file 21 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 232              		.file 22 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 233              		.file 23 "dependencies/libDaisy/src/daisy_core.h"
+ 234              		.file 24 "dependencies/libDaisy/src/per/gpio.h"
+ 235              		.file 25 "dependencies/libDaisy/src/sys/system.h"
+ 236              		.file 26 "ui/switch.h"
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccBbcgtv.s 			page 7
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 switch.cpp
+C:\Users\Oliver\AppData\Local\Temp\ccBbcgtv.s:20     .text._ZN11perspective6Switch4InitEN5daisy3PinEfNS0_4TypeENS0_8PolarityENS1_4GPIO4PullE:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\ccBbcgtv.s:26     .text._ZN11perspective6Switch4InitEN5daisy3PinEfNS0_4TypeENS0_8PolarityENS1_4GPIO4PullE:00000000 _ZN11perspective6Switch4InitEN5daisy3PinEfNS0_4TypeENS0_8PolarityENS1_4GPIO4PullE
+C:\Users\Oliver\AppData\Local\Temp\ccBbcgtv.s:118    .text._ZN11perspective6Switch4InitEN5daisy3PinEf:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\ccBbcgtv.s:124    .text._ZN11perspective6Switch4InitEN5daisy3PinEf:00000000 _ZN11perspective6Switch4InitEN5daisy3PinEf
+C:\Users\Oliver\AppData\Local\Temp\ccBbcgtv.s:156    .text._ZN11perspective6Switch7ProcessEv:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\ccBbcgtv.s:162    .text._ZN11perspective6Switch7ProcessEv:00000000 _ZN11perspective6Switch7ProcessEv
+
+UNDEFINED SYMBOLS
+_ZN5daisy6System5GetUsEv
+_ZN5daisy4GPIO4InitENS_3PinENS0_4ModeENS0_4PullENS0_5SpeedE
+_ZN5daisy4GPIO4ReadEv
+_ZN5daisy6System6GetNowEv

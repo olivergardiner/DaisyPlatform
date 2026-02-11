@@ -1,4 +1,5 @@
-#pragma once
+#ifndef PERSPECTIVE_NOPULLCONTROLS_H
+#define PERSPECTIVE_NOPULLCONTROLS_H
 
 #include "daisy_seed.h"
 #include "hid/encoder.h"
@@ -31,3 +32,5 @@ public:
 };
 
 } // namespace perspective
+
+#endif // PERSPECTIVE_NOPULLCONTROLS_H

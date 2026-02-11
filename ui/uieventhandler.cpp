@@ -1,4 +1,5 @@
 #include "uieventhandler.h"
+#include "knob.h"
 
 #include <algorithm>
 
@@ -18,14 +19,27 @@ void UIEventHandler::RegisterListenerByIndex(UIEventCallback callback, UIEventTy
     listeners_.emplace_back(callback, eventType, nullptr, controlIndex);
 }
 
-void UIEventHandler::QueueEvent(const UIEvent& event) {
+void UIEventHandler::PushEvent(const UIEvent& event) {
     eventQueue_.push(event);
+}
+
+UIEvent UIEventHandler::PopEvent() {
+    UIEvent event = eventQueue_.front();
+    eventQueue_.pop();
+    return event;
+}
+
+void UIEventHandler::QueueEvent(const UIEvent& event) {
+    PushEvent(event);
 }
 
 void UIEventHandler::ProcessEvents() {
     while (!eventQueue_.empty()) {
-        UIEvent event = eventQueue_.front();
-        eventQueue_.pop();
+        UIEvent event = PopEvent();
+        if (event.type == UIEventType::KNOB_CHANGED) {
+            Knob *knob = static_cast<Knob*>(event.source);
+            knob->Filter();
+        }
         DispatchEventToListeners(event);
     }
 }
@@ -36,7 +50,7 @@ size_t UIEventHandler::GetQueueSize() const {
 
 void UIEventHandler::ClearQueue() {
     while (!eventQueue_.empty()) {
-        eventQueue_.pop();
+        PopEvent();
     }
 }
 
@@ -56,52 +70,47 @@ void UIEventHandler::DispatchEventToListeners(const UIEvent& event) {
     }
 }
 
-void UIEventHandler::QueueKnobChanged(void* knob, int controlIndex, float value, float previousValue, const std::string& name) {
+void UIEventHandler::QueueKnobChanged(void* knob, int controlIndex, int value, int previousValue) {
     UIEvent event;
     event.type = UIEventType::KNOB_CHANGED;
     event.source = knob;
     event.controlIndex = controlIndex;
     event.value = value;
     event.previousValue = previousValue;
-    event.name = name;
     QueueEvent(event);
 }
 
-void UIEventHandler::QueueButtonPressed(void* button, int controlIndex, const std::string& name) {
+void UIEventHandler::QueueButtonPressed(void* button, int controlIndex) {
     UIEvent event;
     event.type = UIEventType::BUTTON_PRESSED;
     event.source = button;
     event.controlIndex = controlIndex;
-    event.name = name;
     QueueEvent(event);
 }
 
-void UIEventHandler::QueueButtonReleased(void* button, int controlIndex, const std::string& name) {
+void UIEventHandler::QueueButtonReleased(void* button, int controlIndex) {
     UIEvent event;
     event.type = UIEventType::BUTTON_RELEASED;
     event.source = button;
     event.controlIndex = controlIndex;
-    event.name = name;
     QueueEvent(event);
 }
 
-void UIEventHandler::QueueButtonHeld(void* button, int controlIndex, const std::string& name, float holdTimeMs) {
+void UIEventHandler::QueueButtonHeld(void* button, int controlIndex, float holdTimeMs) {
     UIEvent event;
     event.type = UIEventType::BUTTON_HELD;
     event.source = button;
     event.controlIndex = controlIndex;
-    event.name = name;
     event.value = holdTimeMs;
     QueueEvent(event);
 }
 
-void UIEventHandler::QueueEncoderChanged(void* encoder, int controlIndex, int increment, const std::string& name) {
+void UIEventHandler::QueueEncoderChanged(void* encoder, int controlIndex, int increment) {
     UIEvent event;
     event.type = UIEventType::ENCODER_CHANGED;
     event.source = encoder;
     event.controlIndex = controlIndex;
-    event.intValue = increment;  // Positive for CW, negative for CCW
-    event.name = name;
+    event.value = increment;  // Positive for CW, negative for CCW
     QueueEvent(event);
 }
 

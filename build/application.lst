@@ -1,0 +1,158 @@
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccgNMDek.s 			page 1
+
+
+   1              		.cpu cortex-m7
+   2              		.arch armv7e-m
+   3              		.fpu fpv5-d16
+   4              		.eabi_attribute 28, 1
+   5              		.eabi_attribute 20, 1
+   6              		.eabi_attribute 21, 1
+   7              		.eabi_attribute 23, 3
+   8              		.eabi_attribute 24, 1
+   9              		.eabi_attribute 25, 1
+  10              		.eabi_attribute 26, 1
+  11              		.eabi_attribute 30, 4
+  12              		.eabi_attribute 34, 1
+  13              		.eabi_attribute 18, 4
+  14              		.file	"application.cpp"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.file 1 "application.cpp"
+  19              		.section	.text.startup.main,"ax",%progbits
+  20              		.align	1
+  21              		.global	main
+  22              		.syntax unified
+  23              		.thumb
+  24              		.thumb_func
+  26              	main:
+  27              	.LFB5838:
+   1:application.cpp **** #include "daisy_seed.h"
+   2:application.cpp **** #include "hardware.h"
+   3:application.cpp **** #include "perspective.h"
+   4:application.cpp **** 
+   5:application.cpp **** using namespace daisy;
+   6:application.cpp **** using namespace perspective;
+   7:application.cpp **** 
+   8:application.cpp **** int main(void)
+   9:application.cpp **** {
+  28              		.loc 1 9 1 view -0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 480
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  10:application.cpp ****     perspective::Perspective ui;
+  32              		.loc 1 10 5 view .LVU1
+   9:application.cpp ****     perspective::Perspective ui;
+  33              		.loc 1 9 1 is_stmt 0 view .LVU2
+  34 0000 00B5     		push	{lr}
+  35              		.cfi_def_cfa_offset 4
+  36              		.cfi_offset 14, -4
+  37 0002 F9B0     		sub	sp, sp, #484
+  38              		.cfi_def_cfa_offset 488
+  39              		.loc 1 10 30 view .LVU3
+  40 0004 01A8     		add	r0, sp, #4
+  41 0006 FFF7FEFF 		bl	_ZN11perspective11PerspectiveC1Ev
+  42              	.LVL0:
+  11:application.cpp **** 
+  12:application.cpp ****     // Initialise the UI
+  13:application.cpp ****     ui.Init();
+  43              		.loc 1 13 5 is_stmt 1 view .LVU4
+  44              		.loc 1 13 12 is_stmt 0 view .LVU5
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccgNMDek.s 			page 2
+
+
+  45 000a 01A8     		add	r0, sp, #4
+  46 000c FFF7FEFF 		bl	_ZN11perspective11Perspective4InitEv
+  47              	.LVL1:
+  14:application.cpp ****     
+  15:application.cpp ****     //ui.LightLed(true);
+  16:application.cpp **** 
+  17:application.cpp ****     ui.Exec();
+  48              		.loc 1 17 5 is_stmt 1 view .LVU6
+  49              		.loc 1 17 12 is_stmt 0 view .LVU7
+  50 0010 01A8     		add	r0, sp, #4
+  51 0012 FFF7FEFF 		bl	_ZN11perspective11Perspective4ExecEv
+  52              	.LVL2:
+  18:application.cpp **** }
+  53              		.loc 1 18 1 view .LVU8
+  54 0016 01A8     		add	r0, sp, #4
+  55 0018 FFF7FEFF 		bl	_ZN11perspective11PerspectiveD1Ev
+  56              	.LVL3:
+  57 001c 0020     		movs	r0, #0
+  58 001e 79B0     		add	sp, sp, #484
+  59              		.cfi_def_cfa_offset 4
+  60              		@ sp needed
+  61 0020 5DF804FB 		ldr	pc, [sp], #4
+  62              		.cfi_endproc
+  63              	.LFE5838:
+  65              		.text
+  66              	.Letext0:
+  67              		.file 2 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/ma
+  68              		.file 3 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/sy
+  69              		.file 4 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/st
+  70              		.file 5 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/lib/gcc/arm-none-eabi/14
+  71              		.file 6 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c+
+  72              		.file 7 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c+
+  73              		.file 8 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c+
+  74              		.file 9 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c+
+  75              		.file 10 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+  76              		.file 11 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+  77              		.file 12 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+  78              		.file 13 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+  79              		.file 14 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+  80              		.file 15 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+  81              		.file 16 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+  82              		.file 17 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+  83              		.file 18 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+  84              		.file 19 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+  85              		.file 20 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+  86              		.file 21 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+  87              		.file 22 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+  88              		.file 23 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+  89              		.file 24 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+  90              		.file 25 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+  91              		.file 26 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+  92              		.file 27 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/s
+  93              		.file 28 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/s
+  94              		.file 29 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/s
+  95              		.file 30 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/m
+  96              		.file 31 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/s
+  97              		.file 32 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccgNMDek.s 			page 3
+
+
+  98              		.file 33 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+  99              		.file 34 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 100              		.file 35 "dependencies/libDaisy/src/daisy_core.h"
+ 101              		.file 36 "dependencies/libDaisy/src/dev/max11300.h"
+ 102              		.file 37 "dependencies/libDaisy/src/dev/sr_595.h"
+ 103              		.file 38 "dependencies/libDaisy/src/util/wav_format.h"
+ 104              		.file 39 "dependencies/libDaisy/src/daisy_seed.h"
+ 105              		.file 40 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 106              		.file 41 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/lib/gcc/arm-none-eabi/1
+ 107              		.file 42 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/s
+ 108              		.file 43 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/s
+ 109              		.file 44 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/w
+ 110              		.file 45 "dependencies/libDaisy/Middlewares/Third_Party/FatFs/src/integer.h"
+ 111              		.file 46 "dependencies/libDaisy/Middlewares/Third_Party/FatFs/src/ff.h"
+ 112              		.file 47 "ui/knob.h"
+ 113              		.file 48 "perspective.h"
+ 114              		.file 49 "ui/switch.h"
+ 115              		.file 50 "ui/encoder.h"
+ 116              		.file 51 "hardware.h"
+ 117              		.file 52 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/l
+ 118              		.file 53 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 119              		.file 54 "<built-in>"
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccgNMDek.s 			page 4
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 application.cpp
+C:\Users\Oliver\AppData\Local\Temp\ccgNMDek.s:20     .text.startup.main:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\ccgNMDek.s:26     .text.startup.main:00000000 main
+
+UNDEFINED SYMBOLS
+_ZN11perspective11PerspectiveC1Ev
+_ZN11perspective11Perspective4InitEv
+_ZN11perspective11Perspective4ExecEv
+_ZN11perspective11PerspectiveD1Ev

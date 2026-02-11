@@ -1,4 +1,5 @@
-#pragma once
+#ifndef PERSPECTIVE_TUNEREFFECT_H
+#define PERSPECTIVE_TUNEREFFECT_H
 
 #include "../effect.h"
 #include <daisysp.h>
@@ -62,3 +63,5 @@ private:
 };
 
 } // namespace perspective
+
+#endif // PERSPECTIVE_TUNEREFFECT_H

@@ -11,6 +11,8 @@ int main(void)
 
     // Initialise the UI
     ui.Init();
+    
+    //ui.LightLed(true);
 
     ui.Exec();
 }

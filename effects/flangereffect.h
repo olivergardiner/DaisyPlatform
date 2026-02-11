@@ -1,4 +1,5 @@
-#pragma once
+#ifndef PERSPECTIVE_FLANGEREFFECT_H
+#define PERSPECTIVE_FLANGEREFFECT_H
 
 #include "../effect.h"
 #include "daisysp.h"
@@ -23,3 +24,5 @@ private:
 };
 
 } // namespace perspective
+
+#endif // PERSPECTIVE_FLANGEREFFECT_H

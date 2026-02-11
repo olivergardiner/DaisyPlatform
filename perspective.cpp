@@ -1,19 +1,21 @@
 #include "perspective.h"
 #include "effect.h"
 #include "effectparameter.h"
+#include "effects/effectfactory.h"
 
 using namespace perspective;
 
+static Perspective* g_perspective = nullptr;
+
 static void AudioCallback(AudioHandle::InputBuffer in, AudioHandle::OutputBuffer out, size_t size) {
-    for (size_t i = 0; i < size; i++){
-		out[0][i] = in[0][i];
-		out[1][i] = in[1][i];
-	}
+    if (g_perspective) {
+        g_perspective->AudioCallbackImpl(in, out, size);
+    }
 }
 
 Perspective::Perspective() 
     : currentEffect_(nullptr) {
-
+    g_perspective = this;
 }
 
 Perspective::~Perspective() {
@@ -23,10 +25,42 @@ Perspective::~Perspective() {
 void Perspective::Init() {
     hardware.Init(GetEventHandler());
 
+    LoadEffects(); // Load effects before registering listeners so we can populate effect selection menu
+
     // Initialize perspective-specific UI elements
     RegisterEventListeners();
 
     hardware.StartAudio(AudioCallback);
+}
+
+void Perspective::Exec() {
+    while(true) {
+        hardware.SetProcessing(true); // Indicate that we're processing controls/events
+
+        eventHandler_.ProcessEvents();
+
+        hardware.SetProcessing(false); // Done processing controls/events
+
+        hardware.DelayMs(1); // Small delay to allow events to accumulate
+    }
+}
+
+void Perspective::LightLed(bool on) {
+    hardware.SetLed(on);
+}
+
+void Perspective::AudioCallbackImpl(AudioHandle::InputBuffer in, AudioHandle::OutputBuffer out, size_t size) {
+    if (currentEffect_ && !bypassMode_) {
+        // Process with current effect
+        // Note: ProcessStereo requires non-const pointers, but won't modify input
+        currentEffect_->ProcessStereo(const_cast<float*>(in[0]), const_cast<float*>(in[1]), out[0], out[1], size);
+    } else {
+        // Bypass mode - pass through
+        for (size_t i = 0; i < size; i++){
+            out[0][i] = in[0][i];
+            out[1][i] = in[1][i];
+        }
+    }
 }
 
 void Perspective::RegisterEventListeners() {
@@ -67,10 +101,10 @@ void Perspective::RegisterEventListeners() {
                     // Update parameter based on type
                     if (param->GetType() == ParameterType::ENCODER) {
                         EncoderParameter* encParam = static_cast<EncoderParameter*>(param);
-                        if (event.intValue > 0) {
-                            encParam->Increment(event.intValue);
-                        } else if (event.intValue < 0) {
-                            encParam->Decrement(-event.intValue);
+                        if (event.value > 0) {
+                            encParam->Increment(event.value);
+                        } else if (event.value < 0) {
+                            encParam->Decrement(-event.value);
                         }
                     }
                     // Update effect with new parameter value
@@ -109,7 +143,7 @@ void Perspective::RegisterEventListeners() {
     eventHandler_.RegisterListenerByIndex(
         [](const UIEvent& event) {
             // Handle Encoder_1 changes
-            int increment = event.intValue;  // Positive=CW, Negative=CCW
+            //int increment = event.intValue;  // Positive=CW, Negative=CCW
             // Add your encoder handling logic here
             // e.g., change effect selection based on increment
         },
@@ -140,6 +174,17 @@ void Perspective::RegisterEventListeners() {
 
 void Perspective::toggleBypass() {
     bypassMode_ = !bypassMode_;    
+}
+
+void Perspective::LoadEffects() {
+    // Populate effects vector using the factory function
+    float sampleRate = hardware.AudioSampleRate();
+    PopulateEffects(&effects_, sampleRate);
+    
+    // Set the first effect as current
+    if (!effects_.empty()) {
+        currentEffect_ = effects_[0];
+    }
 }
 
 void Perspective::HandleTapTempo() {

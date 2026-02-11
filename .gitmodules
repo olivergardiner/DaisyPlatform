@@ -16,3 +16,6 @@
 [submodule "dependencies/CloudSeedCore"]
 	path = dependencies/CloudSeedCore
 	url = https://github.com/GhostNoteAudio/CloudSeedCore.git
+[submodule "dependencies/NeuralAmpModelerCore"]
+	path = dependencies/NeuralAmpModelerCore
+	url = https://github.com/sdatkinson/NeuralAmpModelerCore.git

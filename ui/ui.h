@@ -1,4 +1,5 @@
-#pragma once
+#ifndef PERSPECTIVE_UI_H
+#define PERSPECTIVE_UI_H
 
 #include "uieventhandler.h"
 
@@ -11,7 +12,7 @@ public:
     
     virtual void Init() = 0;  // Pure virtual - must be implemented by subclass
     
-    void Exec();
+    virtual void Exec();
     
     UIEventHandler* GetEventHandler();
     
@@ -20,3 +21,5 @@ protected:
 };
 
 } // namespace perspective
+
+#endif // PERSPECTIVE_UI_H

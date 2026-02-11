@@ -1,5 +1,6 @@
 #include "hardware.h"
 #include "ui/ui.h"
+#include "ui/knob.h"
 
 #include "cDisplay.h"
 
@@ -12,6 +13,7 @@ DECLARE_LAYER(BackgroundLayer, 320, 240)
 void timerCallback(void* data)
 {
     Hardware* hardware = static_cast<Hardware *>(data);
+
     hardware->ProcessControls();
 }
 
@@ -23,8 +25,18 @@ void Hardware::Init(UIEventHandler* eventHandler)
 {
     eventHandler_ = eventHandler;
     DaisySeed::Init(boost);
-    
+
+    StartLog(true);
+
+    InitGFX2Display();
+   
     InitControls();
+
+    System::Delay(1000); // Allow time for everything to settle
+
+    SetControlUpdateRate(UPDATE_RATE);
+
+    PrintLine("Tick Frequency: %d Hz", System::GetTickFreq());
 }
 
 void perspective::Hardware::SetControlUpdateRate(float rate)
@@ -54,147 +66,107 @@ void perspective::Hardware::SetControlUpdateRate(float rate)
     config.period = period;
     config.periph = TimerHandle::Config::Peripheral::TIM_5;
 
-    controlTimer.Stop();
+    if (timerRunning) controlTimer.Stop();
     controlTimer.Init(config);
     controlTimer.SetPrescaler(9999);
     controlTimer.SetCallback(timerCallback, this);
     controlTimer.Start();
-
     controlUpdateRate = rate;
+
+    timerRunning = true;
 }
 
-void Hardware::ProcessControls()
-{
+void Hardware::ProcessControls() {
+    if (processing) {
+        return; // Skip processing if already in the middle of processing to prevent reentrancy issues
+    }
+
+    // Update LEDs at a high frequency regardless of event handler to ensure visual responsiveness
+    for (int i = 0; i < numLeds; i++) {
+        leds[i].Update();
+    }
+
     if (!eventHandler_) {
-        // If no event handler, just process controls without firing events
-        for (int i = 0; i < numKnobs; i++) {
-            knobs[i].Process();
-        }
-
-        for (int i = 0; i < numSwitches; i++) {
-            switches[i].Debounce();
-        }
-
-        for (int i = 0; i < numEncoders; i++) {
-            encoders[i].Debounce();
-        }
-
-        for (int i = 0; i < numLeds; i++) {
-            leds[i].Update();
-        }
-        return;
+        return; // No event handler registered, skip processing controls
     }
 
     // Process knobs and fire knob change events
-    for (int i = 0; i < numKnobs; i++) {
-        float previousValue = knobs[i].Value();
-        knobs[i].Process();
-        float newValue = knobs[i].Value();
-        
-        if (newValue != previousValue) {
-            eventHandler_->QueueKnobChanged(
-                &knobs[i],
-                i,
-                newValue,
-                previousValue,
-                "Knob_" + std::to_string(i + 1)
-            );
+    if (++knob_divider >= KNOB_DIVISOR) {
+        knob_divider = 0;
+        for (int i = 0; i < numKnobs; i++) {
+            int previousIntValue = knobs[i].GetRawValue();
+            knobs[i].Process();
+            int newIntValue = knobs[i].GetRawValue();
+            int delta = abs(newIntValue - previousIntValue);
+
+            if (delta > 16) {
+                eventHandler_->QueueKnobChanged(
+                    &knobs[i],
+                    i,
+                    newIntValue,
+                    previousIntValue
+                );
+            }
         }
     }
 
     // Process switches and fire button events
-    for (int i = 0; i < numSwitches; i++) {
-        bool previousState = switches[i].Pressed();
-        switches[i].Debounce();
-        bool currentState = switches[i].Pressed();
-        
-        if (currentState && !previousState) {
-            // Button pressed - reset hold flag
-            switchHoldFired_[i] = false;
-            eventHandler_->QueueButtonPressed(
-                &switches[i],
-                i,
-                "Switch_" + std::to_string(i + 1)
-            );
-        } else if (!currentState && previousState) {
-            // Button released
-            switchHoldFired_[i] = false;
-            eventHandler_->QueueButtonReleased(
-                &switches[i],
-                i,
-                "Switch_" + std::to_string(i + 1)
-            );
-        } else if (currentState) {
-            // Button is being held - check if threshold reached
-            float holdTime = switches[i].TimeHeldMs();
-            if (!switchHoldFired_[i] && holdTime >= BUTTON_HOLD_THRESHOLD_MS) {
-                switchHoldFired_[i] = true;
-                eventHandler_->QueueButtonHeld(
+    if (++switch_divider >= SWITCH_DIVISOR) {
+        switch_divider = 0;
+        for (int i = 0; i < numSwitches; i++) {
+            switches[i].Process();
+            
+            if (switches[i].RisingEdge()) {
+               // Button pressed - reset hold flag
+                switchHoldFired_[i] = false;
+                eventHandler_->QueueButtonPressed(
                     &switches[i],
-                    i,
-                    "Switch_" + std::to_string(i + 1),
-                    holdTime
+                    i
                 );
+            } else if (switches[i].FallingEdge()) {
+                // Button released
+                switchHoldFired_[i] = false;
+                eventHandler_->QueueButtonReleased(
+                    &switches[i],
+                    i
+                );
+            } else if (switches[i].Pressed()) {
+                // Button is being held - check if threshold reached
+                int holdTime = switches[i].TimeHeld();
+                if (!switchHoldFired_[i] && holdTime >= BUTTON_HOLD_THRESHOLD_MS) {
+                    switchHoldFired_[i] = true;
+                    eventHandler_->QueueButtonHeld(
+                        &switches[i],
+                        i,
+                        holdTime
+                    );
+                }
             }
         }
     }
 
     // Process encoders and fire encoder events
-    for (int i = 0; i < numEncoders; i++) {
-        encoders[i].Debounce();
-        int increment = encoders[i].Increment();
-        
-        if (increment != 0) {
-            eventHandler_->QueueEncoderChanged(
-                &encoders[i],
-                i,
-                increment,
-                "Encoder_" + std::to_string(i + 1)
-            );
-        }
-        
-        // Process encoder button (switch) events using native Encoder methods
-        if (encoders[i].RisingEdge()) {
-            // Encoder button just pressed - reset hold flag
-            encoderHoldFired_[i] = false;
-            eventHandler_->QueueButtonPressed(
-                &encoders[i],
-                i + numSwitches,  // Offset by number of switches for unique index
-                "Encoder_" + std::to_string(i + 1) + "_Button"
-            );
-        } else if (encoders[i].FallingEdge()) {
-            // Encoder button released
-            encoderHoldFired_[i] = false;
-            eventHandler_->QueueButtonReleased(
-                &encoders[i],
-                i + numSwitches,  // Offset by number of switches for unique index
-                "Encoder_" + std::to_string(i + 1) + "_Button"
-            );
-        } else if (encoders[i].Pressed()) {
-            // Encoder button is being held - check if threshold reached
-            float holdTime = encoders[i].TimeHeldMs();
-            if (!encoderHoldFired_[i] && holdTime >= BUTTON_HOLD_THRESHOLD_MS) {
-                encoderHoldFired_[i] = true;
-                eventHandler_->QueueButtonHeld(
+    if (++encoder_divider >= ENCODER_DIVISOR) {
+        encoder_divider = 0;
+        for (int i = 0; i < numEncoders; i++) {
+            encoders[i].Process();
+            int increment = encoders[i].Increment();
+            
+            if (increment != 0) {
+                eventHandler_->QueueEncoderChanged(
                     &encoders[i],
-                    i + numSwitches,  // Offset by number of switches for unique index
-                    "Encoder_" + std::to_string(i + 1) + "_Button",
-                    holdTime
+                    i,
+                    increment
                 );
             }
         }
-    }
-
-    // Update LEDs (no events needed)
-    for (int i = 0; i < numLeds; i++) {
-        leds[i].Update();
     }
 }
 
 void Hardware::InitControls()
 {
     numKnobs = sizeof(knobPins) / sizeof(Pin);
-
+ 
     AdcChannelConfig cfg[numKnobs];
 
     for (int i = 0; i < numKnobs; i++) {
@@ -204,26 +176,29 @@ void Hardware::InitControls()
     DaisySeed::adc.Init(cfg, numKnobs);
 
     for (int i = 0; i < numKnobs; i++) {
-        AnalogControl newKnob;
-        newKnob.Init(DaisySeed::adc.GetPtr(i), controlUpdateRate);
+        Knob newKnob;
+        newKnob.Init(DaisySeed::adc.GetPtr(i), controlUpdateRate / KNOB_DIVISOR);
         knobs.push_back(newKnob);
     }
      
     numSwitches = sizeof(switchPins) / sizeof(Pin);
 
     for (int i = 0; i < numSwitches; i++) {
-        NoPullSwitch newSwitch;
-        newSwitch.Init(switchPins[i]);
+        perspective::Switch newSwitch;
+        newSwitch.Init(switchPins[i], controlUpdateRate / SWITCH_DIVISOR);
         switches.push_back(newSwitch);
     }
 
     numEncoders = sizeof(encoderPins) / sizeof(encoderPins[0]);
  
     for (int i = 0; i < numEncoders; i++) {
-        NoPullEncoder newEncoder;
-        newEncoder.Init(encoderPins[i][0], encoderPins[i][1], encoderPins[i][2], controlUpdateRate);
+        perspective::Encoder newEncoder;
+        newEncoder.Init(encoderPins[i][0], encoderPins[i][1], encoderPins[i][2], controlUpdateRate / ENCODER_DIVISOR);
         encoders.push_back(newEncoder);
+        switches.push_back(*newEncoder.GetSwitch()); // Add encoder button as a switch for event handling
     }
+
+    numSwitches += numEncoders; // Account for encoder buttons added to switches
 
     numLeds = sizeof(ledPins) / sizeof(Pin);
 
@@ -243,9 +218,8 @@ void Hardware::InitControls()
     // True bypass control
     trueBypass.Init(TRUE_BYPASS_PIN, GPIO::Mode::OUTPUT);
 
+    PrintLine("Starting ADC");
     adc.Start();
-
-    SetControlUpdateRate(controlUpdateRate); // 1 kHz update rate
 
     // No Midi controls for now
     /*MidiUartHandler::Config midiConfig;
@@ -257,8 +231,12 @@ void Hardware::InitControls()
     dispCfg.driver_config.transport_config.pin_config.dc = displayDC;
     dispCfg.driver_config.transport_config.pin_config.reset = displayReset;
     display.Init(dispCfg);*/
+}
 
+void Hardware::InitGFX2Display()
+{
     INIT_DISPLAY(__Display);
+    __Display.setOrientation(Rotation::Degre_90);
     DadGFX::cLayer* pBackground = ADD_LAYER(BackgroundLayer, 0, 0, 1);
     pBackground->drawFillRect(0,0,320, 240, DadGFX::sColor(9, 111, 148, 255));
     pBackground->drawFillRect(80, 0, 80, 240, DadGFX::sColor(23, 148, 194, 255));

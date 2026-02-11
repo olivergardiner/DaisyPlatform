@@ -16,7 +16,9 @@
                 "${workspaceFolder}/dependencies/DaisySP/**",
                 "${workspaceFolder}/dependencies/DaisySeedGFX2/**",
                 "${workspaceFolder}/dependencies/cycfi/q/q_lib/include/**",
-                "${workspaceFolder}/dependencies/cycfi/infra/include/infra/**"
+                "${workspaceFolder}/dependencies/cycfi/infra/include/infra/**",
+                "${workspaceFolder}/dependencies/CloudSeedCore/**",
+                "${workspaceFolder}/dependencies/NeuralAmpModelerCore/NAM/**"
             ],
             "name": "Win32",
             "windowsSdkVersion": "10.0.17763.0"

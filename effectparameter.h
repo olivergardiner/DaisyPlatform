@@ -1,4 +1,5 @@
-#pragma once
+#ifndef PERSPECTIVE_EFFECTPARAMETER_H
+#define PERSPECTIVE_EFFECTPARAMETER_H
 
 #include "daisy_seed.h"
 #include <string>
@@ -9,6 +10,12 @@
 using namespace daisy;
 
 namespace perspective {
+
+// Local clamp function to avoid std::clamp (C++17)
+template<typename T>
+inline constexpr const T& clamp(const T& v, const T& lo, const T& hi) {
+    return (v < lo) ? lo : (hi < v) ? hi : v;
+}
 
 enum class ParameterType {
     POTENTIOMETER,
@@ -140,3 +147,5 @@ private:
 };
 
 } // namespace perspective
+
+#endif // PERSPECTIVE_EFFECTPARAMETER_H

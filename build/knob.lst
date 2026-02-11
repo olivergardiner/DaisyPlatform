@@ -1,0 +1,655 @@
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccMfdyF3.s 			page 1
+
+
+   1              		.cpu cortex-m7
+   2              		.arch armv7e-m
+   3              		.fpu fpv5-d16
+   4              		.eabi_attribute 28, 1
+   5              		.eabi_attribute 20, 1
+   6              		.eabi_attribute 21, 1
+   7              		.eabi_attribute 23, 3
+   8              		.eabi_attribute 24, 1
+   9              		.eabi_attribute 25, 1
+  10              		.eabi_attribute 26, 1
+  11              		.eabi_attribute 30, 4
+  12              		.eabi_attribute 34, 1
+  13              		.eabi_attribute 18, 4
+  14              		.file	"knob.cpp"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.file 1 "ui/knob.cpp"
+  19              		.section	.text._ZN11perspective4Knob4InitEPtfbbf,"ax",%progbits
+  20              		.align	1
+  21              		.global	_ZN11perspective4Knob4InitEPtfbbf
+  22              		.syntax unified
+  23              		.thumb
+  24              		.thumb_func
+  26              	_ZN11perspective4Knob4InitEPtfbbf:
+  27              	.LVL0:
+  28              	.LFB1525:
+   1:ui/knob.cpp   **** #include "knob.h"
+   2:ui/knob.cpp   **** #include <math.h>
+   3:ui/knob.cpp   **** 
+   4:ui/knob.cpp   **** using namespace perspective;
+   5:ui/knob.cpp   **** 
+   6:ui/knob.cpp   **** void Knob::Init(uint16_t *adcptr,
+   7:ui/knob.cpp   ****                 float     sr,
+   8:ui/knob.cpp   ****                 bool      flip,
+   9:ui/knob.cpp   ****                 bool      invert,
+  10:ui/knob.cpp   ****                 float     slew_seconds)
+  11:ui/knob.cpp   **** {
+  29              		.loc 1 11 1 view -0
+  30              		.cfi_startproc
+  31              		@ args = 0, pretend = 0, frame = 0
+  32              		@ frame_needed = 0, uses_anonymous_args = 0
+  33              		@ link register save eliminated.
+  12:ui/knob.cpp   ****     raw_val_      = 0.0f;
+  34              		.loc 1 12 5 view .LVU1
+  13:ui/knob.cpp   ****     adc_          = adcptr;
+  14:ui/knob.cpp   ****     samplerate_   = sr;
+  15:ui/knob.cpp   ****     SetCoeff(1.0f / (slew_seconds * samplerate_ * 0.5f));
+  35              		.loc 1 15 49 is_stmt 0 view .LVU2
+  36 0000 F6EE007A 		vmov.f32	s15, #5.0e-1
+  14:ui/knob.cpp   ****     SetCoeff(1.0f / (slew_seconds * samplerate_ * 0.5f));
+  37              		.loc 1 14 19 view .LVU3
+  38 0004 80ED030A 		vstr.32	s0, [r0, #12]
+  39              		.loc 1 15 35 view .LVU4
+  40 0008 20EE200A 		vmul.f32	s0, s0, s1
+  41              	.LVL1:
+  12:ui/knob.cpp   ****     raw_val_      = 0.0f;
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccMfdyF3.s 			page 2
+
+
+  42              		.loc 1 12 19 view .LVU5
+  43 000c DFED136A 		vldr.32	s13, .L4
+  44              		.loc 1 15 13 view .LVU6
+  45 0010 B7EE007A 		vmov.f32	s14, #1.0e+0
+  13:ui/knob.cpp   ****     adc_          = adcptr;
+  46              		.loc 1 13 19 view .LVU7
+  47 0014 0160     		str	r1, [r0]
+  12:ui/knob.cpp   ****     raw_val_      = 0.0f;
+  48              		.loc 1 12 19 view .LVU8
+  49 0016 C0ED046A 		vstr.32	s13, [r0, #16]
+  13:ui/knob.cpp   ****     adc_          = adcptr;
+  50              		.loc 1 13 5 is_stmt 1 view .LVU9
+  14:ui/knob.cpp   ****     SetCoeff(1.0f / (slew_seconds * samplerate_ * 0.5f));
+  51              		.loc 1 14 5 view .LVU10
+  52              		.loc 1 15 5 view .LVU11
+  53              		.loc 1 15 49 is_stmt 0 view .LVU12
+  54 001a 20EE270A 		vmul.f32	s0, s0, s15
+  55              		.loc 1 15 13 view .LVU13
+  56 001e C7EE007A 		vdiv.f32	s15, s14, s0
+  57              	.LVL2:
+  58              	.LBB4:
+  59              	.LBI4:
+  60              		.file 2 "ui/knob.h"
+   1:ui/knob.h     **** #pragma once
+   2:ui/knob.h     **** #ifndef KNOB_H
+   3:ui/knob.h     **** #define KNOB_H
+   4:ui/knob.h     **** 
+   5:ui/knob.h     **** #include <stdint.h>
+   6:ui/knob.h     **** 
+   7:ui/knob.h     **** namespace perspective {
+   8:ui/knob.h     **** 
+   9:ui/knob.h     **** /**
+  10:ui/knob.h     ****  * @brief Hardware Interface for control inputs (knobs/potentiometers)
+  11:ui/knob.h     ****  * Similar to AnalogControl but with conversion logic applied outside Process()
+  12:ui/knob.h     ****  * This allows for raw value smoothing separate from scaling/offset/flip transformations
+  13:ui/knob.h     ****  * @author Generated for Perspective
+  14:ui/knob.h     ****  * @date January 2026
+  15:ui/knob.h     ****  */
+  16:ui/knob.h     **** class Knob
+  17:ui/knob.h     **** {
+  18:ui/knob.h     ****   public:
+  19:ui/knob.h     ****     /** Constructor */
+  20:ui/knob.h     ****     Knob() {}
+  21:ui/knob.h     ****     
+  22:ui/knob.h     ****     /** Destructor */
+  23:ui/knob.h     ****     ~Knob() {}
+  24:ui/knob.h     **** 
+  25:ui/knob.h     ****     /**
+  26:ui/knob.h     ****      * Initializes the knob control
+  27:ui/knob.h     ****      * @param adcptr Pointer to the raw ADC read value
+  28:ui/knob.h     ****      * @param sr Sample rate in Hz that the Process function will be called at
+  29:ui/knob.h     ****      * @param flip Determines whether the input is flipped (i.e. 1.0 - input)
+  30:ui/knob.h     ****      * @param invert Determines whether the input is inverted (i.e. -1.0 * input)
+  31:ui/knob.h     ****      * @param slew_seconds Slew time in seconds for the control to reach a new value
+  32:ui/knob.h     ****      */
+  33:ui/knob.h     ****     void Init(uint16_t *adcptr,
+  34:ui/knob.h     ****               float     sr,
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccMfdyF3.s 			page 3
+
+
+  35:ui/knob.h     ****               bool      flip         = false,
+  36:ui/knob.h     ****               bool      invert       = false,
+  37:ui/knob.h     ****               float     slew_seconds = 0.002f);
+  38:ui/knob.h     **** 
+  39:ui/knob.h     ****     /**
+  40:ui/knob.h     ****      * Initializes the Knob for a -5V to 5V inverted input (bipolar CV)
+  41:ui/knob.h     ****      * @param adcptr Pointer to analog digital converter
+  42:ui/knob.h     ****      * @param sr Sample rate
+  43:ui/knob.h     ****      */
+  44:ui/knob.h     ****     void InitBipolarCv(uint16_t *adcptr, float sr);
+  45:ui/knob.h     **** 
+  46:ui/knob.h     ****     /**
+  47:ui/knob.h     ****      * Reads and normalizes the raw ADC value (0.0 to 1.0)
+  48:ui/knob.h     ****      * Returns the raw normalized value without filtering
+  49:ui/knob.h     ****      * Call this at the rate specified by samplerate at Init time
+  50:ui/knob.h     ****      */
+  51:ui/knob.h     ****     inline void Process() {
+  52:ui/knob.h     ****         raw_ = *adc_;
+  53:ui/knob.h     ****     }
+  54:ui/knob.h     **** 
+  55:ui/knob.h     ****     /**
+  56:ui/knob.h     ****      * Applies one-pole smoothing filter to the last value read by Process()
+  57:ui/knob.h     ****      * Call this from the event handler before dispatching events
+  58:ui/knob.h     ****      * Returns the smoothed raw value (0.0 to 1.0)
+  59:ui/knob.h     ****      */
+  60:ui/knob.h     ****     float Filter();
+  61:ui/knob.h     **** 
+  62:ui/knob.h     ****     /**
+  63:ui/knob.h     ****      * Returns the current smoothed raw value without reprocessing (0.0 to 1.0)
+  64:ui/knob.h     ****      */
+  65:ui/knob.h     ****     inline float RawValue() const { return raw_val_; }
+  66:ui/knob.h     **** 
+  67:ui/knob.h     ****     /**
+  68:ui/knob.h     ****      * Returns the converted value with flip/invert/scale/offset applied
+  69:ui/knob.h     ****      */
+  70:ui/knob.h     ****     inline float Value() const { return ConvertValue(raw_val_); }
+  71:ui/knob.h     **** 
+  72:ui/knob.h     ****     /**
+  73:ui/knob.h     ****      * Apply conversions to a given raw value (0.0 to 1.0)
+  74:ui/knob.h     ****      * This applies flip, invert, scale, and offset transformations
+  75:ui/knob.h     ****      */
+  76:ui/knob.h     ****     float ConvertValue(float raw_value) const;
+  77:ui/knob.h     **** 
+  78:ui/knob.h     ****     /**
+  79:ui/knob.h     ****      * Directly set the coefficient of the one-pole smoothing filter
+  80:ui/knob.h     ****      * @param val Coefficient value (clamped between 0 and 1)
+  81:ui/knob.h     ****      */
+  82:ui/knob.h     ****     inline void SetCoeff(float val)
+  61              		.loc 2 82 17 is_stmt 1 view .LVU14
+  62              	.LBB5:
+  83:ui/knob.h     ****     {
+  84:ui/knob.h     ****         val = val > 1.f ? 1.f : val;
+  63              		.loc 2 84 9 view .LVU15
+  64              		.loc 2 84 25 is_stmt 0 view .LVU16
+  65 0022 F4EEC77A 		vcmpe.f32	s15, s14
+  66 0026 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+  67 002a 13DC     		bgt	.L3
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccMfdyF3.s 			page 4
+
+
+  85:ui/knob.h     ****         val = val < 0.f ? 0.f : val;
+  68              		.loc 2 85 9 is_stmt 1 view .LVU17
+  69 002c F4EEE67A 		vcmpe.f32	s15, s13
+  70 0030 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+  71 0034 48BF     		it	mi
+  72 0036 F0EE667A 		vmovmi.f32	s15, s13
+  73              	.LVL3:
+  74              	.L2:
+  86:ui/knob.h     ****         coeff_ = val;
+  75              		.loc 2 86 9 view .LVU18
+  76              	.LBE5:
+  77              	.LBE4:
+  16:ui/knob.cpp   ****     scale_        = 1.0f;
+  17:ui/knob.cpp   ****     offset_       = 0.0f;
+  18:ui/knob.cpp   ****     flip_         = flip;
+  19:ui/knob.cpp   ****     invert_       = invert;
+  78              		.loc 1 19 19 is_stmt 0 view .LVU19
+  79 003a 4377     		strb	r3, [r0, #29]
+  20:ui/knob.cpp   ****     is_bipolar_   = false;
+  80              		.loc 1 20 19 view .LVU20
+  81 003c 0023     		movs	r3, #0
+  82              	.LVL4:
+  83              	.LBB8:
+  84              	.LBB6:
+  85              		.loc 2 86 16 view .LVU21
+  86 003e C0ED027A 		vstr.32	s15, [r0, #8]
+  87              	.LVL5:
+  88              		.loc 2 86 16 view .LVU22
+  89              	.LBE6:
+  90              	.LBE8:
+  16:ui/knob.cpp   ****     scale_        = 1.0f;
+  91              		.loc 1 16 5 is_stmt 1 view .LVU23
+  16:ui/knob.cpp   ****     scale_        = 1.0f;
+  92              		.loc 1 16 19 is_stmt 0 view .LVU24
+  93 0042 80ED057A 		vstr.32	s14, [r0, #20]
+  17:ui/knob.cpp   ****     flip_         = flip;
+  94              		.loc 1 17 5 is_stmt 1 view .LVU25
+  17:ui/knob.cpp   ****     flip_         = flip;
+  95              		.loc 1 17 19 is_stmt 0 view .LVU26
+  96 0046 C0ED066A 		vstr.32	s13, [r0, #24]
+  18:ui/knob.cpp   ****     invert_       = invert;
+  97              		.loc 1 18 5 is_stmt 1 view .LVU27
+  18:ui/knob.cpp   ****     invert_       = invert;
+  98              		.loc 1 18 19 is_stmt 0 view .LVU28
+  99 004a 0277     		strb	r2, [r0, #28]
+  19:ui/knob.cpp   ****     is_bipolar_   = false;
+ 100              		.loc 1 19 5 is_stmt 1 view .LVU29
+ 101              		.loc 1 20 5 view .LVU30
+ 102              		.loc 1 20 19 is_stmt 0 view .LVU31
+ 103 004c 8377     		strb	r3, [r0, #30]
+  21:ui/knob.cpp   ****     slew_seconds_ = slew_seconds;
+ 104              		.loc 1 21 5 is_stmt 1 view .LVU32
+ 105              		.loc 1 21 19 is_stmt 0 view .LVU33
+ 106 004e C0ED080A 		vstr.32	s1, [r0, #32]
+  22:ui/knob.cpp   **** }
+ 107              		.loc 1 22 1 view .LVU34
+ 108 0052 7047     		bx	lr
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccMfdyF3.s 			page 5
+
+
+ 109              	.LVL6:
+ 110              	.L3:
+ 111              	.LBB9:
+ 112              	.LBB7:
+  84:ui/knob.h     ****         val = val < 0.f ? 0.f : val;
+ 113              		.loc 2 84 25 discriminator 1 view .LVU35
+ 114 0054 F0EE477A 		vmov.f32	s15, s14
+ 115              	.LVL7:
+  84:ui/knob.h     ****         val = val < 0.f ? 0.f : val;
+ 116              		.loc 2 84 25 discriminator 1 view .LVU36
+ 117 0058 EFE7     		b	.L2
+ 118              	.L5:
+ 119 005a 00BF     		.align	2
+ 120              	.L4:
+ 121 005c 00000000 		.word	0
+ 122              	.LBE7:
+ 123              	.LBE9:
+ 124              		.cfi_endproc
+ 125              	.LFE1525:
+ 127              		.section	.text._ZN11perspective4Knob13InitBipolarCvEPtf,"ax",%progbits
+ 128              		.align	1
+ 129              		.global	_ZN11perspective4Knob13InitBipolarCvEPtf
+ 130              		.syntax unified
+ 131              		.thumb
+ 132              		.thumb_func
+ 134              	_ZN11perspective4Knob13InitBipolarCvEPtf:
+ 135              	.LVL8:
+ 136              	.LFB1526:
+  23:ui/knob.cpp   **** 
+  24:ui/knob.cpp   **** void Knob::InitBipolarCv(uint16_t *adcptr, float sr)
+  25:ui/knob.cpp   **** {
+ 137              		.loc 1 25 1 is_stmt 1 view -0
+ 138              		.cfi_startproc
+ 139              		@ args = 0, pretend = 0, frame = 0
+ 140              		@ frame_needed = 0, uses_anonymous_args = 0
+ 141              		@ link register save eliminated.
+  26:ui/knob.cpp   ****     raw_val_    = 0.0f;
+ 142              		.loc 1 26 5 view .LVU38
+  27:ui/knob.cpp   ****     adc_        = adcptr;
+  28:ui/knob.cpp   ****     samplerate_ = sr;
+  29:ui/knob.cpp   ****     SetCoeff(1.0f / (0.002f * samplerate_ * 0.5f));
+ 143              		.loc 1 29 29 is_stmt 0 view .LVU39
+ 144 0000 DFED167A 		vldr.32	s15, .L9
+ 145              		.loc 1 29 43 view .LVU40
+ 146 0004 F6EE006A 		vmov.f32	s13, #5.0e-1
+  28:ui/knob.cpp   ****     SetCoeff(1.0f / (0.002f * samplerate_ * 0.5f));
+ 147              		.loc 1 28 17 view .LVU41
+ 148 0008 80ED030A 		vstr.32	s0, [r0, #12]
+ 149              		.loc 1 29 29 view .LVU42
+ 150 000c 20EE270A 		vmul.f32	s0, s0, s15
+ 151              	.LVL9:
+  26:ui/knob.cpp   ****     raw_val_    = 0.0f;
+ 152              		.loc 1 26 17 view .LVU43
+ 153 0010 9FED136A 		vldr.32	s12, .L9+4
+ 154              		.loc 1 29 13 view .LVU44
+ 155 0014 F7EE007A 		vmov.f32	s15, #1.0e+0
+  27:ui/knob.cpp   ****     adc_        = adcptr;
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccMfdyF3.s 			page 6
+
+
+ 156              		.loc 1 27 17 view .LVU45
+ 157 0018 0160     		str	r1, [r0]
+  26:ui/knob.cpp   ****     raw_val_    = 0.0f;
+ 158              		.loc 1 26 17 view .LVU46
+ 159 001a 80ED046A 		vstr.32	s12, [r0, #16]
+  27:ui/knob.cpp   ****     adc_        = adcptr;
+ 160              		.loc 1 27 5 is_stmt 1 view .LVU47
+  28:ui/knob.cpp   ****     SetCoeff(1.0f / (0.002f * samplerate_ * 0.5f));
+ 161              		.loc 1 28 5 view .LVU48
+ 162              		.loc 1 29 5 view .LVU49
+ 163              		.loc 1 29 43 is_stmt 0 view .LVU50
+ 164 001e 20EE260A 		vmul.f32	s0, s0, s13
+ 165              		.loc 1 29 13 view .LVU51
+ 166 0022 87EE807A 		vdiv.f32	s14, s15, s0
+ 167              	.LVL10:
+ 168              	.LBB12:
+ 169              	.LBI12:
+  82:ui/knob.h     ****     {
+ 170              		.loc 2 82 17 is_stmt 1 view .LVU52
+ 171              	.LBB13:
+  84:ui/knob.h     ****         val = val < 0.f ? 0.f : val;
+ 172              		.loc 2 84 9 view .LVU53
+  84:ui/knob.h     ****         val = val < 0.f ? 0.f : val;
+ 173              		.loc 2 84 25 is_stmt 0 view .LVU54
+ 174 0026 B4EEE77A 		vcmpe.f32	s14, s15
+ 175 002a F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 176 002e 08DC     		bgt	.L7
+  85:ui/knob.h     ****         coeff_ = val;
+ 177              		.loc 2 85 9 is_stmt 1 view .LVU55
+ 178 0030 B4EEC67A 		vcmpe.f32	s14, s12
+ 179 0034 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 180 0038 54BF     		ite	pl
+ 181 003a F0EE477A 		vmovpl.f32	s15, s14
+ 182 003e F0EE467A 		vmovmi.f32	s15, s12
+ 183              	.L7:
+ 184              	.LVL11:
+ 185              		.loc 2 86 9 view .LVU56
+ 186              	.LBE13:
+ 187              	.LBE12:
+  30:ui/knob.cpp   ****     scale_      = 2.0f;
+ 188              		.loc 1 30 17 is_stmt 0 view .LVU57
+ 189 0042 4FF08043 		mov	r3, #1073741824
+ 190              	.LBB15:
+ 191              	.LBB14:
+ 192              		.loc 2 86 16 view .LVU58
+ 193 0046 C0ED027A 		vstr.32	s15, [r0, #8]
+ 194              	.LVL12:
+ 195              		.loc 2 86 16 view .LVU59
+ 196              	.LBE14:
+ 197              	.LBE15:
+ 198              		.loc 1 30 5 is_stmt 1 view .LVU60
+  31:ui/knob.cpp   ****     offset_     = 0.5f;
+ 199              		.loc 1 31 5 view .LVU61
+  32:ui/knob.cpp   ****     flip_       = false;
+ 200              		.loc 1 32 5 view .LVU62
+  33:ui/knob.cpp   ****     invert_     = true;
+ 201              		.loc 1 33 5 view .LVU63
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccMfdyF3.s 			page 7
+
+
+  34:ui/knob.cpp   ****     is_bipolar_ = true;
+ 202              		.loc 1 34 5 view .LVU64
+  31:ui/knob.cpp   ****     flip_       = false;
+ 203              		.loc 1 31 17 is_stmt 0 view .LVU65
+ 204 004a C0ED066A 		vstr.32	s13, [r0, #24]
+  30:ui/knob.cpp   ****     offset_     = 0.5f;
+ 205              		.loc 1 30 17 view .LVU66
+ 206 004e 4361     		str	r3, [r0, #20]	@ float
+  32:ui/knob.cpp   ****     invert_     = true;
+ 207              		.loc 1 32 17 view .LVU67
+ 208 0050 4FF48073 		mov	r3, #256
+ 209 0054 8383     		strh	r3, [r0, #28]	@ movhi
+ 210              		.loc 1 34 17 view .LVU68
+ 211 0056 0123     		movs	r3, #1
+ 212 0058 8377     		strb	r3, [r0, #30]
+  35:ui/knob.cpp   **** }
+ 213              		.loc 1 35 1 view .LVU69
+ 214 005a 7047     		bx	lr
+ 215              	.L10:
+ 216              		.align	2
+ 217              	.L9:
+ 218 005c 6F12033B 		.word	990057071
+ 219 0060 00000000 		.word	0
+ 220              		.cfi_endproc
+ 221              	.LFE1526:
+ 223              		.section	.text._ZN11perspective4Knob6FilterEv,"ax",%progbits
+ 224              		.align	1
+ 225              		.global	_ZN11perspective4Knob6FilterEv
+ 226              		.syntax unified
+ 227              		.thumb
+ 228              		.thumb_func
+ 230              	_ZN11perspective4Knob6FilterEv:
+ 231              	.LVL13:
+ 232              	.LFB1527:
+  36:ui/knob.cpp   **** 
+  37:ui/knob.cpp   **** float Knob::Filter()
+  38:ui/knob.cpp   **** {
+ 233              		.loc 1 38 1 is_stmt 1 view -0
+ 234              		.cfi_startproc
+ 235              		@ args = 0, pretend = 0, frame = 0
+ 236              		@ frame_needed = 0, uses_anonymous_args = 0
+ 237              		@ link register save eliminated.
+  39:ui/knob.cpp   ****     // Get the current raw ADC value
+  40:ui/knob.cpp   ****     float t = raw_/65535.f;
+ 238              		.loc 1 40 5 view .LVU71
+  41:ui/knob.cpp   ****     
+  42:ui/knob.cpp   ****     // Apply one-pole smoothing filter
+  43:ui/knob.cpp   ****     raw_val_ += coeff_ * (t - raw_val_);
+ 239              		.loc 1 43 5 view .LVU72
+  40:ui/knob.cpp   ****     
+ 240              		.loc 1 40 19 is_stmt 0 view .LVU73
+ 241 0000 D0ED017A 		vldr.32	s15, [r0, #4]	@ int
+  40:ui/knob.cpp   ****     
+ 242              		.loc 1 40 11 view .LVU74
+ 243 0004 DFED086A 		vldr.32	s13, .L12
+  40:ui/knob.cpp   ****     
+ 244              		.loc 1 40 19 view .LVU75
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccMfdyF3.s 			page 8
+
+
+ 245 0008 B8EEE77A 		vcvt.f32.s32	s14, s15
+ 246              		.loc 1 43 5 view .LVU76
+ 247 000c 90ED040A 		vldr.32	s0, [r0, #16]
+  40:ui/knob.cpp   ****     
+ 248              		.loc 1 40 11 view .LVU77
+ 249 0010 C7EE267A 		vdiv.f32	s15, s14, s13
+ 250              	.LVL14:
+ 251              		.loc 1 43 14 view .LVU78
+ 252 0014 90ED027A 		vldr.32	s14, [r0, #8]
+ 253              		.loc 1 43 29 view .LVU79
+ 254 0018 77EEC07A 		vsub.f32	s15, s15, s0
+ 255              	.LVL15:
+ 256              		.loc 1 43 14 view .LVU80
+ 257 001c A7EE270A 		vfma.f32	s0, s14, s15
+ 258 0020 80ED040A 		vstr.32	s0, [r0, #16]
+  44:ui/knob.cpp   ****     
+  45:ui/knob.cpp   ****     return raw_val_;
+ 259              		.loc 1 45 5 is_stmt 1 view .LVU81
+  46:ui/knob.cpp   **** }
+ 260              		.loc 1 46 1 is_stmt 0 view .LVU82
+ 261 0024 7047     		bx	lr
+ 262              	.L13:
+ 263 0026 00BF     		.align	2
+ 264              	.L12:
+ 265 0028 00FF7F47 		.word	1199570688
+ 266              		.cfi_endproc
+ 267              	.LFE1527:
+ 269              		.section	.text._ZNK11perspective4Knob12ConvertValueEf,"ax",%progbits
+ 270              		.align	1
+ 271              		.global	_ZNK11perspective4Knob12ConvertValueEf
+ 272              		.syntax unified
+ 273              		.thumb
+ 274              		.thumb_func
+ 276              	_ZNK11perspective4Knob12ConvertValueEf:
+ 277              	.LVL16:
+ 278              	.LFB1528:
+  47:ui/knob.cpp   **** 
+  48:ui/knob.cpp   **** float Knob::ConvertValue(float raw_value) const
+  49:ui/knob.cpp   **** {
+ 279              		.loc 1 49 1 is_stmt 1 view -0
+ 280              		.cfi_startproc
+ 281              		@ args = 0, pretend = 0, frame = 0
+ 282              		@ frame_needed = 0, uses_anonymous_args = 0
+ 283              		@ link register save eliminated.
+  50:ui/knob.cpp   ****     float t = raw_value;
+ 284              		.loc 1 50 5 view .LVU84
+  51:ui/knob.cpp   ****     
+  52:ui/knob.cpp   ****     // Apply flip if enabled
+  53:ui/knob.cpp   ****     if(flip_)
+ 285              		.loc 1 53 5 view .LVU85
+ 286 0000 037F     		ldrb	r3, [r0, #28]	@ zero_extendqisi2
+ 287 0002 1BB1     		cbz	r3, .L15
+  54:ui/knob.cpp   ****         t = 1.f - t;
+ 288              		.loc 1 54 9 view .LVU86
+ 289              		.loc 1 54 11 is_stmt 0 view .LVU87
+ 290 0004 F7EE007A 		vmov.f32	s15, #1.0e+0
+ 291 0008 37EEC00A 		vsub.f32	s0, s15, s0
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccMfdyF3.s 			page 9
+
+
+ 292              	.LVL17:
+ 293              	.L15:
+  55:ui/knob.cpp   ****     
+  56:ui/knob.cpp   ****     // Apply offset and scale
+  57:ui/knob.cpp   ****     t = (t - offset_) * scale_;
+ 294              		.loc 1 57 5 is_stmt 1 view .LVU88
+ 295              		.loc 1 57 12 is_stmt 0 view .LVU89
+ 296 000c D0ED067A 		vldr.32	s15, [r0, #24]
+  58:ui/knob.cpp   ****     
+  59:ui/knob.cpp   ****     // Apply invert if enabled
+  60:ui/knob.cpp   ****     if(invert_)
+ 297              		.loc 1 60 5 view .LVU90
+ 298 0010 437F     		ldrb	r3, [r0, #29]	@ zero_extendqisi2
+  57:ui/knob.cpp   ****     
+ 299              		.loc 1 57 12 view .LVU91
+ 300 0012 30EE670A 		vsub.f32	s0, s0, s15
+ 301              	.LVL18:
+  57:ui/knob.cpp   ****     
+ 302              		.loc 1 57 7 view .LVU92
+ 303 0016 D0ED057A 		vldr.32	s15, [r0, #20]
+ 304 001a 20EE270A 		vmul.f32	s0, s0, s15
+ 305              	.LVL19:
+ 306              		.loc 1 60 5 is_stmt 1 view .LVU93
+ 307 001e 0BB1     		cbz	r3, .L14
+  61:ui/knob.cpp   ****         t = -t;
+ 308              		.loc 1 61 9 view .LVU94
+ 309              		.loc 1 61 11 is_stmt 0 view .LVU95
+ 310 0020 B1EE400A 		vneg.f32	s0, s0
+ 311              	.LVL20:
+  62:ui/knob.cpp   ****     
+  63:ui/knob.cpp   ****     return t;
+ 312              		.loc 1 63 5 is_stmt 1 view .LVU96
+ 313              	.L14:
+  64:ui/knob.cpp   **** }
+ 314              		.loc 1 64 1 is_stmt 0 view .LVU97
+ 315 0024 7047     		bx	lr
+ 316              		.cfi_endproc
+ 317              	.LFE1528:
+ 319              		.section	.text._ZN11perspective4Knob13SetSampleRateEf,"ax",%progbits
+ 320              		.align	1
+ 321              		.global	_ZN11perspective4Knob13SetSampleRateEf
+ 322              		.syntax unified
+ 323              		.thumb
+ 324              		.thumb_func
+ 326              	_ZN11perspective4Knob13SetSampleRateEf:
+ 327              	.LVL21:
+ 328              	.LFB1529:
+  65:ui/knob.cpp   **** 
+  66:ui/knob.cpp   **** void Knob::SetSampleRate(float sample_rate)
+  67:ui/knob.cpp   **** {
+ 329              		.loc 1 67 1 is_stmt 1 view -0
+ 330              		.cfi_startproc
+ 331              		@ args = 0, pretend = 0, frame = 0
+ 332              		@ frame_needed = 0, uses_anonymous_args = 0
+ 333              		@ link register save eliminated.
+  68:ui/knob.cpp   ****     samplerate_ = sample_rate;
+ 334              		.loc 1 68 5 view .LVU99
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccMfdyF3.s 			page 10
+
+
+  69:ui/knob.cpp   ****     float slew  = is_bipolar_ ? .002f : slew_seconds_;
+ 335              		.loc 1 69 31 is_stmt 0 view .LVU100
+ 336 0000 837F     		ldrb	r3, [r0, #30]	@ zero_extendqisi2
+  68:ui/knob.cpp   ****     samplerate_ = sample_rate;
+ 337              		.loc 1 68 17 view .LVU101
+ 338 0002 80ED030A 		vstr.32	s0, [r0, #12]
+ 339              		.loc 1 69 5 is_stmt 1 view .LVU102
+ 340              		.loc 1 69 31 is_stmt 0 view .LVU103
+ 341 0006 E3B9     		cbnz	r3, .L26
+ 342              		.loc 1 69 31 discriminator 2 view .LVU104
+ 343 0008 D0ED087A 		vldr.32	s15, [r0, #32]
+ 344              	.L24:
+ 345              	.LVL22:
+  70:ui/knob.cpp   ****     SetCoeff(1.0f / (slew * samplerate_ * 0.5f));
+ 346              		.loc 1 70 5 is_stmt 1 view .LVU105
+ 347              		.loc 1 70 27 is_stmt 0 view .LVU106
+ 348 000c 27EE800A 		vmul.f32	s0, s15, s0
+ 349              	.LVL23:
+ 350              		.loc 1 70 41 view .LVU107
+ 351 0010 F6EE007A 		vmov.f32	s15, #5.0e-1
+ 352              	.LVL24:
+ 353              		.loc 1 70 41 view .LVU108
+ 354 0014 20EE270A 		vmul.f32	s0, s0, s15
+ 355              		.loc 1 70 13 view .LVU109
+ 356 0018 F7EE007A 		vmov.f32	s15, #1.0e+0
+ 357 001c 87EE807A 		vdiv.f32	s14, s15, s0
+ 358              	.LVL25:
+ 359              	.LBB18:
+ 360              	.LBI18:
+  82:ui/knob.h     ****     {
+ 361              		.loc 2 82 17 is_stmt 1 view .LVU110
+ 362              	.LBB19:
+  84:ui/knob.h     ****         val = val < 0.f ? 0.f : val;
+ 363              		.loc 2 84 9 view .LVU111
+  84:ui/knob.h     ****         val = val < 0.f ? 0.f : val;
+ 364              		.loc 2 84 25 is_stmt 0 view .LVU112
+ 365 0020 B4EEE77A 		vcmpe.f32	s14, s15
+ 366 0024 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 367 0028 08DC     		bgt	.L25
+  85:ui/knob.h     ****         coeff_ = val;
+ 368              		.loc 2 85 9 is_stmt 1 view .LVU113
+ 369 002a B5EEC07A 		vcmpe.f32	s14, #0
+ 370 002e DFED067A 		vldr.32	s15, .L28
+ 371 0032 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 372 0036 58BF     		it	pl
+ 373 0038 F0EE477A 		vmovpl.f32	s15, s14
+ 374              	.L25:
+ 375              	.LVL26:
+ 376              		.loc 2 86 9 view .LVU114
+ 377              		.loc 2 86 16 is_stmt 0 view .LVU115
+ 378 003c C0ED027A 		vstr.32	s15, [r0, #8]
+ 379              	.LVL27:
+ 380              		.loc 2 86 16 view .LVU116
+ 381              	.LBE19:
+ 382              	.LBE18:
+  71:ui/knob.cpp   **** }
+ 383              		.loc 1 71 1 view .LVU117
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccMfdyF3.s 			page 11
+
+
+ 384 0040 7047     		bx	lr
+ 385              	.LVL28:
+ 386              	.L26:
+  69:ui/knob.cpp   ****     SetCoeff(1.0f / (slew * samplerate_ * 0.5f));
+ 387              		.loc 1 69 31 discriminator 1 view .LVU118
+ 388 0042 DFED027A 		vldr.32	s15, .L28+4
+ 389 0046 E1E7     		b	.L24
+ 390              	.L29:
+ 391              		.align	2
+ 392              	.L28:
+ 393 0048 00000000 		.word	0
+ 394 004c 6F12033B 		.word	990057071
+ 395              		.cfi_endproc
+ 396              	.LFE1529:
+ 398              		.text
+ 399              	.Letext0:
+ 400              		.file 3 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/ma
+ 401              		.file 4 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/sy
+ 402              		.file 5 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c+
+ 403              		.file 6 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c+
+ 404              		.file 7 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c+
+ 405              		.file 8 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c+
+ 406              		.file 9 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c+
+ 407              		.file 10 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 408              		.file 11 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 409              		.file 12 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 410              		.file 13 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 411              		.file 14 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 412              		.file 15 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/m
+ 413              		.file 16 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 414              		.file 17 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccMfdyF3.s 			page 12
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 knob.cpp
+C:\Users\Oliver\AppData\Local\Temp\ccMfdyF3.s:20     .text._ZN11perspective4Knob4InitEPtfbbf:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\ccMfdyF3.s:26     .text._ZN11perspective4Knob4InitEPtfbbf:00000000 _ZN11perspective4Knob4InitEPtfbbf
+C:\Users\Oliver\AppData\Local\Temp\ccMfdyF3.s:121    .text._ZN11perspective4Knob4InitEPtfbbf:0000005c $d
+C:\Users\Oliver\AppData\Local\Temp\ccMfdyF3.s:128    .text._ZN11perspective4Knob13InitBipolarCvEPtf:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\ccMfdyF3.s:134    .text._ZN11perspective4Knob13InitBipolarCvEPtf:00000000 _ZN11perspective4Knob13InitBipolarCvEPtf
+C:\Users\Oliver\AppData\Local\Temp\ccMfdyF3.s:218    .text._ZN11perspective4Knob13InitBipolarCvEPtf:0000005c $d
+C:\Users\Oliver\AppData\Local\Temp\ccMfdyF3.s:224    .text._ZN11perspective4Knob6FilterEv:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\ccMfdyF3.s:230    .text._ZN11perspective4Knob6FilterEv:00000000 _ZN11perspective4Knob6FilterEv
+C:\Users\Oliver\AppData\Local\Temp\ccMfdyF3.s:265    .text._ZN11perspective4Knob6FilterEv:00000028 $d
+C:\Users\Oliver\AppData\Local\Temp\ccMfdyF3.s:270    .text._ZNK11perspective4Knob12ConvertValueEf:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\ccMfdyF3.s:276    .text._ZNK11perspective4Knob12ConvertValueEf:00000000 _ZNK11perspective4Knob12ConvertValueEf
+C:\Users\Oliver\AppData\Local\Temp\ccMfdyF3.s:320    .text._ZN11perspective4Knob13SetSampleRateEf:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\ccMfdyF3.s:326    .text._ZN11perspective4Knob13SetSampleRateEf:00000000 _ZN11perspective4Knob13SetSampleRateEf
+C:\Users\Oliver\AppData\Local\Temp\ccMfdyF3.s:393    .text._ZN11perspective4Knob13SetSampleRateEf:00000048 $d
+
+NO UNDEFINED SYMBOLS

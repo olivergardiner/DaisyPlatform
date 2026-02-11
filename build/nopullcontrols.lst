@@ -1,0 +1,768 @@
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cchVJwoJ.s 			page 1
+
+
+   1              		.cpu cortex-m7
+   2              		.arch armv7e-m
+   3              		.fpu fpv5-d16
+   4              		.eabi_attribute 28, 1
+   5              		.eabi_attribute 20, 1
+   6              		.eabi_attribute 21, 1
+   7              		.eabi_attribute 23, 3
+   8              		.eabi_attribute 24, 1
+   9              		.eabi_attribute 25, 1
+  10              		.eabi_attribute 26, 1
+  11              		.eabi_attribute 30, 4
+  12              		.eabi_attribute 34, 1
+  13              		.eabi_attribute 18, 4
+  14              		.file	"nopullcontrols.cpp"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.file 1 "nopullcontrols.cpp"
+  19              		.section	.text._ZN11perspective12NoPullSwitchC2Ev,"ax",%progbits
+  20              		.align	1
+  21              		.global	_ZN11perspective12NoPullSwitchC2Ev
+  22              		.syntax unified
+  23              		.thumb
+  24              		.thumb_func
+  26              	_ZN11perspective12NoPullSwitchC2Ev:
+  27              	.LVL0:
+  28              	.LFB3742:
+   1:nopullcontrols.cpp **** #include "nopullcontrols.h"
+   2:nopullcontrols.cpp **** 
+   3:nopullcontrols.cpp **** using namespace daisy;
+   4:nopullcontrols.cpp **** using namespace perspective;
+   5:nopullcontrols.cpp **** 
+   6:nopullcontrols.cpp **** // NoPullSwitch implementation
+   7:nopullcontrols.cpp **** NoPullSwitch::NoPullSwitch() : Switch() {}
+  29              		.loc 1 7 1 view -0
+  30              		.cfi_startproc
+  31              		@ args = 0, pretend = 0, frame = 0
+  32              		@ frame_needed = 0, uses_anonymous_args = 0
+  33              		@ link register save eliminated.
+  34              	.LBB36:
+  35              	.LBI36:
+  36              		.file 2 "dependencies/libDaisy/src/hid/switch.h"
+   1:dependencies/libDaisy/src/hid/switch.h **** #pragma once
+   2:dependencies/libDaisy/src/hid/switch.h **** #ifndef DSY_SWITCH_H
+   3:dependencies/libDaisy/src/hid/switch.h **** #define DSY_SWITCH_H
+   4:dependencies/libDaisy/src/hid/switch.h **** #include "daisy_core.h"
+   5:dependencies/libDaisy/src/hid/switch.h **** #include "per/gpio.h"
+   6:dependencies/libDaisy/src/hid/switch.h **** #include "sys/system.h"
+   7:dependencies/libDaisy/src/hid/switch.h **** 
+   8:dependencies/libDaisy/src/hid/switch.h **** namespace daisy
+   9:dependencies/libDaisy/src/hid/switch.h **** {
+  10:dependencies/libDaisy/src/hid/switch.h **** /** 
+  11:dependencies/libDaisy/src/hid/switch.h ****     Generic Class for handling momentary/latching switches \n 
+  12:dependencies/libDaisy/src/hid/switch.h ****     Inspired/influenced by Mutable Instruments (pichenettes) Switch classes
+  13:dependencies/libDaisy/src/hid/switch.h ****     @author Stephen Hensley
+  14:dependencies/libDaisy/src/hid/switch.h ****     @date December 2019
+  15:dependencies/libDaisy/src/hid/switch.h ****     @ingroup controls
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cchVJwoJ.s 			page 2
+
+
+  16:dependencies/libDaisy/src/hid/switch.h **** */
+  17:dependencies/libDaisy/src/hid/switch.h **** class Switch
+  18:dependencies/libDaisy/src/hid/switch.h **** {
+  19:dependencies/libDaisy/src/hid/switch.h ****   public:
+  20:dependencies/libDaisy/src/hid/switch.h ****     /** Specifies the expected behavior of the switch */
+  21:dependencies/libDaisy/src/hid/switch.h ****     enum Type
+  22:dependencies/libDaisy/src/hid/switch.h ****     {
+  23:dependencies/libDaisy/src/hid/switch.h ****         TYPE_TOGGLE,    /**< & */
+  24:dependencies/libDaisy/src/hid/switch.h ****         TYPE_MOMENTARY, /**< & */
+  25:dependencies/libDaisy/src/hid/switch.h ****     };
+  26:dependencies/libDaisy/src/hid/switch.h ****     /** Specifies whether the pressed is HIGH or LOW. */
+  27:dependencies/libDaisy/src/hid/switch.h ****     enum Polarity
+  28:dependencies/libDaisy/src/hid/switch.h ****     {
+  29:dependencies/libDaisy/src/hid/switch.h ****         POLARITY_NORMAL,   /**< & */
+  30:dependencies/libDaisy/src/hid/switch.h ****         POLARITY_INVERTED, /**< & */
+  31:dependencies/libDaisy/src/hid/switch.h ****     };
+  32:dependencies/libDaisy/src/hid/switch.h **** 
+  33:dependencies/libDaisy/src/hid/switch.h ****     Switch() {}
+  37              		.loc 2 33 5 view .LVU1
+  38              	.LBB37:
+  39              	.LBB38:
+  40              	.LBI38:
+  41              		.file 3 "dependencies/libDaisy/src/per/gpio.h"
+   1:dependencies/libDaisy/src/per/gpio.h **** #pragma once
+   2:dependencies/libDaisy/src/per/gpio.h **** #ifndef DSY_GPIO_H
+   3:dependencies/libDaisy/src/per/gpio.h **** #define DSY_GPIO_H
+   4:dependencies/libDaisy/src/per/gpio.h **** #include "daisy_core.h"
+   5:dependencies/libDaisy/src/per/gpio.h **** 
+   6:dependencies/libDaisy/src/per/gpio.h **** #ifdef __cplusplus
+   7:dependencies/libDaisy/src/per/gpio.h **** 
+   8:dependencies/libDaisy/src/per/gpio.h **** namespace daisy
+   9:dependencies/libDaisy/src/per/gpio.h **** {
+  10:dependencies/libDaisy/src/per/gpio.h **** /** @brief General Purpose I/O control 
+  11:dependencies/libDaisy/src/per/gpio.h ****  *  @details peripheral control over a single GPIO
+  12:dependencies/libDaisy/src/per/gpio.h ****  *  @ingroup peripheral
+  13:dependencies/libDaisy/src/per/gpio.h ****  *   
+  14:dependencies/libDaisy/src/per/gpio.h ****  *  Button Input (with internal Pullup resistor)
+  15:dependencies/libDaisy/src/per/gpio.h ****  *  @include GPIO_Input.cpp 
+  16:dependencies/libDaisy/src/per/gpio.h ****  * 
+  17:dependencies/libDaisy/src/per/gpio.h ****  *  Output Example (perfect for blinking an LED)
+  18:dependencies/libDaisy/src/per/gpio.h ****  *  @include GPIO_Output.cpp
+  19:dependencies/libDaisy/src/per/gpio.h ****  * 
+  20:dependencies/libDaisy/src/per/gpio.h **** */
+  21:dependencies/libDaisy/src/per/gpio.h **** class GPIO
+  22:dependencies/libDaisy/src/per/gpio.h **** {
+  23:dependencies/libDaisy/src/per/gpio.h ****   public:
+  24:dependencies/libDaisy/src/per/gpio.h ****     /** @brief Mode of operation for the specified GPIO */
+  25:dependencies/libDaisy/src/per/gpio.h ****     enum class Mode
+  26:dependencies/libDaisy/src/per/gpio.h ****     {
+  27:dependencies/libDaisy/src/per/gpio.h ****         INPUT,      /**< Input for reading state of pin */
+  28:dependencies/libDaisy/src/per/gpio.h ****         OUTPUT,     /**< Output w/ push-pull configuration */
+  29:dependencies/libDaisy/src/per/gpio.h ****         OPEN_DRAIN, /**< Output w/ open-drain configuration */
+  30:dependencies/libDaisy/src/per/gpio.h ****         ANALOG,     /**< Analog for connection to ADC or DAC peripheral */
+  31:dependencies/libDaisy/src/per/gpio.h ****     };
+  32:dependencies/libDaisy/src/per/gpio.h **** 
+  33:dependencies/libDaisy/src/per/gpio.h ****     /** @brief Configures whether an internal Pull up or Pull down resistor is used. 
+  34:dependencies/libDaisy/src/per/gpio.h ****      *  
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cchVJwoJ.s 			page 3
+
+
+  35:dependencies/libDaisy/src/per/gpio.h ****      * Internal Pull up/down resistors are typically 40k ohms, and will be between
+  36:dependencies/libDaisy/src/per/gpio.h ****      * 30k and 50k
+  37:dependencies/libDaisy/src/per/gpio.h ****      * 
+  38:dependencies/libDaisy/src/per/gpio.h ****      * When the Pin is configured in Analog mode, the pull up/down resistors are
+  39:dependencies/libDaisy/src/per/gpio.h ****      * disabled by hardware. 
+  40:dependencies/libDaisy/src/per/gpio.h ****      */
+  41:dependencies/libDaisy/src/per/gpio.h ****     enum class Pull
+  42:dependencies/libDaisy/src/per/gpio.h ****     {
+  43:dependencies/libDaisy/src/per/gpio.h ****         NOPULL,   /**< No pull up resistor */
+  44:dependencies/libDaisy/src/per/gpio.h ****         PULLUP,   /**< Internal pull up enabled */
+  45:dependencies/libDaisy/src/per/gpio.h ****         PULLDOWN, /**< Internal pull down enabled*/
+  46:dependencies/libDaisy/src/per/gpio.h ****     };
+  47:dependencies/libDaisy/src/per/gpio.h **** 
+  48:dependencies/libDaisy/src/per/gpio.h ****     /** @brief Output speed controls the drive strength, and slew rate of the pin */
+  49:dependencies/libDaisy/src/per/gpio.h ****     enum class Speed
+  50:dependencies/libDaisy/src/per/gpio.h ****     {
+  51:dependencies/libDaisy/src/per/gpio.h ****         LOW,
+  52:dependencies/libDaisy/src/per/gpio.h ****         MEDIUM,
+  53:dependencies/libDaisy/src/per/gpio.h ****         HIGH,
+  54:dependencies/libDaisy/src/per/gpio.h ****         VERY_HIGH,
+  55:dependencies/libDaisy/src/per/gpio.h ****     };
+  56:dependencies/libDaisy/src/per/gpio.h **** 
+  57:dependencies/libDaisy/src/per/gpio.h ****     /** @brief Configuration for a given GPIO */
+  58:dependencies/libDaisy/src/per/gpio.h ****     struct Config
+  59:dependencies/libDaisy/src/per/gpio.h ****     {
+  60:dependencies/libDaisy/src/per/gpio.h ****         Pin   pin;
+  61:dependencies/libDaisy/src/per/gpio.h ****         Mode  mode;
+  62:dependencies/libDaisy/src/per/gpio.h ****         Pull  pull;
+  63:dependencies/libDaisy/src/per/gpio.h ****         Speed speed;
+  64:dependencies/libDaisy/src/per/gpio.h **** 
+  65:dependencies/libDaisy/src/per/gpio.h ****         /** Constructor with no arguments will prepare an invalid GPIO set as
+  66:dependencies/libDaisy/src/per/gpio.h ****          *  an input, with no pullup. 
+  67:dependencies/libDaisy/src/per/gpio.h ****          */
+  68:dependencies/libDaisy/src/per/gpio.h ****         Config()
+  69:dependencies/libDaisy/src/per/gpio.h ****         : pin(), mode(Mode::INPUT), pull(Pull::NOPULL), speed(Speed::LOW)
+  70:dependencies/libDaisy/src/per/gpio.h ****         {
+  71:dependencies/libDaisy/src/per/gpio.h ****         }
+  72:dependencies/libDaisy/src/per/gpio.h ****     };
+  73:dependencies/libDaisy/src/per/gpio.h **** 
+  74:dependencies/libDaisy/src/per/gpio.h ****     GPIO() {}
+  42              		.loc 3 74 5 view .LVU2
+  43              	.LBB39:
+  44              	.LBB40:
+  45              	.LBI40:
+  68:dependencies/libDaisy/src/per/gpio.h ****         : pin(), mode(Mode::INPUT), pull(Pull::NOPULL), speed(Speed::LOW)
+  46              		.loc 3 68 9 view .LVU3
+  47              	.LBB41:
+  48              	.LBB42:
+  49              	.LBB43:
+  50              	.LBI43:
+  51              		.file 4 "dependencies/libDaisy/src/daisy_core.h"
+   1:dependencies/libDaisy/src/daisy_core.h **** #pragma once
+   2:dependencies/libDaisy/src/daisy_core.h **** #ifndef DSY_CORE_HW_H
+   3:dependencies/libDaisy/src/daisy_core.h **** #define DSY_CORE_HW_H /**< & */
+   4:dependencies/libDaisy/src/daisy_core.h **** #include <stdint.h>
+   5:dependencies/libDaisy/src/daisy_core.h **** #include <stdlib.h>
+   6:dependencies/libDaisy/src/daisy_core.h **** 
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cchVJwoJ.s 			page 4
+
+
+   7:dependencies/libDaisy/src/daisy_core.h **** #if defined(_MSC_VER)
+   8:dependencies/libDaisy/src/daisy_core.h **** #define FORCE_INLINE __forceinline /**< & */
+   9:dependencies/libDaisy/src/daisy_core.h **** #elif defined(__clang__)
+  10:dependencies/libDaisy/src/daisy_core.h **** #define FORCE_INLINE inline __attribute__((always_inline)) /**< & */
+  11:dependencies/libDaisy/src/daisy_core.h **** #pragma clang diagnostic ignored "-Wduplicate-decl-specifier"
+  12:dependencies/libDaisy/src/daisy_core.h **** #elif defined(__GNUC__)
+  13:dependencies/libDaisy/src/daisy_core.h **** #define FORCE_INLINE inline __attribute__((always_inline)) /**< & */
+  14:dependencies/libDaisy/src/daisy_core.h **** #else
+  15:dependencies/libDaisy/src/daisy_core.h **** #error unknown compiler
+  16:dependencies/libDaisy/src/daisy_core.h **** #endif
+  17:dependencies/libDaisy/src/daisy_core.h **** 
+  18:dependencies/libDaisy/src/daisy_core.h **** /** @addtogroup utility
+  19:dependencies/libDaisy/src/daisy_core.h ****     @{
+  20:dependencies/libDaisy/src/daisy_core.h **** */
+  21:dependencies/libDaisy/src/daisy_core.h **** 
+  22:dependencies/libDaisy/src/daisy_core.h **** /** Macro for area of memory that is configured as cacheless
+  23:dependencies/libDaisy/src/daisy_core.h **** This should be used primarily for DMA buffers, and the like.
+  24:dependencies/libDaisy/src/daisy_core.h **** */
+  25:dependencies/libDaisy/src/daisy_core.h **** #define DMA_BUFFER_MEM_SECTION __attribute__((section(".sram1_bss")))
+  26:dependencies/libDaisy/src/daisy_core.h **** /** 
+  27:dependencies/libDaisy/src/daisy_core.h **** THE DTCM RAM section is also non-cached. However, is not suitable 
+  28:dependencies/libDaisy/src/daisy_core.h **** for DMA transfers. Performance is on par with internal SRAM w/ 
+  29:dependencies/libDaisy/src/daisy_core.h **** cache enabled.
+  30:dependencies/libDaisy/src/daisy_core.h **** */
+  31:dependencies/libDaisy/src/daisy_core.h **** #define DTCM_MEM_SECTION __attribute__((section(".dtcmram_bss")))
+  32:dependencies/libDaisy/src/daisy_core.h **** 
+  33:dependencies/libDaisy/src/daisy_core.h **** #define FBIPMAX 0.999985f             /**< close to 1.0f-LSB at 16 bit */
+  34:dependencies/libDaisy/src/daisy_core.h **** #define FBIPMIN (-FBIPMAX)            /**< - (1 - LSB) */
+  35:dependencies/libDaisy/src/daisy_core.h **** #define U82F_SCALE 0.0078740f         /**< 1 / 127 */
+  36:dependencies/libDaisy/src/daisy_core.h **** #define F2U8_SCALE 127.0f             /**< 128 - 1 */
+  37:dependencies/libDaisy/src/daisy_core.h **** #define S82F_SCALE 0.0078125f         /**< 1 / (2**7) */
+  38:dependencies/libDaisy/src/daisy_core.h **** #define F2S8_SCALE 127.0f             /**< (2 ** 7) - 1 */
+  39:dependencies/libDaisy/src/daisy_core.h **** #define S162F_SCALE 3.0517578125e-05f /**< 1 / (2** 15) */
+  40:dependencies/libDaisy/src/daisy_core.h **** #define F2S16_SCALE 32767.0f          /**< (2 ** 15) - 1 */
+  41:dependencies/libDaisy/src/daisy_core.h **** #define F2S24_SCALE 8388608.0f        /**< 2 ** 23 */
+  42:dependencies/libDaisy/src/daisy_core.h **** #define S242F_SCALE 1.192092896e-07f  /**< 1 / (2 ** 23) */
+  43:dependencies/libDaisy/src/daisy_core.h **** #define S24SIGN 0x800000              /**< 2 ** 23 */
+  44:dependencies/libDaisy/src/daisy_core.h **** #define S322F_SCALE 4.6566129e-10f    /**< 1 / (2** 31) */
+  45:dependencies/libDaisy/src/daisy_core.h **** #define F2S32_SCALE 2147483647.f      /**< (2 ** 31) - 1 */
+  46:dependencies/libDaisy/src/daisy_core.h **** 
+  47:dependencies/libDaisy/src/daisy_core.h **** 
+  48:dependencies/libDaisy/src/daisy_core.h **** /** shorthand macro for simplifying the reading of the left 
+  49:dependencies/libDaisy/src/daisy_core.h ****  *  channel of a non-interleaved output buffer named out */
+  50:dependencies/libDaisy/src/daisy_core.h **** #define OUT_L out[0]
+  51:dependencies/libDaisy/src/daisy_core.h **** 
+  52:dependencies/libDaisy/src/daisy_core.h **** /** shorthand macro for simplifying the reading of the right 
+  53:dependencies/libDaisy/src/daisy_core.h ****  *  channel of a non-interleaved output buffer named out */
+  54:dependencies/libDaisy/src/daisy_core.h **** #define OUT_R out[1]
+  55:dependencies/libDaisy/src/daisy_core.h **** 
+  56:dependencies/libDaisy/src/daisy_core.h **** /** shorthand macro for simplifying the reading of the left 
+  57:dependencies/libDaisy/src/daisy_core.h ****  *  channel of a non-interleaved input buffer named in */
+  58:dependencies/libDaisy/src/daisy_core.h **** #define IN_L in[0]
+  59:dependencies/libDaisy/src/daisy_core.h **** 
+  60:dependencies/libDaisy/src/daisy_core.h **** /** shorthand macro for simplifying the reading of the right 
+  61:dependencies/libDaisy/src/daisy_core.h ****  *  channel of a non-interleaved input buffer named in */
+  62:dependencies/libDaisy/src/daisy_core.h **** #define IN_R in[1]
+  63:dependencies/libDaisy/src/daisy_core.h **** 
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cchVJwoJ.s 			page 5
+
+
+  64:dependencies/libDaisy/src/daisy_core.h **** /** 
+  65:dependencies/libDaisy/src/daisy_core.h ****     Computes cube.
+  66:dependencies/libDaisy/src/daisy_core.h ****     \param x Number to be cubed
+  67:dependencies/libDaisy/src/daisy_core.h ****     \return x ^ 3
+  68:dependencies/libDaisy/src/daisy_core.h **** */
+  69:dependencies/libDaisy/src/daisy_core.h **** FORCE_INLINE float cube(float x)
+  70:dependencies/libDaisy/src/daisy_core.h **** {
+  71:dependencies/libDaisy/src/daisy_core.h ****     return (x * x) * x;
+  72:dependencies/libDaisy/src/daisy_core.h **** }
+  73:dependencies/libDaisy/src/daisy_core.h **** 
+  74:dependencies/libDaisy/src/daisy_core.h **** /** 
+  75:dependencies/libDaisy/src/daisy_core.h ****     Converts unsigned 8-bit to float
+  76:dependencies/libDaisy/src/daisy_core.h ****     \param x Number to be scaled.
+  77:dependencies/libDaisy/src/daisy_core.h ****     \return Scaled number.
+  78:dependencies/libDaisy/src/daisy_core.h **** */
+  79:dependencies/libDaisy/src/daisy_core.h **** FORCE_INLINE float u82f(uint8_t x)
+  80:dependencies/libDaisy/src/daisy_core.h **** {
+  81:dependencies/libDaisy/src/daisy_core.h ****     return ((float)x - 127.f) * U82F_SCALE;
+  82:dependencies/libDaisy/src/daisy_core.h **** }
+  83:dependencies/libDaisy/src/daisy_core.h **** 
+  84:dependencies/libDaisy/src/daisy_core.h **** /**
+  85:dependencies/libDaisy/src/daisy_core.h ****     Converts float to unsigned 8-bit
+  86:dependencies/libDaisy/src/daisy_core.h **** */
+  87:dependencies/libDaisy/src/daisy_core.h **** FORCE_INLINE uint8_t f2u8(float x)
+  88:dependencies/libDaisy/src/daisy_core.h **** {
+  89:dependencies/libDaisy/src/daisy_core.h ****     x = x <= FBIPMIN ? FBIPMIN : x;
+  90:dependencies/libDaisy/src/daisy_core.h ****     x = x >= FBIPMAX ? FBIPMAX : x;
+  91:dependencies/libDaisy/src/daisy_core.h ****     return (uint8_t)((x * F2U8_SCALE) + F2U8_SCALE);
+  92:dependencies/libDaisy/src/daisy_core.h **** }
+  93:dependencies/libDaisy/src/daisy_core.h **** 
+  94:dependencies/libDaisy/src/daisy_core.h **** 
+  95:dependencies/libDaisy/src/daisy_core.h **** /** 
+  96:dependencies/libDaisy/src/daisy_core.h ****     Converts Signed 8-bit to float
+  97:dependencies/libDaisy/src/daisy_core.h ****     \param x Number to be scaled.
+  98:dependencies/libDaisy/src/daisy_core.h ****     \return Scaled number.
+  99:dependencies/libDaisy/src/daisy_core.h **** */
+ 100:dependencies/libDaisy/src/daisy_core.h **** FORCE_INLINE float s82f(int8_t x)
+ 101:dependencies/libDaisy/src/daisy_core.h **** {
+ 102:dependencies/libDaisy/src/daisy_core.h ****     return (float)x * S82F_SCALE;
+ 103:dependencies/libDaisy/src/daisy_core.h **** }
+ 104:dependencies/libDaisy/src/daisy_core.h **** 
+ 105:dependencies/libDaisy/src/daisy_core.h **** /**
+ 106:dependencies/libDaisy/src/daisy_core.h ****     Converts float to Signed 8-bit
+ 107:dependencies/libDaisy/src/daisy_core.h **** */
+ 108:dependencies/libDaisy/src/daisy_core.h **** FORCE_INLINE int8_t f2s8(float x)
+ 109:dependencies/libDaisy/src/daisy_core.h **** {
+ 110:dependencies/libDaisy/src/daisy_core.h ****     x = x <= FBIPMIN ? FBIPMIN : x;
+ 111:dependencies/libDaisy/src/daisy_core.h ****     x = x >= FBIPMAX ? FBIPMAX : x;
+ 112:dependencies/libDaisy/src/daisy_core.h ****     return (int32_t)(x * F2S8_SCALE);
+ 113:dependencies/libDaisy/src/daisy_core.h **** }
+ 114:dependencies/libDaisy/src/daisy_core.h **** 
+ 115:dependencies/libDaisy/src/daisy_core.h **** /** 
+ 116:dependencies/libDaisy/src/daisy_core.h ****     Converts Signed 16-bit to float
+ 117:dependencies/libDaisy/src/daisy_core.h ****     \param x Number to be scaled.
+ 118:dependencies/libDaisy/src/daisy_core.h ****     \return Scaled number.
+ 119:dependencies/libDaisy/src/daisy_core.h **** */
+ 120:dependencies/libDaisy/src/daisy_core.h **** FORCE_INLINE float s162f(int16_t x)
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cchVJwoJ.s 			page 6
+
+
+ 121:dependencies/libDaisy/src/daisy_core.h **** {
+ 122:dependencies/libDaisy/src/daisy_core.h ****     return (float)x * S162F_SCALE;
+ 123:dependencies/libDaisy/src/daisy_core.h **** }
+ 124:dependencies/libDaisy/src/daisy_core.h **** 
+ 125:dependencies/libDaisy/src/daisy_core.h **** /**
+ 126:dependencies/libDaisy/src/daisy_core.h ****     Converts float to Signed 16-bit
+ 127:dependencies/libDaisy/src/daisy_core.h **** */
+ 128:dependencies/libDaisy/src/daisy_core.h **** FORCE_INLINE int16_t f2s16(float x)
+ 129:dependencies/libDaisy/src/daisy_core.h **** {
+ 130:dependencies/libDaisy/src/daisy_core.h ****     x = x <= FBIPMIN ? FBIPMIN : x;
+ 131:dependencies/libDaisy/src/daisy_core.h ****     x = x >= FBIPMAX ? FBIPMAX : x;
+ 132:dependencies/libDaisy/src/daisy_core.h ****     return (int32_t)(x * F2S16_SCALE);
+ 133:dependencies/libDaisy/src/daisy_core.h **** }
+ 134:dependencies/libDaisy/src/daisy_core.h **** 
+ 135:dependencies/libDaisy/src/daisy_core.h **** /**
+ 136:dependencies/libDaisy/src/daisy_core.h ****     Converts Signed 24-bit to float
+ 137:dependencies/libDaisy/src/daisy_core.h ****  */
+ 138:dependencies/libDaisy/src/daisy_core.h **** FORCE_INLINE float s242f(int32_t x)
+ 139:dependencies/libDaisy/src/daisy_core.h **** {
+ 140:dependencies/libDaisy/src/daisy_core.h ****     x = (x ^ S24SIGN) - S24SIGN; //sign extend aka ((x<<8)>>8)
+ 141:dependencies/libDaisy/src/daisy_core.h ****     return (float)x * S242F_SCALE;
+ 142:dependencies/libDaisy/src/daisy_core.h **** }
+ 143:dependencies/libDaisy/src/daisy_core.h **** /**
+ 144:dependencies/libDaisy/src/daisy_core.h ****     Converts float to Signed 24-bit
+ 145:dependencies/libDaisy/src/daisy_core.h ****  */
+ 146:dependencies/libDaisy/src/daisy_core.h **** FORCE_INLINE int32_t f2s24(float x)
+ 147:dependencies/libDaisy/src/daisy_core.h **** {
+ 148:dependencies/libDaisy/src/daisy_core.h ****     x = x <= FBIPMIN ? FBIPMIN : x;
+ 149:dependencies/libDaisy/src/daisy_core.h ****     x = x >= FBIPMAX ? FBIPMAX : x;
+ 150:dependencies/libDaisy/src/daisy_core.h ****     return (int32_t)(x * F2S24_SCALE);
+ 151:dependencies/libDaisy/src/daisy_core.h **** }
+ 152:dependencies/libDaisy/src/daisy_core.h **** 
+ 153:dependencies/libDaisy/src/daisy_core.h **** /**
+ 154:dependencies/libDaisy/src/daisy_core.h ****     Converts Signed 32-bit to float
+ 155:dependencies/libDaisy/src/daisy_core.h ****  */
+ 156:dependencies/libDaisy/src/daisy_core.h **** FORCE_INLINE float s322f(int32_t x)
+ 157:dependencies/libDaisy/src/daisy_core.h **** {
+ 158:dependencies/libDaisy/src/daisy_core.h ****     return (float)x * S322F_SCALE;
+ 159:dependencies/libDaisy/src/daisy_core.h **** }
+ 160:dependencies/libDaisy/src/daisy_core.h **** /**
+ 161:dependencies/libDaisy/src/daisy_core.h ****     Converts float to Signed 24-bit
+ 162:dependencies/libDaisy/src/daisy_core.h ****  */
+ 163:dependencies/libDaisy/src/daisy_core.h **** FORCE_INLINE int32_t f2s32(float x)
+ 164:dependencies/libDaisy/src/daisy_core.h **** {
+ 165:dependencies/libDaisy/src/daisy_core.h ****     x = x <= FBIPMIN ? FBIPMIN : x;
+ 166:dependencies/libDaisy/src/daisy_core.h ****     x = x >= FBIPMAX ? FBIPMAX : x;
+ 167:dependencies/libDaisy/src/daisy_core.h ****     return (int32_t)(x * F2S32_SCALE);
+ 168:dependencies/libDaisy/src/daisy_core.h **** }
+ 169:dependencies/libDaisy/src/daisy_core.h **** 
+ 170:dependencies/libDaisy/src/daisy_core.h **** #ifdef __cplusplus
+ 171:dependencies/libDaisy/src/daisy_core.h **** 
+ 172:dependencies/libDaisy/src/daisy_core.h **** namespace daisy
+ 173:dependencies/libDaisy/src/daisy_core.h **** {
+ 174:dependencies/libDaisy/src/daisy_core.h **** /** @brief GPIO Port names */
+ 175:dependencies/libDaisy/src/daisy_core.h **** enum GPIOPort
+ 176:dependencies/libDaisy/src/daisy_core.h **** {
+ 177:dependencies/libDaisy/src/daisy_core.h ****     PORTA, /**< Port A */
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cchVJwoJ.s 			page 7
+
+
+ 178:dependencies/libDaisy/src/daisy_core.h ****     PORTB, /**< Port B */
+ 179:dependencies/libDaisy/src/daisy_core.h ****     PORTC, /**< Port C */
+ 180:dependencies/libDaisy/src/daisy_core.h ****     PORTD, /**< Port D */
+ 181:dependencies/libDaisy/src/daisy_core.h ****     PORTE, /**< Port E */
+ 182:dependencies/libDaisy/src/daisy_core.h ****     PORTF, /**< Port F */
+ 183:dependencies/libDaisy/src/daisy_core.h ****     PORTG, /**< Port G */
+ 184:dependencies/libDaisy/src/daisy_core.h ****     PORTH, /**< Port H */
+ 185:dependencies/libDaisy/src/daisy_core.h ****     PORTI, /**< Port I */
+ 186:dependencies/libDaisy/src/daisy_core.h ****     PORTJ, /**< Port J */
+ 187:dependencies/libDaisy/src/daisy_core.h ****     PORTK, /**< Port K */
+ 188:dependencies/libDaisy/src/daisy_core.h ****     PORTX, /**< Used as a dummy port to signal an invalid pin. */
+ 189:dependencies/libDaisy/src/daisy_core.h **** };
+ 190:dependencies/libDaisy/src/daisy_core.h **** 
+ 191:dependencies/libDaisy/src/daisy_core.h **** /** @brief representation of hardware port/pin combination */
+ 192:dependencies/libDaisy/src/daisy_core.h **** struct Pin
+ 193:dependencies/libDaisy/src/daisy_core.h **** {
+ 194:dependencies/libDaisy/src/daisy_core.h ****     GPIOPort port;
+ 195:dependencies/libDaisy/src/daisy_core.h ****     uint8_t  pin;
+ 196:dependencies/libDaisy/src/daisy_core.h **** 
+ 197:dependencies/libDaisy/src/daisy_core.h ****     /** @brief Constructor creates a valid pin. 
+ 198:dependencies/libDaisy/src/daisy_core.h ****      *  @param pt GPIOPort between PA, and PK corresponding to STM32 Port.
+ 199:dependencies/libDaisy/src/daisy_core.h ****      *  @param pn pin number in range of 0-15
+ 200:dependencies/libDaisy/src/daisy_core.h ****     */
+ 201:dependencies/libDaisy/src/daisy_core.h ****     constexpr Pin(const GPIOPort pt, const uint8_t pn) : port(pt), pin(pn) {}
+ 202:dependencies/libDaisy/src/daisy_core.h **** 
+ 203:dependencies/libDaisy/src/daisy_core.h ****     /** @brief Basic Constructor creates an invalid Pin object */
+ 204:dependencies/libDaisy/src/daisy_core.h ****     constexpr Pin() : port(PORTX), pin(255) {}
+  52              		.loc 4 204 15 view .LVU4
+  53              		.loc 4 204 15 is_stmt 0 view .LVU5
+  54              	.LBE43:
+  69:dependencies/libDaisy/src/per/gpio.h ****         {
+  55              		.loc 3 69 18 discriminator 1 view .LVU6
+  56 0000 0022     		movs	r2, #0
+  57 0002 4FF60B71 		movw	r1, #65291
+  69:dependencies/libDaisy/src/per/gpio.h ****         {
+  58              		.loc 3 69 57 discriminator 1 view .LVU7
+  59 0006 C0E90422 		strd	r2, r2, [r0, #16]
+  60              	.LVL1:
+  69:dependencies/libDaisy/src/per/gpio.h ****         {
+  61              		.loc 3 69 18 discriminator 1 view .LVU8
+  62 000a C0E90212 		strd	r1, r2, [r0, #8]
+  63              	.LBE42:
+  64              	.LBE41:
+  65              	.LBE40:
+  66              	.LBE39:
+  67              	.LBE38:
+  68              	.LBE37:
+  69              	.LBE36:
+  70              		.loc 1 7 42 view .LVU9
+  71 000e 7047     		bx	lr
+  72              		.cfi_endproc
+  73              	.LFE3742:
+  75              		.global	_ZN11perspective12NoPullSwitchC1Ev
+  76              		.thumb_set _ZN11perspective12NoPullSwitchC1Ev,_ZN11perspective12NoPullSwitchC2Ev
+  77              		.section	.text._ZN11perspective12NoPullSwitch4InitEN5daisy3PinEfNS1_6Switch4TypeENS3_8PolarityE,"a
+  78              		.align	1
+  79              		.global	_ZN11perspective12NoPullSwitch4InitEN5daisy3PinEfNS1_6Switch4TypeENS3_8PolarityE
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cchVJwoJ.s 			page 8
+
+
+  80              		.syntax unified
+  81              		.thumb
+  82              		.thumb_func
+  84              	_ZN11perspective12NoPullSwitch4InitEN5daisy3PinEfNS1_6Switch4TypeENS3_8PolarityE:
+  85              	.LVL2:
+  86              	.LFB3744:
+   8:nopullcontrols.cpp **** 
+   9:nopullcontrols.cpp **** void NoPullSwitch::Init(Pin pin, 
+  10:nopullcontrols.cpp ****                         float update_rate,
+  11:nopullcontrols.cpp ****                         Type type,
+  12:nopullcontrols.cpp ****                         Polarity polarity) {
+  87              		.loc 1 12 44 is_stmt 1 view -0
+  88              		.cfi_startproc
+  89              		@ args = 0, pretend = 0, frame = 8
+  90              		@ frame_needed = 0, uses_anonymous_args = 0
+  13:nopullcontrols.cpp ****     Switch::Init(pin, update_rate, type, polarity, GPIO::Pull::NOPULL);
+  91              		.loc 1 13 5 view .LVU11
+  12:nopullcontrols.cpp ****     Switch::Init(pin, update_rate, type, polarity, GPIO::Pull::NOPULL);
+  92              		.loc 1 12 44 is_stmt 0 view .LVU12
+  93 0000 1FB5     		push	{r0, r1, r2, r3, r4, lr}
+  94              		.cfi_def_cfa_offset 24
+  95              		.cfi_offset 14, -4
+  12:nopullcontrols.cpp ****     Switch::Init(pin, update_rate, type, polarity, GPIO::Pull::NOPULL);
+  96              		.loc 1 12 44 view .LVU13
+  97 0002 ADF80C10 		strh	r1, [sp, #12]	@ movhi
+  98              		.loc 1 13 17 view .LVU14
+  99 0006 0021     		movs	r1, #0
+ 100 0008 0091     		str	r1, [sp]
+ 101 000a 0399     		ldr	r1, [sp, #12]
+ 102 000c FFF7FEFF 		bl	_ZN5daisy6Switch4InitENS_3PinEfNS0_4TypeENS0_8PolarityENS_4GPIO4PullE
+ 103              	.LVL3:
+  14:nopullcontrols.cpp **** }
+ 104              		.loc 1 14 1 view .LVU15
+ 105 0010 05B0     		add	sp, sp, #20
+ 106              		.cfi_def_cfa_offset 4
+ 107              		@ sp needed
+ 108 0012 5DF804FB 		ldr	pc, [sp], #4
+ 109              		.cfi_endproc
+ 110              	.LFE3744:
+ 112              		.section	.text._ZN11perspective13NoPullEncoder4InitEN5daisy3PinES2_S2_f,"ax",%progbits
+ 113              		.align	1
+ 114              		.global	_ZN11perspective13NoPullEncoder4InitEN5daisy3PinES2_S2_f
+ 115              		.syntax unified
+ 116              		.thumb
+ 117              		.thumb_func
+ 119              	_ZN11perspective13NoPullEncoder4InitEN5daisy3PinES2_S2_f:
+ 120              	.LVL4:
+ 121              	.LFB3745:
+  15:nopullcontrols.cpp **** 
+  16:nopullcontrols.cpp **** // NoPullEncoder implementation
+  17:nopullcontrols.cpp **** void NoPullEncoder::Init(Pin a, Pin b, Pin click, float update_rate) {
+ 122              		.loc 1 17 70 is_stmt 1 view -0
+ 123              		.cfi_startproc
+ 124              		@ args = 0, pretend = 0, frame = 80
+ 125              		@ frame_needed = 0, uses_anonymous_args = 0
+  18:nopullcontrols.cpp ****     // Call base class Init but we need to replicate with NOPULL
+  19:nopullcontrols.cpp ****     // Since we can't access private members, we have to use the base Init
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cchVJwoJ.s 			page 9
+
+
+  20:nopullcontrols.cpp ****     // but immediately reinitialize the GPIO pins with NOPULL
+  21:nopullcontrols.cpp ****     Encoder::Init(a, b, click, update_rate);
+ 126              		.loc 1 21 5 view .LVU17
+  17:nopullcontrols.cpp ****     // Call base class Init but we need to replicate with NOPULL
+ 127              		.loc 1 17 70 is_stmt 0 view .LVU18
+ 128 0000 10B5     		push	{r4, lr}
+ 129              		.cfi_def_cfa_offset 8
+ 130              		.cfi_offset 4, -8
+ 131              		.cfi_offset 14, -4
+ 132 0002 96B0     		sub	sp, sp, #88
+ 133              		.cfi_def_cfa_offset 96
+ 134              	.LBB71:
+ 135              	.LBB72:
+ 136              	.LBB73:
+ 137              	.LBB74:
+ 138              	.LBB75:
+  69:dependencies/libDaisy/src/per/gpio.h ****         {
+ 139              		.loc 3 69 18 discriminator 1 view .LVU19
+ 140 0004 0024     		movs	r4, #0
+ 141              	.LBE75:
+ 142              	.LBE74:
+ 143              	.LBE73:
+ 144              	.LBE72:
+ 145              	.LBE71:
+  17:nopullcontrols.cpp ****     // Call base class Init but we need to replicate with NOPULL
+ 146              		.loc 1 17 70 view .LVU20
+ 147 0006 ADF81410 		strh	r1, [sp, #20]	@ movhi
+ 148              		.loc 1 21 18 view .LVU21
+ 149 000a 0599     		ldr	r1, [sp, #20]
+  17:nopullcontrols.cpp ****     // Call base class Init but we need to replicate with NOPULL
+ 150              		.loc 1 17 70 view .LVU22
+ 151 000c ADF81020 		strh	r2, [sp, #16]	@ movhi
+ 152 0010 ADF80C30 		strh	r3, [sp, #12]	@ movhi
+ 153              		.loc 1 21 18 view .LVU23
+ 154 0014 DDE90332 		ldrd	r3, r2, [sp, #12]
+ 155 0018 FFF7FEFF 		bl	_ZN5daisy7Encoder4InitENS_3PinES1_S1_f
+ 156              	.LVL5:
+  22:nopullcontrols.cpp ****     
+  23:nopullcontrols.cpp ****     // The encoder uses internal GPIO objects that we can't access
+  24:nopullcontrols.cpp ****     // So we need to use a different approach - manually initialize the GPIOs
+  25:nopullcontrols.cpp ****     GPIO gpio_a, gpio_b, gpio_click;
+ 157              		.loc 1 25 5 is_stmt 1 view .LVU24
+ 158              	.LBB89:
+ 159              	.LBI71:
+ 160              		.loc 3 74 5 view .LVU25
+ 161              	.LBB86:
+ 162              	.LBB83:
+ 163              	.LBI73:
+  68:dependencies/libDaisy/src/per/gpio.h ****         : pin(), mode(Mode::INPUT), pull(Pull::NOPULL), speed(Speed::LOW)
+ 164              		.loc 3 68 9 view .LVU26
+ 165              	.LBB80:
+ 166              	.LBB77:
+ 167              	.LBB76:
+ 168              	.LBI76:
+ 169              		.loc 4 204 15 view .LVU27
+ 170              		.loc 4 204 15 is_stmt 0 view .LVU28
+ 171              	.LBE76:
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cchVJwoJ.s 			page 10
+
+
+  69:dependencies/libDaisy/src/per/gpio.h ****         {
+ 172              		.loc 3 69 18 discriminator 1 view .LVU29
+ 173 001c 4FF60B73 		movw	r3, #65291
+ 174              	.LBE77:
+ 175              	.LBE80:
+ 176              	.LBE83:
+ 177              	.LBE86:
+ 178              	.LBE89:
+  26:nopullcontrols.cpp ****     gpio_a.Init(a, GPIO::Mode::INPUT, GPIO::Pull::NOPULL);
+ 179              		.loc 1 26 16 view .LVU30
+ 180 0020 2246     		mov	r2, r4
+ 181 0022 0599     		ldr	r1, [sp, #20]
+ 182 0024 07A8     		add	r0, sp, #28
+ 183              	.LVL6:
+ 184              		.loc 1 26 16 view .LVU31
+ 185 0026 0094     		str	r4, [sp]
+ 186              	.LBB90:
+ 187              	.LBB87:
+ 188              	.LBB84:
+ 189              	.LBB81:
+ 190              	.LBB78:
+  69:dependencies/libDaisy/src/per/gpio.h ****         {
+ 191              		.loc 3 69 18 discriminator 1 view .LVU32
+ 192 0028 CDE90734 		strd	r3, r4, [sp, #28]
+ 193              	.LBE78:
+ 194              	.LBE81:
+ 195              	.LBE84:
+ 196              	.LBE87:
+ 197              	.LBE90:
+ 198              	.LBB91:
+ 199              	.LBB92:
+ 200              	.LBB93:
+ 201              	.LBB94:
+ 202              	.LBB95:
+ 203 002c CDE90C34 		strd	r3, r4, [sp, #48]
+ 204              	.LBE95:
+ 205              	.LBE94:
+ 206              	.LBE93:
+ 207              	.LBE92:
+ 208              	.LBE91:
+ 209              	.LBB101:
+ 210              	.LBB102:
+ 211              	.LBB103:
+ 212              	.LBB104:
+ 213              	.LBB105:
+ 214 0030 CDE91134 		strd	r3, r4, [sp, #68]
+ 215              	.LBE105:
+ 216              	.LBE104:
+ 217              	.LBE103:
+ 218              	.LBE102:
+ 219              	.LBE101:
+ 220              		.loc 1 26 16 view .LVU33
+ 221 0034 2346     		mov	r3, r4
+ 222              	.LBB111:
+ 223              	.LBB88:
+ 224              	.LBB85:
+ 225              	.LBB82:
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cchVJwoJ.s 			page 11
+
+
+ 226              	.LBB79:
+  69:dependencies/libDaisy/src/per/gpio.h ****         {
+ 227              		.loc 3 69 57 discriminator 1 view .LVU34
+ 228 0036 CDE90944 		strd	r4, r4, [sp, #36]
+ 229              	.LVL7:
+  69:dependencies/libDaisy/src/per/gpio.h ****         {
+ 230              		.loc 3 69 57 discriminator 1 view .LVU35
+ 231              	.LBE79:
+ 232              	.LBE82:
+ 233              	.LBE85:
+ 234              	.LBE88:
+ 235              	.LBE111:
+ 236              	.LBB112:
+ 237              	.LBI91:
+ 238              		.loc 3 74 5 is_stmt 1 view .LVU36
+ 239              	.LBB100:
+ 240              	.LBB99:
+ 241              	.LBI93:
+  68:dependencies/libDaisy/src/per/gpio.h ****         : pin(), mode(Mode::INPUT), pull(Pull::NOPULL), speed(Speed::LOW)
+ 242              		.loc 3 68 9 view .LVU37
+ 243              	.LBB98:
+ 244              	.LBB97:
+ 245              	.LBB96:
+ 246              	.LBI96:
+ 247              		.loc 4 204 15 view .LVU38
+ 248              		.loc 4 204 15 is_stmt 0 view .LVU39
+ 249              	.LBE96:
+  69:dependencies/libDaisy/src/per/gpio.h ****         {
+ 250              		.loc 3 69 57 discriminator 1 view .LVU40
+ 251 003a CDE90E44 		strd	r4, r4, [sp, #56]
+ 252              	.LVL8:
+  69:dependencies/libDaisy/src/per/gpio.h ****         {
+ 253              		.loc 3 69 57 discriminator 1 view .LVU41
+ 254              	.LBE97:
+ 255              	.LBE98:
+ 256              	.LBE99:
+ 257              	.LBE100:
+ 258              	.LBE112:
+ 259              	.LBB113:
+ 260              	.LBI101:
+ 261              		.loc 3 74 5 is_stmt 1 view .LVU42
+ 262              	.LBB110:
+ 263              	.LBB109:
+ 264              	.LBI103:
+  68:dependencies/libDaisy/src/per/gpio.h ****         : pin(), mode(Mode::INPUT), pull(Pull::NOPULL), speed(Speed::LOW)
+ 265              		.loc 3 68 9 view .LVU43
+ 266              	.LBB108:
+ 267              	.LBB107:
+ 268              	.LBB106:
+ 269              	.LBI106:
+ 270              		.loc 4 204 15 view .LVU44
+ 271              		.loc 4 204 15 is_stmt 0 view .LVU45
+ 272              	.LBE106:
+  69:dependencies/libDaisy/src/per/gpio.h ****         {
+ 273              		.loc 3 69 57 discriminator 1 view .LVU46
+ 274 003e CDE91344 		strd	r4, r4, [sp, #76]
+ 275              	.LVL9:
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cchVJwoJ.s 			page 12
+
+
+  69:dependencies/libDaisy/src/per/gpio.h ****         {
+ 276              		.loc 3 69 57 discriminator 1 view .LVU47
+ 277              	.LBE107:
+ 278              	.LBE108:
+ 279              	.LBE109:
+ 280              	.LBE110:
+ 281              	.LBE113:
+ 282              		.loc 1 26 5 is_stmt 1 view .LVU48
+ 283              		.loc 1 26 16 is_stmt 0 view .LVU49
+ 284 0042 FFF7FEFF 		bl	_ZN5daisy4GPIO4InitENS_3PinENS0_4ModeENS0_4PullENS0_5SpeedE
+ 285              	.LVL10:
+  27:nopullcontrols.cpp ****     gpio_b.Init(b, GPIO::Mode::INPUT, GPIO::Pull::NOPULL);
+ 286              		.loc 1 27 5 is_stmt 1 view .LVU50
+ 287              		.loc 1 27 16 is_stmt 0 view .LVU51
+ 288 0046 2346     		mov	r3, r4
+ 289 0048 2246     		mov	r2, r4
+ 290 004a 0499     		ldr	r1, [sp, #16]
+ 291 004c 0CA8     		add	r0, sp, #48
+ 292 004e 0094     		str	r4, [sp]
+ 293 0050 FFF7FEFF 		bl	_ZN5daisy4GPIO4InitENS_3PinENS0_4ModeENS0_4PullENS0_5SpeedE
+ 294              	.LVL11:
+  28:nopullcontrols.cpp ****     gpio_click.Init(click, GPIO::Mode::INPUT, GPIO::Pull::NOPULL);
+ 295              		.loc 1 28 5 is_stmt 1 view .LVU52
+ 296              		.loc 1 28 20 is_stmt 0 view .LVU53
+ 297 0054 2346     		mov	r3, r4
+ 298 0056 2246     		mov	r2, r4
+ 299 0058 0399     		ldr	r1, [sp, #12]
+ 300 005a 11A8     		add	r0, sp, #68
+ 301 005c 0094     		str	r4, [sp]
+ 302 005e FFF7FEFF 		bl	_ZN5daisy4GPIO4InitENS_3PinENS0_4ModeENS0_4PullENS0_5SpeedE
+ 303              	.LVL12:
+  29:nopullcontrols.cpp **** }
+ 304              		.loc 1 29 1 view .LVU54
+ 305 0062 16B0     		add	sp, sp, #88
+ 306              		.cfi_def_cfa_offset 8
+ 307              		@ sp needed
+ 308 0064 10BD     		pop	{r4, pc}
+ 309              		.cfi_endproc
+ 310              	.LFE3745:
+ 312              		.text
+ 313              	.Letext0:
+ 314              		.file 5 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/ma
+ 315              		.file 6 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/sy
+ 316              		.file 7 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/st
+ 317              		.file 8 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/lib/gcc/arm-none-eabi/14
+ 318              		.file 9 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c+
+ 319              		.file 10 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 320              		.file 11 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 321              		.file 12 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 322              		.file 13 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 323              		.file 14 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 324              		.file 15 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 325              		.file 16 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 326              		.file 17 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 327              		.file 18 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 328              		.file 19 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 329              		.file 20 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cchVJwoJ.s 			page 13
+
+
+ 330              		.file 21 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 331              		.file 22 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 332              		.file 23 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 333              		.file 24 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 334              		.file 25 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 335              		.file 26 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 336              		.file 27 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/s
+ 337              		.file 28 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/s
+ 338              		.file 29 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/s
+ 339              		.file 30 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/m
+ 340              		.file 31 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/s
+ 341              		.file 32 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 342              		.file 33 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 343              		.file 34 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 344              		.file 35 "dependencies/libDaisy/src/hid/encoder.h"
+ 345              		.file 36 "dependencies/libDaisy/src/dev/max11300.h"
+ 346              		.file 37 "dependencies/libDaisy/src/dev/sr_595.h"
+ 347              		.file 38 "dependencies/libDaisy/src/util/wav_format.h"
+ 348              		.file 39 "dependencies/libDaisy/src/daisy_seed.h"
+ 349              		.file 40 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 350              		.file 41 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/lib/gcc/arm-none-eabi/1
+ 351              		.file 42 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/s
+ 352              		.file 43 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/s
+ 353              		.file 44 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/w
+ 354              		.file 45 "dependencies/libDaisy/Middlewares/Third_Party/FatFs/src/integer.h"
+ 355              		.file 46 "dependencies/libDaisy/Middlewares/Third_Party/FatFs/src/ff.h"
+ 356              		.file 47 "nopullcontrols.h"
+ 357              		.file 48 "<built-in>"
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cchVJwoJ.s 			page 14
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 nopullcontrols.cpp
+C:\Users\Oliver\AppData\Local\Temp\cchVJwoJ.s:20     .text._ZN11perspective12NoPullSwitchC2Ev:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\cchVJwoJ.s:26     .text._ZN11perspective12NoPullSwitchC2Ev:00000000 _ZN11perspective12NoPullSwitchC2Ev
+C:\Users\Oliver\AppData\Local\Temp\cchVJwoJ.s:26     .text._ZN11perspective12NoPullSwitchC2Ev:00000000 _ZN11perspective12NoPullSwitchC1Ev
+C:\Users\Oliver\AppData\Local\Temp\cchVJwoJ.s:78     .text._ZN11perspective12NoPullSwitch4InitEN5daisy3PinEfNS1_6Switch4TypeENS3_8PolarityE:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\cchVJwoJ.s:84     .text._ZN11perspective12NoPullSwitch4InitEN5daisy3PinEfNS1_6Switch4TypeENS3_8PolarityE:00000000 _ZN11perspective12NoPullSwitch4InitEN5daisy3PinEfNS1_6Switch4TypeENS3_8PolarityE
+C:\Users\Oliver\AppData\Local\Temp\cchVJwoJ.s:113    .text._ZN11perspective13NoPullEncoder4InitEN5daisy3PinES2_S2_f:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\cchVJwoJ.s:119    .text._ZN11perspective13NoPullEncoder4InitEN5daisy3PinES2_S2_f:00000000 _ZN11perspective13NoPullEncoder4InitEN5daisy3PinES2_S2_f
+
+UNDEFINED SYMBOLS
+_ZN5daisy6Switch4InitENS_3PinEfNS0_4TypeENS0_8PolarityENS_4GPIO4PullE
+_ZN5daisy7Encoder4InitENS_3PinES1_S1_f
+_ZN5daisy4GPIO4InitENS_3PinENS0_4ModeENS0_4PullENS0_5SpeedE

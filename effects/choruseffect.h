@@ -1,4 +1,5 @@
-#pragma once
+#ifndef PERSPECTIVE_CHORUSEFFECT_H
+#define PERSPECTIVE_CHORUSEFFECT_H
 
 #include "../effect.h"
 #include "daisysp.h"
@@ -23,3 +24,5 @@ private:
 };
 
 } // namespace perspective
+
+#endif // PERSPECTIVE_CHORUSEFFECT_H

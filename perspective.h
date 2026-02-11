@@ -1,7 +1,10 @@
-#pragma once
+#ifndef PERSPECTIVE_PERSPECTIVE_H
+#define PERSPECTIVE_PERSPECTIVE_H
 
 #include "hardware.h"
 #include "ui/ui.h"
+
+#include <vector>
 
 namespace perspective {
 
@@ -13,14 +16,20 @@ public:
     ~Perspective() override;
     
     void Init() override;
+    void Exec() override;
+    void LightLed(bool on);
     
-private:
+    void AudioCallbackImpl(AudioHandle::InputBuffer in, AudioHandle::OutputBuffer out, size_t size);
+    
+protected:
     void RegisterEventListeners();
+    void LoadEffects();
     void toggleBypass();
     void HandleTapTempo();
     
     Hardware hardware;
     Effect* currentEffect_;
+    std::vector<Effect*> effects_;
 
     bool bypassMode_ = true;
     
@@ -31,3 +40,5 @@ private:
 };
 
 } // namespace perspective
+
+#endif // PERSPECTIVE_PERSPECTIVE_H

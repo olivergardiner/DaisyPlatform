@@ -1,4 +1,5 @@
-#pragma once
+#ifndef PERSPECTIVE_AUTOWAHEFFECT_H
+#define PERSPECTIVE_AUTOWAHEFFECT_H
 
 #include "../effect.h"
 #include "daisysp.h"
@@ -24,3 +25,5 @@ private:
 };
 
 } // namespace perspective
+
+#endif // PERSPECTIVE_AUTOWAHEFFECT_H

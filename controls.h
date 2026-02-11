@@ -1,4 +1,5 @@
-#pragma once
+#ifndef PERSPECTIVE_CONTROLS_H
+#define PERSPECTIVE_CONTROLS_H
 
 // Hardware control indices for parameter mapping
 // These indices are used to map effect parameters to physical controls
@@ -50,3 +51,5 @@ namespace perspective {
 #define NUM_TOTAL_BUTTONS   (NUM_SWITCHES + NUM_ENCODERS)  // 6
 
 } // namespace perspective
+
+#endif // PERSPECTIVE_CONTROLS_H

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef PERSPECTIVE_EFFECT_H
+#define PERSPECTIVE_EFFECT_H
 
 #include "effectparameter.h"
 #include <vector>
@@ -53,3 +54,5 @@ protected:
 };
 
 } // namespace perspective
+
+#endif // PERSPECTIVE_EFFECT_H

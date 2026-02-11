@@ -42,11 +42,11 @@ int EffectParameter::GetIndex() const {
 }
 
 void EffectParameter::SetValue(float value) {
-    currentValue_ = std::clamp(value, minValue_, maxValue_);
+    currentValue_ = clamp(value, minValue_, maxValue_);
 }
 
 void EffectParameter::SetNormalizedValue(float normalizedValue) {
-    float clampedNormalized = std::clamp(normalizedValue, 0.0f, 1.0f);
+    float clampedNormalized = clamp(normalizedValue, 0.0f, 1.0f);
     currentValue_ = minValue_ + (clampedNormalized * (maxValue_ - minValue_));
 }
 
@@ -89,7 +89,7 @@ int PotentiometerParameter::GetValueAsInt(int maxInt) const {
     int intValue = static_cast<int>(normalized * maxInt + 0.5f);
     
     // Clamp to ensure we stay within bounds
-    return std::clamp(intValue, 0, maxInt);
+    return clamp(intValue, 0, maxInt);
 }
 
 float PotentiometerParameter::ApplyCurve(float normalizedValue) {
@@ -148,12 +148,12 @@ float EncoderParameter::GetStepSize() const {
 
 void EncoderParameter::Increment(int steps) {
     currentValue_ += steps * stepSize_;
-    currentValue_ = std::clamp(currentValue_, minValue_, maxValue_);
+    currentValue_ = clamp(currentValue_, minValue_, maxValue_);
 }
 
 void EncoderParameter::Decrement(int steps) {
     currentValue_ -= steps * stepSize_;
-    currentValue_ = std::clamp(currentValue_, minValue_, maxValue_);
+    currentValue_ = clamp(currentValue_, minValue_, maxValue_);
 }
 
 ParameterType EncoderParameter::GetType() const {

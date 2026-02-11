@@ -1,4 +1,5 @@
-#pragma once
+#ifndef PERSPECTIVE_UIEVENTHANDLER_H
+#define PERSPECTIVE_UIEVENTHANDLER_H
 
 #include <functional>
 #include <vector>
@@ -21,19 +22,15 @@ struct UIEvent {
     UIEventType type;
     void* source;           // Pointer to the control that triggered the event
     int controlIndex;       // Index of the control (0-based)
-    float value;            // Current value (for knobs)
-    float previousValue;    // Previous value (for change detection)
-    int intValue;           // Integer value (for encoder: positive=CW, negative=CCW)
-    std::string name;       // Name of the control
+    int value;              // Current value (for knobs)
+    int previousValue;      // Previous value (for change detection)
     
     UIEvent()
         : type(UIEventType::KNOB_CHANGED)
         , source(nullptr)
         , controlIndex(-1)
-        , value(0.0f)
-        , previousValue(0.0f)
-        , intValue(0)
-        , name("")
+        , value(0)
+        , previousValue(0)
     {}
 };
 
@@ -80,17 +77,21 @@ public:
     void ClearQueue();
     
     // Create and queue events (interrupt-safe)
-    void QueueKnobChanged(void* knob, int controlIndex, float value, float previousValue, const std::string& name);
-    void QueueButtonPressed(void* button, int controlIndex, const std::string& name);
-    void QueueButtonReleased(void* button, int controlIndex, const std::string& name);
-    void QueueButtonHeld(void* button, int controlIndex, const std::string& name, float holdTimeMs);
-    void QueueEncoderChanged(void* encoder, int controlIndex, int increment, const std::string& name);
+    void QueueKnobChanged(void* knob, int controlIndex, int value, int previousValue);
+    void QueueButtonPressed(void* button, int controlIndex);
+    void QueueButtonReleased(void* button, int controlIndex);
+    void QueueButtonHeld(void* button, int controlIndex, float holdTimeMs);
+    void QueueEncoderChanged(void* encoder, int controlIndex, int increment);
     
     // Remove all listeners
     void ClearListeners();
     
     // Remove listeners for a specific source
     void RemoveListenersForSource(void* source);
+    
+    // Queue delegates
+    void PushEvent(const UIEvent& event);
+    UIEvent PopEvent();
 
 private:
     std::vector<UIEventListener> listeners_;
@@ -101,3 +102,5 @@ private:
 };
 
 } // namespace perspective
+
+#endif // PERSPECTIVE_UIEVENTHANDLER_H
