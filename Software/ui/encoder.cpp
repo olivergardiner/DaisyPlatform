@@ -16,32 +16,40 @@ void Encoder::Init(Pin a, Pin b, Pin click, float update_rate)
     sw_.Init(click, update_rate);
     
     // Set initial states, etc.
-    inc_ = 0;
-    a_ = b_ = 0xff;
+    inc_              = 0;
+    step_accumulator_ = 0;
+    state_            = (hw_a_.Read() << 1) | hw_b_.Read();
 }
 
 void Encoder::Process()
 {
-    // update no faster than 1kHz
-    uint32_t now = System::GetNow();
+    static constexpr int8_t transition_lut[16]
+        = {0, -1, 1, 0, 1, 0, 0, -1, -1, 0, 0, 1, 0, 1, -1, 0};
 
-    if(now - last_update_ >= 1)
+    sw_.Process();
+
+    const uint8_t new_state = (hw_a_.Read() << 1) | hw_b_.Read();
+    const int8_t  delta     = transition_lut[(state_ << 2) | new_state];
+
+    inc_ = 0;
+
+    if(delta == 0)
     {
-        last_update_ = now;
+        state_ = new_state;
+        return;
+    }
 
-        // Read raw hardware states and shift into debounced state
-        a_ = (a_ << 1) | hw_a_.Read();
-        b_ = (b_ << 1) | hw_b_.Read();
+    state_ = new_state;
+    step_accumulator_ += delta;
 
-        // infer increment direction
-        inc_ = 0;
-        if((a_ & 0x03) == 0x02 && (b_ & 0x03) == 0x00)
-        {
-            inc_ = 1;
-        }
-        else if((b_ & 0x03) == 0x02 && (a_ & 0x03) == 0x00)
-        {
-            inc_ = -1;
-        }
+    if(step_accumulator_ >= 4)
+    {
+        inc_ = 1;
+        step_accumulator_ = 0;
+    }
+    else if(step_accumulator_ <= -4)
+    {
+        inc_ = -1;
+        step_accumulator_ = 0;
     }
 }

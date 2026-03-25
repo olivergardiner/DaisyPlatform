@@ -72,7 +72,8 @@ class Encoder
     float    update_rate_;
     Switch   sw_;
     GPIO     hw_a_, hw_b_;
-    uint8_t  a_, b_;
+    uint8_t  state_;
+    int8_t   step_accumulator_;
     int32_t  inc_;
 };
 
