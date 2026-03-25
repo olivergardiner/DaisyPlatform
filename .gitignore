@@ -41,4 +41,4 @@
 *.dwo
 
 # Project build output
-/Software/build/
+Software/build/
