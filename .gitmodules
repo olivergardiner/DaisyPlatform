@@ -1,21 +1,21 @@
 [submodule "dependencies/libDaisy"]
-	path = dependencies/libDaisy
+	path = Software/dependencies/libDaisy
 	url = https://github.com/electro-smith/libDaisy.git
 [submodule "dependencies/DaisySP"]
-	path = dependencies/DaisySP
+	path = Software/dependencies/DaisySP
 	url = https://github.com/electro-smith/DaisySP.git
 [submodule "dependencies/DaisySeedGFX2"]
-	path = dependencies/DaisySeedGFX2
+	path = Software/dependencies/DaisySeedGFX2
 	url = https://github.com/DADDesign-Projects/DaisySeedGFX2.git
 [submodule "dependencies/cycfi/q"]
-	path = dependencies/cycfi/q
+	path = Software/dependencies/cycfi/q
 	url = https://github.com/cycfi/q.git
 [submodule "dependencies/cycfi/infra"]
-	path = dependencies/cycfi/infra
+	path = Software/dependencies/cycfi/infra
 	url = https://github.com/cycfi/infra.git
 [submodule "dependencies/CloudSeedCore"]
-	path = dependencies/CloudSeedCore
+	path = Software/dependencies/CloudSeedCore
 	url = https://github.com/GhostNoteAudio/CloudSeedCore.git
 [submodule "dependencies/NeuralAmpModelerCore"]
-	path = dependencies/NeuralAmpModelerCore
+	path = Software/dependencies/NeuralAmpModelerCore
 	url = https://github.com/sdatkinson/NeuralAmpModelerCore.git
