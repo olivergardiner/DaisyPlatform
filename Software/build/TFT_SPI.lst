@@ -1,0 +1,3551 @@
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s 			page 1
+
+
+   1              		.cpu cortex-m7
+   2              		.arch armv7e-m
+   3              		.fpu fpv5-d16
+   4              		.eabi_attribute 28, 1
+   5              		.eabi_attribute 20, 1
+   6              		.eabi_attribute 21, 1
+   7              		.eabi_attribute 23, 3
+   8              		.eabi_attribute 24, 1
+   9              		.eabi_attribute 25, 1
+  10              		.eabi_attribute 26, 1
+  11              		.eabi_attribute 30, 2
+  12              		.eabi_attribute 34, 1
+  13              		.eabi_attribute 18, 4
+  14              		.file	"TFT_SPI.cpp"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.file 1 "dependencies/DaisySeedGFX2/TFT_SPI.cpp"
+  19              		.section	.text._ZN6DadGFX7TFT_SPI10InitialiseEv,"ax",%progbits
+  20              		.align	1
+  21              		.p2align 2,,3
+  22              		.global	_ZN6DadGFX7TFT_SPI10InitialiseEv
+  23              		.syntax unified
+  24              		.thumb
+  25              		.thumb_func
+  27              	_ZN6DadGFX7TFT_SPI10InitialiseEv:
+  28              	.LVL0:
+  29              	.LFB3748:
+  30              		.file 2 "dependencies/DaisySeedGFX2/ST7789_Defines.h"
+   1:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #pragma once
+   2:dependencies/DaisySeedGFX2/ST7789_Defines.h **** // --------------------------------------------------------------------------
+   3:dependencies/DaisySeedGFX2/ST7789_Defines.h **** // Initialisation de l'écran de type ST7789
+   4:dependencies/DaisySeedGFX2/ST7789_Defines.h **** //   thank:  Adafruit https://github.com/adafruit/Adafruit-ST7735-Library
+   5:dependencies/DaisySeedGFX2/ST7789_Defines.h **** //           and
+   6:dependencies/DaisySeedGFX2/ST7789_Defines.h **** //           TFT_eSPI https://github.com/Bodmer/TFT_eSPI
+   7:dependencies/DaisySeedGFX2/ST7789_Defines.h **** //
+   8:dependencies/DaisySeedGFX2/ST7789_Defines.h **** 
+   9:dependencies/DaisySeedGFX2/ST7789_Defines.h **** // ST7789 specific commands used in init
+  10:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_NOP			0x00
+  11:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_SWRESET		0x01
+  12:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_RDDID		0x04
+  13:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_RDDST		0x09
+  14:dependencies/DaisySeedGFX2/ST7789_Defines.h **** 
+  15:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_RDDPM		0x0A        // Read display power mode
+  16:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_RDD_MADCTL	0x0B      // Read display MADCTL
+  17:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_RDD_COLMOD	0x0C      // Read display pixel format
+  18:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_RDDIM		0x0D        // Read display image mode
+  19:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_RDDSM		0x0E        // Read display signal mode
+  20:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_RDDSR		0x0F        // Read display self-diagnostic result (ST7789V)
+  21:dependencies/DaisySeedGFX2/ST7789_Defines.h **** 
+  22:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_SLPIN		0x10
+  23:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_SLPOUT		0x11
+  24:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_PTLON		0x12
+  25:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_NORON		0x13
+  26:dependencies/DaisySeedGFX2/ST7789_Defines.h **** 
+  27:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_INVOFF		0x20
+  28:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_INVON		0x21
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s 			page 2
+
+
+  29:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_GAMSET		0x26        // Gamma set
+  30:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_DISPOFF	        0x28
+  31:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_DISPON		0x29
+  32:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_CASET		0x2A
+  33:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_RASET		0x2B
+  34:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_RAMWR		0x2C
+  35:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_RGBSET		0x2D      // Color setting for 4096, 64K and 262K colors
+  36:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_RAMRD		0x2E
+  37:dependencies/DaisySeedGFX2/ST7789_Defines.h **** 
+  38:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_PTLAR		0x30
+  39:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_VSCRDEF		0x33      // Vertical scrolling definition (ST7789V)
+  40:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_TEOFF		0x34      // Tearing effect line off
+  41:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_TEON			0x35      // Tearing effect line on
+  42:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_MADCTL		0x36      // Memory data access control
+  43:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_VSCRSADD		0x37      // Vertical screoll address
+  44:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_IDMOFF		0x38      // Idle mode off
+  45:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_IDMON		0x39      // Idle mode on
+  46:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_RAMWRC		0x3C      // Memory write continue (ST7789V)
+  47:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_RAMRDC		0x3E      // Memory read continue (ST7789V)
+  48:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_COLMOD		0x3A
+  49:dependencies/DaisySeedGFX2/ST7789_Defines.h **** 
+  50:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_RAMCTRL		0xB0      // RAM control
+  51:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_RGBCTRL		0xB1      // RGB control
+  52:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_PORCTRL		0xB2      // Porch control
+  53:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_FRCTRL1		0xB3      // Frame rate control
+  54:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_PARCTRL		0xB5      // Partial mode control
+  55:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_GCTRL		0xB7      // Gate control
+  56:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_GTADJ		0xB8      // Gate on timing adjustment
+  57:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_DGMEN		0xBA      // Digital gamma enable
+  58:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_VCOMS		0xBB      // VCOMS setting
+  59:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_LCMCTRL		0xC0      // LCM control
+  60:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_IDSET		0xC1      // ID setting
+  61:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_VDVVRHEN		0xC2      // VDV and VRH command enable
+  62:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_VRHS			0xC3      // VRH set
+  63:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_VDVSET		0xC4      // VDV setting
+  64:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_VCMOFSET		0xC5      // VCOMS offset set
+  65:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_FRCTR2		0xC6      // FR Control 2
+  66:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_CABCCTRL		0xC7      // CABC control
+  67:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_REGSEL1		0xC8      // Register value section 1
+  68:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_REGSEL2		0xCA      // Register value section 2
+  69:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_PWMFRSEL		0xCC      // PWM frequency selection
+  70:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_PWCTRL1		0xD0      // Power control 1
+  71:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_VAPVANEN		0xD2      // Enable VAP/VAN signal output
+  72:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_CMD2EN		0xDF      // Command 2 enable
+  73:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_PVGAMCTRL	0xE0      // Positive voltage gamma control
+  74:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_NVGAMCTRL	0xE1      // Negative voltage gamma control
+  75:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_DGMLUTR		0xE2      // Digital gamma look-up table for red
+  76:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_DGMLUTB		0xE3      // Digital gamma look-up table for blue
+  77:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_GATECTRL		0xE4      // Gate control
+  78:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_SPI2EN		0xE7      // SPI2 enable
+  79:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_PWCTRL2		0xE8      // Power control 2
+  80:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_EQCTRL		0xE9      // Equalize time control
+  81:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_PROMCTRL		0xEC      // Program control
+  82:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_PROMEN		0xFA      // Program mode enable
+  83:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_NVMSET		0xFC      // NVM setting
+  84:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define ST7789_PROMACT		0xFE      // Program action
+  85:dependencies/DaisySeedGFX2/ST7789_Defines.h **** 
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s 			page 3
+
+
+  86:dependencies/DaisySeedGFX2/ST7789_Defines.h **** //#define TFT_MAD_COLOR_ORDER TFT_MAD_RGB
+  87:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #define TFT_MAD_COLOR_ORDER TFT_MAD_BGR
+  88:dependencies/DaisySeedGFX2/ST7789_Defines.h **** 
+  89:dependencies/DaisySeedGFX2/ST7789_Defines.h **** // --------------------------------------------------------------------------
+  90:dependencies/DaisySeedGFX2/ST7789_Defines.h **** // Initialisation de l'écran de type ST7789
+  91:dependencies/DaisySeedGFX2/ST7789_Defines.h **** 
+  92:dependencies/DaisySeedGFX2/ST7789_Defines.h ****  void DadGFX::TFT_SPI::Initialise(){
+  31              		.loc 2 92 36 view -0
+  32              		.cfi_startproc
+  33              		@ args = 0, pretend = 0, frame = 8
+  34              		@ frame_needed = 0, uses_anonymous_args = 0
+  35              		.loc 2 92 36 is_stmt 0 view .LVU1
+  36 0000 2DE9F04F 		push	{r4, r5, r6, r7, r8, r9, r10, fp, lr}
+  37              		.cfi_def_cfa_offset 36
+  38              		.cfi_offset 4, -36
+  39              		.cfi_offset 5, -32
+  40              		.cfi_offset 6, -28
+  41              		.cfi_offset 7, -24
+  42              		.cfi_offset 8, -20
+  43              		.cfi_offset 9, -16
+  44              		.cfi_offset 10, -12
+  45              		.cfi_offset 11, -8
+  46              		.cfi_offset 14, -4
+  47              	.LBB138:
+  48              	.LBB139:
+  49              		.file 3 "dependencies/DaisySeedGFX2/TFT_SPI.h"
+   1:dependencies/DaisySeedGFX2/TFT_SPI.h **** //------------------------------------------------------------------------
+   2:dependencies/DaisySeedGFX2/TFT_SPI.h **** // TFT_SPI.h
+   3:dependencies/DaisySeedGFX2/TFT_SPI.h **** //  Management of an SPI connection to a TFT screen
+   4:dependencies/DaisySeedGFX2/TFT_SPI.h **** // Copyright(c) 2024 Dad Design.
+   5:dependencies/DaisySeedGFX2/TFT_SPI.h **** //------------------------------------------------------------------------
+   6:dependencies/DaisySeedGFX2/TFT_SPI.h **** #pragma once
+   7:dependencies/DaisySeedGFX2/TFT_SPI.h **** #include "daisy_seed.h"
+   8:dependencies/DaisySeedGFX2/TFT_SPI.h **** #include "per/spi.h"
+   9:dependencies/DaisySeedGFX2/TFT_SPI.h **** #include "per/gpio.h"
+  10:dependencies/DaisySeedGFX2/TFT_SPI.h **** #include "sys/system.h"
+  11:dependencies/DaisySeedGFX2/TFT_SPI.h **** #include "../UserConfig.h"
+  12:dependencies/DaisySeedGFX2/TFT_SPI.h **** 
+  13:dependencies/DaisySeedGFX2/TFT_SPI.h **** // TFT Generic commands
+  14:dependencies/DaisySeedGFX2/TFT_SPI.h **** #define TFT_NOP     0x00    // No operation
+  15:dependencies/DaisySeedGFX2/TFT_SPI.h **** #define TFT_SWRST   0x01    // Software reset
+  16:dependencies/DaisySeedGFX2/TFT_SPI.h **** 
+  17:dependencies/DaisySeedGFX2/TFT_SPI.h **** #define TFT_INVOFF  0x20    // Disable inversion
+  18:dependencies/DaisySeedGFX2/TFT_SPI.h **** #define TFT_INVON   0x21    // Enable inversion
+  19:dependencies/DaisySeedGFX2/TFT_SPI.h **** 
+  20:dependencies/DaisySeedGFX2/TFT_SPI.h **** #define TFT_DISPOFF 0x28    // Turn display off
+  21:dependencies/DaisySeedGFX2/TFT_SPI.h **** #define TFT_DISPON  0x29    // Turn display on
+  22:dependencies/DaisySeedGFX2/TFT_SPI.h **** 
+  23:dependencies/DaisySeedGFX2/TFT_SPI.h **** #define TFT_CASET   0x2A    // Set column address
+  24:dependencies/DaisySeedGFX2/TFT_SPI.h **** #define TFT_RASET   0x2B    // Set row address
+  25:dependencies/DaisySeedGFX2/TFT_SPI.h **** #define TFT_RAMWR   0x2C    // Write to display RAM
+  26:dependencies/DaisySeedGFX2/TFT_SPI.h **** 
+  27:dependencies/DaisySeedGFX2/TFT_SPI.h **** #define TFT_MADCTL  0x36    // Memory access control
+  28:dependencies/DaisySeedGFX2/TFT_SPI.h **** #define TFT_MAD_MY  0x80    // Row address order
+  29:dependencies/DaisySeedGFX2/TFT_SPI.h **** #define TFT_MAD_MX  0x40    // Column address order
+  30:dependencies/DaisySeedGFX2/TFT_SPI.h **** #define TFT_MAD_MV  0x20    // Row/Column exchange
+  31:dependencies/DaisySeedGFX2/TFT_SPI.h **** #define TFT_MAD_ML  0x10    // Vertical refresh order
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s 			page 4
+
+
+  32:dependencies/DaisySeedGFX2/TFT_SPI.h **** #define TFT_MAD_BGR 0x08    // Blue-Green-Red pixel order
+  33:dependencies/DaisySeedGFX2/TFT_SPI.h **** #define TFT_MAD_MH  0x04    // Horizontal refresh order
+  34:dependencies/DaisySeedGFX2/TFT_SPI.h **** #define TFT_MAD_RGB 0x00    // Red-Green-Blue pixel order
+  35:dependencies/DaisySeedGFX2/TFT_SPI.h **** 
+  36:dependencies/DaisySeedGFX2/TFT_SPI.h **** using namespace daisy;
+  37:dependencies/DaisySeedGFX2/TFT_SPI.h **** extern DaisySeed hw;
+  38:dependencies/DaisySeedGFX2/TFT_SPI.h **** 
+  39:dependencies/DaisySeedGFX2/TFT_SPI.h **** enum class SPIMode {
+  40:dependencies/DaisySeedGFX2/TFT_SPI.h ****     Mode0, // SPI Mode 0
+  41:dependencies/DaisySeedGFX2/TFT_SPI.h ****     Mode1, // SPI Mode 1
+  42:dependencies/DaisySeedGFX2/TFT_SPI.h ****     Mode2, // SPI Mode 2
+  43:dependencies/DaisySeedGFX2/TFT_SPI.h ****     Mode3  // SPI Mode 3
+  44:dependencies/DaisySeedGFX2/TFT_SPI.h **** };
+  45:dependencies/DaisySeedGFX2/TFT_SPI.h **** 
+  46:dependencies/DaisySeedGFX2/TFT_SPI.h **** enum class Rotation {
+  47:dependencies/DaisySeedGFX2/TFT_SPI.h ****     Degre_0,     // 0-degree rotation
+  48:dependencies/DaisySeedGFX2/TFT_SPI.h ****     Degre_90,    // 90-degree rotation
+  49:dependencies/DaisySeedGFX2/TFT_SPI.h ****     Degre_180,   // 180-degree rotation
+  50:dependencies/DaisySeedGFX2/TFT_SPI.h ****     Degre_270    // 270-degree rotation
+  51:dependencies/DaisySeedGFX2/TFT_SPI.h **** };
+  52:dependencies/DaisySeedGFX2/TFT_SPI.h **** 
+  53:dependencies/DaisySeedGFX2/TFT_SPI.h **** // Configuration of GPIOs used
+  54:dependencies/DaisySeedGFX2/TFT_SPI.h **** #define _TFT_SPI_PORT SpiHandle::Config::Peripheral::TFT_SPI_PORT
+  55:dependencies/DaisySeedGFX2/TFT_SPI.h **** #define _TFT_SPI_MODE SPIMode::TFT_SPI_MODE
+  56:dependencies/DaisySeedGFX2/TFT_SPI.h **** 
+  57:dependencies/DaisySeedGFX2/TFT_SPI.h **** // GPIO configurations for TFT
+  58:dependencies/DaisySeedGFX2/TFT_SPI.h **** #define _TFT_MOSI seed::TFT_MOSI  // MOSI pin
+  59:dependencies/DaisySeedGFX2/TFT_SPI.h **** #define _TFT_SCLK seed::TFT_SCLK  // Clock pin
+  60:dependencies/DaisySeedGFX2/TFT_SPI.h **** #define _TFT_DC   seed::TFT_DC    // Data/Command pin
+  61:dependencies/DaisySeedGFX2/TFT_SPI.h **** #define _TFT_RST  seed::TFT_RST   // Reset pin
+  62:dependencies/DaisySeedGFX2/TFT_SPI.h **** 
+  63:dependencies/DaisySeedGFX2/TFT_SPI.h **** namespace DadGFX {
+  64:dependencies/DaisySeedGFX2/TFT_SPI.h **** 
+  65:dependencies/DaisySeedGFX2/TFT_SPI.h **** //***********************************************************************************
+  66:dependencies/DaisySeedGFX2/TFT_SPI.h **** // TFT_SPI
+  67:dependencies/DaisySeedGFX2/TFT_SPI.h **** //  SPI management for communication with the TFT screen
+  68:dependencies/DaisySeedGFX2/TFT_SPI.h **** //*********************************************************************************** 
+  69:dependencies/DaisySeedGFX2/TFT_SPI.h **** class TFT_SPI {
+  70:dependencies/DaisySeedGFX2/TFT_SPI.h ****     public :
+  71:dependencies/DaisySeedGFX2/TFT_SPI.h **** 
+  72:dependencies/DaisySeedGFX2/TFT_SPI.h ****     // --------------------------------------------------------------------------
+  73:dependencies/DaisySeedGFX2/TFT_SPI.h ****     // Initialize SPI communication
+  74:dependencies/DaisySeedGFX2/TFT_SPI.h ****     void Init_TFT_SPI();
+  75:dependencies/DaisySeedGFX2/TFT_SPI.h **** 
+  76:dependencies/DaisySeedGFX2/TFT_SPI.h ****     // --------------------------------------------------------------------------
+  77:dependencies/DaisySeedGFX2/TFT_SPI.h ****     // Initialize the TFT screen
+  78:dependencies/DaisySeedGFX2/TFT_SPI.h ****     void Initialise();
+  79:dependencies/DaisySeedGFX2/TFT_SPI.h **** 
+  80:dependencies/DaisySeedGFX2/TFT_SPI.h ****     // --------------------------------------------------------------------------
+  81:dependencies/DaisySeedGFX2/TFT_SPI.h ****     // Change the screen orientation
+  82:dependencies/DaisySeedGFX2/TFT_SPI.h ****     void setTFTRotation(Rotation r);
+  83:dependencies/DaisySeedGFX2/TFT_SPI.h **** 
+  84:dependencies/DaisySeedGFX2/TFT_SPI.h ****     // --------------------------------------------------------------------------
+  85:dependencies/DaisySeedGFX2/TFT_SPI.h ****     // Send a command to the TFT screen
+  86:dependencies/DaisySeedGFX2/TFT_SPI.h ****     inline void SendCommand(uint8_t cmd) {
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(false);  // Set DC pin to command mode
+  50              		.loc 3 87 19 view .LVU2
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s 			page 5
+
+
+  51 0004 00F14006 		add	r6, r0, #64
+  52              	.LBE139:
+  53              	.LBE138:
+  54              		.loc 2 92 36 view .LVU3
+  55 0008 83B0     		sub	sp, sp, #12
+  56              		.cfi_def_cfa_offset 48
+  57              		.loc 2 92 36 view .LVU4
+  58 000a 0546     		mov	r5, r0
+  93:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     
+  94:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendCommand(ST7789_SLPOUT);   // Sleep out
+  59              		.loc 2 94 5 is_stmt 1 view .LVU5
+  60              	.LVL1:
+  61              		.loc 2 94 5 is_stmt 0 view .LVU6
+  62 000c 1123     		movs	r3, #17
+  63              	.LBB142:
+  64              	.LBB140:
+  65              		.loc 3 87 19 view .LVU7
+  66 000e 3046     		mov	r0, r6
+  67              	.LVL2:
+  68              		.loc 3 87 19 view .LVU8
+  69 0010 0021     		movs	r1, #0
+  70 0012 8DF80730 		strb	r3, [sp, #7]
+  71              	.LVL3:
+  72              		.loc 3 87 19 view .LVU9
+  73              	.LBE140:
+  74              	.LBI138:
+  86:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(false);  // Set DC pin to command mode
+  75              		.loc 3 86 17 is_stmt 1 view .LVU10
+  76              	.LBB141:
+  77              		.loc 3 87 9 view .LVU11
+  78              		.loc 3 87 19 is_stmt 0 view .LVU12
+  79 0016 FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+  80              	.LVL4:
+  88:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+  81              		.loc 3 88 9 is_stmt 1 view .LVU13
+  82              		.loc 3 88 31 is_stmt 0 view .LVU14
+  83 001a 0122     		movs	r2, #1
+  84 001c 0DF10701 		add	r1, sp, #7
+  85 0020 6423     		movs	r3, #100
+  86 0022 2846     		mov	r0, r5
+  87 0024 FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+  88              	.LVL5:
+  89              		.loc 3 88 31 view .LVU15
+  90              	.LBE141:
+  91              	.LBE142:
+  95:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     System::Delay(120);
+  92              		.loc 2 95 5 is_stmt 1 view .LVU16
+  93              		.loc 2 95 18 is_stmt 0 view .LVU17
+  94 0028 7820     		movs	r0, #120
+  95 002a FFF7FEFF 		bl	_ZN5daisy6System5DelayEm
+  96              	.LVL6:
+  96:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendCommand(ST7789_NORON);    // Normal display mode on
+  97              		.loc 2 96 5 is_stmt 1 view .LVU18
+  98              		.loc 2 96 5 is_stmt 0 view .LVU19
+  99 002e 1323     		movs	r3, #19
+ 100              	.LBB143:
+ 101              	.LBB144:
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s 			page 6
+
+
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 102              		.loc 3 87 19 view .LVU20
+ 103 0030 3046     		mov	r0, r6
+ 104 0032 0021     		movs	r1, #0
+ 105 0034 8DF80730 		strb	r3, [sp, #7]
+ 106              	.LVL7:
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 107              		.loc 3 87 19 view .LVU21
+ 108              	.LBE144:
+ 109              	.LBI143:
+  86:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(false);  // Set DC pin to command mode
+ 110              		.loc 3 86 17 is_stmt 1 view .LVU22
+ 111              	.LBB145:
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 112              		.loc 3 87 9 view .LVU23
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 113              		.loc 3 87 19 is_stmt 0 view .LVU24
+ 114 0038 FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 115              	.LVL8:
+ 116              		.loc 3 88 9 is_stmt 1 view .LVU25
+ 117              		.loc 3 88 31 is_stmt 0 view .LVU26
+ 118 003c 0122     		movs	r2, #1
+ 119 003e 0DF10701 		add	r1, sp, #7
+ 120 0042 6423     		movs	r3, #100
+ 121 0044 2846     		mov	r0, r5
+ 122 0046 FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+ 123              	.LVL9:
+ 124              		.loc 3 88 31 view .LVU27
+ 125              	.LBE145:
+ 126              	.LBE143:
+  97:dependencies/DaisySeedGFX2/ST7789_Defines.h **** 
+  98:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     //------------------------------display and color format setting-------------------------------
+  99:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendCommand(ST7789_MADCTL);
+ 127              		.loc 2 99 5 is_stmt 1 view .LVU28
+ 128              		.loc 2 99 5 is_stmt 0 view .LVU29
+ 129 004a 3623     		movs	r3, #54
+ 130              	.LBB146:
+ 131              	.LBB147:
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 132              		.loc 3 87 19 view .LVU30
+ 133 004c 3046     		mov	r0, r6
+ 134 004e 0021     		movs	r1, #0
+ 135 0050 8DF80730 		strb	r3, [sp, #7]
+ 136              	.LVL10:
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 137              		.loc 3 87 19 view .LVU31
+ 138              	.LBE147:
+ 139              	.LBI146:
+  86:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(false);  // Set DC pin to command mode
+ 140              		.loc 3 86 17 is_stmt 1 view .LVU32
+ 141              	.LBB148:
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 142              		.loc 3 87 9 view .LVU33
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 143              		.loc 3 87 19 is_stmt 0 view .LVU34
+ 144 0054 FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 145              	.LVL11:
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s 			page 7
+
+
+ 146              		.loc 3 88 9 is_stmt 1 view .LVU35
+ 147              		.loc 3 88 31 is_stmt 0 view .LVU36
+ 148 0058 0122     		movs	r2, #1
+ 149 005a 0DF10701 		add	r1, sp, #7
+ 150 005e 6423     		movs	r3, #100
+ 151 0060 2846     		mov	r0, r5
+ 152 0062 FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+ 153              	.LVL12:
+ 154              		.loc 3 88 31 view .LVU37
+ 155              	.LBE148:
+ 156              	.LBE146:
+ 100:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(TFT_MAD_COLOR_ORDER);
+ 157              		.loc 2 100 5 is_stmt 1 view .LVU38
+ 158              		.loc 2 100 5 is_stmt 0 view .LVU39
+ 159 0066 0823     		movs	r3, #8
+ 160              	.LBB149:
+ 161              	.LBB150:
+  89:dependencies/DaisySeedGFX2/TFT_SPI.h ****     }
+  90:dependencies/DaisySeedGFX2/TFT_SPI.h **** 
+  91:dependencies/DaisySeedGFX2/TFT_SPI.h ****     // --------------------------------------------------------------------------
+  92:dependencies/DaisySeedGFX2/TFT_SPI.h ****     // Send a single data byte to the TFT screen
+  93:dependencies/DaisySeedGFX2/TFT_SPI.h ****     inline void SendData(uint8_t Data) {
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(true);  // Set DC pin to data mode
+ 162              		.loc 3 94 19 view .LVU40
+ 163 0068 3046     		mov	r0, r6
+ 164 006a 0121     		movs	r1, #1
+ 165 006c 8DF80730 		strb	r3, [sp, #7]
+ 166              	.LVL13:
+ 167              		.loc 3 94 19 view .LVU41
+ 168              	.LBE150:
+ 169              	.LBI149:
+  93:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(true);  // Set DC pin to data mode
+ 170              		.loc 3 93 17 is_stmt 1 view .LVU42
+ 171              	.LBB151:
+ 172              		.loc 3 94 9 view .LVU43
+ 173              		.loc 3 94 19 is_stmt 0 view .LVU44
+ 174 0070 FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 175              	.LVL14:
+  95:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 176              		.loc 3 95 9 is_stmt 1 view .LVU45
+ 177              		.loc 3 95 31 is_stmt 0 view .LVU46
+ 178 0074 0122     		movs	r2, #1
+ 179 0076 0DF10701 		add	r1, sp, #7
+ 180 007a 6423     		movs	r3, #100
+ 181 007c 2846     		mov	r0, r5
+ 182 007e FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+ 183              	.LVL15:
+ 184              		.loc 3 95 31 view .LVU47
+ 185              	.LBE151:
+ 186              	.LBE149:
+ 101:dependencies/DaisySeedGFX2/ST7789_Defines.h **** 
+ 102:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     // JLX240 display datasheet
+ 103:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendCommand(0xB6);
+ 187              		.loc 2 103 5 is_stmt 1 view .LVU48
+ 188              		.loc 2 103 5 is_stmt 0 view .LVU49
+ 189 0082 B623     		movs	r3, #182
+ 190              	.LBB152:
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s 			page 8
+
+
+ 191              	.LBB153:
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 192              		.loc 3 87 19 view .LVU50
+ 193 0084 3046     		mov	r0, r6
+ 194 0086 0021     		movs	r1, #0
+ 195 0088 4FF00A08 		mov	r8, #10
+ 196 008c 8DF80730 		strb	r3, [sp, #7]
+ 197              	.LVL16:
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 198              		.loc 3 87 19 view .LVU51
+ 199              	.LBE153:
+ 200              	.LBI152:
+  86:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(false);  // Set DC pin to command mode
+ 201              		.loc 3 86 17 is_stmt 1 view .LVU52
+ 202              	.LBB154:
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 203              		.loc 3 87 9 view .LVU53
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 204              		.loc 3 87 19 is_stmt 0 view .LVU54
+ 205 0090 FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 206              	.LVL17:
+  88:dependencies/DaisySeedGFX2/TFT_SPI.h ****     }
+ 207              		.loc 3 88 9 is_stmt 1 view .LVU55
+  88:dependencies/DaisySeedGFX2/TFT_SPI.h ****     }
+ 208              		.loc 3 88 31 is_stmt 0 view .LVU56
+ 209 0094 6423     		movs	r3, #100
+ 210 0096 0122     		movs	r2, #1
+ 211 0098 0DF10701 		add	r1, sp, #7
+ 212 009c 2846     		mov	r0, r5
+ 213 009e 0027     		movs	r7, #0
+ 214 00a0 FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+ 215              	.LVL18:
+  88:dependencies/DaisySeedGFX2/TFT_SPI.h ****     }
+ 216              		.loc 3 88 31 view .LVU57
+ 217              	.LBE154:
+ 218              	.LBE152:
+ 104:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x0A);
+ 219              		.loc 2 104 5 is_stmt 1 view .LVU58
+ 220              	.LBB155:
+ 221              	.LBB156:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 222              		.loc 3 94 19 is_stmt 0 view .LVU59
+ 223 00a4 3046     		mov	r0, r6
+ 224 00a6 0121     		movs	r1, #1
+ 225 00a8 8DF80780 		strb	r8, [sp, #7]
+ 226              	.LVL19:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 227              		.loc 3 94 19 view .LVU60
+ 228              	.LBE156:
+ 229              	.LBI155:
+  93:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(true);  // Set DC pin to data mode
+ 230              		.loc 3 93 17 is_stmt 1 view .LVU61
+ 231              	.LBB157:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 232              		.loc 3 94 9 view .LVU62
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 233              		.loc 3 94 19 is_stmt 0 view .LVU63
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s 			page 9
+
+
+ 234 00ac FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 235              	.LVL20:
+ 236              		.loc 3 95 9 is_stmt 1 view .LVU64
+ 237              		.loc 3 95 31 is_stmt 0 view .LVU65
+ 238 00b0 0122     		movs	r2, #1
+ 239 00b2 0DF10701 		add	r1, sp, #7
+ 240 00b6 6423     		movs	r3, #100
+ 241 00b8 2846     		mov	r0, r5
+ 242 00ba 4FF0C009 		mov	r9, #192
+ 243 00be FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+ 244              	.LVL21:
+ 245              		.loc 3 95 31 view .LVU66
+ 246              	.LBE157:
+ 247              	.LBE155:
+ 105:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x82);
+ 248              		.loc 2 105 5 is_stmt 1 view .LVU67
+ 249              		.loc 2 105 5 is_stmt 0 view .LVU68
+ 250 00c2 8223     		movs	r3, #130
+ 251              	.LBB158:
+ 252              	.LBB159:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 253              		.loc 3 94 19 view .LVU69
+ 254 00c4 3046     		mov	r0, r6
+ 255 00c6 0121     		movs	r1, #1
+ 256 00c8 8DF80730 		strb	r3, [sp, #7]
+ 257              	.LVL22:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 258              		.loc 3 94 19 view .LVU70
+ 259              	.LBE159:
+ 260              	.LBI158:
+  93:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(true);  // Set DC pin to data mode
+ 261              		.loc 3 93 17 is_stmt 1 view .LVU71
+ 262              	.LBB160:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 263              		.loc 3 94 9 view .LVU72
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 264              		.loc 3 94 19 is_stmt 0 view .LVU73
+ 265 00cc FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 266              	.LVL23:
+ 267              		.loc 3 95 9 is_stmt 1 view .LVU74
+ 268              		.loc 3 95 31 is_stmt 0 view .LVU75
+ 269 00d0 6423     		movs	r3, #100
+ 270 00d2 0122     		movs	r2, #1
+ 271 00d4 0DF10701 		add	r1, sp, #7
+ 272 00d8 2846     		mov	r0, r5
+ 273 00da FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+ 274              	.LVL24:
+ 275              		.loc 3 95 31 view .LVU76
+ 276              	.LBE160:
+ 277              	.LBE158:
+ 106:dependencies/DaisySeedGFX2/ST7789_Defines.h **** 
+ 107:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     //SendCommand(ST7789_RAMCTRL);
+ 108:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x00);
+ 278              		.loc 2 108 5 is_stmt 1 view .LVU77
+ 279              	.LBB161:
+ 280              	.LBB162:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s 			page 10
+
+
+ 281              		.loc 3 94 19 is_stmt 0 view .LVU78
+ 282 00de 3046     		mov	r0, r6
+ 283 00e0 0121     		movs	r1, #1
+ 284 00e2 8DF80770 		strb	r7, [sp, #7]
+ 285              	.LVL25:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 286              		.loc 3 94 19 view .LVU79
+ 287              	.LBE162:
+ 288              	.LBI161:
+  93:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(true);  // Set DC pin to data mode
+ 289              		.loc 3 93 17 is_stmt 1 view .LVU80
+ 290              	.LBB163:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 291              		.loc 3 94 9 view .LVU81
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 292              		.loc 3 94 19 is_stmt 0 view .LVU82
+ 293 00e6 FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 294              	.LVL26:
+ 295              		.loc 3 95 9 is_stmt 1 view .LVU83
+ 296              		.loc 3 95 31 is_stmt 0 view .LVU84
+ 297 00ea 6423     		movs	r3, #100
+ 298 00ec 0122     		movs	r2, #1
+ 299 00ee 0DF10701 		add	r1, sp, #7
+ 300 00f2 2846     		mov	r0, r5
+ 301 00f4 0C24     		movs	r4, #12
+ 302 00f6 FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+ 303              	.LVL27:
+ 304              		.loc 3 95 31 view .LVU85
+ 305              	.LBE163:
+ 306              	.LBE161:
+ 109:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0xC0); // 5 to 6-bit conversion: r0 = r5, b0 = b5
+ 307              		.loc 2 109 5 is_stmt 1 view .LVU86
+ 308              	.LBB164:
+ 309              	.LBB165:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 310              		.loc 3 94 19 is_stmt 0 view .LVU87
+ 311 00fa 3046     		mov	r0, r6
+ 312 00fc 0121     		movs	r1, #1
+ 313 00fe 8DF80790 		strb	r9, [sp, #7]
+ 314              	.LVL28:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 315              		.loc 3 94 19 view .LVU88
+ 316              	.LBE165:
+ 317              	.LBI164:
+  93:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(true);  // Set DC pin to data mode
+ 318              		.loc 3 93 17 is_stmt 1 view .LVU89
+ 319              	.LBB166:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 320              		.loc 3 94 9 view .LVU90
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 321              		.loc 3 94 19 is_stmt 0 view .LVU91
+ 322 0102 FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 323              	.LVL29:
+ 324              		.loc 3 95 9 is_stmt 1 view .LVU92
+ 325              		.loc 3 95 31 is_stmt 0 view .LVU93
+ 326 0106 0122     		movs	r2, #1
+ 327 0108 0DF10701 		add	r1, sp, #7
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s 			page 11
+
+
+ 328 010c 6423     		movs	r3, #100
+ 329 010e 2846     		mov	r0, r5
+ 330 0110 4FF0330A 		mov	r10, #51
+ 331 0114 FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+ 332              	.LVL30:
+ 333              		.loc 3 95 31 view .LVU94
+ 334              	.LBE166:
+ 335              	.LBE164:
+ 110:dependencies/DaisySeedGFX2/ST7789_Defines.h **** 
+ 111:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendCommand(ST7789_COLMOD);
+ 336              		.loc 2 111 5 is_stmt 1 view .LVU95
+ 337              		.loc 2 111 5 is_stmt 0 view .LVU96
+ 338 0118 3A23     		movs	r3, #58
+ 339              	.LBB167:
+ 340              	.LBB168:
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 341              		.loc 3 87 19 view .LVU97
+ 342 011a 3946     		mov	r1, r7
+ 343 011c 3046     		mov	r0, r6
+ 344 011e 8DF80730 		strb	r3, [sp, #7]
+ 345              	.LVL31:
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 346              		.loc 3 87 19 view .LVU98
+ 347              	.LBE168:
+ 348              	.LBI167:
+  86:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(false);  // Set DC pin to command mode
+ 349              		.loc 3 86 17 is_stmt 1 view .LVU99
+ 350              	.LBB169:
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 351              		.loc 3 87 9 view .LVU100
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 352              		.loc 3 87 19 is_stmt 0 view .LVU101
+ 353 0122 FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 354              	.LVL32:
+  88:dependencies/DaisySeedGFX2/TFT_SPI.h ****     }
+ 355              		.loc 3 88 9 is_stmt 1 view .LVU102
+  88:dependencies/DaisySeedGFX2/TFT_SPI.h ****     }
+ 356              		.loc 3 88 31 is_stmt 0 view .LVU103
+ 357 0126 0122     		movs	r2, #1
+ 358 0128 0DF10701 		add	r1, sp, #7
+ 359 012c 6423     		movs	r3, #100
+ 360 012e 2846     		mov	r0, r5
+ 361 0130 FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+ 362              	.LVL33:
+  88:dependencies/DaisySeedGFX2/TFT_SPI.h ****     }
+ 363              		.loc 3 88 31 view .LVU104
+ 364              	.LBE169:
+ 365              	.LBE167:
+ 112:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #if TFT_COLOR == 16
+ 113:dependencies/DaisySeedGFX2/ST7789_Defines.h ****         SendData(0x55);
+ 366              		.loc 2 113 9 is_stmt 1 view .LVU105
+ 367              		.loc 2 113 9 is_stmt 0 view .LVU106
+ 368 0134 5523     		movs	r3, #85
+ 369              	.LBB170:
+ 370              	.LBB171:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 371              		.loc 3 94 19 view .LVU107
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s 			page 12
+
+
+ 372 0136 3046     		mov	r0, r6
+ 373 0138 0121     		movs	r1, #1
+ 374 013a 8DF80730 		strb	r3, [sp, #7]
+ 375              	.LVL34:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 376              		.loc 3 94 19 view .LVU108
+ 377              	.LBE171:
+ 378              	.LBI170:
+  93:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(true);  // Set DC pin to data mode
+ 379              		.loc 3 93 17 is_stmt 1 view .LVU109
+ 380              	.LBB172:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 381              		.loc 3 94 9 view .LVU110
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 382              		.loc 3 94 19 is_stmt 0 view .LVU111
+ 383 013e FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 384              	.LVL35:
+ 385              		.loc 3 95 9 is_stmt 1 view .LVU112
+ 386              		.loc 3 95 31 is_stmt 0 view .LVU113
+ 387 0142 0122     		movs	r2, #1
+ 388 0144 0DF10701 		add	r1, sp, #7
+ 389 0148 6423     		movs	r3, #100
+ 390 014a 2846     		mov	r0, r5
+ 391 014c FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+ 392              	.LVL36:
+ 393              		.loc 3 95 31 view .LVU114
+ 394              	.LBE172:
+ 395              	.LBE170:
+ 114:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #else
+ 115:dependencies/DaisySeedGFX2/ST7789_Defines.h ****         SendData(0x66);
+ 116:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #endif
+ 117:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     System::Delay(10);
+ 396              		.loc 2 117 5 is_stmt 1 view .LVU115
+ 397              		.loc 2 117 18 is_stmt 0 view .LVU116
+ 398 0150 4046     		mov	r0, r8
+ 399 0152 FFF7FEFF 		bl	_ZN5daisy6System5DelayEm
+ 400              	.LVL37:
+ 118:dependencies/DaisySeedGFX2/ST7789_Defines.h **** 
+ 119:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     //--------------------------------ST7789V Frame rate setting----------------------------------/
+ 120:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendCommand(ST7789_PORCTRL);
+ 401              		.loc 2 120 5 is_stmt 1 view .LVU117
+ 402              		.loc 2 120 5 is_stmt 0 view .LVU118
+ 403 0156 B223     		movs	r3, #178
+ 404              	.LBB173:
+ 405              	.LBB174:
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 406              		.loc 3 87 19 view .LVU119
+ 407 0158 3946     		mov	r1, r7
+ 408 015a 3046     		mov	r0, r6
+ 409 015c 8DF80730 		strb	r3, [sp, #7]
+ 410              	.LVL38:
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 411              		.loc 3 87 19 view .LVU120
+ 412              	.LBE174:
+ 413              	.LBI173:
+  86:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(false);  // Set DC pin to command mode
+ 414              		.loc 3 86 17 is_stmt 1 view .LVU121
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s 			page 13
+
+
+ 415              	.LBB175:
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 416              		.loc 3 87 9 view .LVU122
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 417              		.loc 3 87 19 is_stmt 0 view .LVU123
+ 418 0160 FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 419              	.LVL39:
+  88:dependencies/DaisySeedGFX2/TFT_SPI.h ****     }
+ 420              		.loc 3 88 9 is_stmt 1 view .LVU124
+  88:dependencies/DaisySeedGFX2/TFT_SPI.h ****     }
+ 421              		.loc 3 88 31 is_stmt 0 view .LVU125
+ 422 0164 6423     		movs	r3, #100
+ 423 0166 0122     		movs	r2, #1
+ 424 0168 0DF10701 		add	r1, sp, #7
+ 425 016c 2846     		mov	r0, r5
+ 426 016e FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+ 427              	.LVL40:
+  88:dependencies/DaisySeedGFX2/TFT_SPI.h ****     }
+ 428              		.loc 3 88 31 view .LVU126
+ 429              	.LBE175:
+ 430              	.LBE173:
+ 121:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x0c);
+ 431              		.loc 2 121 5 is_stmt 1 view .LVU127
+ 432              	.LBB176:
+ 433              	.LBB177:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 434              		.loc 3 94 19 is_stmt 0 view .LVU128
+ 435 0172 3046     		mov	r0, r6
+ 436 0174 0121     		movs	r1, #1
+ 437 0176 8DF80740 		strb	r4, [sp, #7]
+ 438              	.LVL41:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 439              		.loc 3 94 19 view .LVU129
+ 440              	.LBE177:
+ 441              	.LBI176:
+  93:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(true);  // Set DC pin to data mode
+ 442              		.loc 3 93 17 is_stmt 1 view .LVU130
+ 443              	.LBB178:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 444              		.loc 3 94 9 view .LVU131
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 445              		.loc 3 94 19 is_stmt 0 view .LVU132
+ 446 017a FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 447              	.LVL42:
+ 448              		.loc 3 95 9 is_stmt 1 view .LVU133
+ 449              		.loc 3 95 31 is_stmt 0 view .LVU134
+ 450 017e 6423     		movs	r3, #100
+ 451 0180 0122     		movs	r2, #1
+ 452 0182 0DF10701 		add	r1, sp, #7
+ 453 0186 2846     		mov	r0, r5
+ 454 0188 4FF00E0B 		mov	fp, #14
+ 455 018c FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+ 456              	.LVL43:
+ 457              		.loc 3 95 31 view .LVU135
+ 458              	.LBE178:
+ 459              	.LBE176:
+ 122:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x0c);
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s 			page 14
+
+
+ 460              		.loc 2 122 5 is_stmt 1 view .LVU136
+ 461              	.LBB179:
+ 462              	.LBB180:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 463              		.loc 3 94 19 is_stmt 0 view .LVU137
+ 464 0190 3046     		mov	r0, r6
+ 465 0192 0121     		movs	r1, #1
+ 466 0194 8DF80740 		strb	r4, [sp, #7]
+ 467              	.LVL44:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 468              		.loc 3 94 19 view .LVU138
+ 469              	.LBE180:
+ 470              	.LBI179:
+  93:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(true);  // Set DC pin to data mode
+ 471              		.loc 3 93 17 is_stmt 1 view .LVU139
+ 472              	.LBB181:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 473              		.loc 3 94 9 view .LVU140
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 474              		.loc 3 94 19 is_stmt 0 view .LVU141
+ 475 0198 FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 476              	.LVL45:
+ 477              		.loc 3 95 9 is_stmt 1 view .LVU142
+ 478              		.loc 3 95 31 is_stmt 0 view .LVU143
+ 479 019c 6423     		movs	r3, #100
+ 480 019e 0122     		movs	r2, #1
+ 481 01a0 0DF10701 		add	r1, sp, #7
+ 482 01a4 2846     		mov	r0, r5
+ 483 01a6 FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+ 484              	.LVL46:
+ 485              		.loc 3 95 31 view .LVU144
+ 486              	.LBE181:
+ 487              	.LBE179:
+ 123:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x00);
+ 488              		.loc 2 123 5 is_stmt 1 view .LVU145
+ 489              	.LBB182:
+ 490              	.LBB183:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 491              		.loc 3 94 19 is_stmt 0 view .LVU146
+ 492 01aa 3046     		mov	r0, r6
+ 493 01ac 0121     		movs	r1, #1
+ 494 01ae 8DF80770 		strb	r7, [sp, #7]
+ 495              	.LVL47:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 496              		.loc 3 94 19 view .LVU147
+ 497              	.LBE183:
+ 498              	.LBI182:
+  93:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(true);  // Set DC pin to data mode
+ 499              		.loc 3 93 17 is_stmt 1 view .LVU148
+ 500              	.LBB184:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 501              		.loc 3 94 9 view .LVU149
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 502              		.loc 3 94 19 is_stmt 0 view .LVU150
+ 503 01b2 FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 504              	.LVL48:
+ 505              		.loc 3 95 9 is_stmt 1 view .LVU151
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s 			page 15
+
+
+ 506              		.loc 3 95 31 is_stmt 0 view .LVU152
+ 507 01b6 6423     		movs	r3, #100
+ 508 01b8 0122     		movs	r2, #1
+ 509 01ba 0DF10701 		add	r1, sp, #7
+ 510 01be 2846     		mov	r0, r5
+ 511 01c0 FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+ 512              	.LVL49:
+ 513              		.loc 3 95 31 view .LVU153
+ 514              	.LBE184:
+ 515              	.LBE182:
+ 124:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x33);
+ 516              		.loc 2 124 5 is_stmt 1 view .LVU154
+ 517              	.LBB185:
+ 518              	.LBB186:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 519              		.loc 3 94 19 is_stmt 0 view .LVU155
+ 520 01c4 3046     		mov	r0, r6
+ 521 01c6 0121     		movs	r1, #1
+ 522 01c8 8DF807A0 		strb	r10, [sp, #7]
+ 523              	.LVL50:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 524              		.loc 3 94 19 view .LVU156
+ 525              	.LBE186:
+ 526              	.LBI185:
+  93:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(true);  // Set DC pin to data mode
+ 527              		.loc 3 93 17 is_stmt 1 view .LVU157
+ 528              	.LBB187:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 529              		.loc 3 94 9 view .LVU158
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 530              		.loc 3 94 19 is_stmt 0 view .LVU159
+ 531 01cc FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 532              	.LVL51:
+ 533              		.loc 3 95 9 is_stmt 1 view .LVU160
+ 534              		.loc 3 95 31 is_stmt 0 view .LVU161
+ 535 01d0 6423     		movs	r3, #100
+ 536 01d2 0122     		movs	r2, #1
+ 537 01d4 0DF10701 		add	r1, sp, #7
+ 538 01d8 2846     		mov	r0, r5
+ 539 01da FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+ 540              	.LVL52:
+ 541              		.loc 3 95 31 view .LVU162
+ 542              	.LBE187:
+ 543              	.LBE185:
+ 125:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x33);
+ 544              		.loc 2 125 5 is_stmt 1 view .LVU163
+ 545              	.LBB188:
+ 546              	.LBB189:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 547              		.loc 3 94 19 is_stmt 0 view .LVU164
+ 548 01de 3046     		mov	r0, r6
+ 549 01e0 0121     		movs	r1, #1
+ 550 01e2 8DF807A0 		strb	r10, [sp, #7]
+ 551              	.LVL53:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 552              		.loc 3 94 19 view .LVU165
+ 553              	.LBE189:
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s 			page 16
+
+
+ 554              	.LBI188:
+  93:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(true);  // Set DC pin to data mode
+ 555              		.loc 3 93 17 is_stmt 1 view .LVU166
+ 556              	.LBB190:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 557              		.loc 3 94 9 view .LVU167
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 558              		.loc 3 94 19 is_stmt 0 view .LVU168
+ 559 01e6 FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 560              	.LVL54:
+ 561              		.loc 3 95 9 is_stmt 1 view .LVU169
+ 562              		.loc 3 95 31 is_stmt 0 view .LVU170
+ 563 01ea 0122     		movs	r2, #1
+ 564 01ec 0DF10701 		add	r1, sp, #7
+ 565 01f0 6423     		movs	r3, #100
+ 566 01f2 2846     		mov	r0, r5
+ 567 01f4 4FF0280A 		mov	r10, #40
+ 568              	.LVL55:
+ 569              		.loc 3 95 31 view .LVU171
+ 570 01f8 FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+ 571              	.LVL56:
+ 572              		.loc 3 95 31 view .LVU172
+ 573              	.LBE190:
+ 574              	.LBE188:
+ 126:dependencies/DaisySeedGFX2/ST7789_Defines.h **** 
+ 127:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendCommand(ST7789_GCTRL);      // Voltages: VGH / VGL
+ 575              		.loc 2 127 5 is_stmt 1 view .LVU173
+ 576              		.loc 2 127 5 is_stmt 0 view .LVU174
+ 577 01fc B723     		movs	r3, #183
+ 578              	.LBB191:
+ 579              	.LBB192:
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 580              		.loc 3 87 19 view .LVU175
+ 581 01fe 3946     		mov	r1, r7
+ 582 0200 3046     		mov	r0, r6
+ 583 0202 8DF80730 		strb	r3, [sp, #7]
+ 584              	.LVL57:
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 585              		.loc 3 87 19 view .LVU176
+ 586              	.LBE192:
+ 587              	.LBI191:
+  86:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(false);  // Set DC pin to command mode
+ 588              		.loc 3 86 17 is_stmt 1 view .LVU177
+ 589              	.LBB193:
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 590              		.loc 3 87 9 view .LVU178
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 591              		.loc 3 87 19 is_stmt 0 view .LVU179
+ 592 0206 FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 593              	.LVL58:
+  88:dependencies/DaisySeedGFX2/TFT_SPI.h ****     }
+ 594              		.loc 3 88 9 is_stmt 1 view .LVU180
+  88:dependencies/DaisySeedGFX2/TFT_SPI.h ****     }
+ 595              		.loc 3 88 31 is_stmt 0 view .LVU181
+ 596 020a 0122     		movs	r2, #1
+ 597 020c 0DF10701 		add	r1, sp, #7
+ 598 0210 6423     		movs	r3, #100
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s 			page 17
+
+
+ 599 0212 2846     		mov	r0, r5
+ 600 0214 FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+ 601              	.LVL59:
+  88:dependencies/DaisySeedGFX2/TFT_SPI.h ****     }
+ 602              		.loc 3 88 31 view .LVU182
+ 603              	.LBE193:
+ 604              	.LBE191:
+ 128:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x35);
+ 605              		.loc 2 128 5 is_stmt 1 view .LVU183
+ 606              		.loc 2 128 5 is_stmt 0 view .LVU184
+ 607 0218 3523     		movs	r3, #53
+ 608              	.LBB194:
+ 609              	.LBB195:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 610              		.loc 3 94 19 view .LVU185
+ 611 021a 3046     		mov	r0, r6
+ 612 021c 0121     		movs	r1, #1
+ 613 021e 8DF80730 		strb	r3, [sp, #7]
+ 614              	.LVL60:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 615              		.loc 3 94 19 view .LVU186
+ 616              	.LBE195:
+ 617              	.LBI194:
+  93:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(true);  // Set DC pin to data mode
+ 618              		.loc 3 93 17 is_stmt 1 view .LVU187
+ 619              	.LBB196:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 620              		.loc 3 94 9 view .LVU188
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 621              		.loc 3 94 19 is_stmt 0 view .LVU189
+ 622 0222 FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 623              	.LVL61:
+ 624              		.loc 3 95 9 is_stmt 1 view .LVU190
+ 625              		.loc 3 95 31 is_stmt 0 view .LVU191
+ 626 0226 0122     		movs	r2, #1
+ 627 0228 0DF10701 		add	r1, sp, #7
+ 628 022c 6423     		movs	r3, #100
+ 629 022e 2846     		mov	r0, r5
+ 630 0230 FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+ 631              	.LVL62:
+ 632              		.loc 3 95 31 view .LVU192
+ 633              	.LBE196:
+ 634              	.LBE194:
+ 129:dependencies/DaisySeedGFX2/ST7789_Defines.h **** 
+ 130:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     //---------------------------------ST7789V Power setting--------------------------------------/
+ 131:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendCommand(ST7789_VCOMS);
+ 635              		.loc 2 131 5 is_stmt 1 view .LVU193
+ 636              		.loc 2 131 5 is_stmt 0 view .LVU194
+ 637 0234 BB23     		movs	r3, #187
+ 638              	.LBB197:
+ 639              	.LBB198:
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 640              		.loc 3 87 19 view .LVU195
+ 641 0236 3946     		mov	r1, r7
+ 642 0238 3046     		mov	r0, r6
+ 643 023a 8DF80730 		strb	r3, [sp, #7]
+ 644              	.LVL63:
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s 			page 18
+
+
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 645              		.loc 3 87 19 view .LVU196
+ 646              	.LBE198:
+ 647              	.LBI197:
+  86:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(false);  // Set DC pin to command mode
+ 648              		.loc 3 86 17 is_stmt 1 view .LVU197
+ 649              	.LBB199:
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 650              		.loc 3 87 9 view .LVU198
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 651              		.loc 3 87 19 is_stmt 0 view .LVU199
+ 652 023e FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 653              	.LVL64:
+  88:dependencies/DaisySeedGFX2/TFT_SPI.h ****     }
+ 654              		.loc 3 88 9 is_stmt 1 view .LVU200
+  88:dependencies/DaisySeedGFX2/TFT_SPI.h ****     }
+ 655              		.loc 3 88 31 is_stmt 0 view .LVU201
+ 656 0242 6423     		movs	r3, #100
+ 657 0244 0122     		movs	r2, #1
+ 658 0246 0DF10701 		add	r1, sp, #7
+ 659 024a 2846     		mov	r0, r5
+ 660 024c FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+ 661              	.LVL65:
+  88:dependencies/DaisySeedGFX2/TFT_SPI.h ****     }
+ 662              		.loc 3 88 31 view .LVU202
+ 663              	.LBE199:
+ 664              	.LBE197:
+ 132:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x28);		// JLX240 display datasheet
+ 665              		.loc 2 132 5 is_stmt 1 view .LVU203
+ 666              	.LBB200:
+ 667              	.LBB201:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 668              		.loc 3 94 19 is_stmt 0 view .LVU204
+ 669 0250 3046     		mov	r0, r6
+ 670 0252 0121     		movs	r1, #1
+ 671 0254 8DF807A0 		strb	r10, [sp, #7]
+ 672              	.LVL66:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 673              		.loc 3 94 19 view .LVU205
+ 674              	.LBE201:
+ 675              	.LBI200:
+  93:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(true);  // Set DC pin to data mode
+ 676              		.loc 3 93 17 is_stmt 1 view .LVU206
+ 677              	.LBB202:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 678              		.loc 3 94 9 view .LVU207
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 679              		.loc 3 94 19 is_stmt 0 view .LVU208
+ 680 0258 FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 681              	.LVL67:
+ 682              		.loc 3 95 9 is_stmt 1 view .LVU209
+ 683              		.loc 3 95 31 is_stmt 0 view .LVU210
+ 684 025c 6423     		movs	r3, #100
+ 685 025e 0122     		movs	r2, #1
+ 686 0260 0DF10701 		add	r1, sp, #7
+ 687 0264 2846     		mov	r0, r5
+ 688 0266 FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s 			page 19
+
+
+ 689              	.LVL68:
+ 690              		.loc 3 95 31 view .LVU211
+ 691              	.LBE202:
+ 692              	.LBE200:
+ 133:dependencies/DaisySeedGFX2/ST7789_Defines.h **** 
+ 134:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendCommand(ST7789_LCMCTRL);
+ 693              		.loc 2 134 5 is_stmt 1 view .LVU212
+ 694              	.LBB203:
+ 695              	.LBB204:
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 696              		.loc 3 87 19 is_stmt 0 view .LVU213
+ 697 026a 3946     		mov	r1, r7
+ 698 026c 3046     		mov	r0, r6
+ 699 026e 8DF80790 		strb	r9, [sp, #7]
+ 700              	.LVL69:
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 701              		.loc 3 87 19 view .LVU214
+ 702              	.LBE204:
+ 703              	.LBI203:
+  86:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(false);  // Set DC pin to command mode
+ 704              		.loc 3 86 17 is_stmt 1 view .LVU215
+ 705              	.LBB205:
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 706              		.loc 3 87 9 view .LVU216
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 707              		.loc 3 87 19 is_stmt 0 view .LVU217
+ 708 0272 FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 709              	.LVL70:
+  88:dependencies/DaisySeedGFX2/TFT_SPI.h ****     }
+ 710              		.loc 3 88 9 is_stmt 1 view .LVU218
+  88:dependencies/DaisySeedGFX2/TFT_SPI.h ****     }
+ 711              		.loc 3 88 31 is_stmt 0 view .LVU219
+ 712 0276 6423     		movs	r3, #100
+ 713 0278 0122     		movs	r2, #1
+ 714 027a 0DF10701 		add	r1, sp, #7
+ 715 027e 2846     		mov	r0, r5
+ 716 0280 4FF0D009 		mov	r9, #208
+ 717              	.LVL71:
+  88:dependencies/DaisySeedGFX2/TFT_SPI.h ****     }
+ 718              		.loc 3 88 31 view .LVU220
+ 719 0284 FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+ 720              	.LVL72:
+  88:dependencies/DaisySeedGFX2/TFT_SPI.h ****     }
+ 721              		.loc 3 88 31 view .LVU221
+ 722              	.LBE205:
+ 723              	.LBE203:
+ 135:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x0C);
+ 724              		.loc 2 135 5 is_stmt 1 view .LVU222
+ 725              	.LBB206:
+ 726              	.LBB207:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 727              		.loc 3 94 19 is_stmt 0 view .LVU223
+ 728 0288 3046     		mov	r0, r6
+ 729 028a 0121     		movs	r1, #1
+ 730 028c 8DF80740 		strb	r4, [sp, #7]
+ 731              	.LVL73:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s 			page 20
+
+
+ 732              		.loc 3 94 19 view .LVU224
+ 733              	.LBE207:
+ 734              	.LBI206:
+  93:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(true);  // Set DC pin to data mode
+ 735              		.loc 3 93 17 is_stmt 1 view .LVU225
+ 736              	.LBB208:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 737              		.loc 3 94 9 view .LVU226
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 738              		.loc 3 94 19 is_stmt 0 view .LVU227
+ 739 0290 FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 740              	.LVL74:
+ 741              		.loc 3 95 9 is_stmt 1 view .LVU228
+ 742              		.loc 3 95 31 is_stmt 0 view .LVU229
+ 743 0294 0122     		movs	r2, #1
+ 744 0296 0DF10701 		add	r1, sp, #7
+ 745 029a 6423     		movs	r3, #100
+ 746 029c 2846     		mov	r0, r5
+ 747 029e 0124     		movs	r4, #1
+ 748              	.LVL75:
+ 749              		.loc 3 95 31 view .LVU230
+ 750 02a0 FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+ 751              	.LVL76:
+ 752              		.loc 3 95 31 view .LVU231
+ 753              	.LBE208:
+ 754              	.LBE206:
+ 136:dependencies/DaisySeedGFX2/ST7789_Defines.h **** 
+ 137:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendCommand(ST7789_VDVVRHEN);
+ 755              		.loc 2 137 5 is_stmt 1 view .LVU232
+ 756              		.loc 2 137 5 is_stmt 0 view .LVU233
+ 757 02a4 C223     		movs	r3, #194
+ 758              	.LBB209:
+ 759              	.LBB210:
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 760              		.loc 3 87 19 view .LVU234
+ 761 02a6 3946     		mov	r1, r7
+ 762 02a8 3046     		mov	r0, r6
+ 763 02aa 8DF80730 		strb	r3, [sp, #7]
+ 764              	.LVL77:
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 765              		.loc 3 87 19 view .LVU235
+ 766              	.LBE210:
+ 767              	.LBI209:
+  86:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(false);  // Set DC pin to command mode
+ 768              		.loc 3 86 17 is_stmt 1 view .LVU236
+ 769              	.LBB211:
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 770              		.loc 3 87 9 view .LVU237
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 771              		.loc 3 87 19 is_stmt 0 view .LVU238
+ 772 02ae FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 773              	.LVL78:
+  88:dependencies/DaisySeedGFX2/TFT_SPI.h ****     }
+ 774              		.loc 3 88 9 is_stmt 1 view .LVU239
+  88:dependencies/DaisySeedGFX2/TFT_SPI.h ****     }
+ 775              		.loc 3 88 31 is_stmt 0 view .LVU240
+ 776 02b2 6423     		movs	r3, #100
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s 			page 21
+
+
+ 777 02b4 0122     		movs	r2, #1
+ 778 02b6 0DF10701 		add	r1, sp, #7
+ 779 02ba 2846     		mov	r0, r5
+ 780 02bc FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+ 781              	.LVL79:
+  88:dependencies/DaisySeedGFX2/TFT_SPI.h ****     }
+ 782              		.loc 3 88 31 view .LVU241
+ 783              	.LBE211:
+ 784              	.LBE209:
+ 138:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x01);
+ 785              		.loc 2 138 5 is_stmt 1 view .LVU242
+ 786              	.LBB212:
+ 787              	.LBB213:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 788              		.loc 3 94 19 is_stmt 0 view .LVU243
+ 789 02c0 2146     		mov	r1, r4
+ 790 02c2 3046     		mov	r0, r6
+ 791 02c4 8DF80740 		strb	r4, [sp, #7]
+ 792              	.LVL80:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 793              		.loc 3 94 19 view .LVU244
+ 794              	.LBE213:
+ 795              	.LBI212:
+  93:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(true);  // Set DC pin to data mode
+ 796              		.loc 3 93 17 is_stmt 1 view .LVU245
+ 797              	.LBB214:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 798              		.loc 3 94 9 view .LVU246
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 799              		.loc 3 94 19 is_stmt 0 view .LVU247
+ 800 02c8 FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 801              	.LVL81:
+ 802              		.loc 3 95 9 is_stmt 1 view .LVU248
+ 803              		.loc 3 95 31 is_stmt 0 view .LVU249
+ 804 02cc 2246     		mov	r2, r4
+ 805 02ce 0DF10701 		add	r1, sp, #7
+ 806 02d2 6423     		movs	r3, #100
+ 807 02d4 2846     		mov	r0, r5
+ 808 02d6 FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+ 809              	.LVL82:
+ 810              		.loc 3 95 31 view .LVU250
+ 811              	.LBE214:
+ 812              	.LBE212:
+ 139:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0xFF);
+ 813              		.loc 2 139 5 is_stmt 1 view .LVU251
+ 814              		.loc 2 139 5 is_stmt 0 view .LVU252
+ 815 02da FF23     		movs	r3, #255
+ 816              	.LBB215:
+ 817              	.LBB216:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 818              		.loc 3 94 19 view .LVU253
+ 819 02dc 2146     		mov	r1, r4
+ 820 02de 3046     		mov	r0, r6
+ 821 02e0 8DF80730 		strb	r3, [sp, #7]
+ 822              	.LVL83:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 823              		.loc 3 94 19 view .LVU254
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s 			page 22
+
+
+ 824              	.LBE216:
+ 825              	.LBI215:
+  93:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(true);  // Set DC pin to data mode
+ 826              		.loc 3 93 17 is_stmt 1 view .LVU255
+ 827              	.LBB217:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 828              		.loc 3 94 9 view .LVU256
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 829              		.loc 3 94 19 is_stmt 0 view .LVU257
+ 830 02e4 FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 831              	.LVL84:
+ 832              		.loc 3 95 9 is_stmt 1 view .LVU258
+ 833              		.loc 3 95 31 is_stmt 0 view .LVU259
+ 834 02e8 2246     		mov	r2, r4
+ 835 02ea 0DF10701 		add	r1, sp, #7
+ 836 02ee 6423     		movs	r3, #100
+ 837 02f0 2846     		mov	r0, r5
+ 838 02f2 FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+ 839              	.LVL85:
+ 840              		.loc 3 95 31 view .LVU260
+ 841              	.LBE217:
+ 842              	.LBE215:
+ 140:dependencies/DaisySeedGFX2/ST7789_Defines.h **** 
+ 141:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendCommand(ST7789_VRHS);       // voltage VRHS
+ 843              		.loc 2 141 5 is_stmt 1 view .LVU261
+ 844              		.loc 2 141 5 is_stmt 0 view .LVU262
+ 845 02f6 C323     		movs	r3, #195
+ 846              	.LBB218:
+ 847              	.LBB219:
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 848              		.loc 3 87 19 view .LVU263
+ 849 02f8 3946     		mov	r1, r7
+ 850 02fa 3046     		mov	r0, r6
+ 851 02fc 8DF80730 		strb	r3, [sp, #7]
+ 852              	.LVL86:
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 853              		.loc 3 87 19 view .LVU264
+ 854              	.LBE219:
+ 855              	.LBI218:
+  86:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(false);  // Set DC pin to command mode
+ 856              		.loc 3 86 17 is_stmt 1 view .LVU265
+ 857              	.LBB220:
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 858              		.loc 3 87 9 view .LVU266
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 859              		.loc 3 87 19 is_stmt 0 view .LVU267
+ 860 0300 FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 861              	.LVL87:
+  88:dependencies/DaisySeedGFX2/TFT_SPI.h ****     }
+ 862              		.loc 3 88 9 is_stmt 1 view .LVU268
+  88:dependencies/DaisySeedGFX2/TFT_SPI.h ****     }
+ 863              		.loc 3 88 31 is_stmt 0 view .LVU269
+ 864 0304 2246     		mov	r2, r4
+ 865 0306 0DF10701 		add	r1, sp, #7
+ 866 030a 6423     		movs	r3, #100
+ 867 030c 2846     		mov	r0, r5
+ 868 030e FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s 			page 23
+
+
+ 869              	.LVL88:
+  88:dependencies/DaisySeedGFX2/TFT_SPI.h ****     }
+ 870              		.loc 3 88 31 view .LVU270
+ 871              	.LBE220:
+ 872              	.LBE218:
+ 142:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x10);
+ 873              		.loc 2 142 5 is_stmt 1 view .LVU271
+ 874              		.loc 2 142 5 is_stmt 0 view .LVU272
+ 875 0312 1023     		movs	r3, #16
+ 876              	.LBB221:
+ 877              	.LBB222:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 878              		.loc 3 94 19 view .LVU273
+ 879 0314 2146     		mov	r1, r4
+ 880 0316 3046     		mov	r0, r6
+ 881 0318 8DF80730 		strb	r3, [sp, #7]
+ 882              	.LVL89:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 883              		.loc 3 94 19 view .LVU274
+ 884              	.LBE222:
+ 885              	.LBI221:
+  93:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(true);  // Set DC pin to data mode
+ 886              		.loc 3 93 17 is_stmt 1 view .LVU275
+ 887              	.LBB223:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 888              		.loc 3 94 9 view .LVU276
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 889              		.loc 3 94 19 is_stmt 0 view .LVU277
+ 890 031c FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 891              	.LVL90:
+ 892              		.loc 3 95 9 is_stmt 1 view .LVU278
+ 893              		.loc 3 95 31 is_stmt 0 view .LVU279
+ 894 0320 2246     		mov	r2, r4
+ 895 0322 0DF10701 		add	r1, sp, #7
+ 896 0326 6423     		movs	r3, #100
+ 897 0328 2846     		mov	r0, r5
+ 898 032a FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+ 899              	.LVL91:
+ 900              		.loc 3 95 31 view .LVU280
+ 901              	.LBE223:
+ 902              	.LBE221:
+ 143:dependencies/DaisySeedGFX2/ST7789_Defines.h **** 
+ 144:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendCommand(ST7789_VDVSET);
+ 903              		.loc 2 144 5 is_stmt 1 view .LVU281
+ 904              		.loc 2 144 5 is_stmt 0 view .LVU282
+ 905 032e C423     		movs	r3, #196
+ 906              	.LBB224:
+ 907              	.LBB225:
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 908              		.loc 3 87 19 view .LVU283
+ 909 0330 3946     		mov	r1, r7
+ 910 0332 3046     		mov	r0, r6
+ 911 0334 8DF80730 		strb	r3, [sp, #7]
+ 912              	.LVL92:
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 913              		.loc 3 87 19 view .LVU284
+ 914              	.LBE225:
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s 			page 24
+
+
+ 915              	.LBI224:
+  86:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(false);  // Set DC pin to command mode
+ 916              		.loc 3 86 17 is_stmt 1 view .LVU285
+ 917              	.LBB226:
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 918              		.loc 3 87 9 view .LVU286
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 919              		.loc 3 87 19 is_stmt 0 view .LVU287
+ 920 0338 FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 921              	.LVL93:
+  88:dependencies/DaisySeedGFX2/TFT_SPI.h ****     }
+ 922              		.loc 3 88 9 is_stmt 1 view .LVU288
+  88:dependencies/DaisySeedGFX2/TFT_SPI.h ****     }
+ 923              		.loc 3 88 31 is_stmt 0 view .LVU289
+ 924 033c 2246     		mov	r2, r4
+ 925 033e 0DF10701 		add	r1, sp, #7
+ 926 0342 6423     		movs	r3, #100
+ 927 0344 2846     		mov	r0, r5
+ 928 0346 FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+ 929              	.LVL94:
+  88:dependencies/DaisySeedGFX2/TFT_SPI.h ****     }
+ 930              		.loc 3 88 31 view .LVU290
+ 931              	.LBE226:
+ 932              	.LBE224:
+ 145:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x20);
+ 933              		.loc 2 145 5 is_stmt 1 view .LVU291
+ 934              		.loc 2 145 5 is_stmt 0 view .LVU292
+ 935 034a 2023     		movs	r3, #32
+ 936              	.LBB227:
+ 937              	.LBB228:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 938              		.loc 3 94 19 view .LVU293
+ 939 034c 2146     		mov	r1, r4
+ 940 034e 3046     		mov	r0, r6
+ 941 0350 8DF80730 		strb	r3, [sp, #7]
+ 942              	.LVL95:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 943              		.loc 3 94 19 view .LVU294
+ 944              	.LBE228:
+ 945              	.LBI227:
+  93:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(true);  // Set DC pin to data mode
+ 946              		.loc 3 93 17 is_stmt 1 view .LVU295
+ 947              	.LBB229:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 948              		.loc 3 94 9 view .LVU296
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 949              		.loc 3 94 19 is_stmt 0 view .LVU297
+ 950 0354 FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 951              	.LVL96:
+ 952              		.loc 3 95 9 is_stmt 1 view .LVU298
+ 953              		.loc 3 95 31 is_stmt 0 view .LVU299
+ 954 0358 2246     		mov	r2, r4
+ 955 035a 0DF10701 		add	r1, sp, #7
+ 956 035e 6423     		movs	r3, #100
+ 957 0360 2846     		mov	r0, r5
+ 958 0362 FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+ 959              	.LVL97:
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s 			page 25
+
+
+ 960              		.loc 3 95 31 view .LVU300
+ 961              	.LBE229:
+ 962              	.LBE227:
+ 146:dependencies/DaisySeedGFX2/ST7789_Defines.h **** 
+ 147:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendCommand(ST7789_FRCTR2);
+ 963              		.loc 2 147 5 is_stmt 1 view .LVU301
+ 964              		.loc 2 147 5 is_stmt 0 view .LVU302
+ 965 0366 C623     		movs	r3, #198
+ 966              	.LBB230:
+ 967              	.LBB231:
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 968              		.loc 3 87 19 view .LVU303
+ 969 0368 3946     		mov	r1, r7
+ 970 036a 3046     		mov	r0, r6
+ 971 036c 8DF80730 		strb	r3, [sp, #7]
+ 972              	.LVL98:
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 973              		.loc 3 87 19 view .LVU304
+ 974              	.LBE231:
+ 975              	.LBI230:
+  86:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(false);  // Set DC pin to command mode
+ 976              		.loc 3 86 17 is_stmt 1 view .LVU305
+ 977              	.LBB232:
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 978              		.loc 3 87 9 view .LVU306
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 979              		.loc 3 87 19 is_stmt 0 view .LVU307
+ 980 0370 FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 981              	.LVL99:
+  88:dependencies/DaisySeedGFX2/TFT_SPI.h ****     }
+ 982              		.loc 3 88 9 is_stmt 1 view .LVU308
+  88:dependencies/DaisySeedGFX2/TFT_SPI.h ****     }
+ 983              		.loc 3 88 31 is_stmt 0 view .LVU309
+ 984 0374 2246     		mov	r2, r4
+ 985 0376 0DF10701 		add	r1, sp, #7
+ 986 037a 6423     		movs	r3, #100
+ 987 037c 2846     		mov	r0, r5
+ 988 037e FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+ 989              	.LVL100:
+  88:dependencies/DaisySeedGFX2/TFT_SPI.h ****     }
+ 990              		.loc 3 88 31 view .LVU310
+ 991              	.LBE232:
+ 992              	.LBE230:
+ 148:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x0f);
+ 993              		.loc 2 148 5 is_stmt 1 view .LVU311
+ 994              		.loc 2 148 5 is_stmt 0 view .LVU312
+ 995 0382 0F23     		movs	r3, #15
+ 996              	.LBB233:
+ 997              	.LBB234:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 998              		.loc 3 94 19 view .LVU313
+ 999 0384 2146     		mov	r1, r4
+ 1000 0386 3046     		mov	r0, r6
+ 1001 0388 8DF80730 		strb	r3, [sp, #7]
+ 1002              	.LVL101:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1003              		.loc 3 94 19 view .LVU314
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s 			page 26
+
+
+ 1004              	.LBE234:
+ 1005              	.LBI233:
+  93:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(true);  // Set DC pin to data mode
+ 1006              		.loc 3 93 17 is_stmt 1 view .LVU315
+ 1007              	.LBB235:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1008              		.loc 3 94 9 view .LVU316
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1009              		.loc 3 94 19 is_stmt 0 view .LVU317
+ 1010 038c FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 1011              	.LVL102:
+ 1012              		.loc 3 95 9 is_stmt 1 view .LVU318
+ 1013              		.loc 3 95 31 is_stmt 0 view .LVU319
+ 1014 0390 2246     		mov	r2, r4
+ 1015 0392 6423     		movs	r3, #100
+ 1016 0394 0DF10701 		add	r1, sp, #7
+ 1017 0398 2846     		mov	r0, r5
+ 1018 039a FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+ 1019              	.LVL103:
+ 1020              		.loc 3 95 31 view .LVU320
+ 1021              	.LBE235:
+ 1022              	.LBE233:
+ 149:dependencies/DaisySeedGFX2/ST7789_Defines.h **** 
+ 150:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendCommand(ST7789_PWCTRL1);
+ 1023              		.loc 2 150 5 is_stmt 1 view .LVU321
+ 1024              	.LBB236:
+ 1025              	.LBB237:
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 1026              		.loc 3 87 19 is_stmt 0 view .LVU322
+ 1027 039e 3946     		mov	r1, r7
+ 1028 03a0 3046     		mov	r0, r6
+ 1029 03a2 8DF80790 		strb	r9, [sp, #7]
+ 1030              	.LVL104:
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 1031              		.loc 3 87 19 view .LVU323
+ 1032              	.LBE237:
+ 1033              	.LBI236:
+  86:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(false);  // Set DC pin to command mode
+ 1034              		.loc 3 86 17 is_stmt 1 view .LVU324
+ 1035              	.LBB238:
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 1036              		.loc 3 87 9 view .LVU325
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 1037              		.loc 3 87 19 is_stmt 0 view .LVU326
+ 1038 03a6 FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 1039              	.LVL105:
+  88:dependencies/DaisySeedGFX2/TFT_SPI.h ****     }
+ 1040              		.loc 3 88 9 is_stmt 1 view .LVU327
+  88:dependencies/DaisySeedGFX2/TFT_SPI.h ****     }
+ 1041              		.loc 3 88 31 is_stmt 0 view .LVU328
+ 1042 03aa 2246     		mov	r2, r4
+ 1043 03ac 0DF10701 		add	r1, sp, #7
+ 1044 03b0 6423     		movs	r3, #100
+ 1045 03b2 2846     		mov	r0, r5
+ 1046 03b4 FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+ 1047              	.LVL106:
+  88:dependencies/DaisySeedGFX2/TFT_SPI.h ****     }
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s 			page 27
+
+
+ 1048              		.loc 3 88 31 view .LVU329
+ 1049              	.LBE238:
+ 1050              	.LBE236:
+ 151:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0xa4);
+ 1051              		.loc 2 151 5 is_stmt 1 view .LVU330
+ 1052              		.loc 2 151 5 is_stmt 0 view .LVU331
+ 1053 03b8 A423     		movs	r3, #164
+ 1054              	.LBB239:
+ 1055              	.LBB240:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1056              		.loc 3 94 19 view .LVU332
+ 1057 03ba 2146     		mov	r1, r4
+ 1058 03bc 3046     		mov	r0, r6
+ 1059 03be 8DF80730 		strb	r3, [sp, #7]
+ 1060              	.LVL107:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1061              		.loc 3 94 19 view .LVU333
+ 1062              	.LBE240:
+ 1063              	.LBI239:
+  93:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(true);  // Set DC pin to data mode
+ 1064              		.loc 3 93 17 is_stmt 1 view .LVU334
+ 1065              	.LBB241:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1066              		.loc 3 94 9 view .LVU335
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1067              		.loc 3 94 19 is_stmt 0 view .LVU336
+ 1068 03c2 FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 1069              	.LVL108:
+ 1070              		.loc 3 95 9 is_stmt 1 view .LVU337
+ 1071              		.loc 3 95 31 is_stmt 0 view .LVU338
+ 1072 03c6 2246     		mov	r2, r4
+ 1073 03c8 0DF10701 		add	r1, sp, #7
+ 1074 03cc 6423     		movs	r3, #100
+ 1075 03ce 2846     		mov	r0, r5
+ 1076 03d0 FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+ 1077              	.LVL109:
+ 1078              		.loc 3 95 31 view .LVU339
+ 1079              	.LBE241:
+ 1080              	.LBE239:
+ 152:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0xa1);
+ 1081              		.loc 2 152 5 is_stmt 1 view .LVU340
+ 1082              		.loc 2 152 5 is_stmt 0 view .LVU341
+ 1083 03d4 A123     		movs	r3, #161
+ 1084              	.LBB242:
+ 1085              	.LBB243:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1086              		.loc 3 94 19 view .LVU342
+ 1087 03d6 2146     		mov	r1, r4
+ 1088 03d8 3046     		mov	r0, r6
+ 1089 03da 8DF80730 		strb	r3, [sp, #7]
+ 1090              	.LVL110:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1091              		.loc 3 94 19 view .LVU343
+ 1092              	.LBE243:
+ 1093              	.LBI242:
+  93:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(true);  // Set DC pin to data mode
+ 1094              		.loc 3 93 17 is_stmt 1 view .LVU344
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s 			page 28
+
+
+ 1095              	.LBB244:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1096              		.loc 3 94 9 view .LVU345
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1097              		.loc 3 94 19 is_stmt 0 view .LVU346
+ 1098 03de FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 1099              	.LVL111:
+ 1100              		.loc 3 95 9 is_stmt 1 view .LVU347
+ 1101              		.loc 3 95 31 is_stmt 0 view .LVU348
+ 1102 03e2 2246     		mov	r2, r4
+ 1103 03e4 0DF10701 		add	r1, sp, #7
+ 1104 03e8 6423     		movs	r3, #100
+ 1105 03ea 2846     		mov	r0, r5
+ 1106 03ec FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+ 1107              	.LVL112:
+ 1108              		.loc 3 95 31 view .LVU349
+ 1109              	.LBE244:
+ 1110              	.LBE242:
+ 153:dependencies/DaisySeedGFX2/ST7789_Defines.h **** 
+ 154:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     //--------------------------------ST7789V gamma setting---------------------------------------/
+ 155:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendCommand(ST7789_PVGAMCTRL);
+ 1111              		.loc 2 155 5 is_stmt 1 view .LVU350
+ 1112              		.loc 2 155 5 is_stmt 0 view .LVU351
+ 1113 03f0 E023     		movs	r3, #224
+ 1114              	.LBB245:
+ 1115              	.LBB246:
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 1116              		.loc 3 87 19 view .LVU352
+ 1117 03f2 3946     		mov	r1, r7
+ 1118 03f4 3046     		mov	r0, r6
+ 1119 03f6 8DF80730 		strb	r3, [sp, #7]
+ 1120              	.LVL113:
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 1121              		.loc 3 87 19 view .LVU353
+ 1122              	.LBE246:
+ 1123              	.LBI245:
+  86:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(false);  // Set DC pin to command mode
+ 1124              		.loc 3 86 17 is_stmt 1 view .LVU354
+ 1125              	.LBB247:
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 1126              		.loc 3 87 9 view .LVU355
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 1127              		.loc 3 87 19 is_stmt 0 view .LVU356
+ 1128 03fa FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 1129              	.LVL114:
+  88:dependencies/DaisySeedGFX2/TFT_SPI.h ****     }
+ 1130              		.loc 3 88 9 is_stmt 1 view .LVU357
+  88:dependencies/DaisySeedGFX2/TFT_SPI.h ****     }
+ 1131              		.loc 3 88 31 is_stmt 0 view .LVU358
+ 1132 03fe 2246     		mov	r2, r4
+ 1133 0400 6423     		movs	r3, #100
+ 1134 0402 0DF10701 		add	r1, sp, #7
+ 1135 0406 2846     		mov	r0, r5
+ 1136 0408 FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+ 1137              	.LVL115:
+  88:dependencies/DaisySeedGFX2/TFT_SPI.h ****     }
+ 1138              		.loc 3 88 31 view .LVU359
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s 			page 29
+
+
+ 1139              	.LBE247:
+ 1140              	.LBE245:
+ 156:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0xd0);
+ 1141              		.loc 2 156 5 is_stmt 1 view .LVU360
+ 1142              	.LBB248:
+ 1143              	.LBB249:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1144              		.loc 3 94 19 is_stmt 0 view .LVU361
+ 1145 040c 2146     		mov	r1, r4
+ 1146 040e 3046     		mov	r0, r6
+ 1147 0410 8DF80790 		strb	r9, [sp, #7]
+ 1148              	.LVL116:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1149              		.loc 3 94 19 view .LVU362
+ 1150              	.LBE249:
+ 1151              	.LBI248:
+  93:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(true);  // Set DC pin to data mode
+ 1152              		.loc 3 93 17 is_stmt 1 view .LVU363
+ 1153              	.LBB250:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1154              		.loc 3 94 9 view .LVU364
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1155              		.loc 3 94 19 is_stmt 0 view .LVU365
+ 1156 0414 FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 1157              	.LVL117:
+ 1158              		.loc 3 95 9 is_stmt 1 view .LVU366
+ 1159              		.loc 3 95 31 is_stmt 0 view .LVU367
+ 1160 0418 2246     		mov	r2, r4
+ 1161 041a 6423     		movs	r3, #100
+ 1162 041c 0DF10701 		add	r1, sp, #7
+ 1163 0420 2846     		mov	r0, r5
+ 1164 0422 FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+ 1165              	.LVL118:
+ 1166              		.loc 3 95 31 view .LVU368
+ 1167              	.LBE250:
+ 1168              	.LBE248:
+ 157:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x00);
+ 1169              		.loc 2 157 5 is_stmt 1 view .LVU369
+ 1170              	.LBB251:
+ 1171              	.LBB252:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1172              		.loc 3 94 19 is_stmt 0 view .LVU370
+ 1173 0426 2146     		mov	r1, r4
+ 1174 0428 3046     		mov	r0, r6
+ 1175 042a 8DF80770 		strb	r7, [sp, #7]
+ 1176              	.LVL119:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1177              		.loc 3 94 19 view .LVU371
+ 1178              	.LBE252:
+ 1179              	.LBI251:
+  93:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(true);  // Set DC pin to data mode
+ 1180              		.loc 3 93 17 is_stmt 1 view .LVU372
+ 1181              	.LBB253:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1182              		.loc 3 94 9 view .LVU373
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1183              		.loc 3 94 19 is_stmt 0 view .LVU374
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s 			page 30
+
+
+ 1184 042e FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 1185              	.LVL120:
+ 1186              		.loc 3 95 9 is_stmt 1 view .LVU375
+ 1187              		.loc 3 95 31 is_stmt 0 view .LVU376
+ 1188 0432 2246     		mov	r2, r4
+ 1189 0434 0DF10701 		add	r1, sp, #7
+ 1190 0438 6423     		movs	r3, #100
+ 1191 043a 2846     		mov	r0, r5
+ 1192 043c FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+ 1193              	.LVL121:
+ 1194              		.loc 3 95 31 view .LVU377
+ 1195              	.LBE253:
+ 1196              	.LBE251:
+ 158:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x02);
+ 1197              		.loc 2 158 5 is_stmt 1 view .LVU378
+ 1198              		.loc 2 158 5 is_stmt 0 view .LVU379
+ 1199 0440 4FF00203 		mov	r3, #2
+ 1200              	.LBB254:
+ 1201              	.LBB255:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1202              		.loc 3 94 19 view .LVU380
+ 1203 0444 2146     		mov	r1, r4
+ 1204 0446 3046     		mov	r0, r6
+ 1205 0448 8DF80730 		strb	r3, [sp, #7]
+ 1206              	.LVL122:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1207              		.loc 3 94 19 view .LVU381
+ 1208              	.LBE255:
+ 1209              	.LBI254:
+  93:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(true);  // Set DC pin to data mode
+ 1210              		.loc 3 93 17 is_stmt 1 view .LVU382
+ 1211              	.LBB256:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1212              		.loc 3 94 9 view .LVU383
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1213              		.loc 3 94 19 is_stmt 0 view .LVU384
+ 1214 044c FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 1215              	.LVL123:
+ 1216              		.loc 3 95 9 is_stmt 1 view .LVU385
+ 1217              		.loc 3 95 31 is_stmt 0 view .LVU386
+ 1218 0450 6423     		movs	r3, #100
+ 1219 0452 2246     		mov	r2, r4
+ 1220 0454 0DF10701 		add	r1, sp, #7
+ 1221 0458 2846     		mov	r0, r5
+ 1222 045a FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+ 1223              	.LVL124:
+ 1224              		.loc 3 95 31 view .LVU387
+ 1225              	.LBE256:
+ 1226              	.LBE254:
+ 159:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x07);
+ 1227              		.loc 2 159 5 is_stmt 1 view .LVU388
+ 1228              		.loc 2 159 5 is_stmt 0 view .LVU389
+ 1229 045e 4FF00702 		mov	r2, #7
+ 1230              	.LBB257:
+ 1231              	.LBB258:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1232              		.loc 3 94 19 view .LVU390
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s 			page 31
+
+
+ 1233 0462 2146     		mov	r1, r4
+ 1234 0464 3046     		mov	r0, r6
+ 1235 0466 8DF80720 		strb	r2, [sp, #7]
+ 1236              	.LVL125:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1237              		.loc 3 94 19 view .LVU391
+ 1238              	.LBE258:
+ 1239              	.LBI257:
+  93:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(true);  // Set DC pin to data mode
+ 1240              		.loc 3 93 17 is_stmt 1 view .LVU392
+ 1241              	.LBB259:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1242              		.loc 3 94 9 view .LVU393
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1243              		.loc 3 94 19 is_stmt 0 view .LVU394
+ 1244 046a FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 1245              	.LVL126:
+ 1246              		.loc 3 95 9 is_stmt 1 view .LVU395
+ 1247              		.loc 3 95 31 is_stmt 0 view .LVU396
+ 1248 046e 2246     		mov	r2, r4
+ 1249 0470 6423     		movs	r3, #100
+ 1250 0472 0DF10701 		add	r1, sp, #7
+ 1251 0476 2846     		mov	r0, r5
+ 1252 0478 FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+ 1253              	.LVL127:
+ 1254              		.loc 3 95 31 view .LVU397
+ 1255              	.LBE259:
+ 1256              	.LBE257:
+ 160:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x0a);
+ 1257              		.loc 2 160 5 is_stmt 1 view .LVU398
+ 1258              	.LBB260:
+ 1259              	.LBB261:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1260              		.loc 3 94 19 is_stmt 0 view .LVU399
+ 1261 047c 2146     		mov	r1, r4
+ 1262 047e 3046     		mov	r0, r6
+ 1263 0480 8DF80780 		strb	r8, [sp, #7]
+ 1264              	.LVL128:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1265              		.loc 3 94 19 view .LVU400
+ 1266              	.LBE261:
+ 1267              	.LBI260:
+  93:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(true);  // Set DC pin to data mode
+ 1268              		.loc 3 93 17 is_stmt 1 view .LVU401
+ 1269              	.LBB262:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1270              		.loc 3 94 9 view .LVU402
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1271              		.loc 3 94 19 is_stmt 0 view .LVU403
+ 1272 0484 FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 1273              	.LVL129:
+ 1274              		.loc 3 95 9 is_stmt 1 view .LVU404
+ 1275              		.loc 3 95 31 is_stmt 0 view .LVU405
+ 1276 0488 2246     		mov	r2, r4
+ 1277 048a 6423     		movs	r3, #100
+ 1278 048c 0DF10701 		add	r1, sp, #7
+ 1279 0490 2846     		mov	r0, r5
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s 			page 32
+
+
+ 1280 0492 FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+ 1281              	.LVL130:
+ 1282              		.loc 3 95 31 view .LVU406
+ 1283              	.LBE262:
+ 1284              	.LBE260:
+ 161:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x28);
+ 1285              		.loc 2 161 5 is_stmt 1 view .LVU407
+ 1286              	.LBB263:
+ 1287              	.LBB264:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1288              		.loc 3 94 19 is_stmt 0 view .LVU408
+ 1289 0496 2146     		mov	r1, r4
+ 1290 0498 3046     		mov	r0, r6
+ 1291 049a 8DF807A0 		strb	r10, [sp, #7]
+ 1292              	.LVL131:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1293              		.loc 3 94 19 view .LVU409
+ 1294              	.LBE264:
+ 1295              	.LBI263:
+  93:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(true);  // Set DC pin to data mode
+ 1296              		.loc 3 93 17 is_stmt 1 view .LVU410
+ 1297              	.LBB265:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1298              		.loc 3 94 9 view .LVU411
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1299              		.loc 3 94 19 is_stmt 0 view .LVU412
+ 1300 049e FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 1301              	.LVL132:
+ 1302              		.loc 3 95 9 is_stmt 1 view .LVU413
+ 1303              		.loc 3 95 31 is_stmt 0 view .LVU414
+ 1304 04a2 2246     		mov	r2, r4
+ 1305 04a4 0DF10701 		add	r1, sp, #7
+ 1306 04a8 6423     		movs	r3, #100
+ 1307 04aa 2846     		mov	r0, r5
+ 1308 04ac FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+ 1309              	.LVL133:
+ 1310              		.loc 3 95 31 view .LVU415
+ 1311              	.LBE265:
+ 1312              	.LBE263:
+ 162:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x32);
+ 1313              		.loc 2 162 5 is_stmt 1 view .LVU416
+ 1314              		.loc 2 162 5 is_stmt 0 view .LVU417
+ 1315 04b0 3223     		movs	r3, #50
+ 1316              	.LBB266:
+ 1317              	.LBB267:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1318              		.loc 3 94 19 view .LVU418
+ 1319 04b2 2146     		mov	r1, r4
+ 1320 04b4 3046     		mov	r0, r6
+ 1321 04b6 8DF80730 		strb	r3, [sp, #7]
+ 1322              	.LVL134:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1323              		.loc 3 94 19 view .LVU419
+ 1324              	.LBE267:
+ 1325              	.LBI266:
+  93:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(true);  // Set DC pin to data mode
+ 1326              		.loc 3 93 17 is_stmt 1 view .LVU420
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s 			page 33
+
+
+ 1327              	.LBB268:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1328              		.loc 3 94 9 view .LVU421
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1329              		.loc 3 94 19 is_stmt 0 view .LVU422
+ 1330 04ba FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 1331              	.LVL135:
+ 1332              		.loc 3 95 9 is_stmt 1 view .LVU423
+ 1333              		.loc 3 95 31 is_stmt 0 view .LVU424
+ 1334 04be 2246     		mov	r2, r4
+ 1335 04c0 0DF10701 		add	r1, sp, #7
+ 1336 04c4 6423     		movs	r3, #100
+ 1337 04c6 2846     		mov	r0, r5
+ 1338 04c8 FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+ 1339              	.LVL136:
+ 1340              		.loc 3 95 31 view .LVU425
+ 1341              	.LBE268:
+ 1342              	.LBE266:
+ 163:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x44);
+ 1343              		.loc 2 163 5 is_stmt 1 view .LVU426
+ 1344              		.loc 2 163 5 is_stmt 0 view .LVU427
+ 1345 04cc 4423     		movs	r3, #68
+ 1346              	.LBB269:
+ 1347              	.LBB270:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1348              		.loc 3 94 19 view .LVU428
+ 1349 04ce 2146     		mov	r1, r4
+ 1350 04d0 3046     		mov	r0, r6
+ 1351 04d2 8DF80730 		strb	r3, [sp, #7]
+ 1352              	.LVL137:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1353              		.loc 3 94 19 view .LVU429
+ 1354              	.LBE270:
+ 1355              	.LBI269:
+  93:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(true);  // Set DC pin to data mode
+ 1356              		.loc 3 93 17 is_stmt 1 view .LVU430
+ 1357              	.LBB271:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1358              		.loc 3 94 9 view .LVU431
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1359              		.loc 3 94 19 is_stmt 0 view .LVU432
+ 1360 04d6 FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 1361              	.LVL138:
+ 1362              		.loc 3 95 9 is_stmt 1 view .LVU433
+ 1363              		.loc 3 95 31 is_stmt 0 view .LVU434
+ 1364 04da 2246     		mov	r2, r4
+ 1365 04dc 0DF10701 		add	r1, sp, #7
+ 1366 04e0 6423     		movs	r3, #100
+ 1367 04e2 2846     		mov	r0, r5
+ 1368 04e4 FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+ 1369              	.LVL139:
+ 1370              		.loc 3 95 31 view .LVU435
+ 1371              	.LBE271:
+ 1372              	.LBE269:
+ 164:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x42);
+ 1373              		.loc 2 164 5 is_stmt 1 view .LVU436
+ 1374              		.loc 2 164 5 is_stmt 0 view .LVU437
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s 			page 34
+
+
+ 1375 04e8 4223     		movs	r3, #66
+ 1376              	.LBB272:
+ 1377              	.LBB273:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1378              		.loc 3 94 19 view .LVU438
+ 1379 04ea 2146     		mov	r1, r4
+ 1380 04ec 3046     		mov	r0, r6
+ 1381 04ee 8DF80730 		strb	r3, [sp, #7]
+ 1382              	.LVL140:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1383              		.loc 3 94 19 view .LVU439
+ 1384              	.LBE273:
+ 1385              	.LBI272:
+  93:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(true);  // Set DC pin to data mode
+ 1386              		.loc 3 93 17 is_stmt 1 view .LVU440
+ 1387              	.LBB274:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1388              		.loc 3 94 9 view .LVU441
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1389              		.loc 3 94 19 is_stmt 0 view .LVU442
+ 1390 04f2 FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 1391              	.LVL141:
+ 1392              		.loc 3 95 9 is_stmt 1 view .LVU443
+ 1393              		.loc 3 95 31 is_stmt 0 view .LVU444
+ 1394 04f6 2246     		mov	r2, r4
+ 1395 04f8 0DF10701 		add	r1, sp, #7
+ 1396 04fc 6423     		movs	r3, #100
+ 1397 04fe 2846     		mov	r0, r5
+ 1398 0500 FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+ 1399              	.LVL142:
+ 1400              		.loc 3 95 31 view .LVU445
+ 1401              	.LBE274:
+ 1402              	.LBE272:
+ 165:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x06);
+ 1403              		.loc 2 165 5 is_stmt 1 view .LVU446
+ 1404              		.loc 2 165 5 is_stmt 0 view .LVU447
+ 1405 0504 0623     		movs	r3, #6
+ 1406              	.LBB275:
+ 1407              	.LBB276:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1408              		.loc 3 94 19 view .LVU448
+ 1409 0506 2146     		mov	r1, r4
+ 1410 0508 3046     		mov	r0, r6
+ 1411 050a 8DF80730 		strb	r3, [sp, #7]
+ 1412              	.LVL143:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1413              		.loc 3 94 19 view .LVU449
+ 1414              	.LBE276:
+ 1415              	.LBI275:
+  93:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(true);  // Set DC pin to data mode
+ 1416              		.loc 3 93 17 is_stmt 1 view .LVU450
+ 1417              	.LBB277:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1418              		.loc 3 94 9 view .LVU451
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1419              		.loc 3 94 19 is_stmt 0 view .LVU452
+ 1420 050e FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s 			page 35
+
+
+ 1421              	.LVL144:
+ 1422              		.loc 3 95 9 is_stmt 1 view .LVU453
+ 1423              		.loc 3 95 31 is_stmt 0 view .LVU454
+ 1424 0512 2246     		mov	r2, r4
+ 1425 0514 6423     		movs	r3, #100
+ 1426 0516 0DF10701 		add	r1, sp, #7
+ 1427 051a 2846     		mov	r0, r5
+ 1428 051c FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+ 1429              	.LVL145:
+ 1430              		.loc 3 95 31 view .LVU455
+ 1431              	.LBE277:
+ 1432              	.LBE275:
+ 166:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x0e);
+ 1433              		.loc 2 166 5 is_stmt 1 view .LVU456
+ 1434              	.LBB278:
+ 1435              	.LBB279:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1436              		.loc 3 94 19 is_stmt 0 view .LVU457
+ 1437 0520 2146     		mov	r1, r4
+ 1438 0522 3046     		mov	r0, r6
+ 1439 0524 8DF807B0 		strb	fp, [sp, #7]
+ 1440              	.LVL146:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1441              		.loc 3 94 19 view .LVU458
+ 1442              	.LBE279:
+ 1443              	.LBI278:
+  93:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(true);  // Set DC pin to data mode
+ 1444              		.loc 3 93 17 is_stmt 1 view .LVU459
+ 1445              	.LBB280:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1446              		.loc 3 94 9 view .LVU460
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1447              		.loc 3 94 19 is_stmt 0 view .LVU461
+ 1448 0528 FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 1449              	.LVL147:
+ 1450              		.loc 3 95 9 is_stmt 1 view .LVU462
+ 1451              		.loc 3 95 31 is_stmt 0 view .LVU463
+ 1452 052c 2246     		mov	r2, r4
+ 1453 052e 0DF10701 		add	r1, sp, #7
+ 1454 0532 6423     		movs	r3, #100
+ 1455 0534 2846     		mov	r0, r5
+ 1456 0536 FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+ 1457              	.LVL148:
+ 1458              		.loc 3 95 31 view .LVU464
+ 1459              	.LBE280:
+ 1460              	.LBE278:
+ 167:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x12);
+ 1461              		.loc 2 167 5 is_stmt 1 view .LVU465
+ 1462              		.loc 2 167 5 is_stmt 0 view .LVU466
+ 1463 053a 1223     		movs	r3, #18
+ 1464              	.LBB281:
+ 1465              	.LBB282:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1466              		.loc 3 94 19 view .LVU467
+ 1467 053c 2146     		mov	r1, r4
+ 1468 053e 3046     		mov	r0, r6
+ 1469 0540 8DF80730 		strb	r3, [sp, #7]
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s 			page 36
+
+
+ 1470              	.LVL149:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1471              		.loc 3 94 19 view .LVU468
+ 1472              	.LBE282:
+ 1473              	.LBI281:
+  93:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(true);  // Set DC pin to data mode
+ 1474              		.loc 3 93 17 is_stmt 1 view .LVU469
+ 1475              	.LBB283:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1476              		.loc 3 94 9 view .LVU470
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1477              		.loc 3 94 19 is_stmt 0 view .LVU471
+ 1478 0544 FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 1479              	.LVL150:
+ 1480              		.loc 3 95 9 is_stmt 1 view .LVU472
+ 1481              		.loc 3 95 31 is_stmt 0 view .LVU473
+ 1482 0548 2246     		mov	r2, r4
+ 1483 054a 0DF10701 		add	r1, sp, #7
+ 1484 054e 6423     		movs	r3, #100
+ 1485 0550 2846     		mov	r0, r5
+ 1486 0552 FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+ 1487              	.LVL151:
+ 1488              		.loc 3 95 31 view .LVU474
+ 1489              	.LBE283:
+ 1490              	.LBE281:
+ 168:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x14);
+ 1491              		.loc 2 168 5 is_stmt 1 view .LVU475
+ 1492              		.loc 2 168 5 is_stmt 0 view .LVU476
+ 1493 0556 1423     		movs	r3, #20
+ 1494              	.LBB284:
+ 1495              	.LBB285:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1496              		.loc 3 94 19 view .LVU477
+ 1497 0558 2146     		mov	r1, r4
+ 1498 055a 3046     		mov	r0, r6
+ 1499 055c 8DF80730 		strb	r3, [sp, #7]
+ 1500              	.LVL152:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1501              		.loc 3 94 19 view .LVU478
+ 1502              	.LBE285:
+ 1503              	.LBI284:
+  93:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(true);  // Set DC pin to data mode
+ 1504              		.loc 3 93 17 is_stmt 1 view .LVU479
+ 1505              	.LBB286:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1506              		.loc 3 94 9 view .LVU480
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1507              		.loc 3 94 19 is_stmt 0 view .LVU481
+ 1508 0560 FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 1509              	.LVL153:
+ 1510              		.loc 3 95 9 is_stmt 1 view .LVU482
+ 1511              		.loc 3 95 31 is_stmt 0 view .LVU483
+ 1512 0564 2246     		mov	r2, r4
+ 1513 0566 6423     		movs	r3, #100
+ 1514 0568 0DF10701 		add	r1, sp, #7
+ 1515 056c 2846     		mov	r0, r5
+ 1516 056e FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s 			page 37
+
+
+ 1517              	.LVL154:
+ 1518              		.loc 3 95 31 view .LVU484
+ 1519              	.LBE286:
+ 1520              	.LBE284:
+ 169:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x17);
+ 1521              		.loc 2 169 5 is_stmt 1 view .LVU485
+ 1522              		.loc 2 169 5 is_stmt 0 view .LVU486
+ 1523 0572 4FF01701 		mov	r1, #23
+ 1524              	.LBB287:
+ 1525              	.LBB288:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1526              		.loc 3 94 19 view .LVU487
+ 1527 0576 3046     		mov	r0, r6
+ 1528 0578 8DF80710 		strb	r1, [sp, #7]
+ 1529              	.LVL155:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1530              		.loc 3 94 19 view .LVU488
+ 1531              	.LBE288:
+ 1532              	.LBI287:
+  93:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(true);  // Set DC pin to data mode
+ 1533              		.loc 3 93 17 is_stmt 1 view .LVU489
+ 1534              	.LBB289:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1535              		.loc 3 94 9 view .LVU490
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1536              		.loc 3 94 19 is_stmt 0 view .LVU491
+ 1537 057c 2146     		mov	r1, r4
+ 1538              	.LVL156:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1539              		.loc 3 94 19 view .LVU492
+ 1540 057e FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 1541              	.LVL157:
+ 1542              		.loc 3 95 9 is_stmt 1 view .LVU493
+ 1543              		.loc 3 95 31 is_stmt 0 view .LVU494
+ 1544 0582 0DF10700 		add	r0, sp, #7
+ 1545 0586 2246     		mov	r2, r4
+ 1546 0588 6423     		movs	r3, #100
+ 1547 058a 0146     		mov	r1, r0
+ 1548 058c 2846     		mov	r0, r5
+ 1549 058e FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+ 1550              	.LVL158:
+ 1551              		.loc 3 95 31 view .LVU495
+ 1552              	.LBE289:
+ 1553              	.LBE287:
+ 170:dependencies/DaisySeedGFX2/ST7789_Defines.h **** 
+ 171:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendCommand(ST7789_NVGAMCTRL);
+ 1554              		.loc 2 171 5 is_stmt 1 view .LVU496
+ 1555              		.loc 2 171 5 is_stmt 0 view .LVU497
+ 1556 0592 E123     		movs	r3, #225
+ 1557              	.LBB290:
+ 1558              	.LBB291:
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 1559              		.loc 3 87 19 view .LVU498
+ 1560 0594 3946     		mov	r1, r7
+ 1561 0596 3046     		mov	r0, r6
+ 1562 0598 8DF80730 		strb	r3, [sp, #7]
+ 1563              	.LVL159:
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s 			page 38
+
+
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 1564              		.loc 3 87 19 view .LVU499
+ 1565              	.LBE291:
+ 1566              	.LBI290:
+  86:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(false);  // Set DC pin to command mode
+ 1567              		.loc 3 86 17 is_stmt 1 view .LVU500
+ 1568              	.LBB292:
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 1569              		.loc 3 87 9 view .LVU501
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 1570              		.loc 3 87 19 is_stmt 0 view .LVU502
+ 1571 059c FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 1572              	.LVL160:
+  88:dependencies/DaisySeedGFX2/TFT_SPI.h ****     }
+ 1573              		.loc 3 88 9 is_stmt 1 view .LVU503
+  88:dependencies/DaisySeedGFX2/TFT_SPI.h ****     }
+ 1574              		.loc 3 88 31 is_stmt 0 view .LVU504
+ 1575 05a0 0DF10700 		add	r0, sp, #7
+ 1576 05a4 2246     		mov	r2, r4
+ 1577 05a6 6423     		movs	r3, #100
+ 1578 05a8 0146     		mov	r1, r0
+ 1579 05aa 2846     		mov	r0, r5
+ 1580 05ac FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+ 1581              	.LVL161:
+  88:dependencies/DaisySeedGFX2/TFT_SPI.h ****     }
+ 1582              		.loc 3 88 31 view .LVU505
+ 1583              	.LBE292:
+ 1584              	.LBE290:
+ 172:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0xd0);
+ 1585              		.loc 2 172 5 is_stmt 1 view .LVU506
+ 1586              	.LBB293:
+ 1587              	.LBB294:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1588              		.loc 3 94 19 is_stmt 0 view .LVU507
+ 1589 05b0 2146     		mov	r1, r4
+ 1590 05b2 3046     		mov	r0, r6
+ 1591 05b4 8DF80790 		strb	r9, [sp, #7]
+ 1592              	.LVL162:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1593              		.loc 3 94 19 view .LVU508
+ 1594              	.LBE294:
+ 1595              	.LBI293:
+  93:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(true);  // Set DC pin to data mode
+ 1596              		.loc 3 93 17 is_stmt 1 view .LVU509
+ 1597              	.LBB295:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1598              		.loc 3 94 9 view .LVU510
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1599              		.loc 3 94 19 is_stmt 0 view .LVU511
+ 1600 05b8 FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 1601              	.LVL163:
+ 1602              		.loc 3 95 9 is_stmt 1 view .LVU512
+ 1603              		.loc 3 95 31 is_stmt 0 view .LVU513
+ 1604 05bc 0DF10700 		add	r0, sp, #7
+ 1605 05c0 2246     		mov	r2, r4
+ 1606 05c2 6423     		movs	r3, #100
+ 1607 05c4 0146     		mov	r1, r0
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s 			page 39
+
+
+ 1608 05c6 2846     		mov	r0, r5
+ 1609 05c8 FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+ 1610              	.LVL164:
+ 1611              		.loc 3 95 31 view .LVU514
+ 1612              	.LBE295:
+ 1613              	.LBE293:
+ 173:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x00);
+ 1614              		.loc 2 173 5 is_stmt 1 view .LVU515
+ 1615              	.LBB296:
+ 1616              	.LBB297:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1617              		.loc 3 94 19 is_stmt 0 view .LVU516
+ 1618 05cc 2146     		mov	r1, r4
+ 1619 05ce 3046     		mov	r0, r6
+ 1620 05d0 8DF80770 		strb	r7, [sp, #7]
+ 1621              	.LVL165:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1622              		.loc 3 94 19 view .LVU517
+ 1623              	.LBE297:
+ 1624              	.LBI296:
+  93:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(true);  // Set DC pin to data mode
+ 1625              		.loc 3 93 17 is_stmt 1 view .LVU518
+ 1626              	.LBB298:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1627              		.loc 3 94 9 view .LVU519
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1628              		.loc 3 94 19 is_stmt 0 view .LVU520
+ 1629 05d4 FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 1630              	.LVL166:
+ 1631              		.loc 3 95 9 is_stmt 1 view .LVU521
+ 1632              		.loc 3 95 31 is_stmt 0 view .LVU522
+ 1633 05d8 0DF10700 		add	r0, sp, #7
+ 1634 05dc 2246     		mov	r2, r4
+ 1635 05de 6423     		movs	r3, #100
+ 1636 05e0 0146     		mov	r1, r0
+ 1637 05e2 2846     		mov	r0, r5
+ 1638 05e4 FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+ 1639              	.LVL167:
+ 1640              		.loc 3 95 31 view .LVU523
+ 1641              	.LBE298:
+ 1642              	.LBE296:
+ 174:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x02);
+ 1643              		.loc 2 174 5 is_stmt 1 view .LVU524
+ 1644              		.loc 2 174 5 is_stmt 0 view .LVU525
+ 1645 05e8 4FF00203 		mov	r3, #2
+ 1646              	.LBB299:
+ 1647              	.LBB300:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1648              		.loc 3 94 19 view .LVU526
+ 1649 05ec 2146     		mov	r1, r4
+ 1650 05ee 3046     		mov	r0, r6
+ 1651 05f0 8DF80730 		strb	r3, [sp, #7]
+ 1652              	.LVL168:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1653              		.loc 3 94 19 view .LVU527
+ 1654              	.LBE300:
+ 1655              	.LBI299:
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s 			page 40
+
+
+  93:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(true);  // Set DC pin to data mode
+ 1656              		.loc 3 93 17 is_stmt 1 view .LVU528
+ 1657              	.LBB301:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1658              		.loc 3 94 9 view .LVU529
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1659              		.loc 3 94 19 is_stmt 0 view .LVU530
+ 1660 05f4 FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 1661              	.LVL169:
+ 1662              		.loc 3 95 9 is_stmt 1 view .LVU531
+ 1663              		.loc 3 95 31 is_stmt 0 view .LVU532
+ 1664 05f8 0DF10700 		add	r0, sp, #7
+ 1665 05fc 6423     		movs	r3, #100
+ 1666 05fe 2246     		mov	r2, r4
+ 1667 0600 0146     		mov	r1, r0
+ 1668 0602 2846     		mov	r0, r5
+ 1669 0604 FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+ 1670              	.LVL170:
+ 1671              		.loc 3 95 31 view .LVU533
+ 1672              	.LBE301:
+ 1673              	.LBE299:
+ 175:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x07);
+ 1674              		.loc 2 175 5 is_stmt 1 view .LVU534
+ 1675              		.loc 2 175 5 is_stmt 0 view .LVU535
+ 1676 0608 4FF00702 		mov	r2, #7
+ 1677              	.LBB302:
+ 1678              	.LBB303:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1679              		.loc 3 94 19 view .LVU536
+ 1680 060c 2146     		mov	r1, r4
+ 1681 060e 3046     		mov	r0, r6
+ 1682 0610 8DF80720 		strb	r2, [sp, #7]
+ 1683              	.LVL171:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1684              		.loc 3 94 19 view .LVU537
+ 1685              	.LBE303:
+ 1686              	.LBI302:
+  93:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(true);  // Set DC pin to data mode
+ 1687              		.loc 3 93 17 is_stmt 1 view .LVU538
+ 1688              	.LBB304:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1689              		.loc 3 94 9 view .LVU539
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1690              		.loc 3 94 19 is_stmt 0 view .LVU540
+ 1691 0614 FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 1692              	.LVL172:
+ 1693              		.loc 3 95 9 is_stmt 1 view .LVU541
+ 1694              		.loc 3 95 31 is_stmt 0 view .LVU542
+ 1695 0618 0DF10700 		add	r0, sp, #7
+ 1696 061c 2246     		mov	r2, r4
+ 1697 061e 6423     		movs	r3, #100
+ 1698 0620 0146     		mov	r1, r0
+ 1699 0622 2846     		mov	r0, r5
+ 1700 0624 FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+ 1701              	.LVL173:
+ 1702              		.loc 3 95 31 view .LVU543
+ 1703              	.LBE304:
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s 			page 41
+
+
+ 1704              	.LBE302:
+ 176:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x0a);
+ 1705              		.loc 2 176 5 is_stmt 1 view .LVU544
+ 1706              	.LBB305:
+ 1707              	.LBB306:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1708              		.loc 3 94 19 is_stmt 0 view .LVU545
+ 1709 0628 2146     		mov	r1, r4
+ 1710 062a 3046     		mov	r0, r6
+ 1711 062c 8DF80780 		strb	r8, [sp, #7]
+ 1712              	.LVL174:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1713              		.loc 3 94 19 view .LVU546
+ 1714              	.LBE306:
+ 1715              	.LBI305:
+  93:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(true);  // Set DC pin to data mode
+ 1716              		.loc 3 93 17 is_stmt 1 view .LVU547
+ 1717              	.LBB307:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1718              		.loc 3 94 9 view .LVU548
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1719              		.loc 3 94 19 is_stmt 0 view .LVU549
+ 1720 0630 FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 1721              	.LVL175:
+ 1722              		.loc 3 95 9 is_stmt 1 view .LVU550
+ 1723              		.loc 3 95 31 is_stmt 0 view .LVU551
+ 1724 0634 0DF10700 		add	r0, sp, #7
+ 1725 0638 2246     		mov	r2, r4
+ 1726 063a 6423     		movs	r3, #100
+ 1727 063c 0146     		mov	r1, r0
+ 1728 063e 2846     		mov	r0, r5
+ 1729 0640 FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+ 1730              	.LVL176:
+ 1731              		.loc 3 95 31 view .LVU552
+ 1732              	.LBE307:
+ 1733              	.LBE305:
+ 177:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x28);
+ 1734              		.loc 2 177 5 is_stmt 1 view .LVU553
+ 1735              	.LBB308:
+ 1736              	.LBB309:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1737              		.loc 3 94 19 is_stmt 0 view .LVU554
+ 1738 0644 2146     		mov	r1, r4
+ 1739 0646 3046     		mov	r0, r6
+ 1740 0648 8DF807A0 		strb	r10, [sp, #7]
+ 1741              	.LVL177:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1742              		.loc 3 94 19 view .LVU555
+ 1743              	.LBE309:
+ 1744              	.LBI308:
+  93:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(true);  // Set DC pin to data mode
+ 1745              		.loc 3 93 17 is_stmt 1 view .LVU556
+ 1746              	.LBB310:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1747              		.loc 3 94 9 view .LVU557
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1748              		.loc 3 94 19 is_stmt 0 view .LVU558
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s 			page 42
+
+
+ 1749 064c FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 1750              	.LVL178:
+ 1751              		.loc 3 95 9 is_stmt 1 view .LVU559
+ 1752              		.loc 3 95 31 is_stmt 0 view .LVU560
+ 1753 0650 0DF10700 		add	r0, sp, #7
+ 1754 0654 2246     		mov	r2, r4
+ 1755 0656 6423     		movs	r3, #100
+ 1756 0658 0146     		mov	r1, r0
+ 1757 065a 2846     		mov	r0, r5
+ 1758 065c FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+ 1759              	.LVL179:
+ 1760              		.loc 3 95 31 view .LVU561
+ 1761              	.LBE310:
+ 1762              	.LBE308:
+ 178:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x31);
+ 1763              		.loc 2 178 5 is_stmt 1 view .LVU562
+ 1764              		.loc 2 178 5 is_stmt 0 view .LVU563
+ 1765 0660 3123     		movs	r3, #49
+ 1766              	.LBB311:
+ 1767              	.LBB312:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1768              		.loc 3 94 19 view .LVU564
+ 1769 0662 2146     		mov	r1, r4
+ 1770 0664 3046     		mov	r0, r6
+ 1771 0666 8DF80730 		strb	r3, [sp, #7]
+ 1772              	.LVL180:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1773              		.loc 3 94 19 view .LVU565
+ 1774              	.LBE312:
+ 1775              	.LBI311:
+  93:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(true);  // Set DC pin to data mode
+ 1776              		.loc 3 93 17 is_stmt 1 view .LVU566
+ 1777              	.LBB313:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1778              		.loc 3 94 9 view .LVU567
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1779              		.loc 3 94 19 is_stmt 0 view .LVU568
+ 1780 066a FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 1781              	.LVL181:
+ 1782              		.loc 3 95 9 is_stmt 1 view .LVU569
+ 1783              		.loc 3 95 31 is_stmt 0 view .LVU570
+ 1784 066e 0DF10700 		add	r0, sp, #7
+ 1785 0672 2246     		mov	r2, r4
+ 1786 0674 6423     		movs	r3, #100
+ 1787 0676 4FF02108 		mov	r8, #33
+ 1788 067a 0146     		mov	r1, r0
+ 1789 067c 2846     		mov	r0, r5
+ 1790 067e FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+ 1791              	.LVL182:
+ 1792              		.loc 3 95 31 view .LVU571
+ 1793              	.LBE313:
+ 1794              	.LBE311:
+ 179:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x54);
+ 1795              		.loc 2 179 5 is_stmt 1 view .LVU572
+ 1796              		.loc 2 179 5 is_stmt 0 view .LVU573
+ 1797 0682 5423     		movs	r3, #84
+ 1798              	.LBB314:
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s 			page 43
+
+
+ 1799              	.LBB315:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1800              		.loc 3 94 19 view .LVU574
+ 1801 0684 2146     		mov	r1, r4
+ 1802 0686 3046     		mov	r0, r6
+ 1803 0688 8DF80730 		strb	r3, [sp, #7]
+ 1804              	.LVL183:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1805              		.loc 3 94 19 view .LVU575
+ 1806              	.LBE315:
+ 1807              	.LBI314:
+  93:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(true);  // Set DC pin to data mode
+ 1808              		.loc 3 93 17 is_stmt 1 view .LVU576
+ 1809              	.LBB316:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1810              		.loc 3 94 9 view .LVU577
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1811              		.loc 3 94 19 is_stmt 0 view .LVU578
+ 1812 068c FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 1813              	.LVL184:
+ 1814              		.loc 3 95 9 is_stmt 1 view .LVU579
+ 1815              		.loc 3 95 31 is_stmt 0 view .LVU580
+ 1816 0690 0DF10700 		add	r0, sp, #7
+ 1817 0694 2246     		mov	r2, r4
+ 1818 0696 6423     		movs	r3, #100
+ 1819 0698 0146     		mov	r1, r0
+ 1820 069a 2846     		mov	r0, r5
+ 1821 069c FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+ 1822              	.LVL185:
+ 1823              		.loc 3 95 31 view .LVU581
+ 1824              	.LBE316:
+ 1825              	.LBE314:
+ 180:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x47);
+ 1826              		.loc 2 180 5 is_stmt 1 view .LVU582
+ 1827              		.loc 2 180 5 is_stmt 0 view .LVU583
+ 1828 06a0 4723     		movs	r3, #71
+ 1829              	.LBB317:
+ 1830              	.LBB318:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1831              		.loc 3 94 19 view .LVU584
+ 1832 06a2 2146     		mov	r1, r4
+ 1833 06a4 3046     		mov	r0, r6
+ 1834 06a6 8DF80730 		strb	r3, [sp, #7]
+ 1835              	.LVL186:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1836              		.loc 3 94 19 view .LVU585
+ 1837              	.LBE318:
+ 1838              	.LBI317:
+  93:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(true);  // Set DC pin to data mode
+ 1839              		.loc 3 93 17 is_stmt 1 view .LVU586
+ 1840              	.LBB319:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1841              		.loc 3 94 9 view .LVU587
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1842              		.loc 3 94 19 is_stmt 0 view .LVU588
+ 1843 06aa FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 1844              	.LVL187:
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s 			page 44
+
+
+ 1845              		.loc 3 95 9 is_stmt 1 view .LVU589
+ 1846              		.loc 3 95 31 is_stmt 0 view .LVU590
+ 1847 06ae 0DF10700 		add	r0, sp, #7
+ 1848 06b2 2246     		mov	r2, r4
+ 1849 06b4 6423     		movs	r3, #100
+ 1850 06b6 0146     		mov	r1, r0
+ 1851 06b8 2846     		mov	r0, r5
+ 1852 06ba FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+ 1853              	.LVL188:
+ 1854              		.loc 3 95 31 view .LVU591
+ 1855              	.LBE319:
+ 1856              	.LBE317:
+ 181:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x0e);
+ 1857              		.loc 2 181 5 is_stmt 1 view .LVU592
+ 1858              	.LBB320:
+ 1859              	.LBB321:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1860              		.loc 3 94 19 is_stmt 0 view .LVU593
+ 1861 06be 2146     		mov	r1, r4
+ 1862 06c0 3046     		mov	r0, r6
+ 1863 06c2 8DF807B0 		strb	fp, [sp, #7]
+ 1864              	.LVL189:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1865              		.loc 3 94 19 view .LVU594
+ 1866              	.LBE321:
+ 1867              	.LBI320:
+  93:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(true);  // Set DC pin to data mode
+ 1868              		.loc 3 93 17 is_stmt 1 view .LVU595
+ 1869              	.LBB322:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1870              		.loc 3 94 9 view .LVU596
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1871              		.loc 3 94 19 is_stmt 0 view .LVU597
+ 1872 06c6 FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 1873              	.LVL190:
+ 1874              		.loc 3 95 9 is_stmt 1 view .LVU598
+ 1875              		.loc 3 95 31 is_stmt 0 view .LVU599
+ 1876 06ca 0DF10700 		add	r0, sp, #7
+ 1877 06ce 2246     		mov	r2, r4
+ 1878 06d0 6423     		movs	r3, #100
+ 1879 06d2 0146     		mov	r1, r0
+ 1880 06d4 2846     		mov	r0, r5
+ 1881 06d6 FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+ 1882              	.LVL191:
+ 1883              		.loc 3 95 31 view .LVU600
+ 1884              	.LBE322:
+ 1885              	.LBE320:
+ 182:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x1c);
+ 1886              		.loc 2 182 5 is_stmt 1 view .LVU601
+ 1887              		.loc 2 182 5 is_stmt 0 view .LVU602
+ 1888 06da 1C23     		movs	r3, #28
+ 1889              	.LBB323:
+ 1890              	.LBB324:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1891              		.loc 3 94 19 view .LVU603
+ 1892 06dc 2146     		mov	r1, r4
+ 1893 06de 3046     		mov	r0, r6
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s 			page 45
+
+
+ 1894 06e0 8DF80730 		strb	r3, [sp, #7]
+ 1895              	.LVL192:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1896              		.loc 3 94 19 view .LVU604
+ 1897              	.LBE324:
+ 1898              	.LBI323:
+  93:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(true);  // Set DC pin to data mode
+ 1899              		.loc 3 93 17 is_stmt 1 view .LVU605
+ 1900              	.LBB325:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1901              		.loc 3 94 9 view .LVU606
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1902              		.loc 3 94 19 is_stmt 0 view .LVU607
+ 1903 06e4 FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 1904              	.LVL193:
+ 1905              		.loc 3 95 9 is_stmt 1 view .LVU608
+ 1906              		.loc 3 95 31 is_stmt 0 view .LVU609
+ 1907 06e8 0DF10700 		add	r0, sp, #7
+ 1908 06ec 2246     		mov	r2, r4
+ 1909 06ee 6423     		movs	r3, #100
+ 1910 06f0 0146     		mov	r1, r0
+ 1911 06f2 2846     		mov	r0, r5
+ 1912 06f4 FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+ 1913              	.LVL194:
+ 1914              		.loc 3 95 31 view .LVU610
+ 1915              	.LBE325:
+ 1916              	.LBE323:
+ 183:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x17);
+ 1917              		.loc 2 183 5 is_stmt 1 view .LVU611
+ 1918              		.loc 2 183 5 is_stmt 0 view .LVU612
+ 1919 06f8 4FF01701 		mov	r1, #23
+ 1920              	.LBB326:
+ 1921              	.LBB327:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1922              		.loc 3 94 19 view .LVU613
+ 1923 06fc 3046     		mov	r0, r6
+ 1924 06fe 8DF80710 		strb	r1, [sp, #7]
+ 1925              	.LVL195:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1926              		.loc 3 94 19 view .LVU614
+ 1927              	.LBE327:
+ 1928              	.LBI326:
+  93:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(true);  // Set DC pin to data mode
+ 1929              		.loc 3 93 17 is_stmt 1 view .LVU615
+ 1930              	.LBB328:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1931              		.loc 3 94 9 view .LVU616
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1932              		.loc 3 94 19 is_stmt 0 view .LVU617
+ 1933 0702 2146     		mov	r1, r4
+ 1934              	.LVL196:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1935              		.loc 3 94 19 view .LVU618
+ 1936 0704 FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 1937              	.LVL197:
+ 1938              		.loc 3 95 9 is_stmt 1 view .LVU619
+ 1939              		.loc 3 95 31 is_stmt 0 view .LVU620
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s 			page 46
+
+
+ 1940 0708 2246     		mov	r2, r4
+ 1941 070a 0DF10701 		add	r1, sp, #7
+ 1942 070e 6423     		movs	r3, #100
+ 1943 0710 2846     		mov	r0, r5
+ 1944 0712 FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+ 1945              	.LVL198:
+ 1946              		.loc 3 95 31 view .LVU621
+ 1947              	.LBE328:
+ 1948              	.LBE326:
+ 184:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x1b);
+ 1949              		.loc 2 184 5 is_stmt 1 view .LVU622
+ 1950              		.loc 2 184 5 is_stmt 0 view .LVU623
+ 1951 0716 1B23     		movs	r3, #27
+ 1952              	.LBB329:
+ 1953              	.LBB330:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1954              		.loc 3 94 19 view .LVU624
+ 1955 0718 2146     		mov	r1, r4
+ 1956 071a 3046     		mov	r0, r6
+ 1957 071c 8DF80730 		strb	r3, [sp, #7]
+ 1958              	.LVL199:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1959              		.loc 3 94 19 view .LVU625
+ 1960              	.LBE330:
+ 1961              	.LBI329:
+  93:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(true);  // Set DC pin to data mode
+ 1962              		.loc 3 93 17 is_stmt 1 view .LVU626
+ 1963              	.LBB331:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1964              		.loc 3 94 9 view .LVU627
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1965              		.loc 3 94 19 is_stmt 0 view .LVU628
+ 1966 0720 FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 1967              	.LVL200:
+ 1968              		.loc 3 95 9 is_stmt 1 view .LVU629
+ 1969              		.loc 3 95 31 is_stmt 0 view .LVU630
+ 1970 0724 2246     		mov	r2, r4
+ 1971 0726 0DF10701 		add	r1, sp, #7
+ 1972 072a 6423     		movs	r3, #100
+ 1973 072c 2846     		mov	r0, r5
+ 1974 072e FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+ 1975              	.LVL201:
+ 1976              		.loc 3 95 31 view .LVU631
+ 1977              	.LBE331:
+ 1978              	.LBE329:
+ 185:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendData(0x1e);
+ 1979              		.loc 2 185 5 is_stmt 1 view .LVU632
+ 1980              		.loc 2 185 5 is_stmt 0 view .LVU633
+ 1981 0732 1E23     		movs	r3, #30
+ 1982              	.LBB332:
+ 1983              	.LBB333:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1984              		.loc 3 94 19 view .LVU634
+ 1985 0734 2146     		mov	r1, r4
+ 1986 0736 3046     		mov	r0, r6
+ 1987 0738 8DF80730 		strb	r3, [sp, #7]
+ 1988              	.LVL202:
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s 			page 47
+
+
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1989              		.loc 3 94 19 view .LVU635
+ 1990              	.LBE333:
+ 1991              	.LBI332:
+  93:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(true);  // Set DC pin to data mode
+ 1992              		.loc 3 93 17 is_stmt 1 view .LVU636
+ 1993              	.LBB334:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1994              		.loc 3 94 9 view .LVU637
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 1995              		.loc 3 94 19 is_stmt 0 view .LVU638
+ 1996 073c FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 1997              	.LVL203:
+ 1998              		.loc 3 95 9 is_stmt 1 view .LVU639
+ 1999              		.loc 3 95 31 is_stmt 0 view .LVU640
+ 2000 0740 2246     		mov	r2, r4
+ 2001 0742 6423     		movs	r3, #100
+ 2002 0744 0DF10701 		add	r1, sp, #7
+ 2003 0748 2846     		mov	r0, r5
+ 2004 074a FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+ 2005              	.LVL204:
+ 2006              		.loc 3 95 31 view .LVU641
+ 2007              	.LBE334:
+ 2008              	.LBE332:
+ 186:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #ifndef INV_COLOR
+ 187:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendCommand(ST7789_INVON);
+ 2009              		.loc 2 187 5 is_stmt 1 view .LVU642
+ 2010              	.LBB335:
+ 2011              	.LBB336:
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 2012              		.loc 3 87 19 is_stmt 0 view .LVU643
+ 2013 074e 3946     		mov	r1, r7
+ 2014 0750 3046     		mov	r0, r6
+ 2015 0752 8DF80780 		strb	r8, [sp, #7]
+ 2016              	.LVL205:
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 2017              		.loc 3 87 19 view .LVU644
+ 2018              	.LBE336:
+ 2019              	.LBI335:
+  86:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(false);  // Set DC pin to command mode
+ 2020              		.loc 3 86 17 is_stmt 1 view .LVU645
+ 2021              	.LBB337:
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 2022              		.loc 3 87 9 view .LVU646
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 2023              		.loc 3 87 19 is_stmt 0 view .LVU647
+ 2024 0756 FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 2025              	.LVL206:
+  88:dependencies/DaisySeedGFX2/TFT_SPI.h ****     }
+ 2026              		.loc 3 88 9 is_stmt 1 view .LVU648
+  88:dependencies/DaisySeedGFX2/TFT_SPI.h ****     }
+ 2027              		.loc 3 88 31 is_stmt 0 view .LVU649
+ 2028 075a 2246     		mov	r2, r4
+ 2029 075c 6423     		movs	r3, #100
+ 2030 075e 0DF10701 		add	r1, sp, #7
+ 2031 0762 2846     		mov	r0, r5
+ 2032 0764 FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s 			page 48
+
+
+ 2033              	.LVL207:
+  88:dependencies/DaisySeedGFX2/TFT_SPI.h ****     }
+ 2034              		.loc 3 88 31 view .LVU650
+ 2035              	.LBE337:
+ 2036              	.LBE335:
+ 188:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendCommand(ST7789_INVON);
+ 2037              		.loc 2 188 5 is_stmt 1 view .LVU651
+ 2038              	.LBB338:
+ 2039              	.LBB339:
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 2040              		.loc 3 87 19 is_stmt 0 view .LVU652
+ 2041 0768 3946     		mov	r1, r7
+ 2042 076a 3046     		mov	r0, r6
+ 2043 076c 8DF80780 		strb	r8, [sp, #7]
+ 2044              	.LVL208:
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 2045              		.loc 3 87 19 view .LVU653
+ 2046              	.LBE339:
+ 2047              	.LBI338:
+  86:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(false);  // Set DC pin to command mode
+ 2048              		.loc 3 86 17 is_stmt 1 view .LVU654
+ 2049              	.LBB340:
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 2050              		.loc 3 87 9 view .LVU655
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 2051              		.loc 3 87 19 is_stmt 0 view .LVU656
+ 2052 0770 FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 2053              	.LVL209:
+  88:dependencies/DaisySeedGFX2/TFT_SPI.h ****     }
+ 2054              		.loc 3 88 9 is_stmt 1 view .LVU657
+  88:dependencies/DaisySeedGFX2/TFT_SPI.h ****     }
+ 2055              		.loc 3 88 31 is_stmt 0 view .LVU658
+ 2056 0774 2246     		mov	r2, r4
+ 2057 0776 0DF10701 		add	r1, sp, #7
+ 2058 077a 6423     		movs	r3, #100
+ 2059 077c 2846     		mov	r0, r5
+ 2060 077e FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+ 2061              	.LVL210:
+  88:dependencies/DaisySeedGFX2/TFT_SPI.h ****     }
+ 2062              		.loc 3 88 31 view .LVU659
+ 2063              	.LBE340:
+ 2064              	.LBE338:
+ 189:dependencies/DaisySeedGFX2/ST7789_Defines.h **** #endif
+ 190:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     System::Delay(120);
+ 2065              		.loc 2 190 5 is_stmt 1 view .LVU660
+ 2066              		.loc 2 190 18 is_stmt 0 view .LVU661
+ 2067 0782 7820     		movs	r0, #120
+ 2068 0784 FFF7FEFF 		bl	_ZN5daisy6System5DelayEm
+ 2069              	.LVL211:
+ 191:dependencies/DaisySeedGFX2/ST7789_Defines.h **** 
+ 192:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     SendCommand(ST7789_DISPON);    //Display on
+ 2070              		.loc 2 192 5 is_stmt 1 view .LVU662
+ 2071              		.loc 2 192 5 is_stmt 0 view .LVU663
+ 2072 0788 2923     		movs	r3, #41
+ 2073              	.LBB341:
+ 2074              	.LBB342:
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s 			page 49
+
+
+ 2075              		.loc 3 87 19 view .LVU664
+ 2076 078a 3946     		mov	r1, r7
+ 2077 078c 3046     		mov	r0, r6
+ 2078 078e 8DF80730 		strb	r3, [sp, #7]
+ 2079              	.LVL212:
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 2080              		.loc 3 87 19 view .LVU665
+ 2081              	.LBE342:
+ 2082              	.LBI341:
+  86:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(false);  // Set DC pin to command mode
+ 2083              		.loc 3 86 17 is_stmt 1 view .LVU666
+ 2084              	.LBB343:
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 2085              		.loc 3 87 9 view .LVU667
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 2086              		.loc 3 87 19 is_stmt 0 view .LVU668
+ 2087 0792 FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 2088              	.LVL213:
+  88:dependencies/DaisySeedGFX2/TFT_SPI.h ****     }
+ 2089              		.loc 3 88 9 is_stmt 1 view .LVU669
+  88:dependencies/DaisySeedGFX2/TFT_SPI.h ****     }
+ 2090              		.loc 3 88 31 is_stmt 0 view .LVU670
+ 2091 0796 6423     		movs	r3, #100
+ 2092 0798 2246     		mov	r2, r4
+ 2093 079a 0DF10701 		add	r1, sp, #7
+ 2094 079e 2846     		mov	r0, r5
+ 2095 07a0 FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+ 2096              	.LVL214:
+  88:dependencies/DaisySeedGFX2/TFT_SPI.h ****     }
+ 2097              		.loc 3 88 31 view .LVU671
+ 2098              	.LBE343:
+ 2099              	.LBE341:
+ 193:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     System::Delay(120);
+ 2100              		.loc 2 193 5 is_stmt 1 view .LVU672
+ 2101              		.loc 2 193 18 is_stmt 0 view .LVU673
+ 2102 07a4 7820     		movs	r0, #120
+ 194:dependencies/DaisySeedGFX2/ST7789_Defines.h **** }...
+ 2103              		.loc 2 194 1 view .LVU674
+ 2104 07a6 03B0     		add	sp, sp, #12
+ 2105              		.cfi_def_cfa_offset 36
+ 2106              		@ sp needed
+ 2107 07a8 BDE8F04F 		pop	{r4, r5, r6, r7, r8, r9, r10, fp, lr}
+ 2108              		.cfi_restore 14
+ 2109              		.cfi_restore 11
+ 2110              		.cfi_restore 10
+ 2111              		.cfi_restore 9
+ 2112              		.cfi_restore 8
+ 2113              		.cfi_restore 7
+ 2114              		.cfi_restore 6
+ 2115              		.cfi_restore 5
+ 2116              		.cfi_restore 4
+ 2117              		.cfi_def_cfa_offset 0
+ 2118              	.LVL215:
+ 193:dependencies/DaisySeedGFX2/ST7789_Defines.h ****     System::Delay(120);
+ 2119              		.loc 2 193 18 view .LVU675
+ 2120 07ac FFF7FEBF 		b	_ZN5daisy6System5DelayEm
+ 2121              	.LVL216:
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s 			page 50
+
+
+ 2122              		.cfi_endproc
+ 2123              	.LFE3748:
+ 2125              		.section	.text._ZN6DadGFX7TFT_SPI12Init_TFT_SPIEv,"ax",%progbits
+ 2126              		.align	1
+ 2127              		.p2align 2,,3
+ 2128              		.global	_ZN6DadGFX7TFT_SPI12Init_TFT_SPIEv
+ 2129              		.syntax unified
+ 2130              		.thumb
+ 2131              		.thumb_func
+ 2133              	_ZN6DadGFX7TFT_SPI12Init_TFT_SPIEv:
+ 2134              	.LVL217:
+ 2135              	.LFB3749:
+   1:dependencies/DaisySeedGFX2/TFT_SPI.cpp **** //------------------------------------------------------------------------
+   2:dependencies/DaisySeedGFX2/TFT_SPI.cpp **** // TFT_SPI.cpp
+   3:dependencies/DaisySeedGFX2/TFT_SPI.cpp **** //  Management of an SPI connection to a TFT screen
+   4:dependencies/DaisySeedGFX2/TFT_SPI.cpp **** // Copyright(c) 2024 Dad Design.
+   5:dependencies/DaisySeedGFX2/TFT_SPI.cpp **** //------------------------------------------------------------------------
+   6:dependencies/DaisySeedGFX2/TFT_SPI.cpp **** 
+   7:dependencies/DaisySeedGFX2/TFT_SPI.cpp **** #include "TFT_SPI.h"
+   8:dependencies/DaisySeedGFX2/TFT_SPI.cpp **** 
+   9:dependencies/DaisySeedGFX2/TFT_SPI.cpp **** #if TFT_CONTROLEUR_TFT == 7735
+  10:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     #include "ST7735_Defines.h"
+  11:dependencies/DaisySeedGFX2/TFT_SPI.cpp **** #elif TFT_CONTROLEUR_TFT == 7789
+  12:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     #include "ST7789_Defines.h"
+  13:dependencies/DaisySeedGFX2/TFT_SPI.cpp **** #endif
+  14:dependencies/DaisySeedGFX2/TFT_SPI.cpp **** 
+  15:dependencies/DaisySeedGFX2/TFT_SPI.cpp **** namespace DadGFX {
+  16:dependencies/DaisySeedGFX2/TFT_SPI.cpp **** 
+  17:dependencies/DaisySeedGFX2/TFT_SPI.cpp **** //***********************************************************************************
+  18:dependencies/DaisySeedGFX2/TFT_SPI.cpp **** // TFT_SPI
+  19:dependencies/DaisySeedGFX2/TFT_SPI.cpp **** //  SPI management for communication with the TFT screen
+  20:dependencies/DaisySeedGFX2/TFT_SPI.cpp **** //*********************************************************************************** 
+  21:dependencies/DaisySeedGFX2/TFT_SPI.cpp **** 
+  22:dependencies/DaisySeedGFX2/TFT_SPI.cpp **** // --------------------------------------------------------------------------
+  23:dependencies/DaisySeedGFX2/TFT_SPI.cpp **** // Initialize the SPI connection
+  24:dependencies/DaisySeedGFX2/TFT_SPI.cpp **** void TFT_SPI::Init_TFT_SPI() {
+ 2136              		.loc 1 24 30 is_stmt 1 view -0
+ 2137              		.cfi_startproc
+ 2138              		@ args = 0, pretend = 0, frame = 0
+ 2139              		@ frame_needed = 0, uses_anonymous_args = 0
+  25:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     // SPI configuration
+  26:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     m_spi_config.periph     = _TFT_SPI_PORT;                                     // Set the SPI per
+ 2140              		.loc 1 26 5 view .LVU677
+  27:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     m_spi_config.mode       = SpiHandle::Config::Mode::MASTER;                   // Master mode
+  28:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     m_spi_config.direction  = SpiHandle::Config::Direction::TWO_LINES_TX_ONLY;   // TX-only mode
+  29:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     m_spi_config.datasize   = 8;                                                 // 8-bit data size
+  30:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     
+  31:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     // Configure SPI mode based on the defined settings
+  32:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     switch(_TFT_SPI_MODE) {
+  33:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****         case SPIMode::Mode3:
+  34:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****             m_spi_config.clock_polarity = SpiHandle::Config::ClockPolarity::HIGH;
+  35:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****             m_spi_config.clock_phase    = SpiHandle::Config::ClockPhase::TWO_EDGE;
+  36:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****             break;
+  37:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****         case SPIMode::Mode2:
+  38:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****             m_spi_config.clock_polarity = SpiHandle::Config::ClockPolarity::LOW;
+  39:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****             m_spi_config.clock_phase    = SpiHandle::Config::ClockPhase::TWO_EDGE;
+  40:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****             break;
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s 			page 51
+
+
+  41:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****         case SPIMode::Mode1:
+  42:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****             m_spi_config.clock_polarity = SpiHandle::Config::ClockPolarity::HIGH;
+  43:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****             m_spi_config.clock_phase    = SpiHandle::Config::ClockPhase::ONE_EDGE;
+  44:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****             break;
+  45:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****         case SPIMode::Mode0:
+  46:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****         default:
+  47:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****             m_spi_config.clock_polarity = SpiHandle::Config::ClockPolarity::LOW;
+  48:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****             m_spi_config.clock_phase    = SpiHandle::Config::ClockPhase::ONE_EDGE;
+  49:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****             break;
+  50:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     }
+  51:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     
+  52:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     // Other SPI settings
+  53:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     m_spi_config.nss            = SpiHandle::Config::NSS::SOFT;                  // Software NSS
+  54:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     m_spi_config.baud_prescaler = SpiHandle::Config::BaudPrescaler::TFT_SPI_BaudPrescaler;
+  55:dependencies/DaisySeedGFX2/TFT_SPI.cpp **** 
+  56:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     // Pin configuration for SPI
+  57:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     m_spi_config.pin_config.sclk = _TFT_SCLK;                                    // Clock pin
+  58:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     m_spi_config.pin_config.miso = dsy_gpio_pin();                               // MISO pin (not u
+  59:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     m_spi_config.pin_config.mosi = _TFT_MOSI;                                    // MOSI pin
+ 2141              		.loc 1 59 34 is_stmt 0 view .LVU678
+ 2142 0000 2A4B     		ldr	r3, .L6
+  57:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     m_spi_config.pin_config.miso = dsy_gpio_pin();                               // MISO pin (not u
+ 2143              		.loc 1 57 34 view .LVU679
+ 2144 0002 2B4A     		ldr	r2, .L6+4
+ 2145              		.loc 1 59 34 view .LVU680
+ 2146 0004 1B88     		ldrh	r3, [r3]
+  57:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     m_spi_config.pin_config.miso = dsy_gpio_pin();                               // MISO pin (not u
+ 2147              		.loc 1 57 34 view .LVU681
+ 2148 0006 1288     		ldrh	r2, [r2]
+  24:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     // SPI configuration
+ 2149              		.loc 1 24 30 view .LVU682
+ 2150 0008 2DE9F043 		push	{r4, r5, r6, r7, r8, r9, lr}
+ 2151              		.cfi_def_cfa_offset 28
+ 2152              		.cfi_offset 4, -28
+ 2153              		.cfi_offset 5, -24
+ 2154              		.cfi_offset 6, -20
+ 2155              		.cfi_offset 7, -16
+ 2156              		.cfi_offset 8, -12
+ 2157              		.cfi_offset 9, -8
+ 2158              		.cfi_offset 14, -4
+  28:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     m_spi_config.datasize   = 8;                                                 // 8-bit data size
+ 2159              		.loc 1 28 29 view .LVU683
+ 2160 000c 0125     		movs	r5, #1
+  24:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     // SPI configuration
+ 2161              		.loc 1 24 30 view .LVU684
+ 2162 000e 83B0     		sub	sp, sp, #12
+ 2163              		.cfi_def_cfa_offset 40
+ 2164              		.loc 1 59 34 view .LVU685
+ 2165 0010 0381     		strh	r3, [r0, #8]	@ movhi
+  60:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     m_spi_config.pin_config.nss  = dsy_gpio_pin();                               // NSS pin (not us
+  61:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****         
+  62:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     // TFT control pin configuration
+  63:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     m_dc.Init(_TFT_DC, GPIO::Mode::OUTPUT, GPIO::Pull::NOPULL, GPIO::Speed::VERY_HIGH);     // Data
+ 2166              		.loc 1 63 14 view .LVU686
+ 2167 0012 65F30701 		bfi	r1, r5, #0, #8
+ 2168 0016 0923     		movs	r3, #9
+  26:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     m_spi_config.mode       = SpiHandle::Config::Mode::MASTER;                   // Master mode
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s 			page 52
+
+
+ 2169              		.loc 1 26 29 view .LVU687
+ 2170 0018 0026     		movs	r6, #0
+ 2171              		.loc 1 63 14 view .LVU688
+ 2172 001a 00F14008 		add	r8, r0, #64
+  29:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     
+ 2173              		.loc 1 29 29 view .LVU689
+ 2174 001e 0827     		movs	r7, #8
+ 2175              		.loc 1 63 14 view .LVU690
+ 2176 0020 63F30F21 		bfi	r1, r3, #8, #8
+ 2177 0024 4FF00309 		mov	r9, #3
+  54:dependencies/DaisySeedGFX2/TFT_SPI.cpp **** 
+ 2178              		.loc 1 54 33 view .LVU691
+ 2179 0028 0223     		movs	r3, #2
+  24:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     // SPI configuration
+ 2180              		.loc 1 24 30 view .LVU692
+ 2181 002a 0446     		mov	r4, r0
+  57:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     m_spi_config.pin_config.miso = dsy_gpio_pin();                               // MISO pin (not u
+ 2182              		.loc 1 57 34 view .LVU693
+ 2183 002c 8280     		strh	r2, [r0, #4]	@ movhi
+ 2184              		.loc 1 63 14 view .LVU694
+ 2185 002e 2A46     		mov	r2, r5
+  28:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     m_spi_config.datasize   = 8;                                                 // 8-bit data size
+ 2186              		.loc 1 28 29 view .LVU695
+ 2187 0030 4561     		str	r5, [r0, #20]
+  53:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     m_spi_config.baud_prescaler = SpiHandle::Config::BaudPrescaler::TFT_SPI_BaudPrescaler;
+ 2188              		.loc 1 53 33 view .LVU696
+ 2189 0032 4662     		str	r6, [r0, #36]
+  58:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     m_spi_config.pin_config.mosi = _TFT_MOSI;                                    // MOSI pin
+ 2190              		.loc 1 58 34 view .LVU697
+ 2191 0034 C680     		strh	r6, [r0, #6]	@ movhi
+  60:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****         
+ 2192              		.loc 1 60 34 view .LVU698
+ 2193 0036 4681     		strh	r6, [r0, #10]	@ movhi
+  29:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     
+ 2194              		.loc 1 29 29 view .LVU699
+ 2195 0038 8761     		str	r7, [r0, #24]
+  54:dependencies/DaisySeedGFX2/TFT_SPI.cpp **** 
+ 2196              		.loc 1 54 33 view .LVU700
+ 2197 003a 8362     		str	r3, [r0, #40]
+ 2198              		.loc 1 63 14 view .LVU701
+ 2199 003c 3346     		mov	r3, r6
+  27:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     m_spi_config.direction  = SpiHandle::Config::Direction::TWO_LINES_TX_ONLY;   // TX-only mode
+ 2200              		.loc 1 27 29 view .LVU702
+ 2201 003e C0E90366 		strd	r6, r6, [r0, #12]
+  28:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     m_spi_config.datasize   = 8;                                                 // 8-bit data size
+ 2202              		.loc 1 28 5 is_stmt 1 view .LVU703
+  29:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     
+ 2203              		.loc 1 29 5 view .LVU704
+  32:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****         case SPIMode::Mode3:
+ 2204              		.loc 1 32 5 view .LVU705
+  33:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****             m_spi_config.clock_polarity = SpiHandle::Config::ClockPolarity::HIGH;
+ 2205              		.loc 1 33 9 view .LVU706
+  34:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****             m_spi_config.clock_phase    = SpiHandle::Config::ClockPhase::TWO_EDGE;
+ 2206              		.loc 1 34 13 view .LVU707
+  35:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****             break;
+ 2207              		.loc 1 35 13 view .LVU708
+  36:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****         case SPIMode::Mode2:
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s 			page 53
+
+
+ 2208              		.loc 1 36 13 view .LVU709
+  53:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     m_spi_config.baud_prescaler = SpiHandle::Config::BaudPrescaler::TFT_SPI_BaudPrescaler;
+ 2209              		.loc 1 53 5 view .LVU710
+  54:dependencies/DaisySeedGFX2/TFT_SPI.cpp **** 
+ 2210              		.loc 1 54 5 view .LVU711
+  57:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     m_spi_config.pin_config.miso = dsy_gpio_pin();                               // MISO pin (not u
+ 2211              		.loc 1 57 5 view .LVU712
+  58:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     m_spi_config.pin_config.mosi = _TFT_MOSI;                                    // MOSI pin
+ 2212              		.loc 1 58 5 view .LVU713
+  59:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     m_spi_config.pin_config.nss  = dsy_gpio_pin();                               // NSS pin (not us
+ 2213              		.loc 1 59 5 view .LVU714
+  60:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****         
+ 2214              		.loc 1 60 5 view .LVU715
+ 2215              		.loc 1 63 5 view .LVU716
+  35:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****             break;
+ 2216              		.loc 1 35 41 is_stmt 0 view .LVU717
+ 2217 0042 C0E90755 		strd	r5, r5, [r0, #28]
+ 2218              		.loc 1 63 14 view .LVU718
+ 2219 0046 4046     		mov	r0, r8
+ 2220              	.LVL218:
+ 2221              		.loc 1 63 14 view .LVU719
+ 2222 0048 CDF80090 		str	r9, [sp]
+ 2223 004c FFF7FEFF 		bl	_ZN5daisy4GPIO4InitENS_3PinENS0_4ModeENS0_4PullENS0_5SpeedE
+ 2224              	.LVL219:
+  64:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     m_reset.Init(_TFT_RST, GPIO::Mode::OUTPUT, GPIO::Pull::NOPULL, GPIO::Speed::VERY_HIGH); // Rese
+ 2225              		.loc 1 64 5 is_stmt 1 view .LVU720
+ 2226              		.loc 1 64 17 is_stmt 0 view .LVU721
+ 2227 0050 65F30701 		bfi	r1, r5, #0, #8
+ 2228 0054 3346     		mov	r3, r6
+ 2229 0056 2A46     		mov	r2, r5
+ 2230 0058 67F30F21 		bfi	r1, r7, #8, #8
+ 2231 005c 04F12C07 		add	r7, r4, #44
+ 2232 0060 CDF80090 		str	r9, [sp]
+ 2233 0064 3846     		mov	r0, r7
+ 2234 0066 FFF7FEFF 		bl	_ZN5daisy4GPIO4InitENS_3PinENS0_4ModeENS0_4PullENS0_5SpeedE
+ 2235              	.LVL220:
+  65:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     m_dc.Write(true);    // Set DC pin to high
+ 2236              		.loc 1 65 5 is_stmt 1 view .LVU722
+ 2237              		.loc 1 65 15 is_stmt 0 view .LVU723
+ 2238 006a 2946     		mov	r1, r5
+ 2239 006c 4046     		mov	r0, r8
+ 2240 006e FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 2241              	.LVL221:
+  66:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     m_reset.Write(true); // Set Reset pin to high
+ 2242              		.loc 1 66 5 is_stmt 1 view .LVU724
+ 2243              		.loc 1 66 18 is_stmt 0 view .LVU725
+ 2244 0072 2946     		mov	r1, r5
+ 2245 0074 3846     		mov	r0, r7
+ 2246 0076 FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 2247              	.LVL222:
+  67:dependencies/DaisySeedGFX2/TFT_SPI.cpp **** 
+  68:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     // Initialize SPI
+  69:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     m_spi.Init(m_spi_config);
+ 2248              		.loc 1 69 5 is_stmt 1 view .LVU726
+ 2249              		.loc 1 69 15 is_stmt 0 view .LVU727
+ 2250 007a 211D     		adds	r1, r4, #4
+ 2251 007c 2046     		mov	r0, r4
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s 			page 54
+
+
+ 2252 007e FFF7FEFF 		bl	_ZN5daisy9SpiHandle4InitERKNS0_6ConfigE
+ 2253              	.LVL223:
+  70:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     
+  71:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     // Reset the LCD screen
+  72:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     m_reset.Write(false); // Hold Reset pin low
+ 2254              		.loc 1 72 5 is_stmt 1 view .LVU728
+ 2255              		.loc 1 72 18 is_stmt 0 view .LVU729
+ 2256 0082 3146     		mov	r1, r6
+ 2257 0084 3846     		mov	r0, r7
+ 2258 0086 FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 2259              	.LVL224:
+  73:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     System::Delay(50);    // Delay 50 ms
+ 2260              		.loc 1 73 5 is_stmt 1 view .LVU730
+ 2261              		.loc 1 73 18 is_stmt 0 view .LVU731
+ 2262 008a 3220     		movs	r0, #50
+ 2263 008c FFF7FEFF 		bl	_ZN5daisy6System5DelayEm
+ 2264              	.LVL225:
+  74:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     m_reset.Write(true);  // Release Reset pin
+ 2265              		.loc 1 74 5 is_stmt 1 view .LVU732
+ 2266              		.loc 1 74 18 is_stmt 0 view .LVU733
+ 2267 0090 2946     		mov	r1, r5
+ 2268 0092 3846     		mov	r0, r7
+ 2269 0094 FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 2270              	.LVL226:
+  75:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     System::Delay(50);    // Delay 50 ms
+ 2271              		.loc 1 75 5 is_stmt 1 view .LVU734
+ 2272              		.loc 1 75 18 is_stmt 0 view .LVU735
+ 2273 0098 3220     		movs	r0, #50
+ 2274 009a FFF7FEFF 		bl	_ZN5daisy6System5DelayEm
+ 2275              	.LVL227:
+  76:dependencies/DaisySeedGFX2/TFT_SPI.cpp **** 
+  77:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     // Perform additional initialization
+  78:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     Initialise();
+ 2276              		.loc 1 78 5 is_stmt 1 view .LVU736
+ 2277              		.loc 1 78 15 is_stmt 0 view .LVU737
+ 2278 009e 2046     		mov	r0, r4
+  79:dependencies/DaisySeedGFX2/TFT_SPI.cpp **** }
+ 2279              		.loc 1 79 1 view .LVU738
+ 2280 00a0 03B0     		add	sp, sp, #12
+ 2281              		.cfi_def_cfa_offset 28
+ 2282              		@ sp needed
+ 2283 00a2 BDE8F043 		pop	{r4, r5, r6, r7, r8, r9, lr}
+ 2284              		.cfi_restore 14
+ 2285              		.cfi_restore 9
+ 2286              		.cfi_restore 8
+ 2287              		.cfi_restore 7
+ 2288              		.cfi_restore 6
+ 2289              		.cfi_restore 5
+ 2290              		.cfi_restore 4
+ 2291              		.cfi_def_cfa_offset 0
+ 2292              	.LVL228:
+  78:dependencies/DaisySeedGFX2/TFT_SPI.cpp **** }
+ 2293              		.loc 1 78 15 view .LVU739
+ 2294 00a6 FFF7FEBF 		b	_ZN6DadGFX7TFT_SPI10InitialiseEv
+ 2295              	.LVL229:
+ 2296              	.L7:
+  78:dependencies/DaisySeedGFX2/TFT_SPI.cpp **** }
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s 			page 55
+
+
+ 2297              		.loc 1 78 15 view .LVU740
+ 2298 00aa 00BF     		.align	2
+ 2299              	.L6:
+ 2300 00ac 00000000 		.word	_ZN5daisy4seedL3D10E
+ 2301 00b0 00000000 		.word	_ZN5daisy4seedL2D8E
+ 2302              		.cfi_endproc
+ 2303              	.LFE3749:
+ 2305              		.section	.text._ZN6DadGFX7TFT_SPI14setTFTRotationE8Rotation,"ax",%progbits
+ 2306              		.align	1
+ 2307              		.p2align 2,,3
+ 2308              		.global	_ZN6DadGFX7TFT_SPI14setTFTRotationE8Rotation
+ 2309              		.syntax unified
+ 2310              		.thumb
+ 2311              		.thumb_func
+ 2313              	_ZN6DadGFX7TFT_SPI14setTFTRotationE8Rotation:
+ 2314              	.LVL230:
+ 2315              	.LFB3750:
+  80:dependencies/DaisySeedGFX2/TFT_SPI.cpp **** 
+  81:dependencies/DaisySeedGFX2/TFT_SPI.cpp **** // --------------------------------------------------------------------------
+  82:dependencies/DaisySeedGFX2/TFT_SPI.cpp **** // Set the display rotation (0, 90, 180, 270 degrees)
+  83:dependencies/DaisySeedGFX2/TFT_SPI.cpp **** void TFT_SPI::setTFTRotation(Rotation r) {
+ 2316              		.loc 1 83 42 is_stmt 1 view -0
+ 2317              		.cfi_startproc
+ 2318              		@ args = 0, pretend = 0, frame = 8
+ 2319              		@ frame_needed = 0, uses_anonymous_args = 0
+  84:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     // Send the memory access control command
+  85:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     SendCommand(TFT_MADCTL);
+ 2320              		.loc 1 85 5 view .LVU742
+  83:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     // Send the memory access control command
+ 2321              		.loc 1 83 42 is_stmt 0 view .LVU743
+ 2322 0000 70B5     		push	{r4, r5, r6, lr}
+ 2323              		.cfi_def_cfa_offset 16
+ 2324              		.cfi_offset 4, -16
+ 2325              		.cfi_offset 5, -12
+ 2326              		.cfi_offset 6, -8
+ 2327              		.cfi_offset 14, -4
+ 2328              	.LBB354:
+ 2329              	.LBB355:
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 2330              		.loc 3 87 19 view .LVU744
+ 2331 0002 00F14006 		add	r6, r0, #64
+ 2332              	.LBE355:
+ 2333              	.LBE354:
+  83:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     // Send the memory access control command
+ 2334              		.loc 1 83 42 view .LVU745
+ 2335 0006 82B0     		sub	sp, sp, #8
+ 2336              		.cfi_def_cfa_offset 24
+ 2337 0008 3623     		movs	r3, #54
+  83:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     // Send the memory access control command
+ 2338              		.loc 1 83 42 view .LVU746
+ 2339 000a 0446     		mov	r4, r0
+ 2340 000c 0D46     		mov	r5, r1
+ 2341              	.LBB358:
+ 2342              	.LBB356:
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 2343              		.loc 3 87 19 view .LVU747
+ 2344 000e 3046     		mov	r0, r6
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s 			page 56
+
+
+ 2345              	.LVL231:
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 2346              		.loc 3 87 19 view .LVU748
+ 2347 0010 0021     		movs	r1, #0
+ 2348              	.LVL232:
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 2349              		.loc 3 87 19 view .LVU749
+ 2350 0012 8DF80730 		strb	r3, [sp, #7]
+ 2351              	.LVL233:
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 2352              		.loc 3 87 19 view .LVU750
+ 2353              	.LBE356:
+ 2354              	.LBI354:
+  86:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(false);  // Set DC pin to command mode
+ 2355              		.loc 3 86 17 is_stmt 1 view .LVU751
+ 2356              	.LBB357:
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 2357              		.loc 3 87 9 view .LVU752
+  87:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&cmd, 1); // Transmit the command
+ 2358              		.loc 3 87 19 is_stmt 0 view .LVU753
+ 2359 0016 FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 2360              	.LVL234:
+  88:dependencies/DaisySeedGFX2/TFT_SPI.h ****     }
+ 2361              		.loc 3 88 9 is_stmt 1 view .LVU754
+  88:dependencies/DaisySeedGFX2/TFT_SPI.h ****     }
+ 2362              		.loc 3 88 31 is_stmt 0 view .LVU755
+ 2363 001a 6423     		movs	r3, #100
+ 2364 001c 0122     		movs	r2, #1
+ 2365 001e 0DF10701 		add	r1, sp, #7
+ 2366 0022 2046     		mov	r0, r4
+ 2367 0024 FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+ 2368              	.LVL235:
+  88:dependencies/DaisySeedGFX2/TFT_SPI.h ****     }
+ 2369              		.loc 3 88 31 view .LVU756
+ 2370              	.LBE357:
+ 2371              	.LBE358:
+  86:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     switch (r) {
+ 2372              		.loc 1 86 5 is_stmt 1 view .LVU757
+ 2373 0028 032D     		cmp	r5, #3
+ 2374 002a 11D8     		bhi	.L8
+ 2375 002c DFE805F0 		tbb	[pc, r5]
+ 2376              	.L11:
+ 2377 0030 16       		.byte	(.L14-.L11)/2
+ 2378 0031 14       		.byte	(.L13-.L11)/2
+ 2379 0032 12       		.byte	(.L12-.L11)/2
+ 2380 0033 02       		.byte	(.L10-.L11)/2
+ 2381              		.p2align 1
+ 2382              	.L10:
+  87:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****         case Rotation::Degre_0: // Portrait
+  88:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****             SendData(TFT_MAD_COLOR_ORDER);
+  89:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****             break;
+  90:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****         case Rotation::Degre_90: // Landscape (Portrait + 90 degrees)
+  91:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****             SendData(TFT_MAD_MX | TFT_MAD_MV | TFT_MAD_COLOR_ORDER);
+  92:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****             break;
+  93:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****         case Rotation::Degre_180: // Inverted portrait
+  94:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****             SendData(TFT_MAD_MX | TFT_MAD_MY | TFT_MAD_COLOR_ORDER);
+  95:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****             break;
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s 			page 57
+
+
+  96:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****         case Rotation::Degre_270: // Inverted landscape
+ 2383              		.loc 1 96 9 view .LVU758
+  97:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****             SendData(TFT_MAD_MV | TFT_MAD_MY | TFT_MAD_COLOR_ORDER);
+ 2384              		.loc 1 97 13 view .LVU759
+ 2385              	.LVL236:
+ 2386              		.loc 1 97 13 is_stmt 0 view .LVU760
+ 2387 0034 A823     		movs	r3, #168
+ 2388              	.LVL237:
+ 2389              	.L17:
+ 2390              	.LBB359:
+ 2391              	.LBB360:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 2392              		.loc 3 94 19 view .LVU761
+ 2393 0036 0121     		movs	r1, #1
+ 2394 0038 3046     		mov	r0, r6
+ 2395 003a 8DF80730 		strb	r3, [sp, #7]
+ 2396              	.LVL238:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 2397              		.loc 3 94 19 view .LVU762
+ 2398              	.LBE360:
+ 2399              	.LBI359:
+  93:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_dc.Write(true);  // Set DC pin to data mode
+ 2400              		.loc 3 93 17 is_stmt 1 view .LVU763
+ 2401              	.LBB361:
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 2402              		.loc 3 94 9 view .LVU764
+  94:dependencies/DaisySeedGFX2/TFT_SPI.h ****         m_spi.BlockingTransmit(&Data, 1); // Transmit the data
+ 2403              		.loc 3 94 19 is_stmt 0 view .LVU765
+ 2404 003e FFF7FEFF 		bl	_ZN5daisy4GPIO5WriteEb
+ 2405              	.LVL239:
+ 2406              		.loc 3 95 9 is_stmt 1 view .LVU766
+ 2407              		.loc 3 95 31 is_stmt 0 view .LVU767
+ 2408 0042 6423     		movs	r3, #100
+ 2409 0044 0122     		movs	r2, #1
+ 2410 0046 0DF10701 		add	r1, sp, #7
+ 2411 004a 2046     		mov	r0, r4
+ 2412 004c FFF7FEFF 		bl	_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+ 2413              	.LVL240:
+ 2414              		.loc 3 95 31 view .LVU768
+ 2415              	.LBE361:
+ 2416              	.LBE359:
+  98:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****             break;
+ 2417              		.loc 1 98 13 is_stmt 1 view .LVU769
+ 2418              	.L8:
+  99:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****     }
+ 100:dependencies/DaisySeedGFX2/TFT_SPI.cpp **** }
+ 2419              		.loc 1 100 1 is_stmt 0 view .LVU770
+ 2420 0050 02B0     		add	sp, sp, #8
+ 2421              		.cfi_remember_state
+ 2422              		.cfi_def_cfa_offset 16
+ 2423              		@ sp needed
+ 2424 0052 70BD     		pop	{r4, r5, r6, pc}
+ 2425              	.LVL241:
+ 2426              	.L12:
+ 2427              		.cfi_restore_state
+  93:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****             SendData(TFT_MAD_MX | TFT_MAD_MY | TFT_MAD_COLOR_ORDER);
+ 2428              		.loc 1 93 9 is_stmt 1 view .LVU771
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s 			page 58
+
+
+  94:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****             break;
+ 2429              		.loc 1 94 13 view .LVU772
+  94:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****             break;
+ 2430              		.loc 1 94 13 is_stmt 0 view .LVU773
+ 2431 0054 C823     		movs	r3, #200
+ 2432 0056 EEE7     		b	.L17
+ 2433              	.LVL242:
+ 2434              	.L13:
+  90:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****             SendData(TFT_MAD_MX | TFT_MAD_MV | TFT_MAD_COLOR_ORDER);
+ 2435              		.loc 1 90 9 is_stmt 1 view .LVU774
+  91:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****             break;
+ 2436              		.loc 1 91 13 view .LVU775
+  91:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****             break;
+ 2437              		.loc 1 91 13 is_stmt 0 view .LVU776
+ 2438 0058 6823     		movs	r3, #104
+ 2439 005a ECE7     		b	.L17
+ 2440              	.LVL243:
+ 2441              	.L14:
+  87:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****             SendData(TFT_MAD_COLOR_ORDER);
+ 2442              		.loc 1 87 9 is_stmt 1 view .LVU777
+  88:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****             break;
+ 2443              		.loc 1 88 13 view .LVU778
+  88:dependencies/DaisySeedGFX2/TFT_SPI.cpp ****             break;
+ 2444              		.loc 1 88 13 is_stmt 0 view .LVU779
+ 2445 005c 0823     		movs	r3, #8
+ 2446 005e EAE7     		b	.L17
+ 2447              		.cfi_endproc
+ 2448              	.LFE3750:
+ 2450              		.section	.rodata._ZN5daisy4seedL3D12E,"a"
+ 2451              		.align	2
+ 2454              	_ZN5daisy4seedL3D12E:
+ 2455 0000 01       		.byte	1
+ 2456 0001 09       		.byte	9
+ 2457              		.section	.rodata._ZN5daisy4seedL3D11E,"a"
+ 2458              		.align	2
+ 2461              	_ZN5daisy4seedL3D11E:
+ 2462 0000 01       		.byte	1
+ 2463 0001 08       		.byte	8
+ 2464              		.section	.rodata._ZN5daisy4seedL3D10E,"a"
+ 2465              		.align	2
+ 2468              	_ZN5daisy4seedL3D10E:
+ 2469 0000 01       		.byte	1
+ 2470 0001 05       		.byte	5
+ 2471              		.section	.rodata._ZN5daisy4seedL2D8E,"a"
+ 2472              		.align	2
+ 2475              	_ZN5daisy4seedL2D8E:
+ 2476 0000 06       		.byte	6
+ 2477 0001 0B       		.byte	11
+ 2478              		.text
+ 2479              	.Letext0:
+ 2480              		.file 4 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/ma
+ 2481              		.file 5 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/sy
+ 2482              		.file 6 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/st
+ 2483              		.file 7 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/lib/gcc/arm-none-eabi/14
+ 2484              		.file 8 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c+
+ 2485              		.file 9 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c+
+ 2486              		.file 10 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s 			page 59
+
+
+ 2487              		.file 11 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 2488              		.file 12 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 2489              		.file 13 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 2490              		.file 14 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 2491              		.file 15 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 2492              		.file 16 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 2493              		.file 17 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 2494              		.file 18 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 2495              		.file 19 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 2496              		.file 20 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 2497              		.file 21 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 2498              		.file 22 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 2499              		.file 23 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 2500              		.file 24 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 2501              		.file 25 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 2502              		.file 26 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/s
+ 2503              		.file 27 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/s
+ 2504              		.file 28 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/s
+ 2505              		.file 29 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/m
+ 2506              		.file 30 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/s
+ 2507              		.file 31 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 2508              		.file 32 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 2509              		.file 33 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 2510              		.file 34 "dependencies/libDaisy/src/daisy_core.h"
+ 2511              		.file 35 "dependencies/libDaisy/src/sys/system.h"
+ 2512              		.file 36 "dependencies/libDaisy/src/per/gpio.h"
+ 2513              		.file 37 "dependencies/libDaisy/src/per/spi.h"
+ 2514              		.file 38 "dependencies/libDaisy/src/dev/max11300.h"
+ 2515              		.file 39 "dependencies/libDaisy/src/dev/sr_595.h"
+ 2516              		.file 40 "dependencies/libDaisy/src/util/wav_format.h"
+ 2517              		.file 41 "dependencies/libDaisy/src/daisy_seed.h"
+ 2518              		.file 42 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 2519              		.file 43 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/lib/gcc/arm-none-eabi/1
+ 2520              		.file 44 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/s
+ 2521              		.file 45 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/s
+ 2522              		.file 46 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/w
+ 2523              		.file 47 "dependencies/libDaisy/Middlewares/Third_Party/FatFs/src/integer.h"
+ 2524              		.file 48 "dependencies/libDaisy/Middlewares/Third_Party/FatFs/src/ff.h"
+ 2525              		.file 49 "<built-in>"
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s 			page 60
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 TFT_SPI.cpp
+C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s:20     .text._ZN6DadGFX7TFT_SPI10InitialiseEv:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s:27     .text._ZN6DadGFX7TFT_SPI10InitialiseEv:00000000 _ZN6DadGFX7TFT_SPI10InitialiseEv
+C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s:2126   .text._ZN6DadGFX7TFT_SPI12Init_TFT_SPIEv:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s:2133   .text._ZN6DadGFX7TFT_SPI12Init_TFT_SPIEv:00000000 _ZN6DadGFX7TFT_SPI12Init_TFT_SPIEv
+C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s:2300   .text._ZN6DadGFX7TFT_SPI12Init_TFT_SPIEv:000000ac $d
+C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s:2468   .rodata._ZN5daisy4seedL3D10E:00000000 _ZN5daisy4seedL3D10E
+C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s:2475   .rodata._ZN5daisy4seedL2D8E:00000000 _ZN5daisy4seedL2D8E
+C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s:2306   .text._ZN6DadGFX7TFT_SPI14setTFTRotationE8Rotation:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s:2313   .text._ZN6DadGFX7TFT_SPI14setTFTRotationE8Rotation:00000000 _ZN6DadGFX7TFT_SPI14setTFTRotationE8Rotation
+C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s:2377   .text._ZN6DadGFX7TFT_SPI14setTFTRotationE8Rotation:00000030 $d
+C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s:2381   .text._ZN6DadGFX7TFT_SPI14setTFTRotationE8Rotation:00000034 $t
+C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s:2451   .rodata._ZN5daisy4seedL3D12E:00000000 $d
+C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s:2454   .rodata._ZN5daisy4seedL3D12E:00000000 _ZN5daisy4seedL3D12E
+C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s:2458   .rodata._ZN5daisy4seedL3D11E:00000000 $d
+C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s:2461   .rodata._ZN5daisy4seedL3D11E:00000000 _ZN5daisy4seedL3D11E
+C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s:2465   .rodata._ZN5daisy4seedL3D10E:00000000 $d
+C:\Users\Oliver\AppData\Local\Temp\cc1yoaW6.s:2472   .rodata._ZN5daisy4seedL2D8E:00000000 $d
+
+UNDEFINED SYMBOLS
+_ZN5daisy4GPIO5WriteEb
+_ZN5daisy9SpiHandle16BlockingTransmitEPhjm
+_ZN5daisy6System5DelayEm
+_ZN5daisy4GPIO4InitENS_3PinENS0_4ModeENS0_4PullENS0_5SpeedE
+_ZN5daisy9SpiHandle4InitERKNS0_6ConfigE

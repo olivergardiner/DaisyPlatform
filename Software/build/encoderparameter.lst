@@ -1,0 +1,1064 @@
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccnSXlDD.s 			page 1
+
+
+   1              		.cpu cortex-m7
+   2              		.arch armv7e-m
+   3              		.fpu fpv5-d16
+   4              		.eabi_attribute 28, 1
+   5              		.eabi_attribute 20, 1
+   6              		.eabi_attribute 21, 1
+   7              		.eabi_attribute 23, 3
+   8              		.eabi_attribute 24, 1
+   9              		.eabi_attribute 25, 1
+  10              		.eabi_attribute 26, 1
+  11              		.eabi_attribute 30, 2
+  12              		.eabi_attribute 34, 1
+  13              		.eabi_attribute 18, 4
+  14              		.file	"encoderparameter.cpp"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.file 1 "parameters/encoderparameter.cpp"
+  19              		.section	.text._ZNK11perspective16EncoderParameter7GetTypeEv,"ax",%progbits
+  20              		.align	1
+  21              		.p2align 2,,3
+  22              		.global	_ZNK11perspective16EncoderParameter7GetTypeEv
+  23              		.syntax unified
+  24              		.thumb
+  25              		.thumb_func
+  27              	_ZNK11perspective16EncoderParameter7GetTypeEv:
+  28              	.LVL0:
+  29              	.LFB4533:
+   1:parameters/encoderparameter.cpp **** #include "encoderparameter.h"
+   2:parameters/encoderparameter.cpp **** 
+   3:parameters/encoderparameter.cpp **** #include "../hardware.h"
+   4:parameters/encoderparameter.cpp **** 
+   5:parameters/encoderparameter.cpp **** using namespace perspective;
+   6:parameters/encoderparameter.cpp **** using namespace daisy;
+   7:parameters/encoderparameter.cpp **** 
+   8:parameters/encoderparameter.cpp **** EncoderParameter::EncoderParameter(const char* name, float minValue, float maxValue, float defaultV
+   9:parameters/encoderparameter.cpp ****     : EffectParameter(name, minValue, maxValue, defaultValue, index, displayIndex)
+  10:parameters/encoderparameter.cpp ****     , stepSize_(stepSize)
+  11:parameters/encoderparameter.cpp ****     , lastTurnTime_(0)
+  12:parameters/encoderparameter.cpp ****     , accelerationMultiplier_(1.0f)
+  13:parameters/encoderparameter.cpp **** {}
+  14:parameters/encoderparameter.cpp **** 
+  15:parameters/encoderparameter.cpp **** EncoderParameter::~EncoderParameter() {}
+  16:parameters/encoderparameter.cpp **** 
+  17:parameters/encoderparameter.cpp **** void EncoderParameter::SetStepSize(float stepSize) {
+  18:parameters/encoderparameter.cpp ****     stepSize_ = stepSize;
+  19:parameters/encoderparameter.cpp **** }
+  20:parameters/encoderparameter.cpp **** 
+  21:parameters/encoderparameter.cpp **** float EncoderParameter::GetStepSize() const {
+  22:parameters/encoderparameter.cpp ****     return stepSize_;
+  23:parameters/encoderparameter.cpp **** }
+  24:parameters/encoderparameter.cpp **** 
+  25:parameters/encoderparameter.cpp **** void EncoderParameter::Increment(int steps) {
+  26:parameters/encoderparameter.cpp ****     uint32_t now = System::GetNow();
+  27:parameters/encoderparameter.cpp ****     
+  28:parameters/encoderparameter.cpp ****     // Check if this is a continuous turn (within threshold)
+  29:parameters/encoderparameter.cpp ****     if (now - lastTurnTime_ <= ACCELERATION_THRESHOLD_MS && lastTurnTime_ > 0) {
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccnSXlDD.s 			page 2
+
+
+  30:parameters/encoderparameter.cpp ****         Hardware::PrintLine("Continuous turn detected for parameter '%s'. Increasing acceleration m
+  31:parameters/encoderparameter.cpp ****         // Increase acceleration multiplier
+  32:parameters/encoderparameter.cpp ****         accelerationMultiplier_ += ACCELERATION_INCREMENT;
+  33:parameters/encoderparameter.cpp ****         if (accelerationMultiplier_ > MAX_ACCELERATION) {
+  34:parameters/encoderparameter.cpp ****             accelerationMultiplier_ = MAX_ACCELERATION;
+  35:parameters/encoderparameter.cpp ****         }
+  36:parameters/encoderparameter.cpp ****     } else {
+  37:parameters/encoderparameter.cpp ****         // Reset acceleration if there was a pause
+  38:parameters/encoderparameter.cpp ****         accelerationMultiplier_ = 1.0f;
+  39:parameters/encoderparameter.cpp ****     }
+  40:parameters/encoderparameter.cpp ****     
+  41:parameters/encoderparameter.cpp ****     lastTurnTime_ = now;
+  42:parameters/encoderparameter.cpp ****     
+  43:parameters/encoderparameter.cpp ****     currentValue_ -= steps * stepSize_ * accelerationMultiplier_;
+  44:parameters/encoderparameter.cpp ****     currentValue_ = clamp(currentValue_, minValue_, maxValue_);
+  45:parameters/encoderparameter.cpp **** }
+  46:parameters/encoderparameter.cpp **** 
+  47:parameters/encoderparameter.cpp **** void EncoderParameter::Decrement(int steps) {
+  48:parameters/encoderparameter.cpp ****     uint32_t now = System::GetNow();
+  49:parameters/encoderparameter.cpp ****     
+  50:parameters/encoderparameter.cpp ****     // Check if this is a continuous turn (within threshold)
+  51:parameters/encoderparameter.cpp ****     if (now - lastTurnTime_ <= ACCELERATION_THRESHOLD_MS && lastTurnTime_ > 0) {
+  52:parameters/encoderparameter.cpp ****         Hardware::PrintLine("Continuous turn detected for parameter '%s'. Increasing acceleration m
+  53:parameters/encoderparameter.cpp ****         accelerationMultiplier_ += ACCELERATION_INCREMENT;
+  54:parameters/encoderparameter.cpp ****         if (accelerationMultiplier_ > MAX_ACCELERATION) {
+  55:parameters/encoderparameter.cpp ****             accelerationMultiplier_ = MAX_ACCELERATION;
+  56:parameters/encoderparameter.cpp ****         }
+  57:parameters/encoderparameter.cpp ****     } else {
+  58:parameters/encoderparameter.cpp ****         // Reset acceleration if there was a pause
+  59:parameters/encoderparameter.cpp ****         accelerationMultiplier_ = 1.0f;
+  60:parameters/encoderparameter.cpp ****     }
+  61:parameters/encoderparameter.cpp ****     
+  62:parameters/encoderparameter.cpp ****     lastTurnTime_ = now;
+  63:parameters/encoderparameter.cpp ****     
+  64:parameters/encoderparameter.cpp ****     currentValue_ += steps * stepSize_ * accelerationMultiplier_;
+  65:parameters/encoderparameter.cpp ****     currentValue_ = clamp(currentValue_, minValue_, maxValue_);
+  66:parameters/encoderparameter.cpp **** }
+  67:parameters/encoderparameter.cpp **** 
+  68:parameters/encoderparameter.cpp **** ParameterType EncoderParameter::GetType() const {
+  30              		.loc 1 68 49 view -0
+  31              		.cfi_startproc
+  32              		@ args = 0, pretend = 0, frame = 0
+  33              		@ frame_needed = 0, uses_anonymous_args = 0
+  34              		@ link register save eliminated.
+  69:parameters/encoderparameter.cpp ****     return ParameterType::ENCODER;
+  35              		.loc 1 69 5 view .LVU1
+  70:parameters/encoderparameter.cpp **** }
+  36              		.loc 1 70 1 is_stmt 0 view .LVU2
+  37 0000 0120     		movs	r0, #1
+  38              	.LVL1:
+  39              		.loc 1 70 1 view .LVU3
+  40 0002 7047     		bx	lr
+  41              		.cfi_endproc
+  42              	.LFE4533:
+  44              		.section	.text._ZN11perspective16EncoderParameterD2Ev,"ax",%progbits
+  45              		.align	1
+  46              		.p2align 2,,3
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccnSXlDD.s 			page 3
+
+
+  47              		.global	_ZN11perspective16EncoderParameterD2Ev
+  48              		.syntax unified
+  49              		.thumb
+  50              		.thumb_func
+  52              	_ZN11perspective16EncoderParameterD2Ev:
+  53              	.LVL2:
+  54              	.LFB4526:
+  15:parameters/encoderparameter.cpp **** 
+  55              		.loc 1 15 1 is_stmt 1 view -0
+  56              		.cfi_startproc
+  57              		@ args = 0, pretend = 0, frame = 0
+  58              		@ frame_needed = 0, uses_anonymous_args = 0
+  59              	.LBB13:
+  15:parameters/encoderparameter.cpp **** 
+  60              		.loc 1 15 37 is_stmt 0 view .LVU5
+  61 0000 034B     		ldr	r3, .L5
+  62              	.LBE13:
+  15:parameters/encoderparameter.cpp **** 
+  63              		.loc 1 15 1 view .LVU6
+  64 0002 10B5     		push	{r4, lr}
+  65              		.cfi_def_cfa_offset 8
+  66              		.cfi_offset 4, -8
+  67              		.cfi_offset 14, -4
+  15:parameters/encoderparameter.cpp **** 
+  68              		.loc 1 15 1 view .LVU7
+  69 0004 0446     		mov	r4, r0
+  70              	.LBB14:
+  15:parameters/encoderparameter.cpp **** 
+  71              		.loc 1 15 37 view .LVU8
+  72 0006 0360     		str	r3, [r0]
+  15:parameters/encoderparameter.cpp **** 
+  73              		.loc 1 15 40 view .LVU9
+  74 0008 FFF7FEFF 		bl	_ZN11perspective15EffectParameterD2Ev
+  75              	.LVL3:
+  15:parameters/encoderparameter.cpp **** 
+  76              		.loc 1 15 40 view .LVU10
+  77              	.LBE14:
+  78 000c 2046     		mov	r0, r4
+  79 000e 10BD     		pop	{r4, pc}
+  80              	.LVL4:
+  81              	.L6:
+  15:parameters/encoderparameter.cpp **** 
+  82              		.loc 1 15 40 view .LVU11
+  83              		.align	2
+  84              	.L5:
+  85 0010 08000000 		.word	_ZTVN11perspective16EncoderParameterE+8
+  86              		.cfi_endproc
+  87              	.LFE4526:
+  89              		.global	_ZN11perspective16EncoderParameterD1Ev
+  90              		.thumb_set _ZN11perspective16EncoderParameterD1Ev,_ZN11perspective16EncoderParameterD2Ev
+  91              		.section	.text._ZN11perspective16EncoderParameterD0Ev,"ax",%progbits
+  92              		.align	1
+  93              		.p2align 2,,3
+  94              		.global	_ZN11perspective16EncoderParameterD0Ev
+  95              		.syntax unified
+  96              		.thumb
+  97              		.thumb_func
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccnSXlDD.s 			page 4
+
+
+  99              	_ZN11perspective16EncoderParameterD0Ev:
+ 100              	.LVL5:
+ 101              	.LFB4528:
+  15:parameters/encoderparameter.cpp **** 
+ 102              		.loc 1 15 1 is_stmt 1 view -0
+ 103              		.cfi_startproc
+ 104              		@ args = 0, pretend = 0, frame = 0
+ 105              		@ frame_needed = 0, uses_anonymous_args = 0
+ 106              	.LBB15:
+ 107              	.LBB16:
+  15:parameters/encoderparameter.cpp **** 
+ 108              		.loc 1 15 37 is_stmt 0 view .LVU13
+ 109 0000 054B     		ldr	r3, .L9
+ 110              	.LBE16:
+ 111              	.LBE15:
+  15:parameters/encoderparameter.cpp **** 
+ 112              		.loc 1 15 1 view .LVU14
+ 113 0002 10B5     		push	{r4, lr}
+ 114              		.cfi_def_cfa_offset 8
+ 115              		.cfi_offset 4, -8
+ 116              		.cfi_offset 14, -4
+  15:parameters/encoderparameter.cpp **** 
+ 117              		.loc 1 15 1 view .LVU15
+ 118 0004 0446     		mov	r4, r0
+ 119              	.LVL6:
+ 120              	.LBB18:
+ 121              	.LBI15:
+  15:parameters/encoderparameter.cpp **** 
+ 122              		.loc 1 15 1 is_stmt 1 view .LVU16
+ 123              	.LBB17:
+  15:parameters/encoderparameter.cpp **** 
+ 124              		.loc 1 15 37 is_stmt 0 view .LVU17
+ 125 0006 0360     		str	r3, [r0]
+  15:parameters/encoderparameter.cpp **** 
+ 126              		.loc 1 15 40 view .LVU18
+ 127 0008 FFF7FEFF 		bl	_ZN11perspective15EffectParameterD2Ev
+ 128              	.LVL7:
+  15:parameters/encoderparameter.cpp **** 
+ 129              		.loc 1 15 40 view .LVU19
+ 130              	.LBE17:
+ 131              	.LBE18:
+  15:parameters/encoderparameter.cpp **** 
+ 132              		.loc 1 15 40 discriminator 1 view .LVU20
+ 133 000c 3821     		movs	r1, #56
+ 134 000e 2046     		mov	r0, r4
+ 135 0010 FFF7FEFF 		bl	_ZdlPvj
+ 136              	.LVL8:
+  15:parameters/encoderparameter.cpp **** 
+ 137              		.loc 1 15 40 view .LVU21
+ 138 0014 2046     		mov	r0, r4
+ 139 0016 10BD     		pop	{r4, pc}
+ 140              	.LVL9:
+ 141              	.L10:
+  15:parameters/encoderparameter.cpp **** 
+ 142              		.loc 1 15 40 view .LVU22
+ 143              		.align	2
+ 144              	.L9:
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccnSXlDD.s 			page 5
+
+
+ 145 0018 08000000 		.word	_ZTVN11perspective16EncoderParameterE+8
+ 146              		.cfi_endproc
+ 147              	.LFE4528:
+ 149              		.section	.rodata._ZN11perspective16EncoderParameter9IncrementEi.str1.4,"aMS",%progbits,1
+ 150              		.align	2
+ 151              	.LC0:
+ 152 0000 436F6E74 		.ascii	"Continuous turn detected for parameter '%s'. Increa"
+ 152      696E756F 
+ 152      75732074 
+ 152      75726E20 
+ 152      64657465 
+ 153 0033 73696E67 		.ascii	"sing acceleration multiplier.\000"
+ 153      20616363 
+ 153      656C6572 
+ 153      6174696F 
+ 153      6E206D75 
+ 154              		.section	.text._ZN11perspective16EncoderParameter9IncrementEi,"ax",%progbits
+ 155              		.align	1
+ 156              		.p2align 2,,3
+ 157              		.global	_ZN11perspective16EncoderParameter9IncrementEi
+ 158              		.syntax unified
+ 159              		.thumb
+ 160              		.thumb_func
+ 162              	_ZN11perspective16EncoderParameter9IncrementEi:
+ 163              	.LVL10:
+ 164              	.LFB4531:
+  25:parameters/encoderparameter.cpp ****     uint32_t now = System::GetNow();
+ 165              		.loc 1 25 45 is_stmt 1 view -0
+ 166              		.cfi_startproc
+ 167              		@ args = 0, pretend = 0, frame = 0
+ 168              		@ frame_needed = 0, uses_anonymous_args = 0
+  26:parameters/encoderparameter.cpp ****     
+ 169              		.loc 1 26 5 view .LVU24
+  25:parameters/encoderparameter.cpp ****     uint32_t now = System::GetNow();
+ 170              		.loc 1 25 45 is_stmt 0 view .LVU25
+ 171 0000 38B5     		push	{r3, r4, r5, lr}
+ 172              		.cfi_def_cfa_offset 16
+ 173              		.cfi_offset 3, -16
+ 174              		.cfi_offset 4, -12
+ 175              		.cfi_offset 5, -8
+ 176              		.cfi_offset 14, -4
+ 177 0002 0446     		mov	r4, r0
+ 178 0004 2DED028B 		vpush.64	{d8}
+ 179              		.cfi_def_cfa_offset 24
+ 180              		.cfi_offset 80, -24
+ 181              		.cfi_offset 81, -20
+  25:parameters/encoderparameter.cpp ****     uint32_t now = System::GetNow();
+ 182              		.loc 1 25 45 view .LVU26
+ 183 0008 08EE101A 		vmov	s16, r1	@ int
+  26:parameters/encoderparameter.cpp ****     
+ 184              		.loc 1 26 34 view .LVU27
+ 185 000c FFF7FEFF 		bl	_ZN5daisy6System6GetNowEv
+ 186              	.LVL11:
+  29:parameters/encoderparameter.cpp ****         Hardware::PrintLine("Continuous turn detected for parameter '%s'. Increasing acceleration m
+ 187              		.loc 1 29 15 view .LVU28
+ 188 0010 236B     		ldr	r3, [r4, #48]
+  26:parameters/encoderparameter.cpp ****     
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccnSXlDD.s 			page 6
+
+
+ 189              		.loc 1 26 34 view .LVU29
+ 190 0012 0546     		mov	r5, r0
+ 191              	.LVL12:
+  29:parameters/encoderparameter.cpp ****         Hardware::PrintLine("Continuous turn detected for parameter '%s'. Increasing acceleration m
+ 192              		.loc 1 29 5 is_stmt 1 view .LVU30
+  29:parameters/encoderparameter.cpp ****         Hardware::PrintLine("Continuous turn detected for parameter '%s'. Increasing acceleration m
+ 193              		.loc 1 29 13 is_stmt 0 view .LVU31
+ 194 0014 C21A     		subs	r2, r0, r3
+  29:parameters/encoderparameter.cpp ****         Hardware::PrintLine("Continuous turn detected for parameter '%s'. Increasing acceleration m
+ 195              		.loc 1 29 58 discriminator 1 view .LVU32
+ 196 0016 B2F5967F 		cmp	r2, #300
+ 197 001a 00D8     		bhi	.L14
+ 198 001c 23BB     		cbnz	r3, .L23
+ 199              	.L14:
+ 200 001e B7EE006A 		vmov.f32	s12, #1.0e+0
+ 201 0022 F0EE465A 		vmov.f32	s11, s12
+ 202              	.LVL13:
+ 203              	.L12:
+  43:parameters/encoderparameter.cpp ****     currentValue_ = clamp(currentValue_, minValue_, maxValue_);
+ 204              		.loc 1 43 28 view .LVU33
+ 205 0026 B8EEC88A 		vcvt.f32.s32	s16, s16
+ 206              	.LVL14:
+  43:parameters/encoderparameter.cpp ****     currentValue_ = clamp(currentValue_, minValue_, maxValue_);
+ 207              		.loc 1 43 28 view .LVU34
+ 208 002a D4ED0B6A 		vldr.32	s13, [r4, #44]
+  43:parameters/encoderparameter.cpp ****     currentValue_ = clamp(currentValue_, minValue_, maxValue_);
+ 209              		.loc 1 43 19 view .LVU35
+ 210 002e 94ED047A 		vldr.32	s14, [r4, #16]
+ 211              	.LBB19:
+ 212              	.LBB20:
+ 213              		.file 2 "parameters/effectparameter.h"
+   1:parameters/effectparameter.h **** #ifndef PERSPECTIVE_EFFECTPARAMETER_H
+   2:parameters/effectparameter.h **** #define PERSPECTIVE_EFFECTPARAMETER_H
+   3:parameters/effectparameter.h **** 
+   4:parameters/effectparameter.h **** #include "daisy_seed.h"
+   5:parameters/effectparameter.h **** #include <vector>
+   6:parameters/effectparameter.h **** 
+   7:parameters/effectparameter.h **** #include "../controls.h"
+   8:parameters/effectparameter.h **** 
+   9:parameters/effectparameter.h **** using namespace daisy;
+  10:parameters/effectparameter.h **** 
+  11:parameters/effectparameter.h **** namespace perspective {
+  12:parameters/effectparameter.h **** 
+  13:parameters/effectparameter.h **** // Local clamp function to avoid std::clamp (C++17)
+  14:parameters/effectparameter.h **** template<typename T>
+  15:parameters/effectparameter.h **** inline constexpr const T& clamp(const T& v, const T& lo, const T& hi) {
+  16:parameters/effectparameter.h ****     return (v < lo) ? lo : (hi < v) ? hi : v;
+ 214              		.loc 2 16 15 view .LVU36
+ 215 0032 D4ED027A 		vldr.32	s15, [r4, #8]
+ 216              	.LBE20:
+ 217              	.LBE19:
+  43:parameters/encoderparameter.cpp ****     currentValue_ = clamp(currentValue_, minValue_, maxValue_);
+ 218              		.loc 1 43 19 view .LVU37
+ 219 0036 66EEC86A 		vnmul.f32	s13, s13, s16
+  34:parameters/encoderparameter.cpp ****         }
+ 220              		.loc 1 34 37 view .LVU38
+ 221 003a 84ED0D6A 		vstr.32	s12, [r4, #52]
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccnSXlDD.s 			page 7
+
+
+  41:parameters/encoderparameter.cpp ****     
+ 222              		.loc 1 41 5 is_stmt 1 view .LVU39
+  41:parameters/encoderparameter.cpp ****     
+ 223              		.loc 1 41 19 is_stmt 0 view .LVU40
+ 224 003e 2563     		str	r5, [r4, #48]
+  43:parameters/encoderparameter.cpp ****     currentValue_ = clamp(currentValue_, minValue_, maxValue_);
+ 225              		.loc 1 43 5 is_stmt 1 view .LVU41
+  43:parameters/encoderparameter.cpp ****     currentValue_ = clamp(currentValue_, minValue_, maxValue_);
+ 226              		.loc 1 43 19 is_stmt 0 view .LVU42
+ 227 0040 A6EEA57A 		vfma.f32	s14, s13, s11
+  44:parameters/encoderparameter.cpp **** }
+ 228              		.loc 1 44 5 is_stmt 1 view .LVU43
+ 229              	.LVL15:
+ 230              	.LBB22:
+ 231              	.LBI19:
+  15:parameters/effectparameter.h ****     return (v < lo) ? lo : (hi < v) ? hi : v;
+ 232              		.loc 2 15 27 view .LVU44
+ 233              	.LBB21:
+ 234              		.loc 2 16 21 is_stmt 0 view .LVU45
+ 235 0044 B4EEE77A 		vcmpe.f32	s14, s15
+ 236 0048 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 237 004c 07D4     		bmi	.L13
+ 238              		.loc 2 16 32 discriminator 2 view .LVU46
+ 239 004e D4ED037A 		vldr.32	s15, [r4, #12]
+ 240 0052 B4EEE77A 		vcmpe.f32	s14, s15
+ 241 0056 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 242 005a 77FE877A 		vselgt.f32	s15, s15, s14
+ 243              	.L13:
+ 244              	.LVL16:
+ 245              		.loc 2 16 32 discriminator 2 view .LVU47
+ 246              	.LBE21:
+ 247              	.LBE22:
+  45:parameters/encoderparameter.cpp **** 
+ 248              		.loc 1 45 1 view .LVU48
+ 249 005e BDEC028B 		vldm	sp!, {d8}
+ 250              		.cfi_remember_state
+ 251              		.cfi_restore 80
+ 252              		.cfi_restore 81
+ 253              		.cfi_def_cfa_offset 16
+  44:parameters/encoderparameter.cpp **** }
+ 254              		.loc 1 44 19 discriminator 1 view .LVU49
+ 255 0062 C4ED047A 		vstr.32	s15, [r4, #16]
+  45:parameters/encoderparameter.cpp **** 
+ 256              		.loc 1 45 1 view .LVU50
+ 257 0066 38BD     		pop	{r3, r4, r5, pc}
+ 258              	.LVL17:
+ 259              	.L23:
+ 260              		.cfi_restore_state
+  30:parameters/encoderparameter.cpp ****         // Increase acceleration multiplier
+ 261              		.loc 1 30 9 is_stmt 1 view .LVU51
+  30:parameters/encoderparameter.cpp ****         // Increase acceleration multiplier
+ 262              		.loc 1 30 28 is_stmt 0 view .LVU52
+ 263 0068 2046     		mov	r0, r4
+ 264              	.LVL18:
+  30:parameters/encoderparameter.cpp ****         // Increase acceleration multiplier
+ 265              		.loc 1 30 28 view .LVU53
+ 266 006a FFF7FEFF 		bl	_ZNK11perspective15EffectParameter7GetNameEv
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccnSXlDD.s 			page 8
+
+
+ 267              	.LVL19:
+  30:parameters/encoderparameter.cpp ****         // Increase acceleration multiplier
+ 268              		.loc 1 30 28 view .LVU54
+ 269 006e 0146     		mov	r1, r0
+ 270              	.LVL20:
+ 271              	.LBB23:
+ 272              	.LBI23:
+ 273              		.file 3 "dependencies/libDaisy/src/daisy_seed.h"
+   1:dependencies/libDaisy/src/daisy_seed.h **** #pragma once
+   2:dependencies/libDaisy/src/daisy_seed.h **** #ifndef DSY_SEED_H
+   3:dependencies/libDaisy/src/daisy_seed.h **** #define DSY_SEED_H
+   4:dependencies/libDaisy/src/daisy_seed.h **** 
+   5:dependencies/libDaisy/src/daisy_seed.h **** #include "daisy.h"
+   6:dependencies/libDaisy/src/daisy_seed.h **** 
+   7:dependencies/libDaisy/src/daisy_seed.h **** //Uncomment this out if you're still using the rev2 hardware
+   8:dependencies/libDaisy/src/daisy_seed.h **** //#define SEED_REV2
+   9:dependencies/libDaisy/src/daisy_seed.h **** 
+  10:dependencies/libDaisy/src/daisy_seed.h **** namespace daisy
+  11:dependencies/libDaisy/src/daisy_seed.h **** {
+  12:dependencies/libDaisy/src/daisy_seed.h **** /**
+  13:dependencies/libDaisy/src/daisy_seed.h ****    @brief This is the higher-level interface for the Daisy board. \n 
+  14:dependencies/libDaisy/src/daisy_seed.h ****     All basic peripheral configuration/initialization is setup here. \n
+  15:dependencies/libDaisy/src/daisy_seed.h **** 
+  16:dependencies/libDaisy/src/daisy_seed.h ****    @ingroup boards
+  17:dependencies/libDaisy/src/daisy_seed.h **** */
+  18:dependencies/libDaisy/src/daisy_seed.h **** class DaisySeed
+  19:dependencies/libDaisy/src/daisy_seed.h **** {
+  20:dependencies/libDaisy/src/daisy_seed.h ****   public:
+  21:dependencies/libDaisy/src/daisy_seed.h ****     DaisySeed() {}
+  22:dependencies/libDaisy/src/daisy_seed.h ****     ~DaisySeed() {}
+  23:dependencies/libDaisy/src/daisy_seed.h **** 
+  24:dependencies/libDaisy/src/daisy_seed.h ****     /** This function used to provide a pre-initialization configuraiton 
+  25:dependencies/libDaisy/src/daisy_seed.h ****      *  it has since been deprecated, and does nothing.
+  26:dependencies/libDaisy/src/daisy_seed.h ****      */
+  27:dependencies/libDaisy/src/daisy_seed.h ****     void Configure();
+  28:dependencies/libDaisy/src/daisy_seed.h **** 
+  29:dependencies/libDaisy/src/daisy_seed.h ****     /** 
+  30:dependencies/libDaisy/src/daisy_seed.h ****     Initializes the Daisy Seed and the following peripherals:
+  31:dependencies/libDaisy/src/daisy_seed.h ****     SDRAM, QSPI, 24-bit 48kHz Audio via AK4556, Internal USB,
+  32:dependencies/libDaisy/src/daisy_seed.h ****     as well as the built-in LED and Testpoint.
+  33:dependencies/libDaisy/src/daisy_seed.h **** 
+  34:dependencies/libDaisy/src/daisy_seed.h ****     ADCs, DACs, and other special peripherals (such as I2C, SPI, etc.)
+  35:dependencies/libDaisy/src/daisy_seed.h ****     can be initialized using their specific initializers within libdaisy
+  36:dependencies/libDaisy/src/daisy_seed.h ****     for a specific application.
+  37:dependencies/libDaisy/src/daisy_seed.h ****     */
+  38:dependencies/libDaisy/src/daisy_seed.h ****     void Init(bool boost = false);
+  39:dependencies/libDaisy/src/daisy_seed.h **** 
+  40:dependencies/libDaisy/src/daisy_seed.h ****     /** 
+  41:dependencies/libDaisy/src/daisy_seed.h ****     Deinitializes all peripherals automatically handled by `Init`.
+  42:dependencies/libDaisy/src/daisy_seed.h ****     */
+  43:dependencies/libDaisy/src/daisy_seed.h ****     void DeInit();
+  44:dependencies/libDaisy/src/daisy_seed.h **** 
+  45:dependencies/libDaisy/src/daisy_seed.h ****     /** 
+  46:dependencies/libDaisy/src/daisy_seed.h ****     Wait some ms before going on.
+  47:dependencies/libDaisy/src/daisy_seed.h ****     \param del Delay time in ms.
+  48:dependencies/libDaisy/src/daisy_seed.h ****     */
+  49:dependencies/libDaisy/src/daisy_seed.h ****     void DelayMs(size_t del);
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccnSXlDD.s 			page 9
+
+
+  50:dependencies/libDaisy/src/daisy_seed.h **** 
+  51:dependencies/libDaisy/src/daisy_seed.h ****     /** 
+  52:dependencies/libDaisy/src/daisy_seed.h ****     Returns the gpio_pin corresponding to the index 0-31.
+  53:dependencies/libDaisy/src/daisy_seed.h ****     For the given GPIO on the Daisy Seed (labeled 1-32 in docs).
+  54:dependencies/libDaisy/src/daisy_seed.h ****     */
+  55:dependencies/libDaisy/src/daisy_seed.h ****     static Pin GetPin(uint8_t pin_idx);
+  56:dependencies/libDaisy/src/daisy_seed.h **** 
+  57:dependencies/libDaisy/src/daisy_seed.h ****     /** Begins the audio for the seeds builtin audio.
+  58:dependencies/libDaisy/src/daisy_seed.h ****     the specified callback will get called whenever
+  59:dependencies/libDaisy/src/daisy_seed.h ****     new data is ready to be prepared.
+  60:dependencies/libDaisy/src/daisy_seed.h ****     */
+  61:dependencies/libDaisy/src/daisy_seed.h ****     void StartAudio(AudioHandle::InterleavingAudioCallback cb);
+  62:dependencies/libDaisy/src/daisy_seed.h **** 
+  63:dependencies/libDaisy/src/daisy_seed.h ****     /** Begins the audio for the seeds builtin audio.
+  64:dependencies/libDaisy/src/daisy_seed.h ****     the specified callback will get called whenever
+  65:dependencies/libDaisy/src/daisy_seed.h ****     new data is ready to be prepared.
+  66:dependencies/libDaisy/src/daisy_seed.h ****     This will use the newer non-interleaved callback.
+  67:dependencies/libDaisy/src/daisy_seed.h ****     */
+  68:dependencies/libDaisy/src/daisy_seed.h ****     void StartAudio(AudioHandle::AudioCallback cb);
+  69:dependencies/libDaisy/src/daisy_seed.h **** 
+  70:dependencies/libDaisy/src/daisy_seed.h ****     /** Changes to a new interleaved callback
+  71:dependencies/libDaisy/src/daisy_seed.h ****      */
+  72:dependencies/libDaisy/src/daisy_seed.h ****     void ChangeAudioCallback(AudioHandle::InterleavingAudioCallback cb);
+  73:dependencies/libDaisy/src/daisy_seed.h **** 
+  74:dependencies/libDaisy/src/daisy_seed.h ****     /** Changes to a new multichannel callback
+  75:dependencies/libDaisy/src/daisy_seed.h ****      */
+  76:dependencies/libDaisy/src/daisy_seed.h ****     void ChangeAudioCallback(AudioHandle::AudioCallback cb);
+  77:dependencies/libDaisy/src/daisy_seed.h **** 
+  78:dependencies/libDaisy/src/daisy_seed.h ****     /** Stops the audio if it is running. */
+  79:dependencies/libDaisy/src/daisy_seed.h ****     void StopAudio();
+  80:dependencies/libDaisy/src/daisy_seed.h **** 
+  81:dependencies/libDaisy/src/daisy_seed.h ****     /** Updates the Audio Sample Rate, and reinitializes.
+  82:dependencies/libDaisy/src/daisy_seed.h ****      ** Audio must be stopped for this to work.
+  83:dependencies/libDaisy/src/daisy_seed.h ****      */
+  84:dependencies/libDaisy/src/daisy_seed.h ****     void SetAudioSampleRate(SaiHandle::Config::SampleRate samplerate);
+  85:dependencies/libDaisy/src/daisy_seed.h **** 
+  86:dependencies/libDaisy/src/daisy_seed.h ****     /** Returns the audio sample rate in Hz as a floating point number.
+  87:dependencies/libDaisy/src/daisy_seed.h ****      */
+  88:dependencies/libDaisy/src/daisy_seed.h ****     float AudioSampleRate();
+  89:dependencies/libDaisy/src/daisy_seed.h **** 
+  90:dependencies/libDaisy/src/daisy_seed.h ****     /** Sets the number of samples processed per channel by the audio callback.
+  91:dependencies/libDaisy/src/daisy_seed.h ****      */
+  92:dependencies/libDaisy/src/daisy_seed.h ****     void SetAudioBlockSize(size_t blocksize);
+  93:dependencies/libDaisy/src/daisy_seed.h **** 
+  94:dependencies/libDaisy/src/daisy_seed.h ****     /** Returns the number of samples per channel in a block of audio. */
+  95:dependencies/libDaisy/src/daisy_seed.h ****     size_t AudioBlockSize();
+  96:dependencies/libDaisy/src/daisy_seed.h **** 
+  97:dependencies/libDaisy/src/daisy_seed.h ****     /** Returns the rate in Hz that the Audio callback is called */
+  98:dependencies/libDaisy/src/daisy_seed.h ****     float AudioCallbackRate() const;
+  99:dependencies/libDaisy/src/daisy_seed.h **** 
+ 100:dependencies/libDaisy/src/daisy_seed.h ****     /** Returns the SAI Handle for the Daisy Seed 
+ 101:dependencies/libDaisy/src/daisy_seed.h ****      *  This can be useful when adding a secondary codec,
+ 102:dependencies/libDaisy/src/daisy_seed.h ****      *  the result of this function can be passed to the audio reinit 
+ 103:dependencies/libDaisy/src/daisy_seed.h ****      *  with an SAI2 configuration
+ 104:dependencies/libDaisy/src/daisy_seed.h ****      */
+ 105:dependencies/libDaisy/src/daisy_seed.h ****     const SaiHandle& AudioSaiHandle() const;
+ 106:dependencies/libDaisy/src/daisy_seed.h **** 
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccnSXlDD.s 			page 10
+
+
+ 107:dependencies/libDaisy/src/daisy_seed.h ****     /** Sets the state of the built in LED
+ 108:dependencies/libDaisy/src/daisy_seed.h ****      */
+ 109:dependencies/libDaisy/src/daisy_seed.h ****     void SetLed(bool state);
+ 110:dependencies/libDaisy/src/daisy_seed.h **** 
+ 111:dependencies/libDaisy/src/daisy_seed.h ****     /** Sets the state of the test point near pin 10
+ 112:dependencies/libDaisy/src/daisy_seed.h ****      */
+ 113:dependencies/libDaisy/src/daisy_seed.h ****     void SetTestPoint(bool state);
+ 114:dependencies/libDaisy/src/daisy_seed.h **** 
+ 115:dependencies/libDaisy/src/daisy_seed.h ****     /** Print formatted debug log message
+ 116:dependencies/libDaisy/src/daisy_seed.h ****      */
+ 117:dependencies/libDaisy/src/daisy_seed.h ****     template <typename... VA>
+ 118:dependencies/libDaisy/src/daisy_seed.h ****     static void Print(const char* format, VA... va)
+ 119:dependencies/libDaisy/src/daisy_seed.h ****     {
+ 120:dependencies/libDaisy/src/daisy_seed.h ****         Log::Print(format, va...);
+ 121:dependencies/libDaisy/src/daisy_seed.h ****     }
+ 122:dependencies/libDaisy/src/daisy_seed.h **** 
+ 123:dependencies/libDaisy/src/daisy_seed.h ****     /** Print formatted debug log message with automatic line termination
+ 124:dependencies/libDaisy/src/daisy_seed.h ****     */
+ 125:dependencies/libDaisy/src/daisy_seed.h ****     template <typename... VA>
+ 126:dependencies/libDaisy/src/daisy_seed.h ****     static void PrintLine(const char* format, VA... va)
+ 274              		.loc 3 126 17 is_stmt 1 view .LVU55
+ 275              	.LBB24:
+ 127:dependencies/libDaisy/src/daisy_seed.h ****     {
+ 128:dependencies/libDaisy/src/daisy_seed.h ****         Log::PrintLine(format, va...);
+ 276              		.loc 3 128 23 is_stmt 0 view .LVU56
+ 277 0070 0A48     		ldr	r0, .L24
+ 278              	.LVL21:
+ 279              		.loc 3 128 23 view .LVU57
+ 280 0072 FFF7FEFF 		bl	_ZN5daisy6LoggerILNS_17LoggerDestinationE1EE9PrintLineEPKcz
+ 281              	.LVL22:
+ 282              		.loc 3 128 23 view .LVU58
+ 283              	.LBE24:
+ 284              	.LBE23:
+  32:parameters/encoderparameter.cpp ****         if (accelerationMultiplier_ > MAX_ACCELERATION) {
+ 285              		.loc 1 32 9 is_stmt 1 view .LVU59
+  32:parameters/encoderparameter.cpp ****         if (accelerationMultiplier_ > MAX_ACCELERATION) {
+ 286              		.loc 1 32 33 is_stmt 0 view .LVU60
+ 287 0076 F0EE007A 		vmov.f32	s15, #2.0e+0
+ 288 007a D4ED0D5A 		vldr.32	s11, [r4, #52]
+  33:parameters/encoderparameter.cpp ****             accelerationMultiplier_ = MAX_ACCELERATION;
+ 289              		.loc 1 33 9 view .LVU61
+ 290 007e 9FED086A 		vldr.32	s12, .L24+4
+  32:parameters/encoderparameter.cpp ****         if (accelerationMultiplier_ > MAX_ACCELERATION) {
+ 291              		.loc 1 32 33 view .LVU62
+ 292 0082 75EEA75A 		vadd.f32	s11, s11, s15
+  33:parameters/encoderparameter.cpp ****             accelerationMultiplier_ = MAX_ACCELERATION;
+ 293              		.loc 1 33 9 is_stmt 1 view .LVU63
+ 294 0086 F4EEC65A 		vcmpe.f32	s11, s12
+ 295 008a F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 296 008e 02DC     		bgt	.L15
+ 297 0090 B0EE656A 		vmov.f32	s12, s11
+ 298 0094 C7E7     		b	.L12
+ 299              	.L15:
+ 300 0096 F0EE465A 		vmov.f32	s11, s12
+ 301 009a C4E7     		b	.L12
+ 302              	.L25:
+ 303              		.align	2
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccnSXlDD.s 			page 11
+
+
+ 304              	.L24:
+ 305 009c 00000000 		.word	.LC0
+ 306 00a0 00004842 		.word	1112014848
+ 307              		.cfi_endproc
+ 308              	.LFE4531:
+ 310              		.section	.text._ZN11perspective16EncoderParameter9DecrementEi,"ax",%progbits
+ 311              		.align	1
+ 312              		.p2align 2,,3
+ 313              		.global	_ZN11perspective16EncoderParameter9DecrementEi
+ 314              		.syntax unified
+ 315              		.thumb
+ 316              		.thumb_func
+ 318              	_ZN11perspective16EncoderParameter9DecrementEi:
+ 319              	.LVL23:
+ 320              	.LFB4532:
+  47:parameters/encoderparameter.cpp ****     uint32_t now = System::GetNow();
+ 321              		.loc 1 47 45 view -0
+ 322              		.cfi_startproc
+ 323              		@ args = 0, pretend = 0, frame = 0
+ 324              		@ frame_needed = 0, uses_anonymous_args = 0
+  48:parameters/encoderparameter.cpp ****     
+ 325              		.loc 1 48 5 view .LVU65
+  47:parameters/encoderparameter.cpp ****     uint32_t now = System::GetNow();
+ 326              		.loc 1 47 45 is_stmt 0 view .LVU66
+ 327 0000 38B5     		push	{r3, r4, r5, lr}
+ 328              		.cfi_def_cfa_offset 16
+ 329              		.cfi_offset 3, -16
+ 330              		.cfi_offset 4, -12
+ 331              		.cfi_offset 5, -8
+ 332              		.cfi_offset 14, -4
+ 333 0002 0446     		mov	r4, r0
+ 334 0004 2DED028B 		vpush.64	{d8}
+ 335              		.cfi_def_cfa_offset 24
+ 336              		.cfi_offset 80, -24
+ 337              		.cfi_offset 81, -20
+  47:parameters/encoderparameter.cpp ****     uint32_t now = System::GetNow();
+ 338              		.loc 1 47 45 view .LVU67
+ 339 0008 08EE101A 		vmov	s16, r1	@ int
+  48:parameters/encoderparameter.cpp ****     
+ 340              		.loc 1 48 34 view .LVU68
+ 341 000c FFF7FEFF 		bl	_ZN5daisy6System6GetNowEv
+ 342              	.LVL24:
+  51:parameters/encoderparameter.cpp ****         Hardware::PrintLine("Continuous turn detected for parameter '%s'. Increasing acceleration m
+ 343              		.loc 1 51 15 view .LVU69
+ 344 0010 236B     		ldr	r3, [r4, #48]
+  48:parameters/encoderparameter.cpp ****     
+ 345              		.loc 1 48 34 view .LVU70
+ 346 0012 0546     		mov	r5, r0
+ 347              	.LVL25:
+  51:parameters/encoderparameter.cpp ****         Hardware::PrintLine("Continuous turn detected for parameter '%s'. Increasing acceleration m
+ 348              		.loc 1 51 5 is_stmt 1 view .LVU71
+  51:parameters/encoderparameter.cpp ****         Hardware::PrintLine("Continuous turn detected for parameter '%s'. Increasing acceleration m
+ 349              		.loc 1 51 13 is_stmt 0 view .LVU72
+ 350 0014 C21A     		subs	r2, r0, r3
+  51:parameters/encoderparameter.cpp ****         Hardware::PrintLine("Continuous turn detected for parameter '%s'. Increasing acceleration m
+ 351              		.loc 1 51 58 discriminator 1 view .LVU73
+ 352 0016 B2F5967F 		cmp	r2, #300
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccnSXlDD.s 			page 12
+
+
+ 353 001a 00D8     		bhi	.L29
+ 354 001c 23BB     		cbnz	r3, .L38
+ 355              	.L29:
+ 356 001e F7EE006A 		vmov.f32	s13, #1.0e+0
+ 357 0022 B0EE666A 		vmov.f32	s12, s13
+ 358              	.LVL26:
+ 359              	.L27:
+  64:parameters/encoderparameter.cpp ****     currentValue_ = clamp(currentValue_, minValue_, maxValue_);
+ 360              		.loc 1 64 28 view .LVU74
+ 361 0026 B8EEC88A 		vcvt.f32.s32	s16, s16
+ 362              	.LVL27:
+  64:parameters/encoderparameter.cpp ****     currentValue_ = clamp(currentValue_, minValue_, maxValue_);
+ 363              		.loc 1 64 28 view .LVU75
+ 364 002a D4ED0B5A 		vldr.32	s11, [r4, #44]
+  64:parameters/encoderparameter.cpp ****     currentValue_ = clamp(currentValue_, minValue_, maxValue_);
+ 365              		.loc 1 64 19 view .LVU76
+ 366 002e 94ED047A 		vldr.32	s14, [r4, #16]
+ 367              	.LBB25:
+ 368              	.LBB26:
+ 369              		.loc 2 16 15 view .LVU77
+ 370 0032 D4ED027A 		vldr.32	s15, [r4, #8]
+ 371              	.LBE26:
+ 372              	.LBE25:
+  64:parameters/encoderparameter.cpp ****     currentValue_ = clamp(currentValue_, minValue_, maxValue_);
+ 373              		.loc 1 64 28 view .LVU78
+ 374 0036 28EE258A 		vmul.f32	s16, s16, s11
+  55:parameters/encoderparameter.cpp ****         }
+ 375              		.loc 1 55 37 view .LVU79
+ 376 003a C4ED0D6A 		vstr.32	s13, [r4, #52]
+  62:parameters/encoderparameter.cpp ****     
+ 377              		.loc 1 62 5 is_stmt 1 view .LVU80
+  62:parameters/encoderparameter.cpp ****     
+ 378              		.loc 1 62 19 is_stmt 0 view .LVU81
+ 379 003e 2563     		str	r5, [r4, #48]
+  64:parameters/encoderparameter.cpp ****     currentValue_ = clamp(currentValue_, minValue_, maxValue_);
+ 380              		.loc 1 64 5 is_stmt 1 view .LVU82
+  64:parameters/encoderparameter.cpp ****     currentValue_ = clamp(currentValue_, minValue_, maxValue_);
+ 381              		.loc 1 64 19 is_stmt 0 view .LVU83
+ 382 0040 A8EE067A 		vfma.f32	s14, s16, s12
+  65:parameters/encoderparameter.cpp **** }
+ 383              		.loc 1 65 5 is_stmt 1 view .LVU84
+ 384              	.LVL28:
+ 385              	.LBB28:
+ 386              	.LBI25:
+  15:parameters/effectparameter.h ****     return (v < lo) ? lo : (hi < v) ? hi : v;
+ 387              		.loc 2 15 27 view .LVU85
+ 388              	.LBB27:
+ 389              		.loc 2 16 21 is_stmt 0 view .LVU86
+ 390 0044 B4EEE77A 		vcmpe.f32	s14, s15
+ 391 0048 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 392 004c 07D4     		bmi	.L28
+ 393              		.loc 2 16 32 discriminator 2 view .LVU87
+ 394 004e D4ED037A 		vldr.32	s15, [r4, #12]
+ 395 0052 B4EEE77A 		vcmpe.f32	s14, s15
+ 396 0056 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 397 005a 77FE877A 		vselgt.f32	s15, s15, s14
+ 398              	.L28:
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccnSXlDD.s 			page 13
+
+
+ 399              	.LVL29:
+ 400              		.loc 2 16 32 discriminator 2 view .LVU88
+ 401              	.LBE27:
+ 402              	.LBE28:
+  66:parameters/encoderparameter.cpp **** 
+ 403              		.loc 1 66 1 view .LVU89
+ 404 005e BDEC028B 		vldm	sp!, {d8}
+ 405              		.cfi_remember_state
+ 406              		.cfi_restore 80
+ 407              		.cfi_restore 81
+ 408              		.cfi_def_cfa_offset 16
+  65:parameters/encoderparameter.cpp **** }
+ 409              		.loc 1 65 19 discriminator 1 view .LVU90
+ 410 0062 C4ED047A 		vstr.32	s15, [r4, #16]
+  66:parameters/encoderparameter.cpp **** 
+ 411              		.loc 1 66 1 view .LVU91
+ 412 0066 38BD     		pop	{r3, r4, r5, pc}
+ 413              	.LVL30:
+ 414              	.L38:
+ 415              		.cfi_restore_state
+  52:parameters/encoderparameter.cpp ****         accelerationMultiplier_ += ACCELERATION_INCREMENT;
+ 416              		.loc 1 52 9 is_stmt 1 view .LVU92
+  52:parameters/encoderparameter.cpp ****         accelerationMultiplier_ += ACCELERATION_INCREMENT;
+ 417              		.loc 1 52 28 is_stmt 0 view .LVU93
+ 418 0068 2046     		mov	r0, r4
+ 419              	.LVL31:
+  52:parameters/encoderparameter.cpp ****         accelerationMultiplier_ += ACCELERATION_INCREMENT;
+ 420              		.loc 1 52 28 view .LVU94
+ 421 006a FFF7FEFF 		bl	_ZNK11perspective15EffectParameter7GetNameEv
+ 422              	.LVL32:
+  52:parameters/encoderparameter.cpp ****         accelerationMultiplier_ += ACCELERATION_INCREMENT;
+ 423              		.loc 1 52 28 view .LVU95
+ 424 006e 0146     		mov	r1, r0
+ 425              	.LVL33:
+ 426              	.LBB29:
+ 427              	.LBI29:
+ 126:dependencies/libDaisy/src/daisy_seed.h ****     {
+ 428              		.loc 3 126 17 is_stmt 1 view .LVU96
+ 429              	.LBB30:
+ 430              		.loc 3 128 23 is_stmt 0 view .LVU97
+ 431 0070 0A48     		ldr	r0, .L39
+ 432              	.LVL34:
+ 433              		.loc 3 128 23 view .LVU98
+ 434 0072 FFF7FEFF 		bl	_ZN5daisy6LoggerILNS_17LoggerDestinationE1EE9PrintLineEPKcz
+ 435              	.LVL35:
+ 436              		.loc 3 128 23 view .LVU99
+ 437              	.LBE30:
+ 438              	.LBE29:
+  53:parameters/encoderparameter.cpp ****         if (accelerationMultiplier_ > MAX_ACCELERATION) {
+ 439              		.loc 1 53 9 is_stmt 1 view .LVU100
+  53:parameters/encoderparameter.cpp ****         if (accelerationMultiplier_ > MAX_ACCELERATION) {
+ 440              		.loc 1 53 33 is_stmt 0 view .LVU101
+ 441 0076 F0EE007A 		vmov.f32	s15, #2.0e+0
+ 442 007a 94ED0D6A 		vldr.32	s12, [r4, #52]
+  54:parameters/encoderparameter.cpp ****             accelerationMultiplier_ = MAX_ACCELERATION;
+ 443              		.loc 1 54 9 view .LVU102
+ 444 007e DFED086A 		vldr.32	s13, .L39+4
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccnSXlDD.s 			page 14
+
+
+  53:parameters/encoderparameter.cpp ****         if (accelerationMultiplier_ > MAX_ACCELERATION) {
+ 445              		.loc 1 53 33 view .LVU103
+ 446 0082 36EE276A 		vadd.f32	s12, s12, s15
+  54:parameters/encoderparameter.cpp ****             accelerationMultiplier_ = MAX_ACCELERATION;
+ 447              		.loc 1 54 9 is_stmt 1 view .LVU104
+ 448 0086 B4EEE66A 		vcmpe.f32	s12, s13
+ 449 008a F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 450 008e 02DC     		bgt	.L30
+ 451 0090 F0EE466A 		vmov.f32	s13, s12
+ 452 0094 C7E7     		b	.L27
+ 453              	.L30:
+ 454 0096 B0EE666A 		vmov.f32	s12, s13
+ 455 009a C4E7     		b	.L27
+ 456              	.L40:
+ 457              		.align	2
+ 458              	.L39:
+ 459 009c 00000000 		.word	.LC0
+ 460 00a0 00004842 		.word	1112014848
+ 461              		.cfi_endproc
+ 462              	.LFE4532:
+ 464              		.section	.text._ZN11perspective16EncoderParameterC2EPKcffffii,"ax",%progbits
+ 465              		.align	1
+ 466              		.p2align 2,,3
+ 467              		.global	_ZN11perspective16EncoderParameterC2EPKcffffii
+ 468              		.syntax unified
+ 469              		.thumb
+ 470              		.thumb_func
+ 472              	_ZN11perspective16EncoderParameterC2EPKcffffii:
+ 473              	.LVL36:
+ 474              	.LFB4523:
+   8:parameters/encoderparameter.cpp ****     : EffectParameter(name, minValue, maxValue, defaultValue, index, displayIndex)
+ 475              		.loc 1 8 1 view -0
+ 476              		.cfi_startproc
+ 477              		@ args = 0, pretend = 0, frame = 0
+ 478              		@ frame_needed = 0, uses_anonymous_args = 0
+   8:parameters/encoderparameter.cpp ****     : EffectParameter(name, minValue, maxValue, defaultValue, index, displayIndex)
+ 479              		.loc 1 8 1 is_stmt 0 view .LVU106
+ 480 0000 10B5     		push	{r4, lr}
+ 481              		.cfi_def_cfa_offset 8
+ 482              		.cfi_offset 4, -8
+ 483              		.cfi_offset 14, -4
+ 484 0002 2DED028B 		vpush.64	{d8}
+ 485              		.cfi_def_cfa_offset 16
+ 486              		.cfi_offset 80, -16
+ 487              		.cfi_offset 81, -12
+   8:parameters/encoderparameter.cpp ****     : EffectParameter(name, minValue, maxValue, defaultValue, index, displayIndex)
+ 488              		.loc 1 8 1 view .LVU107
+ 489 0006 B0EE618A 		vmov.f32	s16, s3
+ 490 000a 0446     		mov	r4, r0
+ 491              	.LBB31:
+  12:parameters/encoderparameter.cpp **** {}
+ 492              		.loc 1 12 35 view .LVU108
+ 493 000c FFF7FEFF 		bl	_ZN11perspective15EffectParameterC2EPKcfffii
+ 494              	.LVL37:
+  12:parameters/encoderparameter.cpp **** {}
+ 495              		.loc 1 12 7 view .LVU109
+ 496 0010 4FF07E53 		mov	r3, #1065353216
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccnSXlDD.s 			page 15
+
+
+  12:parameters/encoderparameter.cpp **** {}
+ 497              		.loc 1 12 35 discriminator 1 view .LVU110
+ 498 0014 0549     		ldr	r1, .L43
+  11:parameters/encoderparameter.cpp ****     , accelerationMultiplier_(1.0f)
+ 499              		.loc 1 11 7 view .LVU111
+ 500 0016 0022     		movs	r2, #0
+  10:parameters/encoderparameter.cpp ****     , lastTurnTime_(0)
+ 501              		.loc 1 10 7 view .LVU112
+ 502 0018 84ED0B8A 		vstr.32	s16, [r4, #44]
+ 503              	.LBE31:
+  13:parameters/encoderparameter.cpp **** 
+ 504              		.loc 1 13 2 view .LVU113
+ 505 001c 2046     		mov	r0, r4
+ 506              	.LBB32:
+  12:parameters/encoderparameter.cpp **** {}
+ 507              		.loc 1 12 35 discriminator 1 view .LVU114
+ 508 001e 2160     		str	r1, [r4]
+  11:parameters/encoderparameter.cpp ****     , accelerationMultiplier_(1.0f)
+ 509              		.loc 1 11 7 view .LVU115
+ 510 0020 2263     		str	r2, [r4, #48]
+  12:parameters/encoderparameter.cpp **** {}
+ 511              		.loc 1 12 7 view .LVU116
+ 512 0022 6363     		str	r3, [r4, #52]	@ float
+ 513              	.LBE32:
+  13:parameters/encoderparameter.cpp **** 
+ 514              		.loc 1 13 2 view .LVU117
+ 515 0024 BDEC028B 		vldm	sp!, {d8}
+ 516              		.cfi_restore 80
+ 517              		.cfi_restore 81
+ 518              		.cfi_def_cfa_offset 8
+ 519              	.LVL38:
+  13:parameters/encoderparameter.cpp **** 
+ 520              		.loc 1 13 2 view .LVU118
+ 521 0028 10BD     		pop	{r4, pc}
+ 522              	.LVL39:
+ 523              	.L44:
+  13:parameters/encoderparameter.cpp **** 
+ 524              		.loc 1 13 2 view .LVU119
+ 525 002a 00BF     		.align	2
+ 526              	.L43:
+ 527 002c 08000000 		.word	_ZTVN11perspective16EncoderParameterE+8
+ 528              		.cfi_endproc
+ 529              	.LFE4523:
+ 531              		.global	_ZN11perspective16EncoderParameterC1EPKcffffii
+ 532              		.thumb_set _ZN11perspective16EncoderParameterC1EPKcffffii,_ZN11perspective16EncoderParameterC2EPKc
+ 533              		.section	.text._ZN11perspective16EncoderParameter11SetStepSizeEf,"ax",%progbits
+ 534              		.align	1
+ 535              		.p2align 2,,3
+ 536              		.global	_ZN11perspective16EncoderParameter11SetStepSizeEf
+ 537              		.syntax unified
+ 538              		.thumb
+ 539              		.thumb_func
+ 541              	_ZN11perspective16EncoderParameter11SetStepSizeEf:
+ 542              	.LVL40:
+ 543              	.LFB4529:
+  17:parameters/encoderparameter.cpp ****     stepSize_ = stepSize;
+ 544              		.loc 1 17 52 is_stmt 1 view -0
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccnSXlDD.s 			page 16
+
+
+ 545              		.cfi_startproc
+ 546              		@ args = 0, pretend = 0, frame = 0
+ 547              		@ frame_needed = 0, uses_anonymous_args = 0
+ 548              		@ link register save eliminated.
+  18:parameters/encoderparameter.cpp **** }
+ 549              		.loc 1 18 5 view .LVU121
+  18:parameters/encoderparameter.cpp **** }
+ 550              		.loc 1 18 15 is_stmt 0 view .LVU122
+ 551 0000 80ED0B0A 		vstr.32	s0, [r0, #44]
+  19:parameters/encoderparameter.cpp **** 
+ 552              		.loc 1 19 1 view .LVU123
+ 553 0004 7047     		bx	lr
+ 554              		.cfi_endproc
+ 555              	.LFE4529:
+ 557 0006 00BF     		.section	.text._ZNK11perspective16EncoderParameter11GetStepSizeEv,"ax",%progbits
+ 558              		.align	1
+ 559              		.p2align 2,,3
+ 560              		.global	_ZNK11perspective16EncoderParameter11GetStepSizeEv
+ 561              		.syntax unified
+ 562              		.thumb
+ 563              		.thumb_func
+ 565              	_ZNK11perspective16EncoderParameter11GetStepSizeEv:
+ 566              	.LVL41:
+ 567              	.LFB4530:
+  21:parameters/encoderparameter.cpp ****     return stepSize_;
+ 568              		.loc 1 21 45 is_stmt 1 view -0
+ 569              		.cfi_startproc
+ 570              		@ args = 0, pretend = 0, frame = 0
+ 571              		@ frame_needed = 0, uses_anonymous_args = 0
+ 572              		@ link register save eliminated.
+  22:parameters/encoderparameter.cpp **** }
+ 573              		.loc 1 22 5 view .LVU125
+  23:parameters/encoderparameter.cpp **** 
+ 574              		.loc 1 23 1 is_stmt 0 view .LVU126
+ 575 0000 90ED0B0A 		vldr.32	s0, [r0, #44]
+ 576 0004 7047     		bx	lr
+ 577              		.cfi_endproc
+ 578              	.LFE4530:
+ 580              		.global	_ZTVN11perspective16EncoderParameterE
+ 581              		.section	.rodata._ZTVN11perspective16EncoderParameterE,"a"
+ 582              		.align	2
+ 585              	_ZTVN11perspective16EncoderParameterE:
+ 586 0000 00000000 		.word	0
+ 587 0004 00000000 		.word	0
+ 588 0008 00000000 		.word	_ZN11perspective16EncoderParameterD1Ev
+ 589 000c 00000000 		.word	_ZN11perspective16EncoderParameterD0Ev
+ 590 0010 00000000 		.word	_ZNK11perspective16EncoderParameter7GetTypeEv
+ 591 0014 00000000 		.word	_ZNK11perspective15EffectParameter16GetValueAsStringEPcj
+ 592 0018 00000000 		.word	_ZN11perspective15EffectParameter8SetValueEf
+ 593 001c 00000000 		.word	_ZN11perspective16EncoderParameter9IncrementEi
+ 594 0020 00000000 		.word	_ZN11perspective16EncoderParameter9DecrementEi
+ 595              		.text
+ 596              	.Letext0:
+ 597              		.file 4 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/ma
+ 598              		.file 5 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/sy
+ 599              		.file 6 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/st
+ 600              		.file 7 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/lib/gcc/arm-none-eabi/14
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccnSXlDD.s 			page 17
+
+
+ 601              		.file 8 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c+
+ 602              		.file 9 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c+
+ 603              		.file 10 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 604              		.file 11 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 605              		.file 12 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 606              		.file 13 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 607              		.file 14 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 608              		.file 15 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 609              		.file 16 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 610              		.file 17 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 611              		.file 18 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 612              		.file 19 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 613              		.file 20 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 614              		.file 21 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 615              		.file 22 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 616              		.file 23 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 617              		.file 24 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 618              		.file 25 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 619              		.file 26 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/s
+ 620              		.file 27 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/s
+ 621              		.file 28 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/s
+ 622              		.file 29 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/m
+ 623              		.file 30 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/s
+ 624              		.file 31 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 625              		.file 32 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 626              		.file 33 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 627              		.file 34 "dependencies/libDaisy/src/daisy_core.h"
+ 628              		.file 35 "dependencies/libDaisy/src/sys/system.h"
+ 629              		.file 36 "dependencies/libDaisy/src/per/qspi.h"
+ 630              		.file 37 "dependencies/libDaisy/src/per/dac.h"
+ 631              		.file 38 "dependencies/libDaisy/src/per/gpio.h"
+ 632              		.file 39 "dependencies/libDaisy/src/per/sai.h"
+ 633              		.file 40 "dependencies/libDaisy/src/hid/audio.h"
+ 634              		.file 41 "dependencies/libDaisy/src/per/adc.h"
+ 635              		.file 42 "dependencies/libDaisy/src/hid/usb.h"
+ 636              		.file 43 "dependencies/libDaisy/src/hid/logger_impl.h"
+ 637              		.file 44 "dependencies/libDaisy/src/dev/codec_ak4556.h"
+ 638              		.file 45 "dependencies/libDaisy/src/dev/max11300.h"
+ 639              		.file 46 "dependencies/libDaisy/src/dev/sr_595.h"
+ 640              		.file 47 "dependencies/libDaisy/src/util/wav_format.h"
+ 641              		.file 48 "dependencies/libDaisy/src/hid/logger.h"
+ 642              		.file 49 "dependencies/libDaisy/src/dev/sdram.h"
+ 643              		.file 50 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 644              		.file 51 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/lib/gcc/arm-none-eabi/1
+ 645              		.file 52 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/s
+ 646              		.file 53 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/s
+ 647              		.file 54 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/w
+ 648              		.file 55 "dependencies/libDaisy/Middlewares/Third_Party/FatFs/src/integer.h"
+ 649              		.file 56 "dependencies/libDaisy/Middlewares/Third_Party/FatFs/src/ff.h"
+ 650              		.file 57 "parameters/../controls.h"
+ 651              		.file 58 "parameters/encoderparameter.h"
+ 652              		.file 59 "parameters/../ui/switch.h"
+ 653              		.file 60 "parameters/../ui/encoder.h"
+ 654              		.file 61 "parameters/../hardware.h"
+ 655              		.file 62 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 656              		.file 63 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 657              		.file 64 "<built-in>"
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccnSXlDD.s 			page 18
+
+
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccnSXlDD.s 			page 19
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 encoderparameter.cpp
+C:\Users\Oliver\AppData\Local\Temp\ccnSXlDD.s:20     .text._ZNK11perspective16EncoderParameter7GetTypeEv:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\ccnSXlDD.s:27     .text._ZNK11perspective16EncoderParameter7GetTypeEv:00000000 _ZNK11perspective16EncoderParameter7GetTypeEv
+C:\Users\Oliver\AppData\Local\Temp\ccnSXlDD.s:45     .text._ZN11perspective16EncoderParameterD2Ev:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\ccnSXlDD.s:52     .text._ZN11perspective16EncoderParameterD2Ev:00000000 _ZN11perspective16EncoderParameterD2Ev
+C:\Users\Oliver\AppData\Local\Temp\ccnSXlDD.s:85     .text._ZN11perspective16EncoderParameterD2Ev:00000010 $d
+C:\Users\Oliver\AppData\Local\Temp\ccnSXlDD.s:585    .rodata._ZTVN11perspective16EncoderParameterE:00000000 _ZTVN11perspective16EncoderParameterE
+C:\Users\Oliver\AppData\Local\Temp\ccnSXlDD.s:52     .text._ZN11perspective16EncoderParameterD2Ev:00000000 _ZN11perspective16EncoderParameterD1Ev
+C:\Users\Oliver\AppData\Local\Temp\ccnSXlDD.s:92     .text._ZN11perspective16EncoderParameterD0Ev:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\ccnSXlDD.s:99     .text._ZN11perspective16EncoderParameterD0Ev:00000000 _ZN11perspective16EncoderParameterD0Ev
+C:\Users\Oliver\AppData\Local\Temp\ccnSXlDD.s:145    .text._ZN11perspective16EncoderParameterD0Ev:00000018 $d
+C:\Users\Oliver\AppData\Local\Temp\ccnSXlDD.s:150    .rodata._ZN11perspective16EncoderParameter9IncrementEi.str1.4:00000000 $d
+C:\Users\Oliver\AppData\Local\Temp\ccnSXlDD.s:155    .text._ZN11perspective16EncoderParameter9IncrementEi:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\ccnSXlDD.s:162    .text._ZN11perspective16EncoderParameter9IncrementEi:00000000 _ZN11perspective16EncoderParameter9IncrementEi
+C:\Users\Oliver\AppData\Local\Temp\ccnSXlDD.s:305    .text._ZN11perspective16EncoderParameter9IncrementEi:0000009c $d
+C:\Users\Oliver\AppData\Local\Temp\ccnSXlDD.s:311    .text._ZN11perspective16EncoderParameter9DecrementEi:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\ccnSXlDD.s:318    .text._ZN11perspective16EncoderParameter9DecrementEi:00000000 _ZN11perspective16EncoderParameter9DecrementEi
+C:\Users\Oliver\AppData\Local\Temp\ccnSXlDD.s:459    .text._ZN11perspective16EncoderParameter9DecrementEi:0000009c $d
+C:\Users\Oliver\AppData\Local\Temp\ccnSXlDD.s:465    .text._ZN11perspective16EncoderParameterC2EPKcffffii:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\ccnSXlDD.s:472    .text._ZN11perspective16EncoderParameterC2EPKcffffii:00000000 _ZN11perspective16EncoderParameterC2EPKcffffii
+C:\Users\Oliver\AppData\Local\Temp\ccnSXlDD.s:527    .text._ZN11perspective16EncoderParameterC2EPKcffffii:0000002c $d
+C:\Users\Oliver\AppData\Local\Temp\ccnSXlDD.s:472    .text._ZN11perspective16EncoderParameterC2EPKcffffii:00000000 _ZN11perspective16EncoderParameterC1EPKcffffii
+C:\Users\Oliver\AppData\Local\Temp\ccnSXlDD.s:534    .text._ZN11perspective16EncoderParameter11SetStepSizeEf:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\ccnSXlDD.s:541    .text._ZN11perspective16EncoderParameter11SetStepSizeEf:00000000 _ZN11perspective16EncoderParameter11SetStepSizeEf
+C:\Users\Oliver\AppData\Local\Temp\ccnSXlDD.s:558    .text._ZNK11perspective16EncoderParameter11GetStepSizeEv:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\ccnSXlDD.s:565    .text._ZNK11perspective16EncoderParameter11GetStepSizeEv:00000000 _ZNK11perspective16EncoderParameter11GetStepSizeEv
+C:\Users\Oliver\AppData\Local\Temp\ccnSXlDD.s:582    .rodata._ZTVN11perspective16EncoderParameterE:00000000 $d
+
+UNDEFINED SYMBOLS
+_ZN11perspective15EffectParameterD2Ev
+_ZdlPvj
+_ZN5daisy6System6GetNowEv
+_ZNK11perspective15EffectParameter7GetNameEv
+_ZN5daisy6LoggerILNS_17LoggerDestinationE1EE9PrintLineEPKcz
+_ZN11perspective15EffectParameterC2EPKcfffii
+_ZNK11perspective15EffectParameter16GetValueAsStringEPcj
+_ZN11perspective15EffectParameter8SetValueEf

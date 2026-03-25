@@ -1,0 +1,363 @@
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccmqgUKf.s 			page 1
+
+
+   1              		.cpu cortex-m7
+   2              		.arch armv7e-m
+   3              		.fpu fpv5-d16
+   4              		.eabi_attribute 28, 1
+   5              		.eabi_attribute 20, 1
+   6              		.eabi_attribute 21, 1
+   7              		.eabi_attribute 23, 3
+   8              		.eabi_attribute 24, 1
+   9              		.eabi_attribute 25, 1
+  10              		.eabi_attribute 26, 1
+  11              		.eabi_attribute 30, 2
+  12              		.eabi_attribute 34, 1
+  13              		.eabi_attribute 18, 4
+  14              		.file	"ui.cpp"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.file 1 "ui/ui.cpp"
+  19              		.section	.text._ZN11perspective2UI4ExecEv,"ax",%progbits
+  20              		.align	1
+  21              		.p2align 2,,3
+  22              		.global	_ZN11perspective2UI4ExecEv
+  23              		.syntax unified
+  24              		.thumb
+  25              		.thumb_func
+  27              	_ZN11perspective2UI4ExecEv:
+  28              	.LVL0:
+  29              	.LFB3461:
+   1:ui/ui.cpp     **** #include "ui.h"
+   2:ui/ui.cpp     **** 
+   3:ui/ui.cpp     **** using namespace perspective;
+   4:ui/ui.cpp     **** 
+   5:ui/ui.cpp     **** UI::UI() {
+   6:ui/ui.cpp     **** 
+   7:ui/ui.cpp     **** }
+   8:ui/ui.cpp     **** 
+   9:ui/ui.cpp     **** UI::~UI() {
+  10:ui/ui.cpp     ****     
+  11:ui/ui.cpp     **** }
+  12:ui/ui.cpp     **** 
+  13:ui/ui.cpp     **** void UI::Exec() {
+  30              		.loc 1 13 17 view -0
+  31              		.cfi_startproc
+  32              		@ Volatile: function does not return.
+  33              		@ args = 0, pretend = 0, frame = 0
+  34              		@ frame_needed = 0, uses_anonymous_args = 0
+  35              		.loc 1 13 17 is_stmt 0 view .LVU1
+  36 0000 041D     		adds	r4, r0, #4
+  37 0002 08B5     		push	{r3, lr}
+  38              		.cfi_def_cfa_offset 8
+  39              		.cfi_offset 3, -8
+  40              		.cfi_offset 14, -4
+  41              	.LVL1:
+  42              	.L2:
+  14:ui/ui.cpp     ****     while(true) {
+  43              		.loc 1 14 5 is_stmt 1 view .LVU2
+  15:ui/ui.cpp     ****         eventHandler_.ProcessEvents();
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccmqgUKf.s 			page 2
+
+
+  44              		.loc 1 15 9 discriminator 1 view .LVU3
+  45              		.loc 1 15 36 is_stmt 0 discriminator 1 view .LVU4
+  46 0004 2046     		mov	r0, r4
+  47 0006 FFF7FEFF 		bl	_ZN11perspective14UIEventHandler13ProcessEventsEv
+  48              	.LVL2:
+  14:ui/ui.cpp     ****     while(true) {
+  49              		.loc 1 14 5 is_stmt 1 view .LVU5
+  50 000a FBE7     		b	.L2
+  51              		.cfi_endproc
+  52              	.LFE3461:
+  54              		.section	.text._ZN11perspective2UIC2Ev,"ax",%progbits
+  55              		.align	1
+  56              		.p2align 2,,3
+  57              		.global	_ZN11perspective2UIC2Ev
+  58              		.syntax unified
+  59              		.thumb
+  60              		.thumb_func
+  62              	_ZN11perspective2UIC2Ev:
+  63              	.LVL3:
+  64              	.LFB3455:
+   5:ui/ui.cpp     ****     
+  65              		.loc 1 5 1 view -0
+  66              		.cfi_startproc
+  67              		@ args = 0, pretend = 0, frame = 0
+  68              		@ frame_needed = 0, uses_anonymous_args = 0
+  69              	.LBB5:
+   5:ui/ui.cpp     ****     
+  70              		.loc 1 5 8 is_stmt 0 view .LVU7
+  71 0000 044B     		ldr	r3, .L7
+  72              	.LBE5:
+   5:ui/ui.cpp     ****     
+  73              		.loc 1 5 1 view .LVU8
+  74 0002 10B5     		push	{r4, lr}
+  75              		.cfi_def_cfa_offset 8
+  76              		.cfi_offset 4, -8
+  77              		.cfi_offset 14, -4
+   5:ui/ui.cpp     ****     
+  78              		.loc 1 5 1 view .LVU9
+  79 0004 0446     		mov	r4, r0
+  80              	.LBB6:
+   5:ui/ui.cpp     ****     
+  81              		.loc 1 5 8 view .LVU10
+  82 0006 40F8043B 		str	r3, [r0], #4
+  83              	.LVL4:
+   5:ui/ui.cpp     ****     
+  84              		.loc 1 5 8 view .LVU11
+  85 000a FFF7FEFF 		bl	_ZN11perspective14UIEventHandlerC1Ev
+  86              	.LVL5:
+  87              	.LBE6:
+   7:ui/ui.cpp     **** 
+  88              		.loc 1 7 1 view .LVU12
+  89 000e 2046     		mov	r0, r4
+  90 0010 10BD     		pop	{r4, pc}
+  91              	.LVL6:
+  92              	.L8:
+   7:ui/ui.cpp     **** 
+  93              		.loc 1 7 1 view .LVU13
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccmqgUKf.s 			page 3
+
+
+  94 0012 00BF     		.align	2
+  95              	.L7:
+  96 0014 08000000 		.word	_ZTVN11perspective2UIE+8
+  97              		.cfi_endproc
+  98              	.LFE3455:
+ 100              		.global	_ZN11perspective2UIC1Ev
+ 101              		.thumb_set _ZN11perspective2UIC1Ev,_ZN11perspective2UIC2Ev
+ 102              		.section	.text._ZN11perspective2UID2Ev,"ax",%progbits
+ 103              		.align	1
+ 104              		.p2align 2,,3
+ 105              		.global	_ZN11perspective2UID2Ev
+ 106              		.syntax unified
+ 107              		.thumb
+ 108              		.thumb_func
+ 110              	_ZN11perspective2UID2Ev:
+ 111              	.LVL7:
+ 112              	.LFB3458:
+   9:ui/ui.cpp     ****     
+ 113              		.loc 1 9 1 is_stmt 1 view -0
+ 114              		.cfi_startproc
+ 115              		@ args = 0, pretend = 0, frame = 0
+ 116              		@ frame_needed = 0, uses_anonymous_args = 0
+ 117              	.LBB7:
+   9:ui/ui.cpp     ****     
+ 118              		.loc 1 9 9 is_stmt 0 view .LVU15
+ 119 0000 044B     		ldr	r3, .L11
+ 120              	.LBE7:
+   9:ui/ui.cpp     ****     
+ 121              		.loc 1 9 1 view .LVU16
+ 122 0002 10B5     		push	{r4, lr}
+ 123              		.cfi_def_cfa_offset 8
+ 124              		.cfi_offset 4, -8
+ 125              		.cfi_offset 14, -4
+   9:ui/ui.cpp     ****     
+ 126              		.loc 1 9 1 view .LVU17
+ 127 0004 0446     		mov	r4, r0
+ 128              	.LBB8:
+   9:ui/ui.cpp     ****     
+ 129              		.loc 1 9 9 view .LVU18
+ 130 0006 40F8043B 		str	r3, [r0], #4
+ 131              	.LVL8:
+  11:ui/ui.cpp     **** 
+ 132              		.loc 1 11 1 view .LVU19
+ 133 000a FFF7FEFF 		bl	_ZN11perspective14UIEventHandlerD1Ev
+ 134              	.LVL9:
+ 135              	.LBE8:
+ 136 000e 2046     		mov	r0, r4
+ 137 0010 10BD     		pop	{r4, pc}
+ 138              	.LVL10:
+ 139              	.L12:
+  11:ui/ui.cpp     **** 
+ 140              		.loc 1 11 1 view .LVU20
+ 141 0012 00BF     		.align	2
+ 142              	.L11:
+ 143 0014 08000000 		.word	_ZTVN11perspective2UIE+8
+ 144              		.cfi_endproc
+ 145              	.LFE3458:
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccmqgUKf.s 			page 4
+
+
+ 147              		.global	_ZN11perspective2UID1Ev
+ 148              		.thumb_set _ZN11perspective2UID1Ev,_ZN11perspective2UID2Ev
+ 149              		.section	.text._ZN11perspective2UID0Ev,"ax",%progbits
+ 150              		.align	1
+ 151              		.p2align 2,,3
+ 152              		.global	_ZN11perspective2UID0Ev
+ 153              		.syntax unified
+ 154              		.thumb
+ 155              		.thumb_func
+ 157              	_ZN11perspective2UID0Ev:
+ 158              	.LVL11:
+ 159              	.LFB3460:
+   9:ui/ui.cpp     ****     
+ 160              		.loc 1 9 1 is_stmt 1 view -0
+ 161              		.cfi_startproc
+ 162              		@ args = 0, pretend = 0, frame = 0
+ 163              		@ frame_needed = 0, uses_anonymous_args = 0
+ 164              	.LBB9:
+ 165              	.LBB10:
+   9:ui/ui.cpp     ****     
+ 166              		.loc 1 9 9 is_stmt 0 view .LVU22
+ 167 0000 064B     		ldr	r3, .L15
+ 168              	.LBE10:
+ 169              	.LBE9:
+   9:ui/ui.cpp     ****     
+ 170              		.loc 1 9 1 view .LVU23
+ 171 0002 10B5     		push	{r4, lr}
+ 172              		.cfi_def_cfa_offset 8
+ 173              		.cfi_offset 4, -8
+ 174              		.cfi_offset 14, -4
+   9:ui/ui.cpp     ****     
+ 175              		.loc 1 9 1 view .LVU24
+ 176 0004 0446     		mov	r4, r0
+ 177              	.LVL12:
+ 178              	.LBB12:
+ 179              	.LBI9:
+   9:ui/ui.cpp     ****     
+ 180              		.loc 1 9 1 is_stmt 1 view .LVU25
+ 181              	.LBB11:
+   9:ui/ui.cpp     ****     
+ 182              		.loc 1 9 9 is_stmt 0 view .LVU26
+ 183 0006 40F8043B 		str	r3, [r0], #4
+ 184              	.LVL13:
+  11:ui/ui.cpp     **** 
+ 185              		.loc 1 11 1 view .LVU27
+ 186 000a FFF7FEFF 		bl	_ZN11perspective14UIEventHandlerD1Ev
+ 187              	.LVL14:
+  11:ui/ui.cpp     **** 
+ 188              		.loc 1 11 1 view .LVU28
+ 189              	.LBE11:
+ 190              	.LBE12:
+  11:ui/ui.cpp     **** 
+ 191              		.loc 1 11 1 discriminator 1 view .LVU29
+ 192 000e 3821     		movs	r1, #56
+ 193 0010 2046     		mov	r0, r4
+ 194 0012 FFF7FEFF 		bl	_ZdlPvj
+ 195              	.LVL15:
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccmqgUKf.s 			page 5
+
+
+  11:ui/ui.cpp     **** 
+ 196              		.loc 1 11 1 view .LVU30
+ 197 0016 2046     		mov	r0, r4
+ 198 0018 10BD     		pop	{r4, pc}
+ 199              	.LVL16:
+ 200              	.L16:
+  11:ui/ui.cpp     **** 
+ 201              		.loc 1 11 1 view .LVU31
+ 202 001a 00BF     		.align	2
+ 203              	.L15:
+ 204 001c 08000000 		.word	_ZTVN11perspective2UIE+8
+ 205              		.cfi_endproc
+ 206              	.LFE3460:
+ 208              		.section	.text._ZN11perspective2UI15GetEventHandlerEv,"ax",%progbits
+ 209              		.align	1
+ 210              		.p2align 2,,3
+ 211              		.global	_ZN11perspective2UI15GetEventHandlerEv
+ 212              		.syntax unified
+ 213              		.thumb
+ 214              		.thumb_func
+ 216              	_ZN11perspective2UI15GetEventHandlerEv:
+ 217              	.LVL17:
+ 218              	.LFB3462:
+  16:ui/ui.cpp     ****     }
+  17:ui/ui.cpp     **** }
+  18:ui/ui.cpp     **** 
+  19:ui/ui.cpp     **** UIEventHandler* UI::GetEventHandler() {
+ 219              		.loc 1 19 39 is_stmt 1 view -0
+ 220              		.cfi_startproc
+ 221              		@ args = 0, pretend = 0, frame = 0
+ 222              		@ frame_needed = 0, uses_anonymous_args = 0
+ 223              		@ link register save eliminated.
+  20:ui/ui.cpp     ****     return &eventHandler_;
+ 224              		.loc 1 20 5 view .LVU33
+  21:ui/ui.cpp     **** }
+ 225              		.loc 1 21 1 is_stmt 0 view .LVU34
+ 226 0000 0430     		adds	r0, r0, #4
+ 227              	.LVL18:
+ 228              		.loc 1 21 1 view .LVU35
+ 229 0002 7047     		bx	lr
+ 230              		.cfi_endproc
+ 231              	.LFE3462:
+ 233              		.global	_ZTVN11perspective2UIE
+ 234              		.section	.rodata._ZTVN11perspective2UIE,"a"
+ 235              		.align	2
+ 238              	_ZTVN11perspective2UIE:
+ 239 0000 00000000 		.word	0
+ 240 0004 00000000 		.word	0
+ 241 0008 00000000 		.word	0
+ 242 000c 00000000 		.word	0
+ 243 0010 00000000 		.word	__cxa_pure_virtual
+ 244 0014 00000000 		.word	_ZN11perspective2UI4ExecEv
+ 245              		.weak	__cxa_pure_virtual
+ 246              		.text
+ 247              	.Letext0:
+ 248              		.file 2 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/lib/gcc/arm-none-eabi/14
+ 249              		.file 3 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c+
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccmqgUKf.s 			page 6
+
+
+ 250              		.file 4 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c+
+ 251              		.file 5 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c+
+ 252              		.file 6 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c+
+ 253              		.file 7 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c+
+ 254              		.file 8 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c+
+ 255              		.file 9 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c+
+ 256              		.file 10 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 257              		.file 11 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 258              		.file 12 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 259              		.file 13 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 260              		.file 14 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 261              		.file 15 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 262              		.file 16 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 263              		.file 17 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 264              		.file 18 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 265              		.file 19 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 266              		.file 20 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 267              		.file 21 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 268              		.file 22 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 269              		.file 23 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 270              		.file 24 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 271              		.file 25 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 272              		.file 26 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 273              		.file 27 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 274              		.file 28 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 275              		.file 29 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/m
+ 276              		.file 30 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 277              		.file 31 "ui/uieventhandler.h"
+ 278              		.file 32 "ui/ui.h"
+ 279              		.file 33 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 280              		.file 34 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccmqgUKf.s 			page 7
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 ui.cpp
+C:\Users\Oliver\AppData\Local\Temp\ccmqgUKf.s:20     .text._ZN11perspective2UI4ExecEv:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\ccmqgUKf.s:27     .text._ZN11perspective2UI4ExecEv:00000000 _ZN11perspective2UI4ExecEv
+C:\Users\Oliver\AppData\Local\Temp\ccmqgUKf.s:55     .text._ZN11perspective2UIC2Ev:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\ccmqgUKf.s:62     .text._ZN11perspective2UIC2Ev:00000000 _ZN11perspective2UIC2Ev
+C:\Users\Oliver\AppData\Local\Temp\ccmqgUKf.s:96     .text._ZN11perspective2UIC2Ev:00000014 $d
+C:\Users\Oliver\AppData\Local\Temp\ccmqgUKf.s:238    .rodata._ZTVN11perspective2UIE:00000000 _ZTVN11perspective2UIE
+C:\Users\Oliver\AppData\Local\Temp\ccmqgUKf.s:62     .text._ZN11perspective2UIC2Ev:00000000 _ZN11perspective2UIC1Ev
+C:\Users\Oliver\AppData\Local\Temp\ccmqgUKf.s:103    .text._ZN11perspective2UID2Ev:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\ccmqgUKf.s:110    .text._ZN11perspective2UID2Ev:00000000 _ZN11perspective2UID2Ev
+C:\Users\Oliver\AppData\Local\Temp\ccmqgUKf.s:143    .text._ZN11perspective2UID2Ev:00000014 $d
+C:\Users\Oliver\AppData\Local\Temp\ccmqgUKf.s:110    .text._ZN11perspective2UID2Ev:00000000 _ZN11perspective2UID1Ev
+C:\Users\Oliver\AppData\Local\Temp\ccmqgUKf.s:150    .text._ZN11perspective2UID0Ev:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\ccmqgUKf.s:157    .text._ZN11perspective2UID0Ev:00000000 _ZN11perspective2UID0Ev
+C:\Users\Oliver\AppData\Local\Temp\ccmqgUKf.s:204    .text._ZN11perspective2UID0Ev:0000001c $d
+C:\Users\Oliver\AppData\Local\Temp\ccmqgUKf.s:209    .text._ZN11perspective2UI15GetEventHandlerEv:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\ccmqgUKf.s:216    .text._ZN11perspective2UI15GetEventHandlerEv:00000000 _ZN11perspective2UI15GetEventHandlerEv
+C:\Users\Oliver\AppData\Local\Temp\ccmqgUKf.s:235    .rodata._ZTVN11perspective2UIE:00000000 $d
+
+UNDEFINED SYMBOLS
+_ZN11perspective14UIEventHandler13ProcessEventsEv
+_ZN11perspective14UIEventHandlerC1Ev
+_ZN11perspective14UIEventHandlerD1Ev
+_ZdlPvj
+__cxa_pure_virtual

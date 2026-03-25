@@ -1,0 +1,1910 @@
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc7K8AR5.s 			page 1
+
+
+   1              		.cpu cortex-m7
+   2              		.arch armv7e-m
+   3              		.fpu fpv5-d16
+   4              		.eabi_attribute 28, 1
+   5              		.eabi_attribute 20, 1
+   6              		.eabi_attribute 21, 1
+   7              		.eabi_attribute 23, 3
+   8              		.eabi_attribute 24, 1
+   9              		.eabi_attribute 25, 1
+  10              		.eabi_attribute 26, 1
+  11              		.eabi_attribute 30, 2
+  12              		.eabi_attribute 34, 1
+  13              		.eabi_attribute 18, 4
+  14              		.file	"timeparameter.cpp"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.file 1 "parameters/timeparameter.cpp"
+  19              		.section	.text._ZN11perspective13TimeParameterD2Ev,"ax",%progbits
+  20              		.align	1
+  21              		.p2align 2,,3
+  22              		.global	_ZN11perspective13TimeParameterD2Ev
+  23              		.syntax unified
+  24              		.thumb
+  25              		.thumb_func
+  27              	_ZN11perspective13TimeParameterD2Ev:
+  28              	.LVL0:
+  29              	.LFB4479:
+   1:parameters/timeparameter.cpp **** #include "timeparameter.h"
+   2:parameters/timeparameter.cpp **** #include <cstdio>
+   3:parameters/timeparameter.cpp **** #include <cstring>
+   4:parameters/timeparameter.cpp **** 
+   5:parameters/timeparameter.cpp **** using namespace perspective;
+   6:parameters/timeparameter.cpp **** 
+   7:parameters/timeparameter.cpp **** TimeParameter::TimeParameter(const char* name, float minValue, float maxValue, float defaultValue, 
+   8:parameters/timeparameter.cpp ****     : EncoderParameter(name, minValue, maxValue, defaultValue, stepSize, index, displayIndex)
+   9:parameters/timeparameter.cpp ****     , displayMode_(TimeDisplayMode::TIME_MS)
+  10:parameters/timeparameter.cpp ****     , timeModeName_(nullptr)
+  11:parameters/timeparameter.cpp ****     , tempoModeName_(nullptr)
+  12:parameters/timeparameter.cpp **** {
+  13:parameters/timeparameter.cpp ****     // Store the original name as the time mode name
+  14:parameters/timeparameter.cpp ****     if (name) {
+  15:parameters/timeparameter.cpp ****         size_t len = strlen(name);
+  16:parameters/timeparameter.cpp ****         timeModeName_ = new char[len + 1];
+  17:parameters/timeparameter.cpp ****         strcpy(timeModeName_, name);
+  18:parameters/timeparameter.cpp ****     }
+  19:parameters/timeparameter.cpp ****     
+  20:parameters/timeparameter.cpp ****     // Store optional tempo mode name if provided
+  21:parameters/timeparameter.cpp ****     if (tempoModeName) {
+  22:parameters/timeparameter.cpp ****         size_t len = strlen(tempoModeName);
+  23:parameters/timeparameter.cpp ****         tempoModeName_ = new char[len + 1];
+  24:parameters/timeparameter.cpp ****         strcpy(tempoModeName_, tempoModeName);
+  25:parameters/timeparameter.cpp ****     }
+  26:parameters/timeparameter.cpp ****     
+  27:parameters/timeparameter.cpp ****     // Initialize name based on default mode
+  28:parameters/timeparameter.cpp ****     UpdateNameForMode();
+  29:parameters/timeparameter.cpp **** }
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc7K8AR5.s 			page 2
+
+
+  30:parameters/timeparameter.cpp **** 
+  31:parameters/timeparameter.cpp **** TimeParameter::~TimeParameter() {
+  30              		.loc 1 31 1 view -0
+  31              		.cfi_startproc
+  32              		@ args = 0, pretend = 0, frame = 0
+  33              		@ frame_needed = 0, uses_anonymous_args = 0
+  34              		.loc 1 31 1 is_stmt 0 view .LVU1
+  35 0000 10B5     		push	{r4, lr}
+  36              		.cfi_def_cfa_offset 8
+  37              		.cfi_offset 4, -8
+  38              		.cfi_offset 14, -4
+  39              	.LBB31:
+  40              		.loc 1 31 31 view .LVU2
+  41 0002 0A4B     		ldr	r3, .L12
+  42              	.LBE31:
+  43              		.loc 1 31 1 view .LVU3
+  44 0004 0446     		mov	r4, r0
+  45              	.LBB32:
+  32:parameters/timeparameter.cpp ****     if (timeModeName_) {
+  46              		.loc 1 32 9 view .LVU4
+  47 0006 C06B     		ldr	r0, [r0, #60]
+  48              	.LVL1:
+  31:parameters/timeparameter.cpp ****     if (timeModeName_) {
+  49              		.loc 1 31 31 view .LVU5
+  50 0008 2360     		str	r3, [r4]
+  51              		.loc 1 32 5 is_stmt 1 view .LVU6
+  52 000a 18B1     		cbz	r0, .L2
+  33:parameters/timeparameter.cpp ****         delete[] timeModeName_;
+  53              		.loc 1 33 9 view .LVU7
+  54              		.loc 1 33 18 is_stmt 0 discriminator 1 view .LVU8
+  55 000c FFF7FEFF 		bl	_ZdaPv
+  56              	.LVL2:
+  34:parameters/timeparameter.cpp ****         timeModeName_ = nullptr;
+  57              		.loc 1 34 9 is_stmt 1 view .LVU9
+  58              		.loc 1 34 23 is_stmt 0 view .LVU10
+  59 0010 0023     		movs	r3, #0
+  60 0012 E363     		str	r3, [r4, #60]
+  61              	.L2:
+  35:parameters/timeparameter.cpp ****     }
+  36:parameters/timeparameter.cpp ****     if (tempoModeName_) {
+  62              		.loc 1 36 5 is_stmt 1 view .LVU11
+  63              		.loc 1 36 9 is_stmt 0 view .LVU12
+  64 0014 206C     		ldr	r0, [r4, #64]
+  65              		.loc 1 36 5 view .LVU13
+  66 0016 18B1     		cbz	r0, .L3
+  37:parameters/timeparameter.cpp ****         delete[] tempoModeName_;
+  67              		.loc 1 37 9 is_stmt 1 view .LVU14
+  68              		.loc 1 37 18 is_stmt 0 discriminator 1 view .LVU15
+  69 0018 FFF7FEFF 		bl	_ZdaPv
+  70              	.LVL3:
+  38:parameters/timeparameter.cpp ****         tempoModeName_ = nullptr;
+  71              		.loc 1 38 9 is_stmt 1 view .LVU16
+  72              		.loc 1 38 24 is_stmt 0 view .LVU17
+  73 001c 0023     		movs	r3, #0
+  74 001e 2364     		str	r3, [r4, #64]
+  75              	.L3:
+  39:parameters/timeparameter.cpp ****     }
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc7K8AR5.s 			page 3
+
+
+  40:parameters/timeparameter.cpp **** }
+  76              		.loc 1 40 1 view .LVU18
+  77 0020 2046     		mov	r0, r4
+  78 0022 FFF7FEFF 		bl	_ZN11perspective16EncoderParameterD2Ev
+  79              	.LVL4:
+  80              	.LBE32:
+  81 0026 2046     		mov	r0, r4
+  82 0028 10BD     		pop	{r4, pc}
+  83              	.LVL5:
+  84              	.L13:
+  85              		.loc 1 40 1 view .LVU19
+  86 002a 00BF     		.align	2
+  87              	.L12:
+  88 002c 08000000 		.word	_ZTVN11perspective13TimeParameterE+8
+  89              		.cfi_endproc
+  90              	.LFE4479:
+  92              		.global	_ZN11perspective13TimeParameterD1Ev
+  93              		.thumb_set _ZN11perspective13TimeParameterD1Ev,_ZN11perspective13TimeParameterD2Ev
+  94              		.section	.rodata._ZNK11perspective13TimeParameter16GetValueAsStringEPcj.str1.4,"aMS",%progbits,1
+  95              		.align	2
+  96              	.LC0:
+  97 0000 252E3066 		.ascii	"%.0f\000"
+  97      00
+  98 0005 000000   		.align	2
+  99              	.LC1:
+ 100 0008 252E3166 		.ascii	"%.1f\000"
+ 100      00
+ 101 000d 000000   		.align	2
+ 102              	.LC2:
+ 103 0010 2D2D00   		.ascii	"--\000"
+ 104 0013 00       		.align	2
+ 105              	.LC3:
+ 106 0014 252E3066 		.ascii	"%.0f ms\000"
+ 106      206D7300 
+ 107              		.section	.text._ZNK11perspective13TimeParameter16GetValueAsStringEPcj,"ax",%progbits
+ 108              		.align	1
+ 109              		.p2align 2,,3
+ 110              		.global	_ZNK11perspective13TimeParameter16GetValueAsStringEPcj
+ 111              		.syntax unified
+ 112              		.thumb
+ 113              		.thumb_func
+ 115              	_ZNK11perspective13TimeParameter16GetValueAsStringEPcj:
+ 116              	.LVL6:
+ 117              	.LFB4487:
+  41:parameters/timeparameter.cpp **** 
+  42:parameters/timeparameter.cpp **** void TimeParameter::SetDisplayMode(TimeDisplayMode mode) {
+  43:parameters/timeparameter.cpp ****     displayMode_ = mode;
+  44:parameters/timeparameter.cpp ****     UpdateNameForMode();
+  45:parameters/timeparameter.cpp **** }
+  46:parameters/timeparameter.cpp **** 
+  47:parameters/timeparameter.cpp **** TimeDisplayMode TimeParameter::GetDisplayMode() const {
+  48:parameters/timeparameter.cpp ****     return displayMode_;
+  49:parameters/timeparameter.cpp **** }
+  50:parameters/timeparameter.cpp **** 
+  51:parameters/timeparameter.cpp **** void TimeParameter::Increment(int steps) {
+  52:parameters/timeparameter.cpp ****     if (displayMode_ == TimeDisplayMode::TEMPO_BPM) {
+  53:parameters/timeparameter.cpp ****         // In tempo mode, increment BPM (which means decrement ms)
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc7K8AR5.s 			page 4
+
+
+  54:parameters/timeparameter.cpp ****         // So we swap the operation: decrement by BPM_STEP_SIZE * steps
+  55:parameters/timeparameter.cpp ****         float currentBpm = GetValueAsBPM();
+  56:parameters/timeparameter.cpp ****         float newBpm = currentBpm - (BPM_STEP_SIZE * steps);
+  57:parameters/timeparameter.cpp ****         
+  58:parameters/timeparameter.cpp ****         // Clamp BPM to valid range (30-200 BPM corresponds to 2000-300 ms)
+  59:parameters/timeparameter.cpp ****         newBpm = clamp(newBpm, 30.0f, 200.0f);
+  60:parameters/timeparameter.cpp ****         
+  61:parameters/timeparameter.cpp ****         // Convert back to milliseconds
+  62:parameters/timeparameter.cpp ****         float newMs = 60000.0f / newBpm;
+  63:parameters/timeparameter.cpp ****         SetValue(newMs);
+  64:parameters/timeparameter.cpp ****     } else {
+  65:parameters/timeparameter.cpp ****         // In time mode, use base class stepping
+  66:parameters/timeparameter.cpp ****         EncoderParameter::Increment(steps);
+  67:parameters/timeparameter.cpp ****     }
+  68:parameters/timeparameter.cpp **** }
+  69:parameters/timeparameter.cpp **** 
+  70:parameters/timeparameter.cpp **** void TimeParameter::Decrement(int steps) {
+  71:parameters/timeparameter.cpp ****     if (displayMode_ == TimeDisplayMode::TEMPO_BPM) {
+  72:parameters/timeparameter.cpp ****         // In tempo mode, decrement BPM (which means increment ms)
+  73:parameters/timeparameter.cpp ****         // So we swap the operation: increment by BPM_STEP_SIZE * steps
+  74:parameters/timeparameter.cpp ****         float currentBpm = GetValueAsBPM();
+  75:parameters/timeparameter.cpp ****         float newBpm = currentBpm + (BPM_STEP_SIZE * steps);
+  76:parameters/timeparameter.cpp ****         
+  77:parameters/timeparameter.cpp ****         // Clamp BPM to valid range (30-200 BPM corresponds to 2000-300 ms)
+  78:parameters/timeparameter.cpp ****         newBpm = clamp(newBpm, 30.0f, 200.0f);
+  79:parameters/timeparameter.cpp ****         
+  80:parameters/timeparameter.cpp ****         // Convert back to milliseconds
+  81:parameters/timeparameter.cpp ****         float newMs = 60000.0f / newBpm;
+  82:parameters/timeparameter.cpp ****         SetValue(newMs);
+  83:parameters/timeparameter.cpp ****     } else {
+  84:parameters/timeparameter.cpp ****         // In time mode, use base class stepping
+  85:parameters/timeparameter.cpp ****         EncoderParameter::Decrement(steps);
+  86:parameters/timeparameter.cpp ****     }
+  87:parameters/timeparameter.cpp **** }
+  88:parameters/timeparameter.cpp **** 
+  89:parameters/timeparameter.cpp **** void TimeParameter::GetValueAsString(char* buffer, size_t bufferSize) const {
+ 118              		.loc 1 89 77 is_stmt 1 view -0
+ 119              		.cfi_startproc
+ 120              		@ args = 0, pretend = 0, frame = 0
+ 121              		@ frame_needed = 0, uses_anonymous_args = 0
+  90:parameters/timeparameter.cpp ****     if (buffer == nullptr || bufferSize == 0) {
+ 122              		.loc 1 90 5 view .LVU21
+ 123 0000 F9B1     		cbz	r1, .L25
+  89:parameters/timeparameter.cpp ****     if (buffer == nullptr || bufferSize == 0) {
+ 124              		.loc 1 89 77 is_stmt 0 view .LVU22
+ 125 0002 70B5     		push	{r4, r5, r6, lr}
+ 126              		.cfi_def_cfa_offset 16
+ 127              		.cfi_offset 4, -16
+ 128              		.cfi_offset 5, -12
+ 129              		.cfi_offset 6, -8
+ 130              		.cfi_offset 14, -4
+ 131 0004 1546     		mov	r5, r2
+ 132 0006 82B0     		sub	sp, sp, #8
+ 133              		.cfi_def_cfa_offset 24
+ 134              		.loc 1 90 5 view .LVU23
+ 135 0008 CAB1     		cbz	r2, .L14
+ 136 000a 0646     		mov	r6, r0
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc7K8AR5.s 			page 5
+
+
+ 137              	.LVL7:
+ 138              		.loc 1 90 5 view .LVU24
+ 139 000c 0C46     		mov	r4, r1
+ 140              	.LVL8:
+ 141              	.LBB39:
+ 142              	.LBI39:
+  89:parameters/timeparameter.cpp ****     if (buffer == nullptr || bufferSize == 0) {
+ 143              		.loc 1 89 6 is_stmt 1 view .LVU25
+ 144              	.LBB40:
+  91:parameters/timeparameter.cpp ****         return;
+  92:parameters/timeparameter.cpp ****     }
+  93:parameters/timeparameter.cpp ****     
+  94:parameters/timeparameter.cpp ****     float value = GetValue();
+ 145              		.loc 1 94 5 view .LVU26
+ 146              		.loc 1 94 27 is_stmt 0 view .LVU27
+ 147 000e FFF7FEFF 		bl	_ZNK11perspective15EffectParameter8GetValueEv
+ 148              	.LVL9:
+ 149              	.LBB41:
+  95:parameters/timeparameter.cpp ****     
+  96:parameters/timeparameter.cpp ****     switch (displayMode_) {
+ 150              		.loc 1 96 13 view .LVU28
+ 151 0012 B36B     		ldr	r3, [r6, #56]
+ 152              	.LVL10:
+ 153              		.loc 1 96 13 view .LVU29
+ 154              	.LBE41:
+ 155              		.loc 1 96 5 is_stmt 1 view .LVU30
+ 156              	.LBB51:
+ 157 0014 0BB3     		cbz	r3, .L16
+ 158 0016 012B     		cmp	r3, #1
+ 159 0018 14D1     		bne	.L28
+ 160              	.LBB42:
+  97:parameters/timeparameter.cpp ****         case TimeDisplayMode::TIME_MS:
+  98:parameters/timeparameter.cpp ****             // Display as milliseconds
+  99:parameters/timeparameter.cpp ****             snprintf(buffer, bufferSize, "%.0f", value);
+ 100:parameters/timeparameter.cpp ****             break;
+ 101:parameters/timeparameter.cpp ****             
+ 102:parameters/timeparameter.cpp ****         case TimeDisplayMode::TEMPO_BPM: {
+ 161              		.loc 1 102 9 view .LVU31
+ 162              		.loc 1 102 42 view .LVU32
+ 163              	.LBB43:
+ 103:parameters/timeparameter.cpp ****             // Convert milliseconds to BPM (quarter note basis: BPM = 60000 / ms)
+ 104:parameters/timeparameter.cpp ****             if (value > 0.0f) {
+ 164              		.loc 1 104 13 is_stmt 0 view .LVU33
+ 165 001a B5EEC00A 		vcmpe.f32	s0, #0
+ 166 001e F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 167 0022 25DD     		ble	.L23
+ 168              	.LBB44:
+ 105:parameters/timeparameter.cpp ****                 float bpm = 60000.0f / value;
+ 169              		.loc 1 105 17 is_stmt 1 view .LVU34
+ 170              	.LVL11:
+ 106:parameters/timeparameter.cpp ****                 snprintf(buffer, bufferSize, "%.1f", bpm);
+ 171              		.loc 1 106 17 view .LVU35
+ 105:parameters/timeparameter.cpp ****                 float bpm = 60000.0f / value;
+ 172              		.loc 1 105 23 is_stmt 0 view .LVU36
+ 173 0024 DFED167A 		vldr.32	s15, .L29
+ 174              		.loc 1 106 25 view .LVU37
+ 175 0028 2946     		mov	r1, r5
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc7K8AR5.s 			page 6
+
+
+ 176 002a 164A     		ldr	r2, .L29+4
+ 177 002c 2046     		mov	r0, r4
+ 105:parameters/timeparameter.cpp ****                 float bpm = 60000.0f / value;
+ 178              		.loc 1 105 23 view .LVU38
+ 179 002e 87EE807A 		vdiv.f32	s14, s15, s0
+ 180              	.LVL12:
+ 181              		.loc 1 106 25 view .LVU39
+ 182 0032 B7EEC77A 		vcvt.f64.f32	d7, s14
+ 183              	.LVL13:
+ 184              		.loc 1 106 25 view .LVU40
+ 185 0036 8DED007B 		vstr.64	d7, [sp]
+ 186 003a FFF7FEFF 		bl	snprintf
+ 187              	.LVL14:
+ 188              	.L14:
+ 189              		.loc 1 106 25 view .LVU41
+ 190              	.LBE44:
+ 191              	.LBE43:
+ 192              	.LBE42:
+ 193              	.LBE51:
+ 194              	.LBE40:
+ 195              	.LBE39:
+ 107:parameters/timeparameter.cpp ****             } else {
+ 108:parameters/timeparameter.cpp ****                 snprintf(buffer, bufferSize, "--");
+ 109:parameters/timeparameter.cpp ****             }
+ 110:parameters/timeparameter.cpp ****             break;
+ 111:parameters/timeparameter.cpp ****         }
+ 112:parameters/timeparameter.cpp ****         
+ 113:parameters/timeparameter.cpp ****         default:
+ 114:parameters/timeparameter.cpp ****             // Fallback to milliseconds
+ 115:parameters/timeparameter.cpp ****             snprintf(buffer, bufferSize, "%.0f ms", value);
+ 116:parameters/timeparameter.cpp ****             break;
+ 117:parameters/timeparameter.cpp ****     }
+ 118:parameters/timeparameter.cpp **** }
+ 196              		.loc 1 118 1 view .LVU42
+ 197 003e 02B0     		add	sp, sp, #8
+ 198              		.cfi_def_cfa_offset 16
+ 199              		@ sp needed
+ 200 0040 70BD     		pop	{r4, r5, r6, pc}
+ 201              	.LVL15:
+ 202              	.L25:
+ 203              		.cfi_def_cfa_offset 0
+ 204              		.cfi_restore 4
+ 205              		.cfi_restore 5
+ 206              		.cfi_restore 6
+ 207              		.cfi_restore 14
+ 208              		.loc 1 118 1 view .LVU43
+ 209 0042 7047     		bx	lr
+ 210              	.LVL16:
+ 211              	.L28:
+ 212              		.cfi_def_cfa_offset 24
+ 213              		.cfi_offset 4, -16
+ 214              		.cfi_offset 5, -12
+ 215              		.cfi_offset 6, -8
+ 216              		.cfi_offset 14, -4
+ 217              	.LBB60:
+ 218              	.LBB56:
+ 219              	.LBB52:
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc7K8AR5.s 			page 7
+
+
+ 220              	.LBB47:
+ 113:parameters/timeparameter.cpp ****             // Fallback to milliseconds
+ 221              		.loc 1 113 9 is_stmt 1 view .LVU44
+ 115:parameters/timeparameter.cpp ****             break;
+ 222              		.loc 1 115 13 view .LVU45
+ 115:parameters/timeparameter.cpp ****             break;
+ 223              		.loc 1 115 21 is_stmt 0 view .LVU46
+ 224 0044 B7EEC00A 		vcvt.f64.f32	d0, s0
+ 225              	.LVL17:
+ 115:parameters/timeparameter.cpp ****             break;
+ 226              		.loc 1 115 21 view .LVU47
+ 227 0048 0F4A     		ldr	r2, .L29+8
+ 228 004a 2946     		mov	r1, r5
+ 229 004c 2046     		mov	r0, r4
+ 230 004e 8DED000B 		vstr.64	d0, [sp]
+ 231 0052 FFF7FEFF 		bl	snprintf
+ 232              	.LVL18:
+ 116:parameters/timeparameter.cpp ****     }
+ 233              		.loc 1 116 13 is_stmt 1 view .LVU48
+ 116:parameters/timeparameter.cpp ****     }
+ 234              		.loc 1 116 13 is_stmt 0 view .LVU49
+ 235              	.LBE47:
+ 236              	.LBE52:
+ 237              	.LBE56:
+ 238              	.LBE60:
+ 239              		.loc 1 118 1 view .LVU50
+ 240 0056 02B0     		add	sp, sp, #8
+ 241              		.cfi_remember_state
+ 242              		.cfi_def_cfa_offset 16
+ 243              		@ sp needed
+ 244 0058 70BD     		pop	{r4, r5, r6, pc}
+ 245              	.LVL19:
+ 246              	.L16:
+ 247              		.cfi_restore_state
+ 248              	.LBB61:
+ 249              	.LBB57:
+ 250              	.LBB53:
+ 251              	.LBB48:
+  97:parameters/timeparameter.cpp ****             // Display as milliseconds
+ 252              		.loc 1 97 9 is_stmt 1 view .LVU51
+  99:parameters/timeparameter.cpp ****             break;
+ 253              		.loc 1 99 13 view .LVU52
+  99:parameters/timeparameter.cpp ****             break;
+ 254              		.loc 1 99 21 is_stmt 0 view .LVU53
+ 255 005a B7EEC00A 		vcvt.f64.f32	d0, s0
+ 256              	.LVL20:
+  99:parameters/timeparameter.cpp ****             break;
+ 257              		.loc 1 99 21 view .LVU54
+ 258 005e 0B4A     		ldr	r2, .L29+12
+ 259 0060 2946     		mov	r1, r5
+ 260 0062 2046     		mov	r0, r4
+ 261 0064 8DED000B 		vstr.64	d0, [sp]
+ 262 0068 FFF7FEFF 		bl	snprintf
+ 263              	.LVL21:
+ 100:parameters/timeparameter.cpp ****             
+ 264              		.loc 1 100 13 is_stmt 1 view .LVU55
+ 265              	.LBE48:
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc7K8AR5.s 			page 8
+
+
+ 266              	.LBE53:
+ 267              	.LBE57:
+ 268              	.LBE61:
+ 269              		.loc 1 118 1 is_stmt 0 view .LVU56
+ 270 006c 02B0     		add	sp, sp, #8
+ 271              		.cfi_remember_state
+ 272              		.cfi_def_cfa_offset 16
+ 273              		@ sp needed
+ 274 006e 70BD     		pop	{r4, r5, r6, pc}
+ 275              	.LVL22:
+ 276              	.L23:
+ 277              		.cfi_restore_state
+ 278              	.LBB62:
+ 279              	.LBB58:
+ 280              	.LBB54:
+ 281              	.LBB49:
+ 282              	.LBB45:
+ 108:parameters/timeparameter.cpp ****             }
+ 283              		.loc 1 108 17 is_stmt 1 view .LVU57
+ 108:parameters/timeparameter.cpp ****             }
+ 284              		.loc 1 108 25 is_stmt 0 view .LVU58
+ 285 0070 074A     		ldr	r2, .L29+16
+ 286 0072 2946     		mov	r1, r5
+ 287 0074 2046     		mov	r0, r4
+ 288              	.LBE45:
+ 289              	.LBE49:
+ 290              	.LBE54:
+ 291              	.LBE58:
+ 292              	.LBE62:
+ 293              		.loc 1 118 1 view .LVU59
+ 294 0076 02B0     		add	sp, sp, #8
+ 295              		.cfi_def_cfa_offset 16
+ 296              		@ sp needed
+ 297 0078 BDE87040 		pop	{r4, r5, r6, lr}
+ 298              		.cfi_restore 14
+ 299              		.cfi_restore 6
+ 300              		.cfi_restore 5
+ 301              		.cfi_restore 4
+ 302              		.cfi_def_cfa_offset 0
+ 303              	.LVL23:
+ 304              	.LBB63:
+ 305              	.LBB59:
+ 306              	.LBB55:
+ 307              	.LBB50:
+ 308              	.LBB46:
+ 108:parameters/timeparameter.cpp ****             }
+ 309              		.loc 1 108 25 view .LVU60
+ 310 007c FFF7FEBF 		b	snprintf
+ 311              	.LVL24:
+ 312              	.L30:
+ 108:parameters/timeparameter.cpp ****             }
+ 313              		.loc 1 108 25 view .LVU61
+ 314              		.align	2
+ 315              	.L29:
+ 316 0080 00606A47 		.word	1198153728
+ 317 0084 08000000 		.word	.LC1
+ 318 0088 14000000 		.word	.LC3
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc7K8AR5.s 			page 9
+
+
+ 319 008c 00000000 		.word	.LC0
+ 320 0090 10000000 		.word	.LC2
+ 321              	.LBE46:
+ 322              	.LBE50:
+ 323              	.LBE55:
+ 324              	.LBE59:
+ 325              	.LBE63:
+ 326              		.cfi_endproc
+ 327              	.LFE4487:
+ 329              		.section	.text._ZN11perspective13TimeParameterD0Ev,"ax",%progbits
+ 330              		.align	1
+ 331              		.p2align 2,,3
+ 332              		.global	_ZN11perspective13TimeParameterD0Ev
+ 333              		.syntax unified
+ 334              		.thumb
+ 335              		.thumb_func
+ 337              	_ZN11perspective13TimeParameterD0Ev:
+ 338              	.LVL25:
+ 339              	.LFB4481:
+  31:parameters/timeparameter.cpp ****     if (timeModeName_) {
+ 340              		.loc 1 31 1 is_stmt 1 view -0
+ 341              		.cfi_startproc
+ 342              		@ args = 0, pretend = 0, frame = 0
+ 343              		@ frame_needed = 0, uses_anonymous_args = 0
+  31:parameters/timeparameter.cpp ****     if (timeModeName_) {
+ 344              		.loc 1 31 1 is_stmt 0 view .LVU63
+ 345 0000 10B5     		push	{r4, lr}
+ 346              		.cfi_def_cfa_offset 8
+ 347              		.cfi_offset 4, -8
+ 348              		.cfi_offset 14, -4
+ 349              	.LBB67:
+ 350              	.LBB68:
+  31:parameters/timeparameter.cpp ****     if (timeModeName_) {
+ 351              		.loc 1 31 31 view .LVU64
+ 352 0002 0C4B     		ldr	r3, .L41
+ 353              	.LBE68:
+ 354              	.LBE67:
+  31:parameters/timeparameter.cpp ****     if (timeModeName_) {
+ 355              		.loc 1 31 1 view .LVU65
+ 356 0004 0446     		mov	r4, r0
+ 357              	.LVL26:
+ 358              	.LBB70:
+ 359              	.LBI67:
+  31:parameters/timeparameter.cpp ****     if (timeModeName_) {
+ 360              		.loc 1 31 1 is_stmt 1 view .LVU66
+ 361              	.LBB69:
+  32:parameters/timeparameter.cpp ****         delete[] timeModeName_;
+ 362              		.loc 1 32 9 is_stmt 0 view .LVU67
+ 363 0006 C06B     		ldr	r0, [r0, #60]
+ 364              	.LVL27:
+  31:parameters/timeparameter.cpp ****     if (timeModeName_) {
+ 365              		.loc 1 31 31 view .LVU68
+ 366 0008 2360     		str	r3, [r4]
+  32:parameters/timeparameter.cpp ****         delete[] timeModeName_;
+ 367              		.loc 1 32 5 is_stmt 1 view .LVU69
+ 368 000a 18B1     		cbz	r0, .L32
+  33:parameters/timeparameter.cpp ****         timeModeName_ = nullptr;
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc7K8AR5.s 			page 10
+
+
+ 369              		.loc 1 33 9 view .LVU70
+  33:parameters/timeparameter.cpp ****         timeModeName_ = nullptr;
+ 370              		.loc 1 33 18 is_stmt 0 discriminator 1 view .LVU71
+ 371 000c FFF7FEFF 		bl	_ZdaPv
+ 372              	.LVL28:
+  34:parameters/timeparameter.cpp ****     }
+ 373              		.loc 1 34 9 is_stmt 1 view .LVU72
+  34:parameters/timeparameter.cpp ****     }
+ 374              		.loc 1 34 23 is_stmt 0 view .LVU73
+ 375 0010 0023     		movs	r3, #0
+ 376 0012 E363     		str	r3, [r4, #60]
+ 377              	.L32:
+  36:parameters/timeparameter.cpp ****         delete[] tempoModeName_;
+ 378              		.loc 1 36 5 is_stmt 1 view .LVU74
+  36:parameters/timeparameter.cpp ****         delete[] tempoModeName_;
+ 379              		.loc 1 36 9 is_stmt 0 view .LVU75
+ 380 0014 206C     		ldr	r0, [r4, #64]
+  36:parameters/timeparameter.cpp ****         delete[] tempoModeName_;
+ 381              		.loc 1 36 5 view .LVU76
+ 382 0016 18B1     		cbz	r0, .L33
+  37:parameters/timeparameter.cpp ****         tempoModeName_ = nullptr;
+ 383              		.loc 1 37 9 is_stmt 1 view .LVU77
+  37:parameters/timeparameter.cpp ****         tempoModeName_ = nullptr;
+ 384              		.loc 1 37 18 is_stmt 0 discriminator 1 view .LVU78
+ 385 0018 FFF7FEFF 		bl	_ZdaPv
+ 386              	.LVL29:
+  38:parameters/timeparameter.cpp ****     }
+ 387              		.loc 1 38 9 is_stmt 1 view .LVU79
+  38:parameters/timeparameter.cpp ****     }
+ 388              		.loc 1 38 24 is_stmt 0 view .LVU80
+ 389 001c 0023     		movs	r3, #0
+ 390 001e 2364     		str	r3, [r4, #64]
+ 391              	.L33:
+  40:parameters/timeparameter.cpp **** 
+ 392              		.loc 1 40 1 view .LVU81
+ 393 0020 2046     		mov	r0, r4
+ 394 0022 FFF7FEFF 		bl	_ZN11perspective16EncoderParameterD2Ev
+ 395              	.LVL30:
+  40:parameters/timeparameter.cpp **** 
+ 396              		.loc 1 40 1 view .LVU82
+ 397              	.LBE69:
+ 398              	.LBE70:
+  40:parameters/timeparameter.cpp **** 
+ 399              		.loc 1 40 1 discriminator 1 view .LVU83
+ 400 0026 2046     		mov	r0, r4
+ 401 0028 4421     		movs	r1, #68
+ 402 002a FFF7FEFF 		bl	_ZdlPvj
+ 403              	.LVL31:
+  40:parameters/timeparameter.cpp **** 
+ 404              		.loc 1 40 1 view .LVU84
+ 405 002e 2046     		mov	r0, r4
+ 406 0030 10BD     		pop	{r4, pc}
+ 407              	.LVL32:
+ 408              	.L42:
+  40:parameters/timeparameter.cpp **** 
+ 409              		.loc 1 40 1 view .LVU85
+ 410 0032 00BF     		.align	2
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc7K8AR5.s 			page 11
+
+
+ 411              	.L41:
+ 412 0034 08000000 		.word	_ZTVN11perspective13TimeParameterE+8
+ 413              		.cfi_endproc
+ 414              	.LFE4481:
+ 416              		.section	.text._ZN11perspective13TimeParameterC2EPKcffffiS2_i,"ax",%progbits
+ 417              		.align	1
+ 418              		.p2align 2,,3
+ 419              		.global	_ZN11perspective13TimeParameterC2EPKcffffiS2_i
+ 420              		.syntax unified
+ 421              		.thumb
+ 422              		.thumb_func
+ 424              	_ZN11perspective13TimeParameterC2EPKcffffiS2_i:
+ 425              	.LVL33:
+ 426              	.LFB4476:
+   7:parameters/timeparameter.cpp ****     : EncoderParameter(name, minValue, maxValue, defaultValue, stepSize, index, displayIndex)
+ 427              		.loc 1 7 1 is_stmt 1 view -0
+ 428              		.cfi_startproc
+ 429              		@ args = 4, pretend = 0, frame = 0
+ 430              		@ frame_needed = 0, uses_anonymous_args = 0
+   7:parameters/timeparameter.cpp ****     : EncoderParameter(name, minValue, maxValue, defaultValue, stepSize, index, displayIndex)
+ 431              		.loc 1 7 1 is_stmt 0 view .LVU87
+ 432 0000 70B5     		push	{r4, r5, r6, lr}
+ 433              		.cfi_def_cfa_offset 16
+ 434              		.cfi_offset 4, -16
+ 435              		.cfi_offset 5, -12
+ 436              		.cfi_offset 6, -8
+ 437              		.cfi_offset 14, -4
+   7:parameters/timeparameter.cpp ****     : EncoderParameter(name, minValue, maxValue, defaultValue, stepSize, index, displayIndex)
+ 438              		.loc 1 7 1 view .LVU88
+ 439 0002 1E46     		mov	r6, r3
+ 440              	.LBB81:
+  11:parameters/timeparameter.cpp **** {
+ 441              		.loc 1 11 29 view .LVU89
+ 442 0004 049B     		ldr	r3, [sp, #16]
+ 443              	.LVL34:
+  11:parameters/timeparameter.cpp **** {
+ 444              		.loc 1 11 29 view .LVU90
+ 445              	.LBE81:
+   7:parameters/timeparameter.cpp ****     : EncoderParameter(name, minValue, maxValue, defaultValue, stepSize, index, displayIndex)
+ 446              		.loc 1 7 1 view .LVU91
+ 447 0006 0446     		mov	r4, r0
+ 448 0008 0D46     		mov	r5, r1
+ 449              	.LBB93:
+  11:parameters/timeparameter.cpp **** {
+ 450              		.loc 1 11 29 view .LVU92
+ 451 000a FFF7FEFF 		bl	_ZN11perspective16EncoderParameterC2EPKcffffii
+ 452              	.LVL35:
+   9:parameters/timeparameter.cpp ****     , timeModeName_(nullptr)
+ 453              		.loc 1 9 7 view .LVU93
+ 454 000e 0023     		movs	r3, #0
+  11:parameters/timeparameter.cpp **** {
+ 455              		.loc 1 11 29 discriminator 1 view .LVU94
+ 456 0010 1D4A     		ldr	r2, .L66
+  10:parameters/timeparameter.cpp ****     , tempoModeName_(nullptr)
+ 457              		.loc 1 10 7 view .LVU95
+ 458 0012 2364     		str	r3, [r4, #64]
+ 459              	.LBE93:
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc7K8AR5.s 			page 12
+
+
+  14:parameters/timeparameter.cpp ****         size_t len = strlen(name);
+ 460              		.loc 1 14 5 is_stmt 1 view .LVU96
+ 461              	.LBB94:
+  11:parameters/timeparameter.cpp **** {
+ 462              		.loc 1 11 29 is_stmt 0 discriminator 1 view .LVU97
+ 463 0014 2260     		str	r2, [r4]
+  10:parameters/timeparameter.cpp ****     , tempoModeName_(nullptr)
+ 464              		.loc 1 10 7 view .LVU98
+ 465 0016 C4E90E33 		strd	r3, r3, [r4, #56]
+ 466              	.LBB82:
+  14:parameters/timeparameter.cpp ****         size_t len = strlen(name);
+ 467              		.loc 1 14 5 view .LVU99
+ 468 001a D5B1     		cbz	r5, .L44
+ 469              	.LBB83:
+  15:parameters/timeparameter.cpp ****         timeModeName_ = new char[len + 1];
+ 470              		.loc 1 15 9 is_stmt 1 view .LVU100
+  15:parameters/timeparameter.cpp ****         timeModeName_ = new char[len + 1];
+ 471              		.loc 1 15 28 is_stmt 0 view .LVU101
+ 472 001c 2846     		mov	r0, r5
+ 473 001e FFF7FEFF 		bl	strlen
+ 474              	.LVL36:
+  16:parameters/timeparameter.cpp ****         strcpy(timeModeName_, name);
+ 475              		.loc 1 16 9 is_stmt 1 view .LVU102
+  16:parameters/timeparameter.cpp ****         strcpy(timeModeName_, name);
+ 476              		.loc 1 16 41 is_stmt 0 view .LVU103
+ 477 0022 0130     		adds	r0, r0, #1
+ 478              	.LVL37:
+  16:parameters/timeparameter.cpp ****         strcpy(timeModeName_, name);
+ 479              		.loc 1 16 41 view .LVU104
+ 480 0024 FFF7FEFF 		bl	_Znaj
+ 481              	.LVL38:
+  17:parameters/timeparameter.cpp ****     }
+ 482              		.loc 1 17 15 view .LVU105
+ 483 0028 2946     		mov	r1, r5
+  16:parameters/timeparameter.cpp ****         strcpy(timeModeName_, name);
+ 484              		.loc 1 16 23 discriminator 1 view .LVU106
+ 485 002a E063     		str	r0, [r4, #60]
+  17:parameters/timeparameter.cpp ****     }
+ 486              		.loc 1 17 9 is_stmt 1 view .LVU107
+  17:parameters/timeparameter.cpp ****     }
+ 487              		.loc 1 17 15 is_stmt 0 view .LVU108
+ 488 002c FFF7FEFF 		bl	strcpy
+ 489              	.LVL39:
+ 490              	.LBE83:
+ 491              	.LBE82:
+ 492              	.LBE94:
+  21:parameters/timeparameter.cpp ****         size_t len = strlen(tempoModeName);
+ 493              		.loc 1 21 5 is_stmt 1 view .LVU109
+ 494              	.LBB95:
+ 495              	.LBB84:
+ 496 0030 4EB1     		cbz	r6, .L45
+ 497              	.LVL40:
+ 498              	.L52:
+ 499              	.LBB85:
+  22:parameters/timeparameter.cpp ****         tempoModeName_ = new char[len + 1];
+ 500              		.loc 1 22 9 view .LVU110
+  22:parameters/timeparameter.cpp ****         tempoModeName_ = new char[len + 1];
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc7K8AR5.s 			page 13
+
+
+ 501              		.loc 1 22 28 is_stmt 0 view .LVU111
+ 502 0032 3046     		mov	r0, r6
+ 503 0034 FFF7FEFF 		bl	strlen
+ 504              	.LVL41:
+  23:parameters/timeparameter.cpp ****         strcpy(tempoModeName_, tempoModeName);
+ 505              		.loc 1 23 9 is_stmt 1 view .LVU112
+  23:parameters/timeparameter.cpp ****         strcpy(tempoModeName_, tempoModeName);
+ 506              		.loc 1 23 42 is_stmt 0 view .LVU113
+ 507 0038 0130     		adds	r0, r0, #1
+ 508              	.LVL42:
+  23:parameters/timeparameter.cpp ****         strcpy(tempoModeName_, tempoModeName);
+ 509              		.loc 1 23 42 view .LVU114
+ 510 003a FFF7FEFF 		bl	_Znaj
+ 511              	.LVL43:
+  24:parameters/timeparameter.cpp ****     }
+ 512              		.loc 1 24 15 view .LVU115
+ 513 003e 3146     		mov	r1, r6
+  23:parameters/timeparameter.cpp ****         strcpy(tempoModeName_, tempoModeName);
+ 514              		.loc 1 23 24 discriminator 1 view .LVU116
+ 515 0040 2064     		str	r0, [r4, #64]
+  24:parameters/timeparameter.cpp ****     }
+ 516              		.loc 1 24 9 is_stmt 1 view .LVU117
+  24:parameters/timeparameter.cpp ****     }
+ 517              		.loc 1 24 15 is_stmt 0 view .LVU118
+ 518 0042 FFF7FEFF 		bl	strcpy
+ 519              	.LVL44:
+ 520              	.L45:
+  24:parameters/timeparameter.cpp ****     }
+ 521              		.loc 1 24 15 view .LVU119
+ 522              	.LBE85:
+ 523              	.LBE84:
+ 524              	.LBE95:
+  28:parameters/timeparameter.cpp **** }
+ 525              		.loc 1 28 5 is_stmt 1 view .LVU120
+ 526              	.LBB96:
+ 527              	.LBB86:
+ 528              	.LBI86:
+ 119:parameters/timeparameter.cpp **** 
+ 120:parameters/timeparameter.cpp **** float TimeParameter::GetValueAsBPM() const {
+ 121:parameters/timeparameter.cpp ****     float ms = GetValue();
+ 122:parameters/timeparameter.cpp ****     if (ms > 0.0f) {
+ 123:parameters/timeparameter.cpp ****         return 60000.0f / ms;
+ 124:parameters/timeparameter.cpp ****     }
+ 125:parameters/timeparameter.cpp ****     return 0.0f;
+ 126:parameters/timeparameter.cpp **** }
+ 127:parameters/timeparameter.cpp **** 
+ 128:parameters/timeparameter.cpp **** float TimeParameter::GetValueAsMs() const {
+ 129:parameters/timeparameter.cpp ****     // Value is already stored as milliseconds
+ 130:parameters/timeparameter.cpp ****     return GetValue();
+ 131:parameters/timeparameter.cpp **** }
+ 132:parameters/timeparameter.cpp **** 
+ 133:parameters/timeparameter.cpp **** void TimeParameter::UpdateNameForMode() {
+ 529              		.loc 1 133 6 view .LVU121
+ 530              	.LBB87:
+ 134:parameters/timeparameter.cpp ****     const char* newName = nullptr;
+ 531              		.loc 1 134 5 view .LVU122
+ 135:parameters/timeparameter.cpp ****     
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc7K8AR5.s 			page 14
+
+
+ 136:parameters/timeparameter.cpp ****     // Determine which name to use based on mode
+ 137:parameters/timeparameter.cpp ****     if (displayMode_ == TimeDisplayMode::TIME_MS) {
+ 532              		.loc 1 137 5 view .LVU123
+ 533              		.loc 1 137 9 is_stmt 0 view .LVU124
+ 534 0046 A36B     		ldr	r3, [r4, #56]
+ 535              		.loc 1 137 5 view .LVU125
+ 536 0048 4BB1     		cbz	r3, .L64
+ 138:parameters/timeparameter.cpp ****         // Use original time mode name
+ 139:parameters/timeparameter.cpp ****         newName = timeModeName_;
+ 140:parameters/timeparameter.cpp ****     } else if (displayMode_ == TimeDisplayMode::TEMPO_BPM) {
+ 537              		.loc 1 140 12 is_stmt 1 view .LVU126
+ 538 004a 012B     		cmp	r3, #1
+ 539 004c 05D0     		beq	.L65
+ 540              	.LVL45:
+ 541              	.L56:
+ 542              		.loc 1 140 12 is_stmt 0 view .LVU127
+ 543              	.LBE87:
+ 544              	.LBE86:
+ 545              	.LBE96:
+  29:parameters/timeparameter.cpp **** 
+ 546              		.loc 1 29 1 view .LVU128
+ 547 004e 2046     		mov	r0, r4
+ 548 0050 70BD     		pop	{r4, r5, r6, pc}
+ 549              	.LVL46:
+ 550              	.L44:
+  21:parameters/timeparameter.cpp ****         size_t len = strlen(tempoModeName);
+ 551              		.loc 1 21 5 is_stmt 1 view .LVU129
+ 552              	.LBB97:
+ 553              	.LBB91:
+ 554 0052 002E     		cmp	r6, #0
+ 555 0054 EDD1     		bne	.L52
+ 556              	.LBE91:
+ 557              	.LBE97:
+  29:parameters/timeparameter.cpp **** 
+ 558              		.loc 1 29 1 is_stmt 0 view .LVU130
+ 559 0056 2046     		mov	r0, r4
+ 560 0058 70BD     		pop	{r4, r5, r6, pc}
+ 561              	.LVL47:
+ 562              	.L65:
+ 563              	.LBB98:
+ 564              	.LBB92:
+ 565              	.LBB90:
+ 141:parameters/timeparameter.cpp ****         // Use tempo mode name if provided, otherwise fall back to time mode name
+ 142:parameters/timeparameter.cpp ****         newName = tempoModeName_ ? tempoModeName_ : timeModeName_;
+ 566              		.loc 1 142 9 is_stmt 1 view .LVU131
+ 567              		.loc 1 142 19 is_stmt 0 view .LVU132
+ 568 005a 256C     		ldr	r5, [r4, #64]
+ 569              	.LVL48:
+ 570              		.loc 1 142 17 view .LVU133
+ 571 005c 15B9     		cbnz	r5, .L50
+ 572              	.L64:
+ 573              		.loc 1 142 17 discriminator 2 view .LVU134
+ 574 005e E56B     		ldr	r5, [r4, #60]
+ 575              	.LVL49:
+ 143:parameters/timeparameter.cpp ****     }
+ 144:parameters/timeparameter.cpp ****     
+ 145:parameters/timeparameter.cpp ****     // Update the base class name if we have a name for this mode
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc7K8AR5.s 			page 15
+
+
+ 146:parameters/timeparameter.cpp ****     if (newName && name_) {
+ 576              		.loc 1 146 5 is_stmt 1 view .LVU135
+ 577              	.LBB88:
+ 578 0060 002D     		cmp	r5, #0
+ 579 0062 F4D0     		beq	.L56
+ 580              	.LVL50:
+ 581              	.L50:
+ 582              		.loc 1 146 20 is_stmt 0 discriminator 1 view .LVU136
+ 583 0064 6068     		ldr	r0, [r4, #4]
+ 584              		.loc 1 146 17 discriminator 1 view .LVU137
+ 585 0066 0028     		cmp	r0, #0
+ 586 0068 F1D0     		beq	.L56
+ 587              	.LBB89:
+ 147:parameters/timeparameter.cpp ****         // Free existing name
+ 148:parameters/timeparameter.cpp ****         delete[] name_;
+ 588              		.loc 1 148 9 is_stmt 1 view .LVU138
+ 589              		.loc 1 148 18 is_stmt 0 discriminator 1 view .LVU139
+ 590 006a FFF7FEFF 		bl	_ZdaPv
+ 591              	.LVL51:
+ 149:parameters/timeparameter.cpp ****         
+ 150:parameters/timeparameter.cpp ****         // Allocate and copy new name
+ 151:parameters/timeparameter.cpp ****         size_t len = strlen(newName);
+ 592              		.loc 1 151 9 is_stmt 1 view .LVU140
+ 593              		.loc 1 151 28 is_stmt 0 view .LVU141
+ 594 006e 2846     		mov	r0, r5
+ 595 0070 FFF7FEFF 		bl	strlen
+ 596              	.LVL52:
+ 152:parameters/timeparameter.cpp ****         name_ = new char[len + 1];
+ 597              		.loc 1 152 9 is_stmt 1 view .LVU142
+ 598              		.loc 1 152 33 is_stmt 0 view .LVU143
+ 599 0074 0130     		adds	r0, r0, #1
+ 600              	.LVL53:
+ 601              		.loc 1 152 33 view .LVU144
+ 602 0076 FFF7FEFF 		bl	_Znaj
+ 603              	.LVL54:
+ 153:parameters/timeparameter.cpp ****         strcpy(name_, newName);
+ 604              		.loc 1 153 15 view .LVU145
+ 605 007a 2946     		mov	r1, r5
+ 152:parameters/timeparameter.cpp ****         name_ = new char[len + 1];
+ 606              		.loc 1 152 15 discriminator 1 view .LVU146
+ 607 007c 6060     		str	r0, [r4, #4]
+ 608              		.loc 1 153 9 is_stmt 1 view .LVU147
+ 609              		.loc 1 153 15 is_stmt 0 view .LVU148
+ 610 007e FFF7FEFF 		bl	strcpy
+ 611              	.LVL55:
+ 612              	.LBE89:
+ 613              	.LBE88:
+ 614              	.LBE90:
+ 615              	.LBE92:
+ 616              	.LBE98:
+  29:parameters/timeparameter.cpp **** 
+ 617              		.loc 1 29 1 view .LVU149
+ 618 0082 2046     		mov	r0, r4
+ 619 0084 70BD     		pop	{r4, r5, r6, pc}
+ 620              	.LVL56:
+ 621              	.L67:
+  29:parameters/timeparameter.cpp **** 
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc7K8AR5.s 			page 16
+
+
+ 622              		.loc 1 29 1 view .LVU150
+ 623 0086 00BF     		.align	2
+ 624              	.L66:
+ 625 0088 08000000 		.word	_ZTVN11perspective13TimeParameterE+8
+ 626              		.cfi_endproc
+ 627              	.LFE4476:
+ 629              		.global	_ZN11perspective13TimeParameterC1EPKcffffiS2_i
+ 630              		.thumb_set _ZN11perspective13TimeParameterC1EPKcffffiS2_i,_ZN11perspective13TimeParameterC2EPKcfff
+ 631              		.section	.text._ZN11perspective13TimeParameter14SetDisplayModeENS_15TimeDisplayModeE,"ax",%progbit
+ 632              		.align	1
+ 633              		.p2align 2,,3
+ 634              		.global	_ZN11perspective13TimeParameter14SetDisplayModeENS_15TimeDisplayModeE
+ 635              		.syntax unified
+ 636              		.thumb
+ 637              		.thumb_func
+ 639              	_ZN11perspective13TimeParameter14SetDisplayModeENS_15TimeDisplayModeE:
+ 640              	.LVL57:
+ 641              	.LFB4482:
+  42:parameters/timeparameter.cpp ****     displayMode_ = mode;
+ 642              		.loc 1 42 58 is_stmt 1 view -0
+ 643              		.cfi_startproc
+ 644              		@ args = 0, pretend = 0, frame = 0
+ 645              		@ frame_needed = 0, uses_anonymous_args = 0
+  43:parameters/timeparameter.cpp ****     UpdateNameForMode();
+ 646              		.loc 1 43 5 view .LVU152
+  42:parameters/timeparameter.cpp ****     displayMode_ = mode;
+ 647              		.loc 1 42 58 is_stmt 0 view .LVU153
+ 648 0000 38B5     		push	{r3, r4, r5, lr}
+ 649              		.cfi_def_cfa_offset 16
+ 650              		.cfi_offset 3, -16
+ 651              		.cfi_offset 4, -12
+ 652              		.cfi_offset 5, -8
+ 653              		.cfi_offset 14, -4
+  42:parameters/timeparameter.cpp ****     displayMode_ = mode;
+ 654              		.loc 1 42 58 view .LVU154
+ 655 0002 0446     		mov	r4, r0
+  43:parameters/timeparameter.cpp ****     UpdateNameForMode();
+ 656              		.loc 1 43 18 view .LVU155
+ 657 0004 8163     		str	r1, [r0, #56]
+  44:parameters/timeparameter.cpp **** }
+ 658              		.loc 1 44 5 is_stmt 1 view .LVU156
+ 659              	.LVL58:
+ 660              	.LBB103:
+ 661              	.LBI103:
+ 133:parameters/timeparameter.cpp ****     const char* newName = nullptr;
+ 662              		.loc 1 133 6 view .LVU157
+ 663              	.LBB104:
+ 134:parameters/timeparameter.cpp ****     
+ 664              		.loc 1 134 5 view .LVU158
+ 137:parameters/timeparameter.cpp ****         // Use original time mode name
+ 665              		.loc 1 137 5 view .LVU159
+ 666 0006 89B9     		cbnz	r1, .L69
+ 667              	.L72:
+ 139:parameters/timeparameter.cpp ****     } else if (displayMode_ == TimeDisplayMode::TEMPO_BPM) {
+ 668              		.loc 1 139 9 view .LVU160
+ 139:parameters/timeparameter.cpp ****     } else if (displayMode_ == TimeDisplayMode::TEMPO_BPM) {
+ 669              		.loc 1 139 17 is_stmt 0 view .LVU161
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc7K8AR5.s 			page 17
+
+
+ 670 0008 E56B     		ldr	r5, [r4, #60]
+ 671              	.LVL59:
+ 146:parameters/timeparameter.cpp ****         // Free existing name
+ 672              		.loc 1 146 5 is_stmt 1 view .LVU162
+ 673              	.LBB105:
+ 674 000a 8DB1     		cbz	r5, .L68
+ 675              	.LVL60:
+ 676              	.L70:
+ 146:parameters/timeparameter.cpp ****         // Free existing name
+ 677              		.loc 1 146 20 is_stmt 0 discriminator 1 view .LVU163
+ 678 000c 6068     		ldr	r0, [r4, #4]
+ 679              	.LVL61:
+ 146:parameters/timeparameter.cpp ****         // Free existing name
+ 680              		.loc 1 146 17 discriminator 1 view .LVU164
+ 681 000e 78B1     		cbz	r0, .L68
+ 682              	.LBB106:
+ 148:parameters/timeparameter.cpp ****         
+ 683              		.loc 1 148 9 is_stmt 1 view .LVU165
+ 148:parameters/timeparameter.cpp ****         
+ 684              		.loc 1 148 18 is_stmt 0 discriminator 1 view .LVU166
+ 685 0010 FFF7FEFF 		bl	_ZdaPv
+ 686              	.LVL62:
+ 151:parameters/timeparameter.cpp ****         name_ = new char[len + 1];
+ 687              		.loc 1 151 9 is_stmt 1 view .LVU167
+ 151:parameters/timeparameter.cpp ****         name_ = new char[len + 1];
+ 688              		.loc 1 151 28 is_stmt 0 view .LVU168
+ 689 0014 2846     		mov	r0, r5
+ 690 0016 FFF7FEFF 		bl	strlen
+ 691              	.LVL63:
+ 152:parameters/timeparameter.cpp ****         strcpy(name_, newName);
+ 692              		.loc 1 152 9 is_stmt 1 view .LVU169
+ 152:parameters/timeparameter.cpp ****         strcpy(name_, newName);
+ 693              		.loc 1 152 33 is_stmt 0 view .LVU170
+ 694 001a 0130     		adds	r0, r0, #1
+ 695              	.LVL64:
+ 152:parameters/timeparameter.cpp ****         strcpy(name_, newName);
+ 696              		.loc 1 152 33 view .LVU171
+ 697 001c FFF7FEFF 		bl	_Znaj
+ 698              	.LVL65:
+ 699              		.loc 1 153 15 view .LVU172
+ 700 0020 2946     		mov	r1, r5
+ 152:parameters/timeparameter.cpp ****         strcpy(name_, newName);
+ 701              		.loc 1 152 15 discriminator 1 view .LVU173
+ 702 0022 6060     		str	r0, [r4, #4]
+ 703              		.loc 1 153 9 is_stmt 1 view .LVU174
+ 704              	.LBE106:
+ 705              	.LBE105:
+ 706              	.LBE104:
+ 707              	.LBE103:
+  45:parameters/timeparameter.cpp **** 
+ 708              		.loc 1 45 1 is_stmt 0 view .LVU175
+ 709 0024 BDE83840 		pop	{r3, r4, r5, lr}
+ 710              		.cfi_remember_state
+ 711              		.cfi_restore 14
+ 712              		.cfi_restore 5
+ 713              		.cfi_restore 4
+ 714              		.cfi_restore 3
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc7K8AR5.s 			page 18
+
+
+ 715              		.cfi_def_cfa_offset 0
+ 716              	.LVL66:
+ 717              	.LBB111:
+ 718              	.LBB109:
+ 719              	.LBB108:
+ 720              	.LBB107:
+ 721              		.loc 1 153 15 view .LVU176
+ 722 0028 FFF7FEBF 		b	strcpy
+ 723              	.LVL67:
+ 724              	.L69:
+ 725              		.cfi_restore_state
+ 726              		.loc 1 153 15 view .LVU177
+ 727              	.LBE107:
+ 728              	.LBE108:
+ 140:parameters/timeparameter.cpp ****         // Use tempo mode name if provided, otherwise fall back to time mode name
+ 729              		.loc 1 140 12 is_stmt 1 view .LVU178
+ 730 002c 0129     		cmp	r1, #1
+ 731 002e 00D0     		beq	.L80
+ 732              	.LVL68:
+ 733              	.L68:
+ 140:parameters/timeparameter.cpp ****         // Use tempo mode name if provided, otherwise fall back to time mode name
+ 734              		.loc 1 140 12 is_stmt 0 view .LVU179
+ 735              	.LBE109:
+ 736              	.LBE111:
+  45:parameters/timeparameter.cpp **** 
+ 737              		.loc 1 45 1 view .LVU180
+ 738 0030 38BD     		pop	{r3, r4, r5, pc}
+ 739              	.LVL69:
+ 740              	.L80:
+ 741              	.LBB112:
+ 742              	.LBB110:
+ 142:parameters/timeparameter.cpp ****     }
+ 743              		.loc 1 142 9 is_stmt 1 view .LVU181
+ 142:parameters/timeparameter.cpp ****     }
+ 744              		.loc 1 142 19 is_stmt 0 view .LVU182
+ 745 0032 056C     		ldr	r5, [r0, #64]
+ 142:parameters/timeparameter.cpp ****     }
+ 746              		.loc 1 142 17 view .LVU183
+ 747 0034 002D     		cmp	r5, #0
+ 748 0036 E9D1     		bne	.L70
+ 749 0038 E6E7     		b	.L72
+ 750              	.LBE110:
+ 751              	.LBE112:
+ 752              		.cfi_endproc
+ 753              	.LFE4482:
+ 755 003a 00BF     		.section	.text._ZNK11perspective13TimeParameter14GetDisplayModeEv,"ax",%progbits
+ 756              		.align	1
+ 757              		.p2align 2,,3
+ 758              		.global	_ZNK11perspective13TimeParameter14GetDisplayModeEv
+ 759              		.syntax unified
+ 760              		.thumb
+ 761              		.thumb_func
+ 763              	_ZNK11perspective13TimeParameter14GetDisplayModeEv:
+ 764              	.LVL70:
+ 765              	.LFB4483:
+  47:parameters/timeparameter.cpp ****     return displayMode_;
+ 766              		.loc 1 47 55 is_stmt 1 view -0
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc7K8AR5.s 			page 19
+
+
+ 767              		.cfi_startproc
+ 768              		@ args = 0, pretend = 0, frame = 0
+ 769              		@ frame_needed = 0, uses_anonymous_args = 0
+ 770              		@ link register save eliminated.
+  48:parameters/timeparameter.cpp **** }
+ 771              		.loc 1 48 5 view .LVU185
+  49:parameters/timeparameter.cpp **** 
+ 772              		.loc 1 49 1 is_stmt 0 view .LVU186
+ 773 0000 806B     		ldr	r0, [r0, #56]
+ 774              	.LVL71:
+  49:parameters/timeparameter.cpp **** 
+ 775              		.loc 1 49 1 view .LVU187
+ 776 0002 7047     		bx	lr
+ 777              		.cfi_endproc
+ 778              	.LFE4483:
+ 780              		.section	.text._ZNK11perspective13TimeParameter13GetValueAsBPMEv,"ax",%progbits
+ 781              		.align	1
+ 782              		.p2align 2,,3
+ 783              		.global	_ZNK11perspective13TimeParameter13GetValueAsBPMEv
+ 784              		.syntax unified
+ 785              		.thumb
+ 786              		.thumb_func
+ 788              	_ZNK11perspective13TimeParameter13GetValueAsBPMEv:
+ 789              	.LVL72:
+ 790              	.LFB4488:
+ 120:parameters/timeparameter.cpp ****     float ms = GetValue();
+ 791              		.loc 1 120 44 is_stmt 1 view -0
+ 792              		.cfi_startproc
+ 793              		@ args = 0, pretend = 0, frame = 0
+ 794              		@ frame_needed = 0, uses_anonymous_args = 0
+ 121:parameters/timeparameter.cpp ****     if (ms > 0.0f) {
+ 795              		.loc 1 121 5 view .LVU189
+ 120:parameters/timeparameter.cpp ****     float ms = GetValue();
+ 796              		.loc 1 120 44 is_stmt 0 view .LVU190
+ 797 0000 08B5     		push	{r3, lr}
+ 798              		.cfi_def_cfa_offset 8
+ 799              		.cfi_offset 3, -8
+ 800              		.cfi_offset 14, -4
+ 121:parameters/timeparameter.cpp ****     if (ms > 0.0f) {
+ 801              		.loc 1 121 24 view .LVU191
+ 802 0002 FFF7FEFF 		bl	_ZNK11perspective15EffectParameter8GetValueEv
+ 803              	.LVL73:
+ 122:parameters/timeparameter.cpp ****         return 60000.0f / ms;
+ 804              		.loc 1 122 5 is_stmt 1 view .LVU192
+ 805 0006 B5EEC00A 		vcmpe.f32	s0, #0
+ 806 000a F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 807 000e 02DC     		bgt	.L89
+ 125:parameters/timeparameter.cpp **** }
+ 808              		.loc 1 125 12 is_stmt 0 view .LVU193
+ 809 0010 9FED040A 		vldr.32	s0, .L90
+ 810              	.LVL74:
+ 126:parameters/timeparameter.cpp **** 
+ 811              		.loc 1 126 1 view .LVU194
+ 812 0014 08BD     		pop	{r3, pc}
+ 813              	.LVL75:
+ 814              	.L89:
+ 126:parameters/timeparameter.cpp **** 
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc7K8AR5.s 			page 20
+
+
+ 815              		.loc 1 126 1 view .LVU195
+ 816 0016 F0EE407A 		vmov.f32	s15, s0
+ 123:parameters/timeparameter.cpp ****     }
+ 817              		.loc 1 123 9 is_stmt 1 view .LVU196
+ 123:parameters/timeparameter.cpp ****     }
+ 818              		.loc 1 123 27 is_stmt 0 view .LVU197
+ 819 001a 9FED037A 		vldr.32	s14, .L90+4
+ 820 001e 87EE270A 		vdiv.f32	s0, s14, s15
+ 821              	.LVL76:
+ 126:parameters/timeparameter.cpp **** 
+ 822              		.loc 1 126 1 view .LVU198
+ 823 0022 08BD     		pop	{r3, pc}
+ 824              	.L91:
+ 825              		.align	2
+ 826              	.L90:
+ 827 0024 00000000 		.word	0
+ 828 0028 00606A47 		.word	1198153728
+ 829              		.cfi_endproc
+ 830              	.LFE4488:
+ 832              		.section	.text._ZNK11perspective13TimeParameter12GetValueAsMsEv,"ax",%progbits
+ 833              		.align	1
+ 834              		.p2align 2,,3
+ 835              		.global	_ZNK11perspective13TimeParameter12GetValueAsMsEv
+ 836              		.syntax unified
+ 837              		.thumb
+ 838              		.thumb_func
+ 840              	_ZNK11perspective13TimeParameter12GetValueAsMsEv:
+ 841              	.LVL77:
+ 842              	.LFB4489:
+ 128:parameters/timeparameter.cpp ****     // Value is already stored as milliseconds
+ 843              		.loc 1 128 43 is_stmt 1 view -0
+ 844              		.cfi_startproc
+ 845              		@ args = 0, pretend = 0, frame = 0
+ 846              		@ frame_needed = 0, uses_anonymous_args = 0
+ 847              		@ link register save eliminated.
+ 130:parameters/timeparameter.cpp **** }
+ 848              		.loc 1 130 5 view .LVU200
+ 130:parameters/timeparameter.cpp **** }
+ 849              		.loc 1 130 20 is_stmt 0 view .LVU201
+ 850 0000 FFF7FEBF 		b	_ZNK11perspective15EffectParameter8GetValueEv
+ 851              	.LVL78:
+ 130:parameters/timeparameter.cpp **** }
+ 852              		.loc 1 130 20 view .LVU202
+ 853              		.cfi_endproc
+ 854              	.LFE4489:
+ 856              		.section	.text._ZN11perspective13TimeParameter17UpdateNameForModeEv,"ax",%progbits
+ 857              		.align	1
+ 858              		.p2align 2,,3
+ 859              		.global	_ZN11perspective13TimeParameter17UpdateNameForModeEv
+ 860              		.syntax unified
+ 861              		.thumb
+ 862              		.thumb_func
+ 864              	_ZN11perspective13TimeParameter17UpdateNameForModeEv:
+ 865              	.LVL79:
+ 866              	.LFB4490:
+ 133:parameters/timeparameter.cpp ****     const char* newName = nullptr;
+ 867              		.loc 1 133 41 is_stmt 1 view -0
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc7K8AR5.s 			page 21
+
+
+ 868              		.cfi_startproc
+ 869              		@ args = 0, pretend = 0, frame = 0
+ 870              		@ frame_needed = 0, uses_anonymous_args = 0
+ 134:parameters/timeparameter.cpp ****     
+ 871              		.loc 1 134 5 view .LVU204
+ 137:parameters/timeparameter.cpp ****         // Use original time mode name
+ 872              		.loc 1 137 5 view .LVU205
+ 133:parameters/timeparameter.cpp ****     const char* newName = nullptr;
+ 873              		.loc 1 133 41 is_stmt 0 view .LVU206
+ 874 0000 38B5     		push	{r3, r4, r5, lr}
+ 875              		.cfi_def_cfa_offset 16
+ 876              		.cfi_offset 3, -16
+ 877              		.cfi_offset 4, -12
+ 878              		.cfi_offset 5, -8
+ 879              		.cfi_offset 14, -4
+ 137:parameters/timeparameter.cpp ****         // Use original time mode name
+ 880              		.loc 1 137 9 view .LVU207
+ 881 0002 836B     		ldr	r3, [r0, #56]
+ 133:parameters/timeparameter.cpp ****     const char* newName = nullptr;
+ 882              		.loc 1 133 41 view .LVU208
+ 883 0004 0446     		mov	r4, r0
+ 137:parameters/timeparameter.cpp ****         // Use original time mode name
+ 884              		.loc 1 137 5 view .LVU209
+ 885 0006 8BB9     		cbnz	r3, .L94
+ 886              	.L97:
+ 139:parameters/timeparameter.cpp ****     } else if (displayMode_ == TimeDisplayMode::TEMPO_BPM) {
+ 887              		.loc 1 139 9 is_stmt 1 view .LVU210
+ 139:parameters/timeparameter.cpp ****     } else if (displayMode_ == TimeDisplayMode::TEMPO_BPM) {
+ 888              		.loc 1 139 17 is_stmt 0 view .LVU211
+ 889 0008 E56B     		ldr	r5, [r4, #60]
+ 890              	.LVL80:
+ 146:parameters/timeparameter.cpp ****         // Free existing name
+ 891              		.loc 1 146 5 is_stmt 1 view .LVU212
+ 892              	.LBB113:
+ 893 000a 8DB1     		cbz	r5, .L93
+ 894              	.LVL81:
+ 895              	.L95:
+ 146:parameters/timeparameter.cpp ****         // Free existing name
+ 896              		.loc 1 146 20 is_stmt 0 discriminator 1 view .LVU213
+ 897 000c 6068     		ldr	r0, [r4, #4]
+ 898              	.LVL82:
+ 146:parameters/timeparameter.cpp ****         // Free existing name
+ 899              		.loc 1 146 17 discriminator 1 view .LVU214
+ 900 000e 78B1     		cbz	r0, .L93
+ 901              	.LBB114:
+ 148:parameters/timeparameter.cpp ****         
+ 902              		.loc 1 148 9 is_stmt 1 view .LVU215
+ 148:parameters/timeparameter.cpp ****         
+ 903              		.loc 1 148 18 is_stmt 0 discriminator 1 view .LVU216
+ 904 0010 FFF7FEFF 		bl	_ZdaPv
+ 905              	.LVL83:
+ 151:parameters/timeparameter.cpp ****         name_ = new char[len + 1];
+ 906              		.loc 1 151 9 is_stmt 1 view .LVU217
+ 151:parameters/timeparameter.cpp ****         name_ = new char[len + 1];
+ 907              		.loc 1 151 28 is_stmt 0 view .LVU218
+ 908 0014 2846     		mov	r0, r5
+ 909 0016 FFF7FEFF 		bl	strlen
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc7K8AR5.s 			page 22
+
+
+ 910              	.LVL84:
+ 152:parameters/timeparameter.cpp ****         strcpy(name_, newName);
+ 911              		.loc 1 152 9 is_stmt 1 view .LVU219
+ 152:parameters/timeparameter.cpp ****         strcpy(name_, newName);
+ 912              		.loc 1 152 33 is_stmt 0 view .LVU220
+ 913 001a 0130     		adds	r0, r0, #1
+ 914              	.LVL85:
+ 152:parameters/timeparameter.cpp ****         strcpy(name_, newName);
+ 915              		.loc 1 152 33 view .LVU221
+ 916 001c FFF7FEFF 		bl	_Znaj
+ 917              	.LVL86:
+ 918              		.loc 1 153 15 view .LVU222
+ 919 0020 2946     		mov	r1, r5
+ 152:parameters/timeparameter.cpp ****         strcpy(name_, newName);
+ 920              		.loc 1 152 15 discriminator 1 view .LVU223
+ 921 0022 6060     		str	r0, [r4, #4]
+ 922              		.loc 1 153 9 is_stmt 1 view .LVU224
+ 923              	.LBE114:
+ 924              	.LBE113:
+ 154:parameters/timeparameter.cpp ****     }
+ 155:parameters/timeparameter.cpp **** }
+ 925              		.loc 1 155 1 is_stmt 0 view .LVU225
+ 926 0024 BDE83840 		pop	{r3, r4, r5, lr}
+ 927              		.cfi_remember_state
+ 928              		.cfi_restore 14
+ 929              		.cfi_restore 5
+ 930              		.cfi_restore 4
+ 931              		.cfi_restore 3
+ 932              		.cfi_def_cfa_offset 0
+ 933              	.LVL87:
+ 934              	.LBB116:
+ 935              	.LBB115:
+ 153:parameters/timeparameter.cpp ****     }
+ 936              		.loc 1 153 15 view .LVU226
+ 937 0028 FFF7FEBF 		b	strcpy
+ 938              	.LVL88:
+ 939              	.L94:
+ 940              		.cfi_restore_state
+ 153:parameters/timeparameter.cpp ****     }
+ 941              		.loc 1 153 15 view .LVU227
+ 942              	.LBE115:
+ 943              	.LBE116:
+ 140:parameters/timeparameter.cpp ****         // Use tempo mode name if provided, otherwise fall back to time mode name
+ 944              		.loc 1 140 12 is_stmt 1 view .LVU228
+ 945 002c 012B     		cmp	r3, #1
+ 946 002e 00D0     		beq	.L105
+ 947              	.LVL89:
+ 948              	.L93:
+ 949              		.loc 1 155 1 is_stmt 0 view .LVU229
+ 950 0030 38BD     		pop	{r3, r4, r5, pc}
+ 951              	.LVL90:
+ 952              	.L105:
+ 142:parameters/timeparameter.cpp ****     }
+ 953              		.loc 1 142 9 is_stmt 1 view .LVU230
+ 142:parameters/timeparameter.cpp ****     }
+ 954              		.loc 1 142 19 is_stmt 0 view .LVU231
+ 955 0032 056C     		ldr	r5, [r0, #64]
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc7K8AR5.s 			page 23
+
+
+ 142:parameters/timeparameter.cpp ****     }
+ 956              		.loc 1 142 17 view .LVU232
+ 957 0034 002D     		cmp	r5, #0
+ 958 0036 E9D1     		bne	.L95
+ 959 0038 E6E7     		b	.L97
+ 960              		.cfi_endproc
+ 961              	.LFE4490:
+ 963 003a 00BF     		.section	.text._ZN11perspective13TimeParameter9IncrementEi,"ax",%progbits
+ 964              		.align	1
+ 965              		.p2align 2,,3
+ 966              		.global	_ZN11perspective13TimeParameter9IncrementEi
+ 967              		.syntax unified
+ 968              		.thumb
+ 969              		.thumb_func
+ 971              	_ZN11perspective13TimeParameter9IncrementEi:
+ 972              	.LVL91:
+ 973              	.LFB4484:
+  51:parameters/timeparameter.cpp ****     if (displayMode_ == TimeDisplayMode::TEMPO_BPM) {
+ 974              		.loc 1 51 42 is_stmt 1 view -0
+ 975              		.cfi_startproc
+ 976              		@ args = 0, pretend = 0, frame = 8
+ 977              		@ frame_needed = 0, uses_anonymous_args = 0
+  52:parameters/timeparameter.cpp ****         // In tempo mode, increment BPM (which means decrement ms)
+ 978              		.loc 1 52 5 view .LVU234
+ 979              	.LBB126:
+ 980 0000 836B     		ldr	r3, [r0, #56]
+ 981              	.LBE126:
+  51:parameters/timeparameter.cpp ****     if (displayMode_ == TimeDisplayMode::TEMPO_BPM) {
+ 982              		.loc 1 51 42 is_stmt 0 view .LVU235
+ 983 0002 10B5     		push	{r4, lr}
+ 984              		.cfi_def_cfa_offset 8
+ 985              		.cfi_offset 4, -8
+ 986              		.cfi_offset 14, -4
+ 987              	.LBB127:
+  52:parameters/timeparameter.cpp ****         // In tempo mode, increment BPM (which means decrement ms)
+ 988              		.loc 1 52 5 view .LVU236
+ 989 0004 012B     		cmp	r3, #1
+ 990              	.LBE127:
+  51:parameters/timeparameter.cpp ****     if (displayMode_ == TimeDisplayMode::TEMPO_BPM) {
+ 991              		.loc 1 51 42 view .LVU237
+ 992 0006 82B0     		sub	sp, sp, #8
+ 993              		.cfi_def_cfa_offset 16
+  51:parameters/timeparameter.cpp ****     if (displayMode_ == TimeDisplayMode::TEMPO_BPM) {
+ 994              		.loc 1 51 42 view .LVU238
+ 995 0008 0191     		str	r1, [sp, #4]
+ 996              	.LBB128:
+  52:parameters/timeparameter.cpp ****         // In tempo mode, increment BPM (which means decrement ms)
+ 997              		.loc 1 52 5 view .LVU239
+ 998 000a 04D0     		beq	.L116
+  66:parameters/timeparameter.cpp ****     }
+ 999              		.loc 1 66 9 is_stmt 1 view .LVU240
+ 1000              	.LBE128:
+  68:parameters/timeparameter.cpp **** 
+ 1001              		.loc 1 68 1 is_stmt 0 view .LVU241
+ 1002 000c 02B0     		add	sp, sp, #8
+ 1003              		.cfi_remember_state
+ 1004              		.cfi_def_cfa_offset 8
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc7K8AR5.s 			page 24
+
+
+ 1005              		@ sp needed
+ 1006 000e BDE81040 		pop	{r4, lr}
+ 1007              		.cfi_restore 14
+ 1008              		.cfi_restore 4
+ 1009              		.cfi_def_cfa_offset 0
+ 1010              	.LBB129:
+  66:parameters/timeparameter.cpp ****     }
+ 1011              		.loc 1 66 36 view .LVU242
+ 1012 0012 FFF7FEBF 		b	_ZN11perspective16EncoderParameter9IncrementEi
+ 1013              	.LVL92:
+ 1014              	.L116:
+ 1015              		.cfi_restore_state
+  66:parameters/timeparameter.cpp ****     }
+ 1016              		.loc 1 66 36 view .LVU243
+ 1017 0016 0446     		mov	r4, r0
+ 1018              	.LVL93:
+  66:parameters/timeparameter.cpp ****     }
+ 1019              		.loc 1 66 36 view .LVU244
+ 1020              	.LBE129:
+ 1021              	.LBB130:
+ 1022              	.LBI130:
+  51:parameters/timeparameter.cpp ****     if (displayMode_ == TimeDisplayMode::TEMPO_BPM) {
+ 1023              		.loc 1 51 6 is_stmt 1 view .LVU245
+ 1024              	.LBB131:
+ 1025              	.LBB132:
+  55:parameters/timeparameter.cpp ****         float newBpm = currentBpm - (BPM_STEP_SIZE * steps);
+ 1026              		.loc 1 55 9 view .LVU246
+ 1027              	.LBB133:
+ 1028              	.LBI133:
+ 120:parameters/timeparameter.cpp ****     float ms = GetValue();
+ 1029              		.loc 1 120 7 view .LVU247
+ 1030              	.LBB134:
+ 121:parameters/timeparameter.cpp ****     if (ms > 0.0f) {
+ 1031              		.loc 1 121 5 view .LVU248
+ 121:parameters/timeparameter.cpp ****     if (ms > 0.0f) {
+ 1032              		.loc 1 121 24 is_stmt 0 view .LVU249
+ 1033 0018 FFF7FEFF 		bl	_ZNK11perspective15EffectParameter8GetValueEv
+ 1034              	.LVL94:
+ 122:parameters/timeparameter.cpp ****         return 60000.0f / ms;
+ 1035              		.loc 1 122 5 is_stmt 1 view .LVU250
+ 1036 001c B5EEC00A 		vcmpe.f32	s0, #0
+ 1037 0020 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 1038 0024 23DC     		bgt	.L117
+ 125:parameters/timeparameter.cpp **** }
+ 1039              		.loc 1 125 12 is_stmt 0 view .LVU251
+ 1040 0026 9FED167A 		vldr.32	s14, .L118
+ 1041              	.L108:
+ 1042              	.LVL95:
+ 125:parameters/timeparameter.cpp **** }
+ 1043              		.loc 1 125 12 view .LVU252
+ 1044              	.LBE134:
+ 1045              	.LBE133:
+  56:parameters/timeparameter.cpp ****         
+ 1046              		.loc 1 56 9 is_stmt 1 view .LVU253
+  56:parameters/timeparameter.cpp ****         
+ 1047              		.loc 1 56 52 is_stmt 0 view .LVU254
+ 1048 002a DDED017A 		vldr.32	s15, [sp, #4]	@ int
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc7K8AR5.s 			page 25
+
+
+  56:parameters/timeparameter.cpp ****         
+ 1049              		.loc 1 56 35 view .LVU255
+ 1050 002e B6EE006A 		vmov.f32	s12, #5.0e-1
+ 1051              	.LBB136:
+ 1052              	.LBB137:
+ 1053              		.file 2 "parameters/effectparameter.h"
+   1:parameters/effectparameter.h **** #ifndef PERSPECTIVE_EFFECTPARAMETER_H
+   2:parameters/effectparameter.h **** #define PERSPECTIVE_EFFECTPARAMETER_H
+   3:parameters/effectparameter.h **** 
+   4:parameters/effectparameter.h **** #include "daisy_seed.h"
+   5:parameters/effectparameter.h **** #include <vector>
+   6:parameters/effectparameter.h **** 
+   7:parameters/effectparameter.h **** #include "../controls.h"
+   8:parameters/effectparameter.h **** 
+   9:parameters/effectparameter.h **** using namespace daisy;
+  10:parameters/effectparameter.h **** 
+  11:parameters/effectparameter.h **** namespace perspective {
+  12:parameters/effectparameter.h **** 
+  13:parameters/effectparameter.h **** // Local clamp function to avoid std::clamp (C++17)
+  14:parameters/effectparameter.h **** template<typename T>
+  15:parameters/effectparameter.h **** inline constexpr const T& clamp(const T& v, const T& lo, const T& hi) {
+  16:parameters/effectparameter.h ****     return (v < lo) ? lo : (hi < v) ? hi : v;
+ 1054              		.loc 2 16 21 view .LVU256
+ 1055 0032 F3EE0E6A 		vmov.f32	s13, #3.0e+1
+ 1056              	.LBE137:
+ 1057              	.LBE136:
+  56:parameters/timeparameter.cpp ****         
+ 1058              		.loc 1 56 52 view .LVU257
+ 1059 0036 F8EEE77A 		vcvt.f32.s32	s15, s15
+  56:parameters/timeparameter.cpp ****         
+ 1060              		.loc 1 56 35 view .LVU258
+ 1061 003a A7EEC67A 		vfms.f32	s14, s15, s12
+ 1062              	.LVL96:
+  59:parameters/timeparameter.cpp ****         
+ 1063              		.loc 1 59 9 is_stmt 1 view .LVU259
+ 1064              	.LBB140:
+ 1065              	.LBI136:
+  15:parameters/effectparameter.h ****     return (v < lo) ? lo : (hi < v) ? hi : v;
+ 1066              		.loc 2 15 27 view .LVU260
+ 1067              	.LBB138:
+ 1068              		.loc 2 16 21 is_stmt 0 view .LVU261
+ 1069 003e B4EEE67A 		vcmpe.f32	s14, s13
+ 1070 0042 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 1071 0046 17D4     		bmi	.L112
+ 1072              	.LBE138:
+ 1073              	.LBE140:
+  62:parameters/timeparameter.cpp ****         SetValue(newMs);
+ 1074              		.loc 1 62 15 view .LVU262
+ 1075 0048 DFED0E7A 		vldr.32	s15, .L118+4
+ 1076 004c DFED0E6A 		vldr.32	s13, .L118+8
+ 1077 0050 B4EEE77A 		vcmpe.f32	s14, s15
+ 1078 0054 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 1079 0058 77FE877A 		vselgt.f32	s15, s15, s14
+ 1080 005c 86EEA70A 		vdiv.f32	s0, s13, s15
+ 1081              	.L110:
+ 1082              	.LVL97:
+  62:parameters/timeparameter.cpp ****         SetValue(newMs);
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc7K8AR5.s 			page 26
+
+
+ 1083              		.loc 1 62 9 is_stmt 1 view .LVU263
+  63:parameters/timeparameter.cpp ****     } else {
+ 1084              		.loc 1 63 9 view .LVU264
+  63:parameters/timeparameter.cpp ****     } else {
+ 1085              		.loc 1 63 17 is_stmt 0 view .LVU265
+ 1086 0060 2368     		ldr	r3, [r4]
+ 1087 0062 2046     		mov	r0, r4
+ 1088 0064 1B69     		ldr	r3, [r3, #16]
+ 1089              	.LBE132:
+ 1090              	.LBE131:
+ 1091              	.LBE130:
+  68:parameters/timeparameter.cpp **** 
+ 1092              		.loc 1 68 1 view .LVU266
+ 1093 0066 02B0     		add	sp, sp, #8
+ 1094              		.cfi_remember_state
+ 1095              		.cfi_def_cfa_offset 8
+ 1096              		@ sp needed
+ 1097 0068 BDE81040 		pop	{r4, lr}
+ 1098              		.cfi_restore 14
+ 1099              		.cfi_restore 4
+ 1100              		.cfi_def_cfa_offset 0
+ 1101              	.LVL98:
+ 1102              	.LBB145:
+ 1103              	.LBB144:
+ 1104              	.LBB143:
+  63:parameters/timeparameter.cpp ****     } else {
+ 1105              		.loc 1 63 17 view .LVU267
+ 1106 006c 1847     		bx	r3	@ indirect register sibling call
+ 1107              	.LVL99:
+ 1108              	.L117:
+ 1109              		.cfi_restore_state
+ 1110              	.LBB141:
+ 1111              	.LBB135:
+ 123:parameters/timeparameter.cpp ****     }
+ 1112              		.loc 1 123 9 is_stmt 1 view .LVU268
+ 123:parameters/timeparameter.cpp ****     }
+ 1113              		.loc 1 123 27 is_stmt 0 view .LVU269
+ 1114 006e DFED067A 		vldr.32	s15, .L118+8
+ 1115 0072 87EE807A 		vdiv.f32	s14, s15, s0
+ 1116 0076 D8E7     		b	.L108
+ 1117              	.LVL100:
+ 1118              	.L112:
+ 123:parameters/timeparameter.cpp ****     }
+ 1119              		.loc 1 123 27 view .LVU270
+ 1120              	.LBE135:
+ 1121              	.LBE141:
+ 1122              	.LBB142:
+ 1123              	.LBB139:
+ 1124 0078 9FED040A 		vldr.32	s0, .L118+12
+ 1125 007c F0E7     		b	.L110
+ 1126              	.L119:
+ 1127 007e 00BF     		.align	2
+ 1128              	.L118:
+ 1129 0080 00000000 		.word	0
+ 1130 0084 00004843 		.word	1128792064
+ 1131 0088 00606A47 		.word	1198153728
+ 1132 008c 0000FA44 		.word	1157234688
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc7K8AR5.s 			page 27
+
+
+ 1133              	.LBE139:
+ 1134              	.LBE142:
+ 1135              	.LBE143:
+ 1136              	.LBE144:
+ 1137              	.LBE145:
+ 1138              		.cfi_endproc
+ 1139              	.LFE4484:
+ 1141              		.section	.text._ZN11perspective13TimeParameter9DecrementEi,"ax",%progbits
+ 1142              		.align	1
+ 1143              		.p2align 2,,3
+ 1144              		.global	_ZN11perspective13TimeParameter9DecrementEi
+ 1145              		.syntax unified
+ 1146              		.thumb
+ 1147              		.thumb_func
+ 1149              	_ZN11perspective13TimeParameter9DecrementEi:
+ 1150              	.LVL101:
+ 1151              	.LFB4486:
+  70:parameters/timeparameter.cpp ****     if (displayMode_ == TimeDisplayMode::TEMPO_BPM) {
+ 1152              		.loc 1 70 42 is_stmt 1 view -0
+ 1153              		.cfi_startproc
+ 1154              		@ args = 0, pretend = 0, frame = 8
+ 1155              		@ frame_needed = 0, uses_anonymous_args = 0
+  71:parameters/timeparameter.cpp ****         // In tempo mode, decrement BPM (which means increment ms)
+ 1156              		.loc 1 71 5 view .LVU272
+ 1157              	.LBB155:
+ 1158 0000 836B     		ldr	r3, [r0, #56]
+ 1159              	.LBE155:
+  70:parameters/timeparameter.cpp ****     if (displayMode_ == TimeDisplayMode::TEMPO_BPM) {
+ 1160              		.loc 1 70 42 is_stmt 0 view .LVU273
+ 1161 0002 10B5     		push	{r4, lr}
+ 1162              		.cfi_def_cfa_offset 8
+ 1163              		.cfi_offset 4, -8
+ 1164              		.cfi_offset 14, -4
+ 1165              	.LBB156:
+  71:parameters/timeparameter.cpp ****         // In tempo mode, decrement BPM (which means increment ms)
+ 1166              		.loc 1 71 5 view .LVU274
+ 1167 0004 012B     		cmp	r3, #1
+ 1168              	.LBE156:
+  70:parameters/timeparameter.cpp ****     if (displayMode_ == TimeDisplayMode::TEMPO_BPM) {
+ 1169              		.loc 1 70 42 view .LVU275
+ 1170 0006 82B0     		sub	sp, sp, #8
+ 1171              		.cfi_def_cfa_offset 16
+  70:parameters/timeparameter.cpp ****     if (displayMode_ == TimeDisplayMode::TEMPO_BPM) {
+ 1172              		.loc 1 70 42 view .LVU276
+ 1173 0008 0191     		str	r1, [sp, #4]
+ 1174              	.LBB157:
+  71:parameters/timeparameter.cpp ****         // In tempo mode, decrement BPM (which means increment ms)
+ 1175              		.loc 1 71 5 view .LVU277
+ 1176 000a 04D0     		beq	.L130
+  85:parameters/timeparameter.cpp ****     }
+ 1177              		.loc 1 85 9 is_stmt 1 view .LVU278
+ 1178              	.LBE157:
+  87:parameters/timeparameter.cpp **** 
+ 1179              		.loc 1 87 1 is_stmt 0 view .LVU279
+ 1180 000c 02B0     		add	sp, sp, #8
+ 1181              		.cfi_remember_state
+ 1182              		.cfi_def_cfa_offset 8
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc7K8AR5.s 			page 28
+
+
+ 1183              		@ sp needed
+ 1184 000e BDE81040 		pop	{r4, lr}
+ 1185              		.cfi_restore 14
+ 1186              		.cfi_restore 4
+ 1187              		.cfi_def_cfa_offset 0
+ 1188              	.LBB158:
+  85:parameters/timeparameter.cpp ****     }
+ 1189              		.loc 1 85 36 view .LVU280
+ 1190 0012 FFF7FEBF 		b	_ZN11perspective16EncoderParameter9DecrementEi
+ 1191              	.LVL102:
+ 1192              	.L130:
+ 1193              		.cfi_restore_state
+  85:parameters/timeparameter.cpp ****     }
+ 1194              		.loc 1 85 36 view .LVU281
+ 1195 0016 0446     		mov	r4, r0
+ 1196              	.LVL103:
+  85:parameters/timeparameter.cpp ****     }
+ 1197              		.loc 1 85 36 view .LVU282
+ 1198              	.LBE158:
+ 1199              	.LBB159:
+ 1200              	.LBI159:
+  70:parameters/timeparameter.cpp ****     if (displayMode_ == TimeDisplayMode::TEMPO_BPM) {
+ 1201              		.loc 1 70 6 is_stmt 1 view .LVU283
+ 1202              	.LBB160:
+ 1203              	.LBB161:
+  74:parameters/timeparameter.cpp ****         float newBpm = currentBpm + (BPM_STEP_SIZE * steps);
+ 1204              		.loc 1 74 9 view .LVU284
+ 1205              	.LBB162:
+ 1206              	.LBI162:
+ 120:parameters/timeparameter.cpp ****     float ms = GetValue();
+ 1207              		.loc 1 120 7 view .LVU285
+ 1208              	.LBB163:
+ 121:parameters/timeparameter.cpp ****     if (ms > 0.0f) {
+ 1209              		.loc 1 121 5 view .LVU286
+ 121:parameters/timeparameter.cpp ****     if (ms > 0.0f) {
+ 1210              		.loc 1 121 24 is_stmt 0 view .LVU287
+ 1211 0018 FFF7FEFF 		bl	_ZNK11perspective15EffectParameter8GetValueEv
+ 1212              	.LVL104:
+ 122:parameters/timeparameter.cpp ****         return 60000.0f / ms;
+ 1213              		.loc 1 122 5 is_stmt 1 view .LVU288
+ 1214 001c B5EEC00A 		vcmpe.f32	s0, #0
+ 1215 0020 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 1216 0024 23DC     		bgt	.L131
+ 125:parameters/timeparameter.cpp **** }
+ 1217              		.loc 1 125 12 is_stmt 0 view .LVU289
+ 1218 0026 9FED167A 		vldr.32	s14, .L132
+ 1219              	.L122:
+ 1220              	.LVL105:
+ 125:parameters/timeparameter.cpp **** }
+ 1221              		.loc 1 125 12 view .LVU290
+ 1222              	.LBE163:
+ 1223              	.LBE162:
+  75:parameters/timeparameter.cpp ****         
+ 1224              		.loc 1 75 9 is_stmt 1 view .LVU291
+  75:parameters/timeparameter.cpp ****         
+ 1225              		.loc 1 75 52 is_stmt 0 view .LVU292
+ 1226 002a DDED017A 		vldr.32	s15, [sp, #4]	@ int
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc7K8AR5.s 			page 29
+
+
+  75:parameters/timeparameter.cpp ****         
+ 1227              		.loc 1 75 35 view .LVU293
+ 1228 002e B6EE006A 		vmov.f32	s12, #5.0e-1
+ 1229              	.LBB165:
+ 1230              	.LBB166:
+ 1231              		.loc 2 16 21 view .LVU294
+ 1232 0032 F3EE0E6A 		vmov.f32	s13, #3.0e+1
+ 1233              	.LBE166:
+ 1234              	.LBE165:
+  75:parameters/timeparameter.cpp ****         
+ 1235              		.loc 1 75 52 view .LVU295
+ 1236 0036 F8EEE77A 		vcvt.f32.s32	s15, s15
+  75:parameters/timeparameter.cpp ****         
+ 1237              		.loc 1 75 35 view .LVU296
+ 1238 003a A7EE867A 		vfma.f32	s14, s15, s12
+ 1239              	.LVL106:
+  78:parameters/timeparameter.cpp ****         
+ 1240              		.loc 1 78 9 is_stmt 1 view .LVU297
+ 1241              	.LBB169:
+ 1242              	.LBI165:
+  15:parameters/effectparameter.h ****     return (v < lo) ? lo : (hi < v) ? hi : v;
+ 1243              		.loc 2 15 27 view .LVU298
+ 1244              	.LBB167:
+ 1245              		.loc 2 16 21 is_stmt 0 view .LVU299
+ 1246 003e B4EEE67A 		vcmpe.f32	s14, s13
+ 1247 0042 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 1248 0046 17D4     		bmi	.L126
+ 1249              	.LBE167:
+ 1250              	.LBE169:
+  81:parameters/timeparameter.cpp ****         SetValue(newMs);
+ 1251              		.loc 1 81 15 view .LVU300
+ 1252 0048 DFED0E7A 		vldr.32	s15, .L132+4
+ 1253 004c DFED0E6A 		vldr.32	s13, .L132+8
+ 1254 0050 B4EEE77A 		vcmpe.f32	s14, s15
+ 1255 0054 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 1256 0058 77FE877A 		vselgt.f32	s15, s15, s14
+ 1257 005c 86EEA70A 		vdiv.f32	s0, s13, s15
+ 1258              	.L124:
+ 1259              	.LVL107:
+  81:parameters/timeparameter.cpp ****         SetValue(newMs);
+ 1260              		.loc 1 81 9 is_stmt 1 view .LVU301
+  82:parameters/timeparameter.cpp ****     } else {
+ 1261              		.loc 1 82 9 view .LVU302
+  82:parameters/timeparameter.cpp ****     } else {
+ 1262              		.loc 1 82 17 is_stmt 0 view .LVU303
+ 1263 0060 2368     		ldr	r3, [r4]
+ 1264 0062 2046     		mov	r0, r4
+ 1265 0064 1B69     		ldr	r3, [r3, #16]
+ 1266              	.LBE161:
+ 1267              	.LBE160:
+ 1268              	.LBE159:
+  87:parameters/timeparameter.cpp **** 
+ 1269              		.loc 1 87 1 view .LVU304
+ 1270 0066 02B0     		add	sp, sp, #8
+ 1271              		.cfi_remember_state
+ 1272              		.cfi_def_cfa_offset 8
+ 1273              		@ sp needed
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc7K8AR5.s 			page 30
+
+
+ 1274 0068 BDE81040 		pop	{r4, lr}
+ 1275              		.cfi_restore 14
+ 1276              		.cfi_restore 4
+ 1277              		.cfi_def_cfa_offset 0
+ 1278              	.LVL108:
+ 1279              	.LBB174:
+ 1280              	.LBB173:
+ 1281              	.LBB172:
+  82:parameters/timeparameter.cpp ****     } else {
+ 1282              		.loc 1 82 17 view .LVU305
+ 1283 006c 1847     		bx	r3	@ indirect register sibling call
+ 1284              	.LVL109:
+ 1285              	.L131:
+ 1286              		.cfi_restore_state
+ 1287              	.LBB170:
+ 1288              	.LBB164:
+ 123:parameters/timeparameter.cpp ****     }
+ 1289              		.loc 1 123 9 is_stmt 1 view .LVU306
+ 123:parameters/timeparameter.cpp ****     }
+ 1290              		.loc 1 123 27 is_stmt 0 view .LVU307
+ 1291 006e DFED067A 		vldr.32	s15, .L132+8
+ 1292 0072 87EE807A 		vdiv.f32	s14, s15, s0
+ 1293 0076 D8E7     		b	.L122
+ 1294              	.LVL110:
+ 1295              	.L126:
+ 123:parameters/timeparameter.cpp ****     }
+ 1296              		.loc 1 123 27 view .LVU308
+ 1297              	.LBE164:
+ 1298              	.LBE170:
+ 1299              	.LBB171:
+ 1300              	.LBB168:
+ 1301 0078 9FED040A 		vldr.32	s0, .L132+12
+ 1302 007c F0E7     		b	.L124
+ 1303              	.L133:
+ 1304 007e 00BF     		.align	2
+ 1305              	.L132:
+ 1306 0080 00000000 		.word	0
+ 1307 0084 00004843 		.word	1128792064
+ 1308 0088 00606A47 		.word	1198153728
+ 1309 008c 0000FA44 		.word	1157234688
+ 1310              	.LBE168:
+ 1311              	.LBE171:
+ 1312              	.LBE172:
+ 1313              	.LBE173:
+ 1314              	.LBE174:
+ 1315              		.cfi_endproc
+ 1316              	.LFE4486:
+ 1318              		.global	_ZTVN11perspective13TimeParameterE
+ 1319              		.section	.rodata._ZTVN11perspective13TimeParameterE,"a"
+ 1320              		.align	2
+ 1323              	_ZTVN11perspective13TimeParameterE:
+ 1324 0000 00000000 		.word	0
+ 1325 0004 00000000 		.word	0
+ 1326 0008 00000000 		.word	_ZN11perspective13TimeParameterD1Ev
+ 1327 000c 00000000 		.word	_ZN11perspective13TimeParameterD0Ev
+ 1328 0010 00000000 		.word	_ZNK11perspective16EncoderParameter7GetTypeEv
+ 1329 0014 00000000 		.word	_ZNK11perspective13TimeParameter16GetValueAsStringEPcj
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc7K8AR5.s 			page 31
+
+
+ 1330 0018 00000000 		.word	_ZN11perspective15EffectParameter8SetValueEf
+ 1331 001c 00000000 		.word	_ZN11perspective13TimeParameter9IncrementEi
+ 1332 0020 00000000 		.word	_ZN11perspective13TimeParameter9DecrementEi
+ 1333              		.text
+ 1334              	.Letext0:
+ 1335              		.file 3 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/ma
+ 1336              		.file 4 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/sy
+ 1337              		.file 5 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/st
+ 1338              		.file 6 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/lib/gcc/arm-none-eabi/14
+ 1339              		.file 7 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c+
+ 1340              		.file 8 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c+
+ 1341              		.file 9 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c+
+ 1342              		.file 10 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 1343              		.file 11 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 1344              		.file 12 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 1345              		.file 13 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 1346              		.file 14 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 1347              		.file 15 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 1348              		.file 16 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 1349              		.file 17 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 1350              		.file 18 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 1351              		.file 19 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 1352              		.file 20 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 1353              		.file 21 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 1354              		.file 22 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 1355              		.file 23 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 1356              		.file 24 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 1357              		.file 25 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/s
+ 1358              		.file 26 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/s
+ 1359              		.file 27 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/s
+ 1360              		.file 28 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/m
+ 1361              		.file 29 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/s
+ 1362              		.file 30 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 1363              		.file 31 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 1364              		.file 32 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 1365              		.file 33 "dependencies/libDaisy/src/daisy_core.h"
+ 1366              		.file 34 "dependencies/libDaisy/src/dev/max11300.h"
+ 1367              		.file 35 "dependencies/libDaisy/src/dev/sr_595.h"
+ 1368              		.file 36 "dependencies/libDaisy/src/util/wav_format.h"
+ 1369              		.file 37 "dependencies/libDaisy/src/daisy_seed.h"
+ 1370              		.file 38 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 1371              		.file 39 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/lib/gcc/arm-none-eabi/1
+ 1372              		.file 40 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/s
+ 1373              		.file 41 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/s
+ 1374              		.file 42 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/w
+ 1375              		.file 43 "dependencies/libDaisy/Middlewares/Third_Party/FatFs/src/integer.h"
+ 1376              		.file 44 "dependencies/libDaisy/Middlewares/Third_Party/FatFs/src/ff.h"
+ 1377              		.file 45 "parameters/../controls.h"
+ 1378              		.file 46 "parameters/encoderparameter.h"
+ 1379              		.file 47 "parameters/timeparameter.h"
+ 1380              		.file 48 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 1381              		.file 49 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 1382              		.file 50 "<built-in>"
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\cc7K8AR5.s 			page 32
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 timeparameter.cpp
+C:\Users\Oliver\AppData\Local\Temp\cc7K8AR5.s:20     .text._ZN11perspective13TimeParameterD2Ev:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\cc7K8AR5.s:27     .text._ZN11perspective13TimeParameterD2Ev:00000000 _ZN11perspective13TimeParameterD2Ev
+C:\Users\Oliver\AppData\Local\Temp\cc7K8AR5.s:88     .text._ZN11perspective13TimeParameterD2Ev:0000002c $d
+C:\Users\Oliver\AppData\Local\Temp\cc7K8AR5.s:1323   .rodata._ZTVN11perspective13TimeParameterE:00000000 _ZTVN11perspective13TimeParameterE
+C:\Users\Oliver\AppData\Local\Temp\cc7K8AR5.s:27     .text._ZN11perspective13TimeParameterD2Ev:00000000 _ZN11perspective13TimeParameterD1Ev
+C:\Users\Oliver\AppData\Local\Temp\cc7K8AR5.s:95     .rodata._ZNK11perspective13TimeParameter16GetValueAsStringEPcj.str1.4:00000000 $d
+C:\Users\Oliver\AppData\Local\Temp\cc7K8AR5.s:108    .text._ZNK11perspective13TimeParameter16GetValueAsStringEPcj:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\cc7K8AR5.s:115    .text._ZNK11perspective13TimeParameter16GetValueAsStringEPcj:00000000 _ZNK11perspective13TimeParameter16GetValueAsStringEPcj
+C:\Users\Oliver\AppData\Local\Temp\cc7K8AR5.s:316    .text._ZNK11perspective13TimeParameter16GetValueAsStringEPcj:00000080 $d
+C:\Users\Oliver\AppData\Local\Temp\cc7K8AR5.s:330    .text._ZN11perspective13TimeParameterD0Ev:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\cc7K8AR5.s:337    .text._ZN11perspective13TimeParameterD0Ev:00000000 _ZN11perspective13TimeParameterD0Ev
+C:\Users\Oliver\AppData\Local\Temp\cc7K8AR5.s:412    .text._ZN11perspective13TimeParameterD0Ev:00000034 $d
+C:\Users\Oliver\AppData\Local\Temp\cc7K8AR5.s:417    .text._ZN11perspective13TimeParameterC2EPKcffffiS2_i:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\cc7K8AR5.s:424    .text._ZN11perspective13TimeParameterC2EPKcffffiS2_i:00000000 _ZN11perspective13TimeParameterC2EPKcffffiS2_i
+C:\Users\Oliver\AppData\Local\Temp\cc7K8AR5.s:625    .text._ZN11perspective13TimeParameterC2EPKcffffiS2_i:00000088 $d
+C:\Users\Oliver\AppData\Local\Temp\cc7K8AR5.s:424    .text._ZN11perspective13TimeParameterC2EPKcffffiS2_i:00000000 _ZN11perspective13TimeParameterC1EPKcffffiS2_i
+C:\Users\Oliver\AppData\Local\Temp\cc7K8AR5.s:632    .text._ZN11perspective13TimeParameter14SetDisplayModeENS_15TimeDisplayModeE:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\cc7K8AR5.s:639    .text._ZN11perspective13TimeParameter14SetDisplayModeENS_15TimeDisplayModeE:00000000 _ZN11perspective13TimeParameter14SetDisplayModeENS_15TimeDisplayModeE
+C:\Users\Oliver\AppData\Local\Temp\cc7K8AR5.s:756    .text._ZNK11perspective13TimeParameter14GetDisplayModeEv:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\cc7K8AR5.s:763    .text._ZNK11perspective13TimeParameter14GetDisplayModeEv:00000000 _ZNK11perspective13TimeParameter14GetDisplayModeEv
+C:\Users\Oliver\AppData\Local\Temp\cc7K8AR5.s:781    .text._ZNK11perspective13TimeParameter13GetValueAsBPMEv:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\cc7K8AR5.s:788    .text._ZNK11perspective13TimeParameter13GetValueAsBPMEv:00000000 _ZNK11perspective13TimeParameter13GetValueAsBPMEv
+C:\Users\Oliver\AppData\Local\Temp\cc7K8AR5.s:827    .text._ZNK11perspective13TimeParameter13GetValueAsBPMEv:00000024 $d
+C:\Users\Oliver\AppData\Local\Temp\cc7K8AR5.s:833    .text._ZNK11perspective13TimeParameter12GetValueAsMsEv:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\cc7K8AR5.s:840    .text._ZNK11perspective13TimeParameter12GetValueAsMsEv:00000000 _ZNK11perspective13TimeParameter12GetValueAsMsEv
+C:\Users\Oliver\AppData\Local\Temp\cc7K8AR5.s:857    .text._ZN11perspective13TimeParameter17UpdateNameForModeEv:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\cc7K8AR5.s:864    .text._ZN11perspective13TimeParameter17UpdateNameForModeEv:00000000 _ZN11perspective13TimeParameter17UpdateNameForModeEv
+C:\Users\Oliver\AppData\Local\Temp\cc7K8AR5.s:964    .text._ZN11perspective13TimeParameter9IncrementEi:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\cc7K8AR5.s:971    .text._ZN11perspective13TimeParameter9IncrementEi:00000000 _ZN11perspective13TimeParameter9IncrementEi
+C:\Users\Oliver\AppData\Local\Temp\cc7K8AR5.s:1129   .text._ZN11perspective13TimeParameter9IncrementEi:00000080 $d
+C:\Users\Oliver\AppData\Local\Temp\cc7K8AR5.s:1142   .text._ZN11perspective13TimeParameter9DecrementEi:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\cc7K8AR5.s:1149   .text._ZN11perspective13TimeParameter9DecrementEi:00000000 _ZN11perspective13TimeParameter9DecrementEi
+C:\Users\Oliver\AppData\Local\Temp\cc7K8AR5.s:1306   .text._ZN11perspective13TimeParameter9DecrementEi:00000080 $d
+C:\Users\Oliver\AppData\Local\Temp\cc7K8AR5.s:1320   .rodata._ZTVN11perspective13TimeParameterE:00000000 $d
+
+UNDEFINED SYMBOLS
+_ZdaPv
+_ZN11perspective16EncoderParameterD2Ev
+_ZNK11perspective15EffectParameter8GetValueEv
+snprintf
+_ZdlPvj
+_ZN11perspective16EncoderParameterC2EPKcffffii
+strlen
+_Znaj
+strcpy
+_ZN11perspective16EncoderParameter9IncrementEi
+_ZN11perspective16EncoderParameter9DecrementEi
+_ZNK11perspective16EncoderParameter7GetTypeEv
+_ZN11perspective15EffectParameter8SetValueEf

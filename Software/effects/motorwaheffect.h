@@ -1,0 +1,25 @@
+#ifndef PERSPECTIVE_MOTORWAHEFFECT_H
+#define PERSPECTIVE_MOTORWAHEFFECT_H
+
+#include "autowahv2effect.h"
+
+namespace perspective {
+
+class MotorWahEffect : public AutowahV2Effect {
+public:
+    MotorWahEffect();
+    ~MotorWahEffect() override;
+
+    void Init(float sampleRate) override;
+    void Process(float* in, float* out, size_t size) override;
+    void ProcessStereo(float* inL, float* inR, float* outL, float* outR, size_t size) override;
+    void Update() override;
+    float GetTempoPulseBrightness() const override;
+
+private:
+    Oscillator lfo_;
+};
+
+} // namespace perspective
+
+#endif // PERSPECTIVE_MOTORWAHEFFECT_H

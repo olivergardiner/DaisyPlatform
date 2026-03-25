@@ -1,0 +1,2056 @@
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s 			page 1
+
+
+   1              		.cpu cortex-m7
+   2              		.arch armv7e-m
+   3              		.fpu fpv5-d16
+   4              		.eabi_attribute 28, 1
+   5              		.eabi_attribute 20, 1
+   6              		.eabi_attribute 21, 1
+   7              		.eabi_attribute 23, 3
+   8              		.eabi_attribute 24, 1
+   9              		.eabi_attribute 25, 1
+  10              		.eabi_attribute 26, 1
+  11              		.eabi_attribute 30, 2
+  12              		.eabi_attribute 34, 1
+  13              		.eabi_attribute 18, 4
+  14              		.file	"effectparameter.cpp"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.file 1 "parameters/effectparameter.cpp"
+  19              		.section	.text._ZN11perspective15EffectParameter8SetValueEf,"ax",%progbits
+  20              		.align	1
+  21              		.p2align 2,,3
+  22              		.global	_ZN11perspective15EffectParameter8SetValueEf
+  23              		.syntax unified
+  24              		.thumb
+  25              		.thumb_func
+  27              	_ZN11perspective15EffectParameter8SetValueEf:
+  28              	.LVL0:
+  29              	.LFB4536:
+   1:parameters/effectparameter.cpp **** #include "effectparameter.h"
+   2:parameters/effectparameter.cpp **** #include <algorithm>
+   3:parameters/effectparameter.cpp **** #include <cmath>
+   4:parameters/effectparameter.cpp **** #include <cstring>
+   5:parameters/effectparameter.cpp **** #include <cstdio>
+   6:parameters/effectparameter.cpp **** 
+   7:parameters/effectparameter.cpp **** #include "../hardware.h"
+   8:parameters/effectparameter.cpp **** 
+   9:parameters/effectparameter.cpp **** using namespace daisy;
+  10:parameters/effectparameter.cpp **** using namespace perspective;
+  11:parameters/effectparameter.cpp **** 
+  12:parameters/effectparameter.cpp **** // ========== EffectParameter Base Class ==========
+  13:parameters/effectparameter.cpp **** 
+  14:parameters/effectparameter.cpp **** EffectParameter::EffectParameter(const char* name, float minValue, float maxValue, float defaultVal
+  15:parameters/effectparameter.cpp ****     : name_(nullptr)
+  16:parameters/effectparameter.cpp ****     , minValue_(minValue)
+  17:parameters/effectparameter.cpp ****     , maxValue_(maxValue)
+  18:parameters/effectparameter.cpp ****     , currentValue_(defaultValue)
+  19:parameters/effectparameter.cpp ****     , index_(index)
+  20:parameters/effectparameter.cpp ****     , displayIndex_(displayIndex)
+  21:parameters/effectparameter.cpp ****     , displayType_(DisplayType::DEFAULT)
+  22:parameters/effectparameter.cpp ****     , scaleFactor_(1.0f)
+  23:parameters/effectparameter.cpp ****     , discreteValues_(nullptr)
+  24:parameters/effectparameter.cpp ****     , discreteValueCount_(0)
+  25:parameters/effectparameter.cpp **** {
+  26:parameters/effectparameter.cpp ****     if (name) {
+  27:parameters/effectparameter.cpp ****         size_t len = strlen(name);
+  28:parameters/effectparameter.cpp ****         name_ = new char[len + 1];
+  29:parameters/effectparameter.cpp ****         strcpy(name_, name);
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s 			page 2
+
+
+  30:parameters/effectparameter.cpp ****     }
+  31:parameters/effectparameter.cpp **** }
+  32:parameters/effectparameter.cpp **** 
+  33:parameters/effectparameter.cpp **** EffectParameter::~EffectParameter() {
+  34:parameters/effectparameter.cpp ****     if (name_) {
+  35:parameters/effectparameter.cpp ****         delete[] name_;
+  36:parameters/effectparameter.cpp ****         name_ = nullptr;
+  37:parameters/effectparameter.cpp ****     }
+  38:parameters/effectparameter.cpp **** }
+  39:parameters/effectparameter.cpp **** 
+  40:parameters/effectparameter.cpp **** float EffectParameter::GetValue() const {
+  41:parameters/effectparameter.cpp ****     return currentValue_;
+  42:parameters/effectparameter.cpp **** }
+  43:parameters/effectparameter.cpp **** 
+  44:parameters/effectparameter.cpp **** float EffectParameter::GetNormalizedValue() const {
+  45:parameters/effectparameter.cpp ****     if (maxValue_ <= minValue_) {
+  46:parameters/effectparameter.cpp ****         return 0.0f;
+  47:parameters/effectparameter.cpp ****     }
+  48:parameters/effectparameter.cpp ****     return (currentValue_ - minValue_) / (maxValue_ - minValue_);
+  49:parameters/effectparameter.cpp **** }
+  50:parameters/effectparameter.cpp **** 
+  51:parameters/effectparameter.cpp **** const char* EffectParameter::GetName() const {
+  52:parameters/effectparameter.cpp ****     return name_;
+  53:parameters/effectparameter.cpp **** }
+  54:parameters/effectparameter.cpp **** 
+  55:parameters/effectparameter.cpp **** float EffectParameter::GetMin() const {
+  56:parameters/effectparameter.cpp ****     return minValue_;
+  57:parameters/effectparameter.cpp **** }
+  58:parameters/effectparameter.cpp **** 
+  59:parameters/effectparameter.cpp **** float EffectParameter::GetMax() const {
+  60:parameters/effectparameter.cpp ****     return maxValue_;
+  61:parameters/effectparameter.cpp **** }
+  62:parameters/effectparameter.cpp **** 
+  63:parameters/effectparameter.cpp **** int EffectParameter::GetIndex() const {
+  64:parameters/effectparameter.cpp ****     return index_;
+  65:parameters/effectparameter.cpp **** }
+  66:parameters/effectparameter.cpp **** 
+  67:parameters/effectparameter.cpp **** int EffectParameter::GetDisplayIndex() const {
+  68:parameters/effectparameter.cpp ****     return displayIndex_;
+  69:parameters/effectparameter.cpp **** }
+  70:parameters/effectparameter.cpp **** 
+  71:parameters/effectparameter.cpp **** void EffectParameter::SetValue(float value) {
+  30              		.loc 1 71 45 view -0
+  31              		.cfi_startproc
+  32              		@ args = 0, pretend = 0, frame = 0
+  33              		@ frame_needed = 0, uses_anonymous_args = 0
+  34              		@ link register save eliminated.
+  72:parameters/effectparameter.cpp ****     currentValue_ = clamp(value, minValue_, maxValue_);
+  35              		.loc 1 72 5 view .LVU1
+  36              	.LBB67:
+  37              	.LBI67:
+  38              		.file 2 "parameters/effectparameter.h"
+   1:parameters/effectparameter.h **** #ifndef PERSPECTIVE_EFFECTPARAMETER_H
+   2:parameters/effectparameter.h **** #define PERSPECTIVE_EFFECTPARAMETER_H
+   3:parameters/effectparameter.h **** 
+   4:parameters/effectparameter.h **** #include "daisy_seed.h"
+   5:parameters/effectparameter.h **** #include <vector>
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s 			page 3
+
+
+   6:parameters/effectparameter.h **** 
+   7:parameters/effectparameter.h **** #include "../controls.h"
+   8:parameters/effectparameter.h **** 
+   9:parameters/effectparameter.h **** using namespace daisy;
+  10:parameters/effectparameter.h **** 
+  11:parameters/effectparameter.h **** namespace perspective {
+  12:parameters/effectparameter.h **** 
+  13:parameters/effectparameter.h **** // Local clamp function to avoid std::clamp (C++17)
+  14:parameters/effectparameter.h **** template<typename T>
+  15:parameters/effectparameter.h **** inline constexpr const T& clamp(const T& v, const T& lo, const T& hi) {
+  39              		.loc 2 15 27 view .LVU2
+  40              	.LBB68:
+  16:parameters/effectparameter.h ****     return (v < lo) ? lo : (hi < v) ? hi : v;
+  41              		.loc 2 16 15 is_stmt 0 view .LVU3
+  42 0000 D0ED027A 		vldr.32	s15, [r0, #8]
+  43              		.loc 2 16 21 view .LVU4
+  44 0004 F4EEC07A 		vcmpe.f32	s15, s0
+  45 0008 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+  46 000c 08DC     		bgt	.L2
+  47              		.loc 2 16 32 discriminator 2 view .LVU5
+  48 000e D0ED037A 		vldr.32	s15, [r0, #12]
+  49 0012 F4EEC07A 		vcmpe.f32	s15, s0
+  50 0016 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+  51 001a 58BF     		it	pl
+  52 001c F0EE407A 		vmovpl.f32	s15, s0
+  53              	.L2:
+  54              	.LVL1:
+  55              		.loc 2 16 32 discriminator 2 view .LVU6
+  56              	.LBE68:
+  57              	.LBE67:
+  58              		.loc 1 72 19 discriminator 1 view .LVU7
+  59 0020 C0ED047A 		vstr.32	s15, [r0, #16]
+  73:parameters/effectparameter.cpp **** }
+  60              		.loc 1 73 1 view .LVU8
+  61 0024 7047     		bx	lr
+  62              		.cfi_endproc
+  63              	.LFE4536:
+  65 0026 00BF     		.section	.rodata._ZNK11perspective15EffectParameter16GetValueAsStringEPcj.str1.4,"aMS",%progbits,1
+  66              		.align	2
+  67              	.LC0:
+  68 0000 252E3266 		.ascii	"%.2f\000"
+  68      00
+  69 0005 000000   		.align	2
+  70              	.LC1:
+  71 0008 45666665 		.ascii	"EffectParameter '%s' discrete value index: %d\000"
+  71      63745061 
+  71      72616D65 
+  71      74657220 
+  71      27257327 
+  72 0036 0000     		.align	2
+  73              	.LC2:
+  74 0038 257300   		.ascii	"%s\000"
+  75 003b 00       		.align	2
+  76              	.LC3:
+  77 003c 2D2D00   		.ascii	"--\000"
+  78              		.section	.text._ZNK11perspective15EffectParameter16GetValueAsStringEPcj,"ax",%progbits
+  79              		.align	1
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s 			page 4
+
+
+  80              		.p2align 2,,3
+  81              		.global	_ZNK11perspective15EffectParameter16GetValueAsStringEPcj
+  82              		.syntax unified
+  83              		.thumb
+  84              		.thumb_func
+  86              	_ZNK11perspective15EffectParameter16GetValueAsStringEPcj:
+  87              	.LVL2:
+  88              	.LFB4547:
+  74:parameters/effectparameter.cpp **** 
+  75:parameters/effectparameter.cpp **** void EffectParameter::SetNormalizedValue(float normalizedValue) {
+  76:parameters/effectparameter.cpp ****     float clampedNormalized = clamp(normalizedValue, 0.0f, 1.0f);
+  77:parameters/effectparameter.cpp ****     currentValue_ = minValue_ + (clampedNormalized * (maxValue_ - minValue_));
+  78:parameters/effectparameter.cpp **** }
+  79:parameters/effectparameter.cpp **** 
+  80:parameters/effectparameter.cpp **** void EffectParameter::SetIndex(int index) {
+  81:parameters/effectparameter.cpp ****     index_ = index;
+  82:parameters/effectparameter.cpp **** }
+  83:parameters/effectparameter.cpp **** 
+  84:parameters/effectparameter.cpp **** void EffectParameter::SetDisplayIndex(int displayIndex) {
+  85:parameters/effectparameter.cpp ****     displayIndex_ = displayIndex;
+  86:parameters/effectparameter.cpp **** }
+  87:parameters/effectparameter.cpp **** 
+  88:parameters/effectparameter.cpp **** void EffectParameter::SetDisplayType(DisplayType type) {
+  89:parameters/effectparameter.cpp ****     displayType_ = type;
+  90:parameters/effectparameter.cpp **** }
+  91:parameters/effectparameter.cpp **** 
+  92:parameters/effectparameter.cpp **** void EffectParameter::SetScaleFactor(float scaleFactor) {
+  93:parameters/effectparameter.cpp ****     scaleFactor_ = scaleFactor;
+  94:parameters/effectparameter.cpp **** }
+  95:parameters/effectparameter.cpp **** 
+  96:parameters/effectparameter.cpp **** void EffectParameter::SetDiscreteValues(const char** values, int count) {
+  97:parameters/effectparameter.cpp ****     for (int i = 0; i < count; ++i) {
+  98:parameters/effectparameter.cpp ****         Hardware::PrintLine("EffectParameter '%s' discrete value %d: %s", GetName(), i, values[i]);
+  99:parameters/effectparameter.cpp ****     }
+ 100:parameters/effectparameter.cpp ****     discreteValues_ = values;
+ 101:parameters/effectparameter.cpp ****     discreteValueCount_ = count;
+ 102:parameters/effectparameter.cpp **** }
+ 103:parameters/effectparameter.cpp **** 
+ 104:parameters/effectparameter.cpp **** void EffectParameter::SetRange(float minValue, float maxValue) {
+ 105:parameters/effectparameter.cpp ****     if (maxValue <= minValue) {
+ 106:parameters/effectparameter.cpp ****         return;
+ 107:parameters/effectparameter.cpp ****     }
+ 108:parameters/effectparameter.cpp **** 
+ 109:parameters/effectparameter.cpp ****     minValue_ = minValue;
+ 110:parameters/effectparameter.cpp ****     maxValue_ = maxValue;
+ 111:parameters/effectparameter.cpp ****     currentValue_ = clamp(currentValue_, minValue_, maxValue_);
+ 112:parameters/effectparameter.cpp **** }
+ 113:parameters/effectparameter.cpp **** 
+ 114:parameters/effectparameter.cpp **** int EffectParameter::GetValueAsInt(int maxInt) const {
+ 115:parameters/effectparameter.cpp ****     // Get normalized value (0.0 to 1.0)
+ 116:parameters/effectparameter.cpp ****     float normalized = GetNormalizedValue();
+ 117:parameters/effectparameter.cpp ****     
+ 118:parameters/effectparameter.cpp ****     // Scale to integer range (0 to maxInt)
+ 119:parameters/effectparameter.cpp ****     // Add 0.5 for proper rounding
+ 120:parameters/effectparameter.cpp ****     int intValue = static_cast<int>(normalized * maxInt + 0.5f);
+ 121:parameters/effectparameter.cpp ****     
+ 122:parameters/effectparameter.cpp ****     // Clamp to ensure we stay within bounds
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s 			page 5
+
+
+ 123:parameters/effectparameter.cpp ****     return clamp(intValue, 0, maxInt);
+ 124:parameters/effectparameter.cpp **** }
+ 125:parameters/effectparameter.cpp **** 
+ 126:parameters/effectparameter.cpp **** void EffectParameter::GetValueAsString(char* buffer, size_t bufferSize) const {
+  89              		.loc 1 126 79 is_stmt 1 view -0
+  90              		.cfi_startproc
+  91              		@ args = 0, pretend = 0, frame = 0
+  92              		@ frame_needed = 0, uses_anonymous_args = 0
+ 127:parameters/effectparameter.cpp ****     if (buffer == nullptr || bufferSize == 0) {
+  93              		.loc 1 127 5 view .LVU10
+  94 0000 0029     		cmp	r1, #0
+  95 0002 68D0     		beq	.L19
+ 126:parameters/effectparameter.cpp ****     if (buffer == nullptr || bufferSize == 0) {
+  96              		.loc 1 126 79 is_stmt 0 view .LVU11
+  97 0004 F0B5     		push	{r4, r5, r6, r7, lr}
+  98              		.cfi_def_cfa_offset 20
+  99              		.cfi_offset 4, -20
+ 100              		.cfi_offset 5, -16
+ 101              		.cfi_offset 6, -12
+ 102              		.cfi_offset 7, -8
+ 103              		.cfi_offset 14, -4
+ 104 0006 1646     		mov	r6, r2
+ 105 0008 83B0     		sub	sp, sp, #12
+ 106              		.cfi_def_cfa_offset 32
+ 107              		.loc 1 127 5 view .LVU12
+ 108 000a 8AB1     		cbz	r2, .L4
+ 109              	.LBB101:
+ 128:parameters/effectparameter.cpp ****         return;
+ 129:parameters/effectparameter.cpp ****     }
+ 130:parameters/effectparameter.cpp ****     
+ 131:parameters/effectparameter.cpp ****     switch (displayType_) {
+ 110              		.loc 1 131 13 view .LVU13
+ 111 000c C369     		ldr	r3, [r0, #28]
+ 112 000e 0446     		mov	r4, r0
+ 113 0010 0D46     		mov	r5, r1
+ 114              	.LBE101:
+ 115              		.loc 1 131 5 is_stmt 1 view .LVU14
+ 116              	.LBB108:
+ 117 0012 012B     		cmp	r3, #1
+ 118 0014 0ED0     		beq	.L6
+ 119 0016 022B     		cmp	r3, #2
+ 120 0018 1DD0     		beq	.L7
+ 121              	.LBE108:
+ 132:parameters/effectparameter.cpp ****         case DisplayType::SCALED: {
+ 133:parameters/effectparameter.cpp ****             float scaledValue = GetValue() * scaleFactor_;
+ 134:parameters/effectparameter.cpp ****             snprintf(buffer, bufferSize, "%.2f", scaledValue);
+ 135:parameters/effectparameter.cpp ****             break;
+ 136:parameters/effectparameter.cpp ****         }
+ 137:parameters/effectparameter.cpp ****         
+ 138:parameters/effectparameter.cpp ****         case DisplayType::DISCRETE: {
+ 139:parameters/effectparameter.cpp ****             if (discreteValues_ != nullptr && discreteValueCount_ > 0) {
+ 140:parameters/effectparameter.cpp ****                 int index = GetValueAsInt(discreteValueCount_ - 1);
+ 141:parameters/effectparameter.cpp ****                 index = clamp(index, 0, discreteValueCount_ - 1);
+ 142:parameters/effectparameter.cpp ****                 Hardware::PrintLine("EffectParameter '%s' discrete value index: %d", GetName(), ind
+ 143:parameters/effectparameter.cpp ****                 snprintf(buffer, bufferSize, "%s", discreteValues_[index]);
+ 144:parameters/effectparameter.cpp ****             } else {
+ 145:parameters/effectparameter.cpp ****                 snprintf(buffer, bufferSize, "--");
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s 			page 6
+
+
+ 146:parameters/effectparameter.cpp ****             }
+ 147:parameters/effectparameter.cpp ****             break;
+ 148:parameters/effectparameter.cpp ****         }
+ 149:parameters/effectparameter.cpp ****         
+ 150:parameters/effectparameter.cpp ****         case DisplayType::DEFAULT:
+ 122              		.loc 1 150 9 view .LVU15
+ 151:parameters/effectparameter.cpp ****         default: {
+ 123              		.loc 1 151 9 view .LVU16
+ 124              		.loc 1 151 18 view .LVU17
+ 125              	.LBB109:
+ 126              	.LBB102:
+ 152:parameters/effectparameter.cpp ****             float value = GetValue();
+ 127              		.loc 1 152 13 view .LVU18
+ 128              	.LVL3:
+ 129              	.LBB103:
+ 130              	.LBI103:
+  40:parameters/effectparameter.cpp ****     return currentValue_;
+ 131              		.loc 1 40 7 view .LVU19
+ 132              	.LBB104:
+  41:parameters/effectparameter.cpp **** }
+ 133              		.loc 1 41 5 view .LVU20
+  41:parameters/effectparameter.cpp **** }
+ 134              		.loc 1 41 5 is_stmt 0 view .LVU21
+ 135              	.LBE104:
+ 136              	.LBE103:
+ 153:parameters/effectparameter.cpp ****             snprintf(buffer, bufferSize, "%.2f", value);
+ 137              		.loc 1 153 13 is_stmt 1 view .LVU22
+ 138              		.loc 1 153 21 is_stmt 0 view .LVU23
+ 139 001a 90ED047A 		vldr.32	s14, [r0, #16]
+ 140 001e 3146     		mov	r1, r6
+ 141              	.LVL4:
+ 142              		.loc 1 153 21 view .LVU24
+ 143 0020 304A     		ldr	r2, .L22
+ 144              	.LVL5:
+ 145              		.loc 1 153 21 view .LVU25
+ 146 0022 2846     		mov	r0, r5
+ 147              	.LVL6:
+ 148              		.loc 1 153 21 view .LVU26
+ 149 0024 B7EEC77A 		vcvt.f64.f32	d7, s14
+ 150              	.LVL7:
+ 151              		.loc 1 153 21 view .LVU27
+ 152 0028 8DED007B 		vstr.64	d7, [sp]
+ 153              	.LVL8:
+ 154              		.loc 1 153 21 view .LVU28
+ 155 002c FFF7FEFF 		bl	snprintf
+ 156              	.LVL9:
+ 154:parameters/effectparameter.cpp ****             break;
+ 157              		.loc 1 154 13 is_stmt 1 view .LVU29
+ 158              	.L4:
+ 159              		.loc 1 154 13 is_stmt 0 view .LVU30
+ 160              	.LBE102:
+ 161              	.LBE109:
+ 155:parameters/effectparameter.cpp ****         }
+ 156:parameters/effectparameter.cpp ****     }
+ 157:parameters/effectparameter.cpp **** }
+ 162              		.loc 1 157 1 view .LVU31
+ 163 0030 03B0     		add	sp, sp, #12
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s 			page 7
+
+
+ 164              		.cfi_remember_state
+ 165              		.cfi_def_cfa_offset 20
+ 166              		@ sp needed
+ 167 0032 F0BD     		pop	{r4, r5, r6, r7, pc}
+ 168              	.LVL10:
+ 169              	.L6:
+ 170              		.cfi_restore_state
+ 132:parameters/effectparameter.cpp ****             float scaledValue = GetValue() * scaleFactor_;
+ 171              		.loc 1 132 9 is_stmt 1 view .LVU32
+ 132:parameters/effectparameter.cpp ****             float scaledValue = GetValue() * scaleFactor_;
+ 172              		.loc 1 132 35 view .LVU33
+ 173              	.LBB110:
+ 174              	.LBB105:
+ 133:parameters/effectparameter.cpp ****             snprintf(buffer, bufferSize, "%.2f", scaledValue);
+ 175              		.loc 1 133 13 view .LVU34
+ 176              	.LBB106:
+ 177              	.LBI106:
+  40:parameters/effectparameter.cpp ****     return currentValue_;
+ 178              		.loc 1 40 7 view .LVU35
+ 179              	.LBB107:
+  41:parameters/effectparameter.cpp **** }
+ 180              		.loc 1 41 5 view .LVU36
+  41:parameters/effectparameter.cpp **** }
+ 181              		.loc 1 41 5 is_stmt 0 view .LVU37
+ 182              	.LBE107:
+ 183              	.LBE106:
+ 134:parameters/effectparameter.cpp ****             break;
+ 184              		.loc 1 134 13 is_stmt 1 view .LVU38
+ 133:parameters/effectparameter.cpp ****             snprintf(buffer, bufferSize, "%.2f", scaledValue);
+ 185              		.loc 1 133 46 is_stmt 0 discriminator 1 view .LVU39
+ 186 0034 D0ED047A 		vldr.32	s15, [r0, #16]
+ 134:parameters/effectparameter.cpp ****             break;
+ 187              		.loc 1 134 21 view .LVU40
+ 188 0038 3146     		mov	r1, r6
+ 189              	.LVL11:
+ 133:parameters/effectparameter.cpp ****             snprintf(buffer, bufferSize, "%.2f", scaledValue);
+ 190              		.loc 1 133 46 discriminator 1 view .LVU41
+ 191 003a 90ED087A 		vldr.32	s14, [r0, #32]
+ 134:parameters/effectparameter.cpp ****             break;
+ 192              		.loc 1 134 21 view .LVU42
+ 193 003e 2846     		mov	r0, r5
+ 194              	.LVL12:
+ 134:parameters/effectparameter.cpp ****             break;
+ 195              		.loc 1 134 21 view .LVU43
+ 196 0040 284A     		ldr	r2, .L22
+ 197              	.LVL13:
+ 133:parameters/effectparameter.cpp ****             snprintf(buffer, bufferSize, "%.2f", scaledValue);
+ 198              		.loc 1 133 46 discriminator 1 view .LVU44
+ 199 0042 27EE277A 		vmul.f32	s14, s14, s15
+ 200              	.LVL14:
+ 134:parameters/effectparameter.cpp ****             break;
+ 201              		.loc 1 134 21 view .LVU45
+ 202 0046 B7EEC77A 		vcvt.f64.f32	d7, s14
+ 203              	.LVL15:
+ 134:parameters/effectparameter.cpp ****             break;
+ 204              		.loc 1 134 21 view .LVU46
+ 205 004a 8DED007B 		vstr.64	d7, [sp]
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s 			page 8
+
+
+ 206              	.LVL16:
+ 134:parameters/effectparameter.cpp ****             break;
+ 207              		.loc 1 134 21 view .LVU47
+ 208 004e FFF7FEFF 		bl	snprintf
+ 209              	.LVL17:
+ 135:parameters/effectparameter.cpp ****         }
+ 210              		.loc 1 135 13 is_stmt 1 view .LVU48
+ 211              	.LBE105:
+ 212              	.LBE110:
+ 213              		.loc 1 157 1 is_stmt 0 view .LVU49
+ 214 0052 03B0     		add	sp, sp, #12
+ 215              		.cfi_remember_state
+ 216              		.cfi_def_cfa_offset 20
+ 217              		@ sp needed
+ 218 0054 F0BD     		pop	{r4, r5, r6, r7, pc}
+ 219              	.LVL18:
+ 220              	.L7:
+ 221              		.cfi_restore_state
+ 222              	.LBB111:
+ 223              	.LBI111:
+ 126:parameters/effectparameter.cpp ****     if (buffer == nullptr || bufferSize == 0) {
+ 224              		.loc 1 126 6 is_stmt 1 view .LVU50
+ 138:parameters/effectparameter.cpp ****             if (discreteValues_ != nullptr && discreteValueCount_ > 0) {
+ 225              		.loc 1 138 9 view .LVU51
+ 138:parameters/effectparameter.cpp ****             if (discreteValues_ != nullptr && discreteValueCount_ > 0) {
+ 226              		.loc 1 138 37 view .LVU52
+ 227              	.LBB112:
+ 139:parameters/effectparameter.cpp ****                 int index = GetValueAsInt(discreteValueCount_ - 1);
+ 228              		.loc 1 139 13 is_stmt 0 view .LVU53
+ 229 0056 436A     		ldr	r3, [r0, #36]
+ 230 0058 ABB3     		cbz	r3, .L9
+ 139:parameters/effectparameter.cpp ****                 int index = GetValueAsInt(discreteValueCount_ - 1);
+ 231              		.loc 1 139 47 discriminator 1 view .LVU54
+ 232 005a 876A     		ldr	r7, [r0, #40]
+ 139:parameters/effectparameter.cpp ****                 int index = GetValueAsInt(discreteValueCount_ - 1);
+ 233              		.loc 1 139 44 discriminator 1 view .LVU55
+ 234 005c 002F     		cmp	r7, #0
+ 235 005e 32DD     		ble	.L9
+ 236              	.LBB113:
+ 140:parameters/effectparameter.cpp ****                 index = clamp(index, 0, discreteValueCount_ - 1);
+ 237              		.loc 1 140 17 is_stmt 1 view .LVU56
+ 238              	.LBB114:
+ 239              	.LBB115:
+ 240              	.LBB116:
+ 241              	.LBB117:
+  45:parameters/effectparameter.cpp ****         return 0.0f;
+ 242              		.loc 1 45 9 is_stmt 0 view .LVU57
+ 243 0060 D0ED037A 		vldr.32	s15, [r0, #12]
+ 244              	.LBE117:
+ 245              	.LBE116:
+ 246              	.LBE115:
+ 247              	.LBE114:
+ 140:parameters/effectparameter.cpp ****                 index = clamp(index, 0, discreteValueCount_ - 1);
+ 248              		.loc 1 140 42 view .LVU58
+ 249 0064 013F     		subs	r7, r7, #1
+ 250              	.LVL19:
+ 251              	.LBB128:
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s 			page 9
+
+
+ 252              	.LBI114:
+ 114:parameters/effectparameter.cpp ****     // Get normalized value (0.0 to 1.0)
+ 253              		.loc 1 114 5 is_stmt 1 view .LVU59
+ 254              	.LBB126:
+ 116:parameters/effectparameter.cpp ****     
+ 255              		.loc 1 116 5 view .LVU60
+ 256              	.LBB120:
+ 257              	.LBI116:
+  44:parameters/effectparameter.cpp ****     if (maxValue_ <= minValue_) {
+ 258              		.loc 1 44 7 view .LVU61
+ 259              	.LBB118:
+  45:parameters/effectparameter.cpp ****         return 0.0f;
+ 260              		.loc 1 45 5 view .LVU62
+  45:parameters/effectparameter.cpp ****         return 0.0f;
+ 261              		.loc 1 45 22 is_stmt 0 view .LVU63
+ 262 0066 90ED027A 		vldr.32	s14, [r0, #8]
+  45:parameters/effectparameter.cpp ****         return 0.0f;
+ 263              		.loc 1 45 5 view .LVU64
+ 264 006a F4EEC77A 		vcmpe.f32	s15, s14
+ 265 006e F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 266 0072 33D9     		bls	.L12
+  48:parameters/effectparameter.cpp **** }
+ 267              		.loc 1 48 5 is_stmt 1 view .LVU65
+  48:parameters/effectparameter.cpp **** }
+ 268              		.loc 1 48 27 is_stmt 0 view .LVU66
+ 269 0074 D0ED046A 		vldr.32	s13, [r0, #16]
+  48:parameters/effectparameter.cpp **** }
+ 270              		.loc 1 48 53 view .LVU67
+ 271 0078 77EEC77A 		vsub.f32	s15, s15, s14
+  48:parameters/effectparameter.cpp **** }
+ 272              		.loc 1 48 27 view .LVU68
+ 273 007c 36EEC77A 		vsub.f32	s14, s13, s14
+  48:parameters/effectparameter.cpp **** }
+ 274              		.loc 1 48 64 view .LVU69
+ 275 0080 C7EE276A 		vdiv.f32	s13, s14, s15
+ 276              	.L10:
+ 277              	.LVL20:
+  48:parameters/effectparameter.cpp **** }
+ 278              		.loc 1 48 64 view .LVU70
+ 279              	.LBE118:
+ 280              	.LBE120:
+ 120:parameters/effectparameter.cpp ****     
+ 281              		.loc 1 120 5 is_stmt 1 view .LVU71
+ 120:parameters/effectparameter.cpp ****     
+ 282              		.loc 1 120 48 is_stmt 0 view .LVU72
+ 283 0084 07EE907A 		vmov	s15, r7	@ int
+ 284 0088 B8EEE77A 		vcvt.f32.s32	s14, s15
+ 120:parameters/effectparameter.cpp ****     
+ 285              		.loc 1 120 57 view .LVU73
+ 286 008c F6EE007A 		vmov.f32	s15, #5.0e-1
+ 287 0090 E7EE267A 		vfma.f32	s15, s14, s13
+ 120:parameters/effectparameter.cpp ****     
+ 288              		.loc 1 120 20 view .LVU74
+ 289 0094 FDEEE77A 		vcvt.s32.f32	s15, s15
+ 290 0098 17EE903A 		vmov	r3, s15	@ int
+ 123:parameters/effectparameter.cpp **** }
+ 291              		.loc 1 123 5 is_stmt 1 view .LVU75
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s 			page 10
+
+
+ 292              	.LVL21:
+ 293              	.LBB121:
+ 294              	.LBI121:
+  15:parameters/effectparameter.h ****     return (v < lo) ? lo : (hi < v) ? hi : v;
+ 295              		.loc 2 15 27 view .LVU76
+ 296              	.LBB122:
+ 297              		.loc 2 16 21 is_stmt 0 view .LVU77
+ 298 009c 002B     		cmp	r3, #0
+ 299 009e 1BDB     		blt	.L13
+ 300              		.loc 2 16 21 discriminator 1 view .LVU78
+ 301 00a0 9F42     		cmp	r7, r3
+ 302 00a2 A8BF     		it	ge
+ 303 00a4 1F46     		movge	r7, r3
+ 304              	.LVL22:
+ 305              	.L11:
+ 306              		.loc 2 16 21 discriminator 1 view .LVU79
+ 307              	.LBE122:
+ 308              	.LBE121:
+ 309              	.LBE126:
+ 310              	.LBE128:
+ 141:parameters/effectparameter.cpp ****                 Hardware::PrintLine("EffectParameter '%s' discrete value index: %d", GetName(), ind
+ 311              		.loc 1 141 17 is_stmt 1 view .LVU80
+ 142:parameters/effectparameter.cpp ****                 snprintf(buffer, bufferSize, "%s", discreteValues_[index]);
+ 312              		.loc 1 142 17 view .LVU81
+ 313              	.LBB129:
+ 314              	.LBI129:
+  51:parameters/effectparameter.cpp ****     return name_;
+ 315              		.loc 1 51 13 view .LVU82
+ 316              	.LBB130:
+  52:parameters/effectparameter.cpp **** }
+ 317              		.loc 1 52 5 view .LVU83
+  52:parameters/effectparameter.cpp **** }
+ 318              		.loc 1 52 5 is_stmt 0 view .LVU84
+ 319              	.LBE130:
+ 320              	.LBE129:
+ 321              	.LBB131:
+ 322              	.LBI131:
+ 323              		.file 3 "dependencies/libDaisy/src/daisy_seed.h"
+   1:dependencies/libDaisy/src/daisy_seed.h **** #pragma once
+   2:dependencies/libDaisy/src/daisy_seed.h **** #ifndef DSY_SEED_H
+   3:dependencies/libDaisy/src/daisy_seed.h **** #define DSY_SEED_H
+   4:dependencies/libDaisy/src/daisy_seed.h **** 
+   5:dependencies/libDaisy/src/daisy_seed.h **** #include "daisy.h"
+   6:dependencies/libDaisy/src/daisy_seed.h **** 
+   7:dependencies/libDaisy/src/daisy_seed.h **** //Uncomment this out if you're still using the rev2 hardware
+   8:dependencies/libDaisy/src/daisy_seed.h **** //#define SEED_REV2
+   9:dependencies/libDaisy/src/daisy_seed.h **** 
+  10:dependencies/libDaisy/src/daisy_seed.h **** namespace daisy
+  11:dependencies/libDaisy/src/daisy_seed.h **** {
+  12:dependencies/libDaisy/src/daisy_seed.h **** /**
+  13:dependencies/libDaisy/src/daisy_seed.h ****    @brief This is the higher-level interface for the Daisy board. \n 
+  14:dependencies/libDaisy/src/daisy_seed.h ****     All basic peripheral configuration/initialization is setup here. \n
+  15:dependencies/libDaisy/src/daisy_seed.h **** 
+  16:dependencies/libDaisy/src/daisy_seed.h ****    @ingroup boards
+  17:dependencies/libDaisy/src/daisy_seed.h **** */
+  18:dependencies/libDaisy/src/daisy_seed.h **** class DaisySeed
+  19:dependencies/libDaisy/src/daisy_seed.h **** {
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s 			page 11
+
+
+  20:dependencies/libDaisy/src/daisy_seed.h ****   public:
+  21:dependencies/libDaisy/src/daisy_seed.h ****     DaisySeed() {}
+  22:dependencies/libDaisy/src/daisy_seed.h ****     ~DaisySeed() {}
+  23:dependencies/libDaisy/src/daisy_seed.h **** 
+  24:dependencies/libDaisy/src/daisy_seed.h ****     /** This function used to provide a pre-initialization configuraiton 
+  25:dependencies/libDaisy/src/daisy_seed.h ****      *  it has since been deprecated, and does nothing.
+  26:dependencies/libDaisy/src/daisy_seed.h ****      */
+  27:dependencies/libDaisy/src/daisy_seed.h ****     void Configure();
+  28:dependencies/libDaisy/src/daisy_seed.h **** 
+  29:dependencies/libDaisy/src/daisy_seed.h ****     /** 
+  30:dependencies/libDaisy/src/daisy_seed.h ****     Initializes the Daisy Seed and the following peripherals:
+  31:dependencies/libDaisy/src/daisy_seed.h ****     SDRAM, QSPI, 24-bit 48kHz Audio via AK4556, Internal USB,
+  32:dependencies/libDaisy/src/daisy_seed.h ****     as well as the built-in LED and Testpoint.
+  33:dependencies/libDaisy/src/daisy_seed.h **** 
+  34:dependencies/libDaisy/src/daisy_seed.h ****     ADCs, DACs, and other special peripherals (such as I2C, SPI, etc.)
+  35:dependencies/libDaisy/src/daisy_seed.h ****     can be initialized using their specific initializers within libdaisy
+  36:dependencies/libDaisy/src/daisy_seed.h ****     for a specific application.
+  37:dependencies/libDaisy/src/daisy_seed.h ****     */
+  38:dependencies/libDaisy/src/daisy_seed.h ****     void Init(bool boost = false);
+  39:dependencies/libDaisy/src/daisy_seed.h **** 
+  40:dependencies/libDaisy/src/daisy_seed.h ****     /** 
+  41:dependencies/libDaisy/src/daisy_seed.h ****     Deinitializes all peripherals automatically handled by `Init`.
+  42:dependencies/libDaisy/src/daisy_seed.h ****     */
+  43:dependencies/libDaisy/src/daisy_seed.h ****     void DeInit();
+  44:dependencies/libDaisy/src/daisy_seed.h **** 
+  45:dependencies/libDaisy/src/daisy_seed.h ****     /** 
+  46:dependencies/libDaisy/src/daisy_seed.h ****     Wait some ms before going on.
+  47:dependencies/libDaisy/src/daisy_seed.h ****     \param del Delay time in ms.
+  48:dependencies/libDaisy/src/daisy_seed.h ****     */
+  49:dependencies/libDaisy/src/daisy_seed.h ****     void DelayMs(size_t del);
+  50:dependencies/libDaisy/src/daisy_seed.h **** 
+  51:dependencies/libDaisy/src/daisy_seed.h ****     /** 
+  52:dependencies/libDaisy/src/daisy_seed.h ****     Returns the gpio_pin corresponding to the index 0-31.
+  53:dependencies/libDaisy/src/daisy_seed.h ****     For the given GPIO on the Daisy Seed (labeled 1-32 in docs).
+  54:dependencies/libDaisy/src/daisy_seed.h ****     */
+  55:dependencies/libDaisy/src/daisy_seed.h ****     static Pin GetPin(uint8_t pin_idx);
+  56:dependencies/libDaisy/src/daisy_seed.h **** 
+  57:dependencies/libDaisy/src/daisy_seed.h ****     /** Begins the audio for the seeds builtin audio.
+  58:dependencies/libDaisy/src/daisy_seed.h ****     the specified callback will get called whenever
+  59:dependencies/libDaisy/src/daisy_seed.h ****     new data is ready to be prepared.
+  60:dependencies/libDaisy/src/daisy_seed.h ****     */
+  61:dependencies/libDaisy/src/daisy_seed.h ****     void StartAudio(AudioHandle::InterleavingAudioCallback cb);
+  62:dependencies/libDaisy/src/daisy_seed.h **** 
+  63:dependencies/libDaisy/src/daisy_seed.h ****     /** Begins the audio for the seeds builtin audio.
+  64:dependencies/libDaisy/src/daisy_seed.h ****     the specified callback will get called whenever
+  65:dependencies/libDaisy/src/daisy_seed.h ****     new data is ready to be prepared.
+  66:dependencies/libDaisy/src/daisy_seed.h ****     This will use the newer non-interleaved callback.
+  67:dependencies/libDaisy/src/daisy_seed.h ****     */
+  68:dependencies/libDaisy/src/daisy_seed.h ****     void StartAudio(AudioHandle::AudioCallback cb);
+  69:dependencies/libDaisy/src/daisy_seed.h **** 
+  70:dependencies/libDaisy/src/daisy_seed.h ****     /** Changes to a new interleaved callback
+  71:dependencies/libDaisy/src/daisy_seed.h ****      */
+  72:dependencies/libDaisy/src/daisy_seed.h ****     void ChangeAudioCallback(AudioHandle::InterleavingAudioCallback cb);
+  73:dependencies/libDaisy/src/daisy_seed.h **** 
+  74:dependencies/libDaisy/src/daisy_seed.h ****     /** Changes to a new multichannel callback
+  75:dependencies/libDaisy/src/daisy_seed.h ****      */
+  76:dependencies/libDaisy/src/daisy_seed.h ****     void ChangeAudioCallback(AudioHandle::AudioCallback cb);
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s 			page 12
+
+
+  77:dependencies/libDaisy/src/daisy_seed.h **** 
+  78:dependencies/libDaisy/src/daisy_seed.h ****     /** Stops the audio if it is running. */
+  79:dependencies/libDaisy/src/daisy_seed.h ****     void StopAudio();
+  80:dependencies/libDaisy/src/daisy_seed.h **** 
+  81:dependencies/libDaisy/src/daisy_seed.h ****     /** Updates the Audio Sample Rate, and reinitializes.
+  82:dependencies/libDaisy/src/daisy_seed.h ****      ** Audio must be stopped for this to work.
+  83:dependencies/libDaisy/src/daisy_seed.h ****      */
+  84:dependencies/libDaisy/src/daisy_seed.h ****     void SetAudioSampleRate(SaiHandle::Config::SampleRate samplerate);
+  85:dependencies/libDaisy/src/daisy_seed.h **** 
+  86:dependencies/libDaisy/src/daisy_seed.h ****     /** Returns the audio sample rate in Hz as a floating point number.
+  87:dependencies/libDaisy/src/daisy_seed.h ****      */
+  88:dependencies/libDaisy/src/daisy_seed.h ****     float AudioSampleRate();
+  89:dependencies/libDaisy/src/daisy_seed.h **** 
+  90:dependencies/libDaisy/src/daisy_seed.h ****     /** Sets the number of samples processed per channel by the audio callback.
+  91:dependencies/libDaisy/src/daisy_seed.h ****      */
+  92:dependencies/libDaisy/src/daisy_seed.h ****     void SetAudioBlockSize(size_t blocksize);
+  93:dependencies/libDaisy/src/daisy_seed.h **** 
+  94:dependencies/libDaisy/src/daisy_seed.h ****     /** Returns the number of samples per channel in a block of audio. */
+  95:dependencies/libDaisy/src/daisy_seed.h ****     size_t AudioBlockSize();
+  96:dependencies/libDaisy/src/daisy_seed.h **** 
+  97:dependencies/libDaisy/src/daisy_seed.h ****     /** Returns the rate in Hz that the Audio callback is called */
+  98:dependencies/libDaisy/src/daisy_seed.h ****     float AudioCallbackRate() const;
+  99:dependencies/libDaisy/src/daisy_seed.h **** 
+ 100:dependencies/libDaisy/src/daisy_seed.h ****     /** Returns the SAI Handle for the Daisy Seed 
+ 101:dependencies/libDaisy/src/daisy_seed.h ****      *  This can be useful when adding a secondary codec,
+ 102:dependencies/libDaisy/src/daisy_seed.h ****      *  the result of this function can be passed to the audio reinit 
+ 103:dependencies/libDaisy/src/daisy_seed.h ****      *  with an SAI2 configuration
+ 104:dependencies/libDaisy/src/daisy_seed.h ****      */
+ 105:dependencies/libDaisy/src/daisy_seed.h ****     const SaiHandle& AudioSaiHandle() const;
+ 106:dependencies/libDaisy/src/daisy_seed.h **** 
+ 107:dependencies/libDaisy/src/daisy_seed.h ****     /** Sets the state of the built in LED
+ 108:dependencies/libDaisy/src/daisy_seed.h ****      */
+ 109:dependencies/libDaisy/src/daisy_seed.h ****     void SetLed(bool state);
+ 110:dependencies/libDaisy/src/daisy_seed.h **** 
+ 111:dependencies/libDaisy/src/daisy_seed.h ****     /** Sets the state of the test point near pin 10
+ 112:dependencies/libDaisy/src/daisy_seed.h ****      */
+ 113:dependencies/libDaisy/src/daisy_seed.h ****     void SetTestPoint(bool state);
+ 114:dependencies/libDaisy/src/daisy_seed.h **** 
+ 115:dependencies/libDaisy/src/daisy_seed.h ****     /** Print formatted debug log message
+ 116:dependencies/libDaisy/src/daisy_seed.h ****      */
+ 117:dependencies/libDaisy/src/daisy_seed.h ****     template <typename... VA>
+ 118:dependencies/libDaisy/src/daisy_seed.h ****     static void Print(const char* format, VA... va)
+ 119:dependencies/libDaisy/src/daisy_seed.h ****     {
+ 120:dependencies/libDaisy/src/daisy_seed.h ****         Log::Print(format, va...);
+ 121:dependencies/libDaisy/src/daisy_seed.h ****     }
+ 122:dependencies/libDaisy/src/daisy_seed.h **** 
+ 123:dependencies/libDaisy/src/daisy_seed.h ****     /** Print formatted debug log message with automatic line termination
+ 124:dependencies/libDaisy/src/daisy_seed.h ****     */
+ 125:dependencies/libDaisy/src/daisy_seed.h ****     template <typename... VA>
+ 126:dependencies/libDaisy/src/daisy_seed.h ****     static void PrintLine(const char* format, VA... va)
+ 324              		.loc 3 126 17 is_stmt 1 view .LVU85
+ 325              	.LBB132:
+ 127:dependencies/libDaisy/src/daisy_seed.h ****     {
+ 128:dependencies/libDaisy/src/daisy_seed.h ****         Log::PrintLine(format, va...);
+ 326              		.loc 3 128 23 is_stmt 0 view .LVU86
+ 327 00a6 3A46     		mov	r2, r7
+ 328              	.LVL23:
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s 			page 13
+
+
+ 329              		.loc 3 128 23 view .LVU87
+ 330 00a8 6168     		ldr	r1, [r4, #4]
+ 331              	.LVL24:
+ 332              		.loc 3 128 23 view .LVU88
+ 333 00aa 0F48     		ldr	r0, .L22+4
+ 334              	.LVL25:
+ 335              		.loc 3 128 23 view .LVU89
+ 336 00ac FFF7FEFF 		bl	_ZN5daisy6LoggerILNS_17LoggerDestinationE1EE9PrintLineEPKcz
+ 337              	.LVL26:
+ 338              		.loc 3 128 23 view .LVU90
+ 339              	.LBE132:
+ 340              	.LBE131:
+ 143:parameters/effectparameter.cpp ****             } else {
+ 341              		.loc 1 143 17 is_stmt 1 view .LVU91
+ 143:parameters/effectparameter.cpp ****             } else {
+ 342              		.loc 1 143 25 is_stmt 0 view .LVU92
+ 343 00b0 636A     		ldr	r3, [r4, #36]
+ 344 00b2 0E4A     		ldr	r2, .L22+8
+ 345 00b4 3146     		mov	r1, r6
+ 346 00b6 53F82730 		ldr	r3, [r3, r7, lsl #2]
+ 347 00ba 2846     		mov	r0, r5
+ 348              	.LBE113:
+ 349              	.LBE112:
+ 350              	.LBE111:
+ 351              		.loc 1 157 1 view .LVU93
+ 352 00bc 03B0     		add	sp, sp, #12
+ 353              		.cfi_remember_state
+ 354              		.cfi_def_cfa_offset 20
+ 355              		@ sp needed
+ 356 00be BDE8F040 		pop	{r4, r5, r6, r7, lr}
+ 357              		.cfi_restore 14
+ 358              		.cfi_restore 7
+ 359              		.cfi_restore 6
+ 360              		.cfi_restore 5
+ 361              		.cfi_restore 4
+ 362              		.cfi_def_cfa_offset 0
+ 363              	.LVL27:
+ 364              	.LBB138:
+ 365              	.LBB136:
+ 366              	.LBB134:
+ 143:parameters/effectparameter.cpp ****             } else {
+ 367              		.loc 1 143 25 view .LVU94
+ 368 00c2 FFF7FEBF 		b	snprintf
+ 369              	.LVL28:
+ 370              	.L9:
+ 371              		.cfi_restore_state
+ 143:parameters/effectparameter.cpp ****             } else {
+ 372              		.loc 1 143 25 view .LVU95
+ 373              	.LBE134:
+ 145:parameters/effectparameter.cpp ****             }
+ 374              		.loc 1 145 17 is_stmt 1 view .LVU96
+ 145:parameters/effectparameter.cpp ****             }
+ 375              		.loc 1 145 25 is_stmt 0 view .LVU97
+ 376 00c6 0A4A     		ldr	r2, .L22+12
+ 377              	.LVL29:
+ 145:parameters/effectparameter.cpp ****             }
+ 378              		.loc 1 145 25 view .LVU98
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s 			page 14
+
+
+ 379 00c8 3146     		mov	r1, r6
+ 380              	.LVL30:
+ 145:parameters/effectparameter.cpp ****             }
+ 381              		.loc 1 145 25 view .LVU99
+ 382 00ca 2846     		mov	r0, r5
+ 383              	.LVL31:
+ 145:parameters/effectparameter.cpp ****             }
+ 384              		.loc 1 145 25 view .LVU100
+ 385              	.LBE136:
+ 386              	.LBE138:
+ 387              		.loc 1 157 1 view .LVU101
+ 388 00cc 03B0     		add	sp, sp, #12
+ 389              		.cfi_def_cfa_offset 20
+ 390              		@ sp needed
+ 391 00ce BDE8F040 		pop	{r4, r5, r6, r7, lr}
+ 392              		.cfi_restore 14
+ 393              		.cfi_restore 7
+ 394              		.cfi_restore 6
+ 395              		.cfi_restore 5
+ 396              		.cfi_restore 4
+ 397              		.cfi_def_cfa_offset 0
+ 398              	.LVL32:
+ 399              	.LBB139:
+ 400              	.LBB137:
+ 145:parameters/effectparameter.cpp ****             }
+ 401              		.loc 1 145 25 view .LVU102
+ 402 00d2 FFF7FEBF 		b	snprintf
+ 403              	.LVL33:
+ 404              	.L19:
+ 145:parameters/effectparameter.cpp ****             }
+ 405              		.loc 1 145 25 view .LVU103
+ 406 00d6 7047     		bx	lr
+ 407              	.LVL34:
+ 408              	.L13:
+ 409              		.cfi_def_cfa_offset 32
+ 410              		.cfi_offset 4, -20
+ 411              		.cfi_offset 5, -16
+ 412              		.cfi_offset 6, -12
+ 413              		.cfi_offset 7, -8
+ 414              		.cfi_offset 14, -4
+ 415              	.LBB135:
+ 416              	.LBB133:
+ 417              	.LBB127:
+ 418              	.LBB124:
+ 419              	.LBB123:
+ 145:parameters/effectparameter.cpp ****             }
+ 420              		.loc 1 145 25 view .LVU104
+ 421 00d8 0027     		movs	r7, #0
+ 422              	.LVL35:
+ 145:parameters/effectparameter.cpp ****             }
+ 423              		.loc 1 145 25 view .LVU105
+ 424 00da E4E7     		b	.L11
+ 425              	.LVL36:
+ 426              	.L12:
+ 145:parameters/effectparameter.cpp ****             }
+ 427              		.loc 1 145 25 view .LVU106
+ 428              	.LBE123:
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s 			page 15
+
+
+ 429              	.LBE124:
+ 430              	.LBB125:
+ 431              	.LBB119:
+  46:parameters/effectparameter.cpp ****     }
+ 432              		.loc 1 46 16 view .LVU107
+ 433 00dc DFED056A 		vldr.32	s13, .L22+16
+ 434 00e0 D0E7     		b	.L10
+ 435              	.L23:
+ 436 00e2 00BF     		.align	2
+ 437              	.L22:
+ 438 00e4 00000000 		.word	.LC0
+ 439 00e8 08000000 		.word	.LC1
+ 440 00ec 38000000 		.word	.LC2
+ 441 00f0 3C000000 		.word	.LC3
+ 442 00f4 00000000 		.word	0
+ 443              	.LBE119:
+ 444              	.LBE125:
+ 445              	.LBE127:
+ 446              	.LBE133:
+ 447              	.LBE135:
+ 448              	.LBE137:
+ 449              	.LBE139:
+ 450              		.cfi_endproc
+ 451              	.LFE4547:
+ 453              		.section	.text._ZN11perspective15EffectParameterC2EPKcfffii,"ax",%progbits
+ 454              		.align	1
+ 455              		.p2align 2,,3
+ 456              		.global	_ZN11perspective15EffectParameterC2EPKcfffii
+ 457              		.syntax unified
+ 458              		.thumb
+ 459              		.thumb_func
+ 461              	_ZN11perspective15EffectParameterC2EPKcfffii:
+ 462              	.LVL37:
+ 463              	.LFB4523:
+  14:parameters/effectparameter.cpp ****     : name_(nullptr)
+ 464              		.loc 1 14 1 is_stmt 1 view -0
+ 465              		.cfi_startproc
+ 466              		@ args = 0, pretend = 0, frame = 0
+ 467              		@ frame_needed = 0, uses_anonymous_args = 0
+  14:parameters/effectparameter.cpp ****     : name_(nullptr)
+ 468              		.loc 1 14 1 is_stmt 0 view .LVU109
+ 469 0000 38B5     		push	{r3, r4, r5, lr}
+ 470              		.cfi_def_cfa_offset 16
+ 471              		.cfi_offset 3, -16
+ 472              		.cfi_offset 4, -12
+ 473              		.cfi_offset 5, -8
+ 474              		.cfi_offset 14, -4
+  14:parameters/effectparameter.cpp ****     : name_(nullptr)
+ 475              		.loc 1 14 1 view .LVU110
+ 476 0002 0446     		mov	r4, r0
+ 477              	.LBB150:
+  24:parameters/effectparameter.cpp **** {
+ 478              		.loc 1 24 28 view .LVU111
+ 479 0004 0F48     		ldr	r0, .L30
+ 480              	.LVL38:
+  19:parameters/effectparameter.cpp ****     , displayIndex_(displayIndex)
+ 481              		.loc 1 19 7 view .LVU112
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s 			page 16
+
+
+ 482 0006 6261     		str	r2, [r4, #20]
+  22:parameters/effectparameter.cpp ****     , discreteValues_(nullptr)
+ 483              		.loc 1 22 7 view .LVU113
+ 484 0008 4FF07E52 		mov	r2, #1065353216
+ 485              	.LVL39:
+  24:parameters/effectparameter.cpp **** {
+ 486              		.loc 1 24 28 view .LVU114
+ 487 000c 2060     		str	r0, [r4]
+  15:parameters/effectparameter.cpp ****     , minValue_(minValue)
+ 488              		.loc 1 15 7 view .LVU115
+ 489 000e 0020     		movs	r0, #0
+  16:parameters/effectparameter.cpp ****     , maxValue_(maxValue)
+ 490              		.loc 1 16 7 view .LVU116
+ 491 0010 84ED020A 		vstr.32	s0, [r4, #8]
+  17:parameters/effectparameter.cpp ****     , currentValue_(defaultValue)
+ 492              		.loc 1 17 7 view .LVU117
+ 493 0014 C4ED030A 		vstr.32	s1, [r4, #12]
+  18:parameters/effectparameter.cpp ****     , index_(index)
+ 494              		.loc 1 18 7 view .LVU118
+ 495 0018 84ED041A 		vstr.32	s2, [r4, #16]
+  15:parameters/effectparameter.cpp ****     , minValue_(minValue)
+ 496              		.loc 1 15 7 view .LVU119
+ 497 001c 6060     		str	r0, [r4, #4]
+  23:parameters/effectparameter.cpp ****     , discreteValueCount_(0)
+ 498              		.loc 1 23 7 view .LVU120
+ 499 001e 6062     		str	r0, [r4, #36]
+  22:parameters/effectparameter.cpp ****     , discreteValues_(nullptr)
+ 500              		.loc 1 22 7 view .LVU121
+ 501 0020 2262     		str	r2, [r4, #32]	@ float
+  24:parameters/effectparameter.cpp **** {
+ 502              		.loc 1 24 7 view .LVU122
+ 503 0022 A062     		str	r0, [r4, #40]
+ 504              	.LBE150:
+  26:parameters/effectparameter.cpp ****         size_t len = strlen(name);
+ 505              		.loc 1 26 5 is_stmt 1 view .LVU123
+ 506              	.LBB152:
+  21:parameters/effectparameter.cpp ****     , scaleFactor_(1.0f)
+ 507              		.loc 1 21 7 is_stmt 0 view .LVU124
+ 508 0024 C4E90630 		strd	r3, r0, [r4, #24]
+ 509              	.LBB151:
+  26:parameters/effectparameter.cpp ****         size_t len = strlen(name);
+ 510              		.loc 1 26 5 view .LVU125
+ 511 0028 51B1     		cbz	r1, .L25
+ 512              	.LVL40:
+  26:parameters/effectparameter.cpp ****         size_t len = strlen(name);
+ 513              		.loc 1 26 5 view .LVU126
+ 514              	.LBE151:
+ 515              	.LBE152:
+ 516              	.LBB153:
+ 517              	.LBI153:
+  14:parameters/effectparameter.cpp ****     : name_(nullptr)
+ 518              		.loc 1 14 1 is_stmt 1 view .LVU127
+ 519              	.LBB154:
+  27:parameters/effectparameter.cpp ****         name_ = new char[len + 1];
+ 520              		.loc 1 27 9 view .LVU128
+ 521 002a 0D46     		mov	r5, r1
+  27:parameters/effectparameter.cpp ****         name_ = new char[len + 1];
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s 			page 17
+
+
+ 522              		.loc 1 27 28 is_stmt 0 view .LVU129
+ 523 002c 0846     		mov	r0, r1
+ 524 002e FFF7FEFF 		bl	strlen
+ 525              	.LVL41:
+  28:parameters/effectparameter.cpp ****         strcpy(name_, name);
+ 526              		.loc 1 28 9 is_stmt 1 view .LVU130
+  28:parameters/effectparameter.cpp ****         strcpy(name_, name);
+ 527              		.loc 1 28 33 is_stmt 0 view .LVU131
+ 528 0032 0130     		adds	r0, r0, #1
+ 529              	.LVL42:
+  28:parameters/effectparameter.cpp ****         strcpy(name_, name);
+ 530              		.loc 1 28 33 view .LVU132
+ 531 0034 FFF7FEFF 		bl	_Znaj
+ 532              	.LVL43:
+  29:parameters/effectparameter.cpp ****     }
+ 533              		.loc 1 29 15 view .LVU133
+ 534 0038 2946     		mov	r1, r5
+  28:parameters/effectparameter.cpp ****         strcpy(name_, name);
+ 535              		.loc 1 28 15 discriminator 1 view .LVU134
+ 536 003a 6060     		str	r0, [r4, #4]
+  29:parameters/effectparameter.cpp ****     }
+ 537              		.loc 1 29 9 is_stmt 1 view .LVU135
+  29:parameters/effectparameter.cpp ****     }
+ 538              		.loc 1 29 15 is_stmt 0 view .LVU136
+ 539 003c FFF7FEFF 		bl	strcpy
+ 540              	.LVL44:
+ 541              	.L25:
+  29:parameters/effectparameter.cpp ****     }
+ 542              		.loc 1 29 15 view .LVU137
+ 543              	.LBE154:
+ 544              	.LBE153:
+  31:parameters/effectparameter.cpp **** 
+ 545              		.loc 1 31 1 view .LVU138
+ 546 0040 2046     		mov	r0, r4
+ 547 0042 38BD     		pop	{r3, r4, r5, pc}
+ 548              	.LVL45:
+ 549              	.L31:
+  31:parameters/effectparameter.cpp **** 
+ 550              		.loc 1 31 1 view .LVU139
+ 551              		.align	2
+ 552              	.L30:
+ 553 0044 08000000 		.word	_ZTVN11perspective15EffectParameterE+8
+ 554              		.cfi_endproc
+ 555              	.LFE4523:
+ 557              		.global	_ZN11perspective15EffectParameterC1EPKcfffii
+ 558              		.thumb_set _ZN11perspective15EffectParameterC1EPKcfffii,_ZN11perspective15EffectParameterC2EPKcfff
+ 559              		.section	.text._ZN11perspective15EffectParameterD2Ev,"ax",%progbits
+ 560              		.align	1
+ 561              		.p2align 2,,3
+ 562              		.global	_ZN11perspective15EffectParameterD2Ev
+ 563              		.syntax unified
+ 564              		.thumb
+ 565              		.thumb_func
+ 567              	_ZN11perspective15EffectParameterD2Ev:
+ 568              	.LVL46:
+ 569              	.LFB4526:
+  33:parameters/effectparameter.cpp ****     if (name_) {
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s 			page 18
+
+
+ 570              		.loc 1 33 1 is_stmt 1 view -0
+ 571              		.cfi_startproc
+ 572              		@ args = 0, pretend = 0, frame = 0
+ 573              		@ frame_needed = 0, uses_anonymous_args = 0
+  33:parameters/effectparameter.cpp ****     if (name_) {
+ 574              		.loc 1 33 1 is_stmt 0 view .LVU141
+ 575 0000 10B5     		push	{r4, lr}
+ 576              		.cfi_def_cfa_offset 8
+ 577              		.cfi_offset 4, -8
+ 578              		.cfi_offset 14, -4
+ 579              	.LBB155:
+  33:parameters/effectparameter.cpp ****     if (name_) {
+ 580              		.loc 1 33 35 view .LVU142
+ 581 0002 044B     		ldr	r3, .L38
+ 582              	.LBE155:
+  33:parameters/effectparameter.cpp ****     if (name_) {
+ 583              		.loc 1 33 1 view .LVU143
+ 584 0004 0446     		mov	r4, r0
+ 585              	.LBB156:
+  34:parameters/effectparameter.cpp ****         delete[] name_;
+ 586              		.loc 1 34 9 view .LVU144
+ 587 0006 4068     		ldr	r0, [r0, #4]
+ 588              	.LVL47:
+  33:parameters/effectparameter.cpp ****     if (name_) {
+ 589              		.loc 1 33 35 view .LVU145
+ 590 0008 2360     		str	r3, [r4]
+  34:parameters/effectparameter.cpp ****         delete[] name_;
+ 591              		.loc 1 34 5 is_stmt 1 view .LVU146
+ 592 000a 08B1     		cbz	r0, .L33
+  35:parameters/effectparameter.cpp ****         name_ = nullptr;
+ 593              		.loc 1 35 9 view .LVU147
+  35:parameters/effectparameter.cpp ****         name_ = nullptr;
+ 594              		.loc 1 35 18 is_stmt 0 discriminator 1 view .LVU148
+ 595 000c FFF7FEFF 		bl	_ZdaPv
+ 596              	.LVL48:
+  36:parameters/effectparameter.cpp ****     }
+ 597              		.loc 1 36 9 is_stmt 1 view .LVU149
+ 598              	.L33:
+ 599              	.LBE156:
+  38:parameters/effectparameter.cpp **** 
+ 600              		.loc 1 38 1 is_stmt 0 view .LVU150
+ 601 0010 2046     		mov	r0, r4
+ 602 0012 10BD     		pop	{r4, pc}
+ 603              	.LVL49:
+ 604              	.L39:
+  38:parameters/effectparameter.cpp **** 
+ 605              		.loc 1 38 1 view .LVU151
+ 606              		.align	2
+ 607              	.L38:
+ 608 0014 08000000 		.word	_ZTVN11perspective15EffectParameterE+8
+ 609              		.cfi_endproc
+ 610              	.LFE4526:
+ 612              		.global	_ZN11perspective15EffectParameterD1Ev
+ 613              		.thumb_set _ZN11perspective15EffectParameterD1Ev,_ZN11perspective15EffectParameterD2Ev
+ 614              		.section	.text._ZN11perspective15EffectParameterD0Ev,"ax",%progbits
+ 615              		.align	1
+ 616              		.p2align 2,,3
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s 			page 19
+
+
+ 617              		.global	_ZN11perspective15EffectParameterD0Ev
+ 618              		.syntax unified
+ 619              		.thumb
+ 620              		.thumb_func
+ 622              	_ZN11perspective15EffectParameterD0Ev:
+ 623              	.LVL50:
+ 624              	.LFB4528:
+  33:parameters/effectparameter.cpp ****     if (name_) {
+ 625              		.loc 1 33 1 is_stmt 1 view -0
+ 626              		.cfi_startproc
+ 627              		@ args = 0, pretend = 0, frame = 0
+ 628              		@ frame_needed = 0, uses_anonymous_args = 0
+  33:parameters/effectparameter.cpp ****     if (name_) {
+ 629              		.loc 1 33 1 is_stmt 0 view .LVU153
+ 630 0000 10B5     		push	{r4, lr}
+ 631              		.cfi_def_cfa_offset 8
+ 632              		.cfi_offset 4, -8
+ 633              		.cfi_offset 14, -4
+ 634              	.LBB157:
+ 635              	.LBB158:
+  33:parameters/effectparameter.cpp ****     if (name_) {
+ 636              		.loc 1 33 35 view .LVU154
+ 637 0002 064B     		ldr	r3, .L46
+ 638              	.LBE158:
+ 639              	.LBE157:
+  33:parameters/effectparameter.cpp ****     if (name_) {
+ 640              		.loc 1 33 1 view .LVU155
+ 641 0004 0446     		mov	r4, r0
+ 642              	.LVL51:
+ 643              	.LBB160:
+ 644              	.LBI157:
+  33:parameters/effectparameter.cpp ****     if (name_) {
+ 645              		.loc 1 33 1 is_stmt 1 view .LVU156
+ 646              	.LBB159:
+  34:parameters/effectparameter.cpp ****         delete[] name_;
+ 647              		.loc 1 34 9 is_stmt 0 view .LVU157
+ 648 0006 4068     		ldr	r0, [r0, #4]
+ 649              	.LVL52:
+  33:parameters/effectparameter.cpp ****     if (name_) {
+ 650              		.loc 1 33 35 view .LVU158
+ 651 0008 2360     		str	r3, [r4]
+  34:parameters/effectparameter.cpp ****         delete[] name_;
+ 652              		.loc 1 34 5 is_stmt 1 view .LVU159
+ 653 000a 08B1     		cbz	r0, .L41
+  35:parameters/effectparameter.cpp ****         name_ = nullptr;
+ 654              		.loc 1 35 9 view .LVU160
+  35:parameters/effectparameter.cpp ****         name_ = nullptr;
+ 655              		.loc 1 35 18 is_stmt 0 discriminator 1 view .LVU161
+ 656 000c FFF7FEFF 		bl	_ZdaPv
+ 657              	.LVL53:
+  36:parameters/effectparameter.cpp ****     }
+ 658              		.loc 1 36 9 is_stmt 1 view .LVU162
+ 659              	.L41:
+  36:parameters/effectparameter.cpp ****     }
+ 660              		.loc 1 36 9 is_stmt 0 view .LVU163
+ 661              	.LBE159:
+ 662              	.LBE160:
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s 			page 20
+
+
+  38:parameters/effectparameter.cpp **** 
+ 663              		.loc 1 38 1 discriminator 1 view .LVU164
+ 664 0010 2046     		mov	r0, r4
+ 665 0012 2C21     		movs	r1, #44
+ 666 0014 FFF7FEFF 		bl	_ZdlPvj
+ 667              	.LVL54:
+  38:parameters/effectparameter.cpp **** 
+ 668              		.loc 1 38 1 view .LVU165
+ 669 0018 2046     		mov	r0, r4
+ 670 001a 10BD     		pop	{r4, pc}
+ 671              	.LVL55:
+ 672              	.L47:
+  38:parameters/effectparameter.cpp **** 
+ 673              		.loc 1 38 1 view .LVU166
+ 674              		.align	2
+ 675              	.L46:
+ 676 001c 08000000 		.word	_ZTVN11perspective15EffectParameterE+8
+ 677              		.cfi_endproc
+ 678              	.LFE4528:
+ 680              		.section	.text._ZNK11perspective15EffectParameter8GetValueEv,"ax",%progbits
+ 681              		.align	1
+ 682              		.p2align 2,,3
+ 683              		.global	_ZNK11perspective15EffectParameter8GetValueEv
+ 684              		.syntax unified
+ 685              		.thumb
+ 686              		.thumb_func
+ 688              	_ZNK11perspective15EffectParameter8GetValueEv:
+ 689              	.LVL56:
+ 690              	.LFB4529:
+  40:parameters/effectparameter.cpp ****     return currentValue_;
+ 691              		.loc 1 40 41 is_stmt 1 view -0
+ 692              		.cfi_startproc
+ 693              		@ args = 0, pretend = 0, frame = 0
+ 694              		@ frame_needed = 0, uses_anonymous_args = 0
+ 695              		@ link register save eliminated.
+  41:parameters/effectparameter.cpp **** }
+ 696              		.loc 1 41 5 view .LVU168
+  42:parameters/effectparameter.cpp **** 
+ 697              		.loc 1 42 1 is_stmt 0 view .LVU169
+ 698 0000 90ED040A 		vldr.32	s0, [r0, #16]
+ 699 0004 7047     		bx	lr
+ 700              		.cfi_endproc
+ 701              	.LFE4529:
+ 703 0006 00BF     		.section	.text._ZNK11perspective15EffectParameter18GetNormalizedValueEv,"ax",%progbits
+ 704              		.align	1
+ 705              		.p2align 2,,3
+ 706              		.global	_ZNK11perspective15EffectParameter18GetNormalizedValueEv
+ 707              		.syntax unified
+ 708              		.thumb
+ 709              		.thumb_func
+ 711              	_ZNK11perspective15EffectParameter18GetNormalizedValueEv:
+ 712              	.LVL57:
+ 713              	.LFB4530:
+  44:parameters/effectparameter.cpp ****     if (maxValue_ <= minValue_) {
+ 714              		.loc 1 44 51 is_stmt 1 view -0
+ 715              		.cfi_startproc
+ 716              		@ args = 0, pretend = 0, frame = 0
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s 			page 21
+
+
+ 717              		@ frame_needed = 0, uses_anonymous_args = 0
+ 718              		@ link register save eliminated.
+  45:parameters/effectparameter.cpp ****         return 0.0f;
+ 719              		.loc 1 45 5 view .LVU171
+  45:parameters/effectparameter.cpp ****         return 0.0f;
+ 720              		.loc 1 45 9 is_stmt 0 view .LVU172
+ 721 0000 D0ED037A 		vldr.32	s15, [r0, #12]
+  45:parameters/effectparameter.cpp ****         return 0.0f;
+ 722              		.loc 1 45 22 view .LVU173
+ 723 0004 90ED027A 		vldr.32	s14, [r0, #8]
+  45:parameters/effectparameter.cpp ****         return 0.0f;
+ 724              		.loc 1 45 5 view .LVU174
+ 725 0008 F4EEC77A 		vcmpe.f32	s15, s14
+ 726 000c F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 727 0010 08D9     		bls	.L51
+  48:parameters/effectparameter.cpp **** }
+ 728              		.loc 1 48 5 is_stmt 1 view .LVU175
+  48:parameters/effectparameter.cpp **** }
+ 729              		.loc 1 48 27 is_stmt 0 view .LVU176
+ 730 0012 D0ED046A 		vldr.32	s13, [r0, #16]
+  48:parameters/effectparameter.cpp **** }
+ 731              		.loc 1 48 53 view .LVU177
+ 732 0016 77EEC77A 		vsub.f32	s15, s15, s14
+  48:parameters/effectparameter.cpp **** }
+ 733              		.loc 1 48 27 view .LVU178
+ 734 001a 36EEC77A 		vsub.f32	s14, s13, s14
+  48:parameters/effectparameter.cpp **** }
+ 735              		.loc 1 48 64 view .LVU179
+ 736 001e 87EE270A 		vdiv.f32	s0, s14, s15
+ 737 0022 7047     		bx	lr
+ 738              	.L51:
+  46:parameters/effectparameter.cpp ****     }
+ 739              		.loc 1 46 16 view .LVU180
+ 740 0024 9FED010A 		vldr.32	s0, .L52
+  49:parameters/effectparameter.cpp **** 
+ 741              		.loc 1 49 1 view .LVU181
+ 742 0028 7047     		bx	lr
+ 743              	.L53:
+ 744 002a 00BF     		.align	2
+ 745              	.L52:
+ 746 002c 00000000 		.word	0
+ 747              		.cfi_endproc
+ 748              	.LFE4530:
+ 750              		.section	.text._ZNK11perspective15EffectParameter7GetNameEv,"ax",%progbits
+ 751              		.align	1
+ 752              		.p2align 2,,3
+ 753              		.global	_ZNK11perspective15EffectParameter7GetNameEv
+ 754              		.syntax unified
+ 755              		.thumb
+ 756              		.thumb_func
+ 758              	_ZNK11perspective15EffectParameter7GetNameEv:
+ 759              	.LVL58:
+ 760              	.LFB4531:
+  51:parameters/effectparameter.cpp ****     return name_;
+ 761              		.loc 1 51 46 is_stmt 1 view -0
+ 762              		.cfi_startproc
+ 763              		@ args = 0, pretend = 0, frame = 0
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s 			page 22
+
+
+ 764              		@ frame_needed = 0, uses_anonymous_args = 0
+ 765              		@ link register save eliminated.
+  52:parameters/effectparameter.cpp **** }
+ 766              		.loc 1 52 5 view .LVU183
+  53:parameters/effectparameter.cpp **** 
+ 767              		.loc 1 53 1 is_stmt 0 view .LVU184
+ 768 0000 4068     		ldr	r0, [r0, #4]
+ 769              	.LVL59:
+  53:parameters/effectparameter.cpp **** 
+ 770              		.loc 1 53 1 view .LVU185
+ 771 0002 7047     		bx	lr
+ 772              		.cfi_endproc
+ 773              	.LFE4531:
+ 775              		.section	.text._ZNK11perspective15EffectParameter6GetMinEv,"ax",%progbits
+ 776              		.align	1
+ 777              		.p2align 2,,3
+ 778              		.global	_ZNK11perspective15EffectParameter6GetMinEv
+ 779              		.syntax unified
+ 780              		.thumb
+ 781              		.thumb_func
+ 783              	_ZNK11perspective15EffectParameter6GetMinEv:
+ 784              	.LVL60:
+ 785              	.LFB4532:
+  55:parameters/effectparameter.cpp ****     return minValue_;
+ 786              		.loc 1 55 39 is_stmt 1 view -0
+ 787              		.cfi_startproc
+ 788              		@ args = 0, pretend = 0, frame = 0
+ 789              		@ frame_needed = 0, uses_anonymous_args = 0
+ 790              		@ link register save eliminated.
+  56:parameters/effectparameter.cpp **** }
+ 791              		.loc 1 56 5 view .LVU187
+  57:parameters/effectparameter.cpp **** 
+ 792              		.loc 1 57 1 is_stmt 0 view .LVU188
+ 793 0000 90ED020A 		vldr.32	s0, [r0, #8]
+ 794 0004 7047     		bx	lr
+ 795              		.cfi_endproc
+ 796              	.LFE4532:
+ 798 0006 00BF     		.section	.text._ZNK11perspective15EffectParameter6GetMaxEv,"ax",%progbits
+ 799              		.align	1
+ 800              		.p2align 2,,3
+ 801              		.global	_ZNK11perspective15EffectParameter6GetMaxEv
+ 802              		.syntax unified
+ 803              		.thumb
+ 804              		.thumb_func
+ 806              	_ZNK11perspective15EffectParameter6GetMaxEv:
+ 807              	.LVL61:
+ 808              	.LFB4533:
+  59:parameters/effectparameter.cpp ****     return maxValue_;
+ 809              		.loc 1 59 39 is_stmt 1 view -0
+ 810              		.cfi_startproc
+ 811              		@ args = 0, pretend = 0, frame = 0
+ 812              		@ frame_needed = 0, uses_anonymous_args = 0
+ 813              		@ link register save eliminated.
+  60:parameters/effectparameter.cpp **** }
+ 814              		.loc 1 60 5 view .LVU190
+  61:parameters/effectparameter.cpp **** 
+ 815              		.loc 1 61 1 is_stmt 0 view .LVU191
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s 			page 23
+
+
+ 816 0000 90ED030A 		vldr.32	s0, [r0, #12]
+ 817 0004 7047     		bx	lr
+ 818              		.cfi_endproc
+ 819              	.LFE4533:
+ 821 0006 00BF     		.section	.text._ZNK11perspective15EffectParameter8GetIndexEv,"ax",%progbits
+ 822              		.align	1
+ 823              		.p2align 2,,3
+ 824              		.global	_ZNK11perspective15EffectParameter8GetIndexEv
+ 825              		.syntax unified
+ 826              		.thumb
+ 827              		.thumb_func
+ 829              	_ZNK11perspective15EffectParameter8GetIndexEv:
+ 830              	.LVL62:
+ 831              	.LFB4534:
+  63:parameters/effectparameter.cpp ****     return index_;
+ 832              		.loc 1 63 39 is_stmt 1 view -0
+ 833              		.cfi_startproc
+ 834              		@ args = 0, pretend = 0, frame = 0
+ 835              		@ frame_needed = 0, uses_anonymous_args = 0
+ 836              		@ link register save eliminated.
+  64:parameters/effectparameter.cpp **** }
+ 837              		.loc 1 64 5 view .LVU193
+  65:parameters/effectparameter.cpp **** 
+ 838              		.loc 1 65 1 is_stmt 0 view .LVU194
+ 839 0000 4069     		ldr	r0, [r0, #20]
+ 840              	.LVL63:
+  65:parameters/effectparameter.cpp **** 
+ 841              		.loc 1 65 1 view .LVU195
+ 842 0002 7047     		bx	lr
+ 843              		.cfi_endproc
+ 844              	.LFE4534:
+ 846              		.section	.text._ZNK11perspective15EffectParameter15GetDisplayIndexEv,"ax",%progbits
+ 847              		.align	1
+ 848              		.p2align 2,,3
+ 849              		.global	_ZNK11perspective15EffectParameter15GetDisplayIndexEv
+ 850              		.syntax unified
+ 851              		.thumb
+ 852              		.thumb_func
+ 854              	_ZNK11perspective15EffectParameter15GetDisplayIndexEv:
+ 855              	.LVL64:
+ 856              	.LFB4535:
+  67:parameters/effectparameter.cpp ****     return displayIndex_;
+ 857              		.loc 1 67 46 is_stmt 1 view -0
+ 858              		.cfi_startproc
+ 859              		@ args = 0, pretend = 0, frame = 0
+ 860              		@ frame_needed = 0, uses_anonymous_args = 0
+ 861              		@ link register save eliminated.
+  68:parameters/effectparameter.cpp **** }
+ 862              		.loc 1 68 5 view .LVU197
+  69:parameters/effectparameter.cpp **** 
+ 863              		.loc 1 69 1 is_stmt 0 view .LVU198
+ 864 0000 8069     		ldr	r0, [r0, #24]
+ 865              	.LVL65:
+  69:parameters/effectparameter.cpp **** 
+ 866              		.loc 1 69 1 view .LVU199
+ 867 0002 7047     		bx	lr
+ 868              		.cfi_endproc
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s 			page 24
+
+
+ 869              	.LFE4535:
+ 871              		.section	.text._ZN11perspective15EffectParameter18SetNormalizedValueEf,"ax",%progbits
+ 872              		.align	1
+ 873              		.p2align 2,,3
+ 874              		.global	_ZN11perspective15EffectParameter18SetNormalizedValueEf
+ 875              		.syntax unified
+ 876              		.thumb
+ 877              		.thumb_func
+ 879              	_ZN11perspective15EffectParameter18SetNormalizedValueEf:
+ 880              	.LVL66:
+ 881              	.LFB4537:
+  75:parameters/effectparameter.cpp ****     float clampedNormalized = clamp(normalizedValue, 0.0f, 1.0f);
+ 882              		.loc 1 75 65 is_stmt 1 view -0
+ 883              		.cfi_startproc
+ 884              		@ args = 0, pretend = 0, frame = 0
+ 885              		@ frame_needed = 0, uses_anonymous_args = 0
+ 886              		@ link register save eliminated.
+  76:parameters/effectparameter.cpp ****     currentValue_ = minValue_ + (clampedNormalized * (maxValue_ - minValue_));
+ 887              		.loc 1 76 5 view .LVU201
+ 888              	.LBB161:
+ 889              	.LBI161:
+  15:parameters/effectparameter.h ****     return (v < lo) ? lo : (hi < v) ? hi : v;
+ 890              		.loc 2 15 27 view .LVU202
+ 891              	.LBB162:
+ 892              		.loc 2 16 21 is_stmt 0 view .LVU203
+ 893 0000 B5EEC00A 		vcmpe.f32	s0, #0
+ 894 0004 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 895 0008 12D4     		bmi	.L61
+ 896 000a F7EE006A 		vmov.f32	s13, #1.0e+0
+ 897 000e B4EEE60A 		vcmpe.f32	s0, s13
+ 898 0012 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 899 0016 76FE806A 		vselgt.f32	s13, s13, s0
+ 900              	.L60:
+ 901              	.LVL67:
+ 902              		.loc 2 16 21 view .LVU204
+ 903              	.LBE162:
+ 904              	.LBE161:
+  77:parameters/effectparameter.cpp **** }
+ 905              		.loc 1 77 5 is_stmt 1 view .LVU205
+  77:parameters/effectparameter.cpp **** }
+ 906              		.loc 1 77 21 is_stmt 0 view .LVU206
+ 907 001a D0ED027A 		vldr.32	s15, [r0, #8]
+  77:parameters/effectparameter.cpp **** }
+ 908              		.loc 1 77 65 view .LVU207
+ 909 001e 90ED037A 		vldr.32	s14, [r0, #12]
+ 910 0022 37EE677A 		vsub.f32	s14, s14, s15
+  77:parameters/effectparameter.cpp **** }
+ 911              		.loc 1 77 31 view .LVU208
+ 912 0026 E7EE267A 		vfma.f32	s15, s14, s13
+  77:parameters/effectparameter.cpp **** }
+ 913              		.loc 1 77 19 view .LVU209
+ 914 002a C0ED047A 		vstr.32	s15, [r0, #16]
+  78:parameters/effectparameter.cpp **** 
+ 915              		.loc 1 78 1 view .LVU210
+ 916 002e 7047     		bx	lr
+ 917              	.LVL68:
+ 918              	.L61:
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s 			page 25
+
+
+ 919              	.LBB164:
+ 920              	.LBB163:
+ 921              		.loc 2 16 21 discriminator 1 view .LVU211
+ 922 0030 DFED016A 		vldr.32	s13, .L62
+ 923 0034 F1E7     		b	.L60
+ 924              	.L63:
+ 925 0036 00BF     		.align	2
+ 926              	.L62:
+ 927 0038 00000000 		.word	0
+ 928              	.LBE163:
+ 929              	.LBE164:
+ 930              		.cfi_endproc
+ 931              	.LFE4537:
+ 933              		.section	.text._ZN11perspective15EffectParameter8SetIndexEi,"ax",%progbits
+ 934              		.align	1
+ 935              		.p2align 2,,3
+ 936              		.global	_ZN11perspective15EffectParameter8SetIndexEi
+ 937              		.syntax unified
+ 938              		.thumb
+ 939              		.thumb_func
+ 941              	_ZN11perspective15EffectParameter8SetIndexEi:
+ 942              	.LVL69:
+ 943              	.LFB4539:
+  80:parameters/effectparameter.cpp ****     index_ = index;
+ 944              		.loc 1 80 43 is_stmt 1 view -0
+ 945              		.cfi_startproc
+ 946              		@ args = 0, pretend = 0, frame = 0
+ 947              		@ frame_needed = 0, uses_anonymous_args = 0
+ 948              		@ link register save eliminated.
+  81:parameters/effectparameter.cpp **** }
+ 949              		.loc 1 81 5 view .LVU213
+  81:parameters/effectparameter.cpp **** }
+ 950              		.loc 1 81 12 is_stmt 0 view .LVU214
+ 951 0000 4161     		str	r1, [r0, #20]
+  82:parameters/effectparameter.cpp **** 
+ 952              		.loc 1 82 1 view .LVU215
+ 953 0002 7047     		bx	lr
+ 954              		.cfi_endproc
+ 955              	.LFE4539:
+ 957              		.section	.text._ZN11perspective15EffectParameter15SetDisplayIndexEi,"ax",%progbits
+ 958              		.align	1
+ 959              		.p2align 2,,3
+ 960              		.global	_ZN11perspective15EffectParameter15SetDisplayIndexEi
+ 961              		.syntax unified
+ 962              		.thumb
+ 963              		.thumb_func
+ 965              	_ZN11perspective15EffectParameter15SetDisplayIndexEi:
+ 966              	.LVL70:
+ 967              	.LFB4540:
+  84:parameters/effectparameter.cpp ****     displayIndex_ = displayIndex;
+ 968              		.loc 1 84 57 is_stmt 1 view -0
+ 969              		.cfi_startproc
+ 970              		@ args = 0, pretend = 0, frame = 0
+ 971              		@ frame_needed = 0, uses_anonymous_args = 0
+ 972              		@ link register save eliminated.
+  85:parameters/effectparameter.cpp **** }
+ 973              		.loc 1 85 5 view .LVU217
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s 			page 26
+
+
+  85:parameters/effectparameter.cpp **** }
+ 974              		.loc 1 85 19 is_stmt 0 view .LVU218
+ 975 0000 8161     		str	r1, [r0, #24]
+  86:parameters/effectparameter.cpp **** 
+ 976              		.loc 1 86 1 view .LVU219
+ 977 0002 7047     		bx	lr
+ 978              		.cfi_endproc
+ 979              	.LFE4540:
+ 981              		.section	.text._ZN11perspective15EffectParameter14SetDisplayTypeENS_11DisplayTypeE,"ax",%progbits
+ 982              		.align	1
+ 983              		.p2align 2,,3
+ 984              		.global	_ZN11perspective15EffectParameter14SetDisplayTypeENS_11DisplayTypeE
+ 985              		.syntax unified
+ 986              		.thumb
+ 987              		.thumb_func
+ 989              	_ZN11perspective15EffectParameter14SetDisplayTypeENS_11DisplayTypeE:
+ 990              	.LVL71:
+ 991              	.LFB4541:
+  88:parameters/effectparameter.cpp ****     displayType_ = type;
+ 992              		.loc 1 88 56 is_stmt 1 view -0
+ 993              		.cfi_startproc
+ 994              		@ args = 0, pretend = 0, frame = 0
+ 995              		@ frame_needed = 0, uses_anonymous_args = 0
+ 996              		@ link register save eliminated.
+  89:parameters/effectparameter.cpp **** }
+ 997              		.loc 1 89 5 view .LVU221
+  89:parameters/effectparameter.cpp **** }
+ 998              		.loc 1 89 18 is_stmt 0 view .LVU222
+ 999 0000 C161     		str	r1, [r0, #28]
+  90:parameters/effectparameter.cpp **** 
+ 1000              		.loc 1 90 1 view .LVU223
+ 1001 0002 7047     		bx	lr
+ 1002              		.cfi_endproc
+ 1003              	.LFE4541:
+ 1005              		.section	.text._ZN11perspective15EffectParameter14SetScaleFactorEf,"ax",%progbits
+ 1006              		.align	1
+ 1007              		.p2align 2,,3
+ 1008              		.global	_ZN11perspective15EffectParameter14SetScaleFactorEf
+ 1009              		.syntax unified
+ 1010              		.thumb
+ 1011              		.thumb_func
+ 1013              	_ZN11perspective15EffectParameter14SetScaleFactorEf:
+ 1014              	.LVL72:
+ 1015              	.LFB4542:
+  92:parameters/effectparameter.cpp ****     scaleFactor_ = scaleFactor;
+ 1016              		.loc 1 92 57 is_stmt 1 view -0
+ 1017              		.cfi_startproc
+ 1018              		@ args = 0, pretend = 0, frame = 0
+ 1019              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1020              		@ link register save eliminated.
+  93:parameters/effectparameter.cpp **** }
+ 1021              		.loc 1 93 5 view .LVU225
+  93:parameters/effectparameter.cpp **** }
+ 1022              		.loc 1 93 18 is_stmt 0 view .LVU226
+ 1023 0000 80ED080A 		vstr.32	s0, [r0, #32]
+  94:parameters/effectparameter.cpp **** 
+ 1024              		.loc 1 94 1 view .LVU227
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s 			page 27
+
+
+ 1025 0004 7047     		bx	lr
+ 1026              		.cfi_endproc
+ 1027              	.LFE4542:
+ 1029 0006 00BF     		.section	.rodata._ZN11perspective15EffectParameter17SetDiscreteValuesEPPKci.str1.4,"aMS",%progbits
+ 1030              		.align	2
+ 1031              	.LC4:
+ 1032 0000 45666665 		.ascii	"EffectParameter '%s' discrete value %d: %s\000"
+ 1032      63745061 
+ 1032      72616D65 
+ 1032      74657220 
+ 1032      27257327 
+ 1033              		.section	.text._ZN11perspective15EffectParameter17SetDiscreteValuesEPPKci,"ax",%progbits
+ 1034              		.align	1
+ 1035              		.p2align 2,,3
+ 1036              		.global	_ZN11perspective15EffectParameter17SetDiscreteValuesEPPKci
+ 1037              		.syntax unified
+ 1038              		.thumb
+ 1039              		.thumb_func
+ 1041              	_ZN11perspective15EffectParameter17SetDiscreteValuesEPPKci:
+ 1042              	.LVL73:
+ 1043              	.LFB4543:
+  96:parameters/effectparameter.cpp ****     for (int i = 0; i < count; ++i) {
+ 1044              		.loc 1 96 73 is_stmt 1 view -0
+ 1045              		.cfi_startproc
+ 1046              		@ args = 0, pretend = 0, frame = 0
+ 1047              		@ frame_needed = 0, uses_anonymous_args = 0
+  97:parameters/effectparameter.cpp ****         Hardware::PrintLine("EffectParameter '%s' discrete value %d: %s", GetName(), i, values[i]);
+ 1048              		.loc 1 97 5 view .LVU229
+ 1049              	.LBB165:
+  97:parameters/effectparameter.cpp ****         Hardware::PrintLine("EffectParameter '%s' discrete value %d: %s", GetName(), i, values[i]);
+ 1050              		.loc 1 97 23 discriminator 1 view .LVU230
+ 1051              	.LBE165:
+  96:parameters/effectparameter.cpp ****     for (int i = 0; i < count; ++i) {
+ 1052              		.loc 1 96 73 is_stmt 0 view .LVU231
+ 1053 0000 2DE9F041 		push	{r4, r5, r6, r7, r8, lr}
+ 1054              		.cfi_def_cfa_offset 24
+ 1055              		.cfi_offset 4, -24
+ 1056              		.cfi_offset 5, -20
+ 1057              		.cfi_offset 6, -16
+ 1058              		.cfi_offset 7, -12
+ 1059              		.cfi_offset 8, -8
+ 1060              		.cfi_offset 14, -4
+ 1061              	.LBB172:
+  97:parameters/effectparameter.cpp ****         Hardware::PrintLine("EffectParameter '%s' discrete value %d: %s", GetName(), i, values[i]);
+ 1062              		.loc 1 97 23 discriminator 1 view .LVU232
+ 1063 0004 171E     		subs	r7, r2, #0
+ 1064              	.LBE172:
+  96:parameters/effectparameter.cpp ****     for (int i = 0; i < count; ++i) {
+ 1065              		.loc 1 96 73 view .LVU233
+ 1066 0006 0646     		mov	r6, r0
+ 1067 0008 8846     		mov	r8, r1
+ 1068              	.LBB173:
+  97:parameters/effectparameter.cpp ****         Hardware::PrintLine("EffectParameter '%s' discrete value %d: %s", GetName(), i, values[i]);
+ 1069              		.loc 1 97 23 discriminator 1 view .LVU234
+ 1070 000a 0BDD     		ble	.L69
+ 1071 000c 0D1F     		subs	r5, r1, #4
+  97:parameters/effectparameter.cpp ****         Hardware::PrintLine("EffectParameter '%s' discrete value %d: %s", GetName(), i, values[i]);
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s 			page 28
+
+
+ 1072              		.loc 1 97 14 view .LVU235
+ 1073 000e 0024     		movs	r4, #0
+ 1074              	.LVL74:
+ 1075              	.L70:
+  98:parameters/effectparameter.cpp ****     }
+ 1076              		.loc 1 98 9 is_stmt 1 view .LVU236
+ 1077              	.LBB166:
+ 1078              	.LBI166:
+  51:parameters/effectparameter.cpp ****     return name_;
+ 1079              		.loc 1 51 13 view .LVU237
+ 1080              	.LBB167:
+  52:parameters/effectparameter.cpp **** }
+ 1081              		.loc 1 52 5 view .LVU238
+  52:parameters/effectparameter.cpp **** }
+ 1082              		.loc 1 52 5 is_stmt 0 view .LVU239
+ 1083              	.LBE167:
+ 1084              	.LBE166:
+ 1085              	.LBB168:
+ 1086              	.LBI168:
+ 126:dependencies/libDaisy/src/daisy_seed.h ****     {
+ 1087              		.loc 3 126 17 is_stmt 1 view .LVU240
+ 1088              	.LBB169:
+ 1089              		.loc 3 128 23 is_stmt 0 view .LVU241
+ 1090 0010 2246     		mov	r2, r4
+ 1091              	.LBE169:
+ 1092              	.LBE168:
+  97:parameters/effectparameter.cpp ****         Hardware::PrintLine("EffectParameter '%s' discrete value %d: %s", GetName(), i, values[i]);
+ 1093              		.loc 1 97 5 discriminator 3 view .LVU242
+ 1094 0012 0134     		adds	r4, r4, #1
+ 1095              	.LVL75:
+ 1096              	.LBB171:
+ 1097              	.LBB170:
+ 1098              		.loc 3 128 23 view .LVU243
+ 1099 0014 55F8043F 		ldr	r3, [r5, #4]!
+ 1100              	.LVL76:
+ 1101              		.loc 3 128 23 view .LVU244
+ 1102 0018 7168     		ldr	r1, [r6, #4]
+ 1103 001a 0448     		ldr	r0, .L73
+ 1104 001c FFF7FEFF 		bl	_ZN5daisy6LoggerILNS_17LoggerDestinationE1EE9PrintLineEPKcz
+ 1105              	.LVL77:
+ 1106              		.loc 3 128 23 view .LVU245
+ 1107              	.LBE170:
+ 1108              	.LBE171:
+  97:parameters/effectparameter.cpp ****         Hardware::PrintLine("EffectParameter '%s' discrete value %d: %s", GetName(), i, values[i]);
+ 1109              		.loc 1 97 5 is_stmt 1 discriminator 3 view .LVU246
+  97:parameters/effectparameter.cpp ****         Hardware::PrintLine("EffectParameter '%s' discrete value %d: %s", GetName(), i, values[i]);
+ 1110              		.loc 1 97 23 discriminator 1 view .LVU247
+ 1111 0020 A742     		cmp	r7, r4
+ 1112 0022 F5D1     		bne	.L70
+ 1113              	.LVL78:
+ 1114              	.L69:
+  97:parameters/effectparameter.cpp ****         Hardware::PrintLine("EffectParameter '%s' discrete value %d: %s", GetName(), i, values[i]);
+ 1115              		.loc 1 97 23 is_stmt 0 discriminator 1 view .LVU248
+ 1116              	.LBE173:
+ 100:parameters/effectparameter.cpp ****     discreteValueCount_ = count;
+ 1117              		.loc 1 100 5 is_stmt 1 view .LVU249
+ 101:parameters/effectparameter.cpp **** }
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s 			page 29
+
+
+ 1118              		.loc 1 101 25 is_stmt 0 view .LVU250
+ 1119 0024 C6E90987 		strd	r8, r7, [r6, #36]
+ 102:parameters/effectparameter.cpp **** 
+ 1120              		.loc 1 102 1 view .LVU251
+ 1121 0028 BDE8F081 		pop	{r4, r5, r6, r7, r8, pc}
+ 1122              	.LVL79:
+ 1123              	.L74:
+ 102:parameters/effectparameter.cpp **** 
+ 1124              		.loc 1 102 1 view .LVU252
+ 1125              		.align	2
+ 1126              	.L73:
+ 1127 002c 00000000 		.word	.LC4
+ 1128              		.cfi_endproc
+ 1129              	.LFE4543:
+ 1131              		.section	.text._ZN11perspective15EffectParameter8SetRangeEff,"ax",%progbits
+ 1132              		.align	1
+ 1133              		.p2align 2,,3
+ 1134              		.global	_ZN11perspective15EffectParameter8SetRangeEff
+ 1135              		.syntax unified
+ 1136              		.thumb
+ 1137              		.thumb_func
+ 1139              	_ZN11perspective15EffectParameter8SetRangeEff:
+ 1140              	.LVL80:
+ 1141              	.LFB4544:
+ 104:parameters/effectparameter.cpp ****     if (maxValue <= minValue) {
+ 1142              		.loc 1 104 64 is_stmt 1 view -0
+ 1143              		.cfi_startproc
+ 1144              		@ args = 0, pretend = 0, frame = 0
+ 1145              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1146              		@ link register save eliminated.
+ 105:parameters/effectparameter.cpp ****         return;
+ 1147              		.loc 1 105 5 view .LVU254
+ 1148 0000 F4EEC00A 		vcmpe.f32	s1, s0
+ 1149 0004 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 1150 0008 0CD9     		bls	.L75
+ 109:parameters/effectparameter.cpp ****     maxValue_ = maxValue;
+ 1151              		.loc 1 109 5 view .LVU255
+ 1152              	.LBB174:
+ 1153              	.LBB175:
+ 1154              		.loc 2 16 15 is_stmt 0 view .LVU256
+ 1155 000a D0ED047A 		vldr.32	s15, [r0, #16]
+ 1156              	.LBE175:
+ 1157              	.LBE174:
+ 109:parameters/effectparameter.cpp ****     maxValue_ = maxValue;
+ 1158              		.loc 1 109 15 view .LVU257
+ 1159 000e 80ED020A 		vstr.32	s0, [r0, #8]
+ 110:parameters/effectparameter.cpp ****     currentValue_ = clamp(currentValue_, minValue_, maxValue_);
+ 1160              		.loc 1 110 5 is_stmt 1 view .LVU258
+ 1161              	.LBB179:
+ 1162              	.LBB176:
+ 1163              		.loc 2 16 21 is_stmt 0 view .LVU259
+ 1164 0012 B4EEE70A 		vcmpe.f32	s0, s15
+ 1165              	.LBE176:
+ 1166              	.LBE179:
+ 110:parameters/effectparameter.cpp ****     currentValue_ = clamp(currentValue_, minValue_, maxValue_);
+ 1167              		.loc 1 110 15 view .LVU260
+ 1168 0016 C0ED030A 		vstr.32	s1, [r0, #12]
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s 			page 30
+
+
+ 111:parameters/effectparameter.cpp **** }
+ 1169              		.loc 1 111 5 is_stmt 1 view .LVU261
+ 1170              	.LVL81:
+ 1171              	.LBB180:
+ 1172              	.LBI174:
+  15:parameters/effectparameter.h ****     return (v < lo) ? lo : (hi < v) ? hi : v;
+ 1173              		.loc 2 15 27 view .LVU262
+ 1174              	.LBB177:
+ 1175              		.loc 2 16 21 is_stmt 0 view .LVU263
+ 1176 001a F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 1177 001e 02DD     		ble	.L78
+ 1178              	.LVL82:
+ 1179              	.L77:
+ 1180              		.loc 2 16 21 view .LVU264
+ 1181              	.LBE177:
+ 1182              	.LBE180:
+ 111:parameters/effectparameter.cpp **** }
+ 1183              		.loc 1 111 19 discriminator 1 view .LVU265
+ 1184 0020 80ED040A 		vstr.32	s0, [r0, #16]
+ 1185              	.LVL83:
+ 1186              	.L75:
+ 112:parameters/effectparameter.cpp **** 
+ 1187              		.loc 1 112 1 view .LVU266
+ 1188 0024 7047     		bx	lr
+ 1189              	.LVL84:
+ 1190              	.L78:
+ 112:parameters/effectparameter.cpp **** 
+ 1191              		.loc 1 112 1 view .LVU267
+ 1192 0026 F4EEE70A 		vcmpe.f32	s1, s15
+ 1193 002a F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 1194 002e 54BF     		ite	pl
+ 1195 0030 B0EE670A 		vmovpl.f32	s0, s15
+ 1196 0034 B0EE600A 		vmovmi.f32	s0, s1
+ 1197              	.LVL85:
+ 1198              	.LBB181:
+ 1199              	.LBB178:
+ 112:parameters/effectparameter.cpp **** 
+ 1200              		.loc 1 112 1 view .LVU268
+ 1201 0038 F2E7     		b	.L77
+ 1202              	.LBE178:
+ 1203              	.LBE181:
+ 1204              		.cfi_endproc
+ 1205              	.LFE4544:
+ 1207 003a 00BF     		.section	.text._ZNK11perspective15EffectParameter13GetValueAsIntEi,"ax",%progbits
+ 1208              		.align	1
+ 1209              		.p2align 2,,3
+ 1210              		.global	_ZNK11perspective15EffectParameter13GetValueAsIntEi
+ 1211              		.syntax unified
+ 1212              		.thumb
+ 1213              		.thumb_func
+ 1215              	_ZNK11perspective15EffectParameter13GetValueAsIntEi:
+ 1216              	.LVL86:
+ 1217              	.LFB4545:
+ 114:parameters/effectparameter.cpp ****     // Get normalized value (0.0 to 1.0)
+ 1218              		.loc 1 114 54 is_stmt 1 view -0
+ 1219              		.cfi_startproc
+ 1220              		@ args = 0, pretend = 0, frame = 0
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s 			page 31
+
+
+ 1221              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1222              		@ link register save eliminated.
+ 116:parameters/effectparameter.cpp ****     
+ 1223              		.loc 1 116 5 view .LVU270
+ 1224              	.LBB182:
+ 1225              	.LBI182:
+  44:parameters/effectparameter.cpp ****     if (maxValue_ <= minValue_) {
+ 1226              		.loc 1 44 7 view .LVU271
+ 1227              	.LBB183:
+  45:parameters/effectparameter.cpp ****         return 0.0f;
+ 1228              		.loc 1 45 5 view .LVU272
+  45:parameters/effectparameter.cpp ****         return 0.0f;
+ 1229              		.loc 1 45 9 is_stmt 0 view .LVU273
+ 1230 0000 D0ED037A 		vldr.32	s15, [r0, #12]
+  45:parameters/effectparameter.cpp ****         return 0.0f;
+ 1231              		.loc 1 45 22 view .LVU274
+ 1232 0004 90ED027A 		vldr.32	s14, [r0, #8]
+  45:parameters/effectparameter.cpp ****         return 0.0f;
+ 1233              		.loc 1 45 5 view .LVU275
+ 1234 0008 F4EEC77A 		vcmpe.f32	s15, s14
+ 1235 000c F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 1236 0010 1BD9     		bls	.L82
+  48:parameters/effectparameter.cpp **** }
+ 1237              		.loc 1 48 5 is_stmt 1 view .LVU276
+  48:parameters/effectparameter.cpp **** }
+ 1238              		.loc 1 48 27 is_stmt 0 view .LVU277
+ 1239 0012 D0ED046A 		vldr.32	s13, [r0, #16]
+  48:parameters/effectparameter.cpp **** }
+ 1240              		.loc 1 48 53 view .LVU278
+ 1241 0016 77EEC77A 		vsub.f32	s15, s15, s14
+  48:parameters/effectparameter.cpp **** }
+ 1242              		.loc 1 48 27 view .LVU279
+ 1243 001a 36EEC77A 		vsub.f32	s14, s13, s14
+  48:parameters/effectparameter.cpp **** }
+ 1244              		.loc 1 48 64 view .LVU280
+ 1245 001e C7EE276A 		vdiv.f32	s13, s14, s15
+ 1246              	.L80:
+ 1247              	.LVL87:
+  48:parameters/effectparameter.cpp **** }
+ 1248              		.loc 1 48 64 view .LVU281
+ 1249              	.LBE183:
+ 1250              	.LBE182:
+ 120:parameters/effectparameter.cpp ****     
+ 1251              		.loc 1 120 5 is_stmt 1 view .LVU282
+ 120:parameters/effectparameter.cpp ****     
+ 1252              		.loc 1 120 48 is_stmt 0 view .LVU283
+ 1253 0022 07EE901A 		vmov	s15, r1	@ int
+ 1254 0026 B8EEE77A 		vcvt.f32.s32	s14, s15
+ 120:parameters/effectparameter.cpp ****     
+ 1255              		.loc 1 120 57 view .LVU284
+ 1256 002a F6EE007A 		vmov.f32	s15, #5.0e-1
+ 1257 002e E7EE267A 		vfma.f32	s15, s14, s13
+ 120:parameters/effectparameter.cpp ****     
+ 1258              		.loc 1 120 20 view .LVU285
+ 1259 0032 FDEEE77A 		vcvt.s32.f32	s15, s15
+ 1260 0036 17EE900A 		vmov	r0, s15	@ int
+ 1261              	.LVL88:
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s 			page 32
+
+
+ 123:parameters/effectparameter.cpp **** }
+ 1262              		.loc 1 123 5 is_stmt 1 view .LVU286
+ 1263              	.LBB185:
+ 1264              	.LBI185:
+  15:parameters/effectparameter.h ****     return (v < lo) ? lo : (hi < v) ? hi : v;
+ 1265              		.loc 2 15 27 view .LVU287
+ 1266              	.LBB186:
+ 1267              		.loc 2 16 21 is_stmt 0 view .LVU288
+ 1268 003a 0028     		cmp	r0, #0
+ 1269 003c 03DB     		blt	.L83
+ 1270              		.loc 2 16 21 discriminator 1 view .LVU289
+ 1271 003e 8842     		cmp	r0, r1
+ 1272 0040 A8BF     		it	ge
+ 1273 0042 0846     		movge	r0, r1
+ 1274 0044 7047     		bx	lr
+ 1275              	.L83:
+ 1276              		.loc 2 16 21 discriminator 2 view .LVU290
+ 1277 0046 0020     		movs	r0, #0
+ 1278              	.LVL89:
+ 1279              		.loc 2 16 21 discriminator 2 view .LVU291
+ 1280              	.LBE186:
+ 1281              	.LBE185:
+ 124:parameters/effectparameter.cpp **** 
+ 1282              		.loc 1 124 1 view .LVU292
+ 1283 0048 7047     		bx	lr
+ 1284              	.LVL90:
+ 1285              	.L82:
+ 1286              	.LBB187:
+ 1287              	.LBB184:
+  46:parameters/effectparameter.cpp ****     }
+ 1288              		.loc 1 46 16 view .LVU293
+ 1289 004a DFED016A 		vldr.32	s13, .L84
+ 1290 004e E8E7     		b	.L80
+ 1291              	.L85:
+ 1292              		.align	2
+ 1293              	.L84:
+ 1294 0050 00000000 		.word	0
+ 1295              	.LBE184:
+ 1296              	.LBE187:
+ 1297              		.cfi_endproc
+ 1298              	.LFE4545:
+ 1300              		.global	_ZTVN11perspective15EffectParameterE
+ 1301              		.section	.rodata._ZTVN11perspective15EffectParameterE,"a"
+ 1302              		.align	2
+ 1305              	_ZTVN11perspective15EffectParameterE:
+ 1306 0000 00000000 		.word	0
+ 1307 0004 00000000 		.word	0
+ 1308 0008 00000000 		.word	0
+ 1309 000c 00000000 		.word	0
+ 1310 0010 00000000 		.word	__cxa_pure_virtual
+ 1311 0014 00000000 		.word	_ZNK11perspective15EffectParameter16GetValueAsStringEPcj
+ 1312 0018 00000000 		.word	_ZN11perspective15EffectParameter8SetValueEf
+ 1313              		.weak	__cxa_pure_virtual
+ 1314              		.text
+ 1315              	.Letext0:
+ 1316              		.file 4 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/ma
+ 1317              		.file 5 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/sy
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s 			page 33
+
+
+ 1318              		.file 6 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/st
+ 1319              		.file 7 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/lib/gcc/arm-none-eabi/14
+ 1320              		.file 8 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c+
+ 1321              		.file 9 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c+
+ 1322              		.file 10 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 1323              		.file 11 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 1324              		.file 12 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 1325              		.file 13 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 1326              		.file 14 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 1327              		.file 15 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 1328              		.file 16 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 1329              		.file 17 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 1330              		.file 18 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 1331              		.file 19 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 1332              		.file 20 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 1333              		.file 21 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 1334              		.file 22 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 1335              		.file 23 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 1336              		.file 24 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 1337              		.file 25 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 1338              		.file 26 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/s
+ 1339              		.file 27 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/s
+ 1340              		.file 28 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/s
+ 1341              		.file 29 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/m
+ 1342              		.file 30 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/s
+ 1343              		.file 31 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 1344              		.file 32 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 1345              		.file 33 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 1346              		.file 34 "dependencies/libDaisy/src/daisy_core.h"
+ 1347              		.file 35 "dependencies/libDaisy/src/sys/system.h"
+ 1348              		.file 36 "dependencies/libDaisy/src/per/qspi.h"
+ 1349              		.file 37 "dependencies/libDaisy/src/per/dac.h"
+ 1350              		.file 38 "dependencies/libDaisy/src/per/gpio.h"
+ 1351              		.file 39 "dependencies/libDaisy/src/per/sai.h"
+ 1352              		.file 40 "dependencies/libDaisy/src/hid/audio.h"
+ 1353              		.file 41 "dependencies/libDaisy/src/per/adc.h"
+ 1354              		.file 42 "dependencies/libDaisy/src/hid/usb.h"
+ 1355              		.file 43 "dependencies/libDaisy/src/hid/logger_impl.h"
+ 1356              		.file 44 "dependencies/libDaisy/src/dev/codec_ak4556.h"
+ 1357              		.file 45 "dependencies/libDaisy/src/dev/max11300.h"
+ 1358              		.file 46 "dependencies/libDaisy/src/dev/sr_595.h"
+ 1359              		.file 47 "dependencies/libDaisy/src/util/wav_format.h"
+ 1360              		.file 48 "dependencies/libDaisy/src/hid/logger.h"
+ 1361              		.file 49 "dependencies/libDaisy/src/dev/sdram.h"
+ 1362              		.file 50 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 1363              		.file 51 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/lib/gcc/arm-none-eabi/1
+ 1364              		.file 52 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/s
+ 1365              		.file 53 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/s
+ 1366              		.file 54 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/w
+ 1367              		.file 55 "dependencies/libDaisy/Middlewares/Third_Party/FatFs/src/integer.h"
+ 1368              		.file 56 "dependencies/libDaisy/Middlewares/Third_Party/FatFs/src/ff.h"
+ 1369              		.file 57 "parameters/../controls.h"
+ 1370              		.file 58 "parameters/../ui/switch.h"
+ 1371              		.file 59 "parameters/../ui/encoder.h"
+ 1372              		.file 60 "parameters/../hardware.h"
+ 1373              		.file 61 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ 1374              		.file 62 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/arm-none-eabi/include/c
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s 			page 34
+
+
+ 1375              		.file 63 "<built-in>"
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s 			page 35
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 effectparameter.cpp
+C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s:20     .text._ZN11perspective15EffectParameter8SetValueEf:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s:27     .text._ZN11perspective15EffectParameter8SetValueEf:00000000 _ZN11perspective15EffectParameter8SetValueEf
+C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s:66     .rodata._ZNK11perspective15EffectParameter16GetValueAsStringEPcj.str1.4:00000000 $d
+C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s:79     .text._ZNK11perspective15EffectParameter16GetValueAsStringEPcj:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s:86     .text._ZNK11perspective15EffectParameter16GetValueAsStringEPcj:00000000 _ZNK11perspective15EffectParameter16GetValueAsStringEPcj
+C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s:438    .text._ZNK11perspective15EffectParameter16GetValueAsStringEPcj:000000e4 $d
+C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s:454    .text._ZN11perspective15EffectParameterC2EPKcfffii:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s:461    .text._ZN11perspective15EffectParameterC2EPKcfffii:00000000 _ZN11perspective15EffectParameterC2EPKcfffii
+C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s:553    .text._ZN11perspective15EffectParameterC2EPKcfffii:00000044 $d
+C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s:1305   .rodata._ZTVN11perspective15EffectParameterE:00000000 _ZTVN11perspective15EffectParameterE
+C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s:461    .text._ZN11perspective15EffectParameterC2EPKcfffii:00000000 _ZN11perspective15EffectParameterC1EPKcfffii
+C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s:560    .text._ZN11perspective15EffectParameterD2Ev:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s:567    .text._ZN11perspective15EffectParameterD2Ev:00000000 _ZN11perspective15EffectParameterD2Ev
+C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s:608    .text._ZN11perspective15EffectParameterD2Ev:00000014 $d
+C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s:567    .text._ZN11perspective15EffectParameterD2Ev:00000000 _ZN11perspective15EffectParameterD1Ev
+C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s:615    .text._ZN11perspective15EffectParameterD0Ev:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s:622    .text._ZN11perspective15EffectParameterD0Ev:00000000 _ZN11perspective15EffectParameterD0Ev
+C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s:676    .text._ZN11perspective15EffectParameterD0Ev:0000001c $d
+C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s:681    .text._ZNK11perspective15EffectParameter8GetValueEv:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s:688    .text._ZNK11perspective15EffectParameter8GetValueEv:00000000 _ZNK11perspective15EffectParameter8GetValueEv
+C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s:704    .text._ZNK11perspective15EffectParameter18GetNormalizedValueEv:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s:711    .text._ZNK11perspective15EffectParameter18GetNormalizedValueEv:00000000 _ZNK11perspective15EffectParameter18GetNormalizedValueEv
+C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s:746    .text._ZNK11perspective15EffectParameter18GetNormalizedValueEv:0000002c $d
+C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s:751    .text._ZNK11perspective15EffectParameter7GetNameEv:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s:758    .text._ZNK11perspective15EffectParameter7GetNameEv:00000000 _ZNK11perspective15EffectParameter7GetNameEv
+C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s:776    .text._ZNK11perspective15EffectParameter6GetMinEv:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s:783    .text._ZNK11perspective15EffectParameter6GetMinEv:00000000 _ZNK11perspective15EffectParameter6GetMinEv
+C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s:799    .text._ZNK11perspective15EffectParameter6GetMaxEv:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s:806    .text._ZNK11perspective15EffectParameter6GetMaxEv:00000000 _ZNK11perspective15EffectParameter6GetMaxEv
+C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s:822    .text._ZNK11perspective15EffectParameter8GetIndexEv:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s:829    .text._ZNK11perspective15EffectParameter8GetIndexEv:00000000 _ZNK11perspective15EffectParameter8GetIndexEv
+C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s:847    .text._ZNK11perspective15EffectParameter15GetDisplayIndexEv:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s:854    .text._ZNK11perspective15EffectParameter15GetDisplayIndexEv:00000000 _ZNK11perspective15EffectParameter15GetDisplayIndexEv
+C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s:872    .text._ZN11perspective15EffectParameter18SetNormalizedValueEf:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s:879    .text._ZN11perspective15EffectParameter18SetNormalizedValueEf:00000000 _ZN11perspective15EffectParameter18SetNormalizedValueEf
+C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s:927    .text._ZN11perspective15EffectParameter18SetNormalizedValueEf:00000038 $d
+C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s:934    .text._ZN11perspective15EffectParameter8SetIndexEi:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s:941    .text._ZN11perspective15EffectParameter8SetIndexEi:00000000 _ZN11perspective15EffectParameter8SetIndexEi
+C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s:958    .text._ZN11perspective15EffectParameter15SetDisplayIndexEi:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s:965    .text._ZN11perspective15EffectParameter15SetDisplayIndexEi:00000000 _ZN11perspective15EffectParameter15SetDisplayIndexEi
+C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s:982    .text._ZN11perspective15EffectParameter14SetDisplayTypeENS_11DisplayTypeE:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s:989    .text._ZN11perspective15EffectParameter14SetDisplayTypeENS_11DisplayTypeE:00000000 _ZN11perspective15EffectParameter14SetDisplayTypeENS_11DisplayTypeE
+C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s:1006   .text._ZN11perspective15EffectParameter14SetScaleFactorEf:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s:1013   .text._ZN11perspective15EffectParameter14SetScaleFactorEf:00000000 _ZN11perspective15EffectParameter14SetScaleFactorEf
+C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s:1030   .rodata._ZN11perspective15EffectParameter17SetDiscreteValuesEPPKci.str1.4:00000000 $d
+C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s:1034   .text._ZN11perspective15EffectParameter17SetDiscreteValuesEPPKci:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s:1041   .text._ZN11perspective15EffectParameter17SetDiscreteValuesEPPKci:00000000 _ZN11perspective15EffectParameter17SetDiscreteValuesEPPKci
+C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s:1127   .text._ZN11perspective15EffectParameter17SetDiscreteValuesEPPKci:0000002c $d
+C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s:1132   .text._ZN11perspective15EffectParameter8SetRangeEff:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s:1139   .text._ZN11perspective15EffectParameter8SetRangeEff:00000000 _ZN11perspective15EffectParameter8SetRangeEff
+C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s:1208   .text._ZNK11perspective15EffectParameter13GetValueAsIntEi:00000000 $t
+C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s:1215   .text._ZNK11perspective15EffectParameter13GetValueAsIntEi:00000000 _ZNK11perspective15EffectParameter13GetValueAsIntEi
+C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s:1294   .text._ZNK11perspective15EffectParameter13GetValueAsIntEi:00000050 $d
+C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s:1302   .rodata._ZTVN11perspective15EffectParameterE:00000000 $d
+
+ARM GAS  C:\Users\Oliver\AppData\Local\Temp\ccaXZo0f.s 			page 36
+
+
+UNDEFINED SYMBOLS
+snprintf
+_ZN5daisy6LoggerILNS_17LoggerDestinationE1EE9PrintLineEPKcz
+strlen
+_Znaj
+strcpy
+_ZdaPv
+_ZdlPvj
+__cxa_pure_virtual
