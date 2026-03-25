@@ -13,7 +13,7 @@
 using namespace daisy;
 
 #define UPDATE_RATE 2000.0f // in Hz
-#define ENCODER_DIVISOR 2 // Process encoder changes every 2nd call to control timer for ~1kHz encoder polling
+#define ENCODER_DIVISOR 1 // Process encoder changes every control timer tick for better quadrature tracking
 #define SWITCH_DIVISOR 16 // Process switch changes every 16th call to control timer for better responsiveness
 #define KNOB_DIVISOR 16 // Process knob changes every 16th call to control timer for better responsiveness
 
