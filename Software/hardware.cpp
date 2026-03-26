@@ -54,15 +54,15 @@ void perspective::Hardware::SetControlUpdateRate(float rate)
 {
     PrintLine("Setting control update rate to %.2f Hz", rate);
     for (int i = 0; i < numKnobs; i++) {
-        knobs[i].SetSampleRate(rate);
+        knobs[i].SetSampleRate(rate / KNOB_DIVISOR);
     }
 
     for (int i = 0; i < numSwitches; i++) {
-        switches[i].SetUpdateRate(rate);
+        switches[i].SetUpdateRate(rate / SWITCH_DIVISOR);
     }
 
     for (int i = 0; i < numEncoders; i++) {
-        encoders[i].SetUpdateRate(rate);
+        encoders[i].SetUpdateRate(rate / ENCODER_DIVISOR);
     }
 
     for (int i = 0; i < numLeds; i++) {
@@ -82,7 +82,8 @@ void perspective::Hardware::SetControlUpdateRate(float rate)
     controlTimer.Init(config);
     controlTimer.SetPrescaler(9999);
     controlTimer.SetCallback(timerCallback, this);
-    controlTimer.Start();
+    // Control scanning runs in the main loop to avoid ISR interaction with UI/event processing.
+    //controlTimer.Start();
     controlUpdateRate = rate;
 
     timerRunning = true;
@@ -93,10 +94,6 @@ void Hardware::ProcessControls() {
     // Update LEDs at a high frequency regardless of event handler to ensure visual responsiveness
     for (int i = 0; i < numLeds; i++) {
         leds[i].Update();
-    }
-
-    if (processing) {
-        return; // Skip processing if already in the middle of processing to prevent reentrancy issues
     }
 
     if (!eventHandler_) {
@@ -233,6 +230,8 @@ void Hardware::InitControls()
     for (int i = 0; i < numEncoders; i++) {
         perspective::Encoder newEncoder;
         newEncoder.Init(encoderPins[i][0], encoderPins[i][1], encoderPins[i][2], controlUpdateRate / ENCODER_DIVISOR);
+        newEncoder.SetStepsPerDetent(ENCODER_STEPS_PER_DETENT);
+        newEncoder.SetDirection(ENCODER_DIRECTION);
         encoders.push_back(newEncoder);
         switches.push_back(*newEncoder.GetSwitch()); // Add encoder button as a switch for event handling
     }

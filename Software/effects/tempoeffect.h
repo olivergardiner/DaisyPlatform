@@ -15,6 +15,9 @@ public:
     virtual ~TempoEffect();
     float GetTempoPulseBrightness() const override;
 
+    // Canonical subdivision glyph strings (shared by all delay-based effects)
+    static const char* kSubdivisionGlyphs[8];
+
 protected:
     // Tempo-related state
     float baseDelayTime_ = 0.5f;
@@ -45,6 +48,7 @@ protected:
     static constexpr float SUBDIVISION_4_16TH = 1.0f;    // 4 sixteenths (quarter) - Default
     static constexpr float SUBDIVISION_5_16TH = 1.25f;   // 5 sixteenths
     static constexpr float SUBDIVISION_6_16TH = 1.5f;    // 6 sixteenths (dotted quarter)
+    static constexpr float SUBDIVISION_7_16TH = 1.75f;   // 7 sixteenths (double-dotted quarter)
     static constexpr float SUBDIVISION_8_16TH = 2.0f;    // 8 sixteenths (half)
     
     // Subdivision parameter index (must be set by derived classes)

@@ -7,9 +7,6 @@
 
 using namespace perspective;
 
-static const char *subDivisions[7] = {
-    "_", "^", "^ `", "]", "] ` `", "] `", "\\"
-};
 
 ParallelDelayEffect::ParallelDelayEffect()
     : CompoundEffect("Parallel Delay", RoutingMode::PARALLEL)
@@ -48,9 +45,9 @@ void ParallelDelayEffect::Init(float sampleRate) {
     parameters_.back()->SetDisplayType(DisplayType::SCALED);
     parameters_.back()->SetScaleFactor(100.0f); // Display feedback as percentage
     
-    AddParameter(new PotentiometerParameter("K3 Subdivision", 0.0f, 6.0f, 3.0f, PotCurve::LIN, KNOB_3_IDX));
+    AddParameter(new PotentiometerParameter("K3 Subdivision", 0.0f, 7.0f, 3.0f, PotCurve::LIN, KNOB_3_IDX));
     parameters_.back()->SetDisplayType(DisplayType::DISCRETE);
-    parameters_.back()->SetDiscreteValues(subDivisions, 7);
+    parameters_.back()->SetDiscreteValues(TempoEffect::kSubdivisionGlyphs, 8);
     
     // Add parameters for Delay 2
     AddParameter(new PotentiometerParameter("K4 Mix", 0.0f, 1.0f, 0.50f, PotCurve::LIN, KNOB_4_IDX));
@@ -61,9 +58,9 @@ void ParallelDelayEffect::Init(float sampleRate) {
     parameters_.back()->SetDisplayType(DisplayType::SCALED);
     parameters_.back()->SetScaleFactor(100.0f); // Display feedback as percentage
     
-    AddParameter(new PotentiometerParameter("K6 Subdivision", 0.0f, 6.0f, 3.0f, PotCurve::LIN, KNOB_6_IDX));
+    AddParameter(new PotentiometerParameter("K6 Subdivision", 0.0f, 7.0f, 3.0f, PotCurve::LIN, KNOB_6_IDX));
     parameters_.back()->SetDisplayType(DisplayType::DISCRETE);
-    parameters_.back()->SetDiscreteValues(subDivisions, 7);
+    parameters_.back()->SetDiscreteValues(TempoEffect::kSubdivisionGlyphs, 8);
     
     // Add delay 1 time parameter (Encoder 1) - TimeParameter with ms range (250-2000 ms = 240-30 BPM)
     AddParameter(new TimeParameter("E1 Time 1", 250.0f, 2000.0f, 500.0f, 1.0f, ENCODER_1_IDX, "E1 Tempo 1"));

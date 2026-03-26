@@ -12,9 +12,11 @@
 
 using namespace daisy;
 
-#define UPDATE_RATE 2000.0f // in Hz
-#define ENCODER_DIVISOR 1 // Process encoder changes every control timer tick for better quadrature tracking
-#define SWITCH_DIVISOR 16 // Process switch changes every 16th call to control timer for better responsiveness
+#define UPDATE_RATE 1000.0f // in Hz
+#define ENCODER_DIVISOR 1 // Process encoder changes every control tick for best quadrature tracking
+#define ENCODER_STEPS_PER_DETENT 2 // 1=quarter-step, 2=half-step, 4=full detent
+#define ENCODER_DIRECTION 1 // Set to 1 or -1 to match physical clockwise/counter-clockwise direction
+#define SWITCH_DIVISOR 1 // Process switches every control tick for responsive edge detection
 #define KNOB_DIVISOR 16 // Process knob changes every 16th call to control timer for better responsiveness
 
 namespace DadGFX {

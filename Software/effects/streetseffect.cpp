@@ -9,9 +9,6 @@
 
 using namespace perspective;
 
-static const char *subDivisions[7] = {
-    "_", "^", "^ `", "]", "] ` `", "] `", "\\"
-};
 
 StreetsEffect::StreetsEffect()
     : CompoundEffect("Streets", RoutingMode::SERIES)
@@ -50,9 +47,9 @@ void StreetsEffect::Init(float sampleRate) {
     parameters_.back()->SetDisplayType(DisplayType::SCALED);
     parameters_.back()->SetScaleFactor(100.0f);
     
-    AddParameter(new PotentiometerParameter("K3 Subdivision", 0.0f, 6.0f, 2.0f, PotCurve::LIN, KNOB_3_IDX, 2));
+    AddParameter(new PotentiometerParameter("K3 Subdivision", 0.0f, 7.0f, 2.0f, PotCurve::LIN, KNOB_3_IDX, 2));
     parameters_.back()->SetDisplayType(DisplayType::DISCRETE);
-    parameters_.back()->SetDiscreteValues(subDivisions, 7);
+    parameters_.back()->SetDiscreteValues(TempoEffect::kSubdivisionGlyphs, 8);
     
     // Delay 2 controls
     AddParameter(new PotentiometerParameter("K4 Mix", 0.0f, 1.0f, 0.35f, PotCurve::LIN, KNOB_4_IDX, 4));

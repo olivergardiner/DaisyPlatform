@@ -15,9 +15,6 @@ constexpr size_t MAX_DELAY = 48000 * 4; // 4 seconds max delay at 48kHz
 static DelayLine<float, MAX_DELAY> DSY_SDRAM_BSS delayL_;
 static DelayLine<float, MAX_DELAY> DSY_SDRAM_BSS delayR_;
 
-static const char *subDivisions[7] = {
-    "_", "^", "^ `", "]", "] ` `", "] `", "\\"
-};
 
 static const char *lfoWaveShapes[8] = {
     "Sin", "Tri", "Saw", "Ramp", "Square", "PB Tri", "PB Saw", "PB Sq"
@@ -67,9 +64,9 @@ void ModDelayEffect::Init(float sampleRate) {
     AddParameter(new PotentiometerParameter("K4 Mod Depth", 0.0f, 1.0f, 0.0f, PotCurve::LIN, KNOB_4_IDX));
     parameters_.back()->SetDisplayType(DisplayType::SCALED);
     parameters_.back()->SetScaleFactor(100.0f); // Display depth as percentage
-    AddParameter(new PotentiometerParameter("K5 Subdivision", 0.0f, 6.0f, 3.0f, PotCurve::LIN, KNOB_5_IDX)); // 7 subdivisions: 1-6 and 8 sixteenths, default to quarter note (4 sixteenths)
+    AddParameter(new PotentiometerParameter("K5 Subdivision", 0.0f, 7.0f, 3.0f, PotCurve::LIN, KNOB_5_IDX)); // 8 subdivisions: 1-8 sixteenths, default to quarter note (4 sixteenths)
     parameters_.back()->SetDisplayType(DisplayType::DISCRETE);
-    parameters_.back()->SetDiscreteValues(subDivisions, 7);
+    parameters_.back()->SetDiscreteValues(kSubdivisionGlyphs, 8);
     subdivisionParamIndex_ = 4;  // Track subdivision parameter index
     char valueStr[16];
     parameters_.back()->GetValueAsString(valueStr, sizeof(valueStr));

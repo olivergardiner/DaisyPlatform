@@ -4,6 +4,10 @@
 
 using namespace perspective;
 
+const char* TempoEffect::kSubdivisionGlyphs[8] = {
+    "_", "^", "^ `", "]", "] _", "] `", "] ` `", "\\"
+};
+
 TempoEffect::TempoEffect(const char* name)
     : Effect(name) {
     // Initialize metronome bass drum (will be properly initialized in derived class Init())
@@ -48,7 +52,7 @@ float TempoEffect::GetSubdivisionMultiplier() const {
     }
     
     PotentiometerParameter* subdivParam = static_cast<PotentiometerParameter*>(parameters_[subdivisionParamIndex_]);
-    int subdivIndex = subdivParam->GetValueAsInt(6); // 0-6 for 7 subdivisions
+    int subdivIndex = subdivParam->GetValueAsInt(7); // 0-7 for 8 subdivisions
     
     switch (subdivIndex) {
         case 0: return SUBDIVISION_1_16TH;  // 1 sixteenth
@@ -57,7 +61,8 @@ float TempoEffect::GetSubdivisionMultiplier() const {
         case 3: return SUBDIVISION_4_16TH;  // 4 sixteenths (quarter) - Default
         case 4: return SUBDIVISION_5_16TH;  // 5 sixteenths
         case 5: return SUBDIVISION_6_16TH;  // 6 sixteenths (dotted quarter)
-        case 6: return SUBDIVISION_8_16TH;  // 8 sixteenths (half)
+        case 6: return SUBDIVISION_7_16TH;  // 7 sixteenths (double-dotted quarter)
+        case 7: return SUBDIVISION_8_16TH;  // 8 sixteenths (half)
         default: return SUBDIVISION_4_16TH;
     }
 }

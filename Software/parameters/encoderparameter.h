@@ -19,6 +19,10 @@ public:
     virtual void Increment(int steps = 1);
     virtual void Decrement(int steps = 1);
     
+    // For discrete parameters: move to next/previous option with wrapping
+    void IncrementDiscrete(int steps = 1);
+    void DecrementDiscrete(int steps = 1);
+    
     ParameterType GetType() const override;
 
 private:

@@ -32,9 +32,6 @@ static void FreeDelayInstance(int id) {
     }
 }
 
-static const char *subDivisions[7] = {
-    "_", "^", "^ `", "]", "] ` `", "] `", "\\"
-};
 
 DelayEffect::DelayEffect() 
     : TempoEffect("Delay")
@@ -108,9 +105,9 @@ void DelayEffect::Init(float sampleRate) {
     parameters_.back()->SetDisplayType(DisplayType::SCALED);
     parameters_.back()->SetScaleFactor(100.0f); // Display feedback as percentage
     
-    AddParameter(new PotentiometerParameter("K3 Subdivision", 0.0f, 6.0f, 3.0f, PotCurve::LIN, KNOB_3_IDX));
+    AddParameter(new PotentiometerParameter("K3 Subdivision", 0.0f, 7.0f, 3.0f, PotCurve::LIN, KNOB_3_IDX));
     parameters_.back()->SetDisplayType(DisplayType::DISCRETE);
-    parameters_.back()->SetDiscreteValues(subDivisions, 7);
+    parameters_.back()->SetDiscreteValues(kSubdivisionGlyphs, 8);
     subdivisionParamIndex_ = 2;  // Track subdivision parameter index
     
     // TimeParameter with milliseconds range (10-2000 ms), 1ms step in time mode, 0.5 BPM in tempo mode

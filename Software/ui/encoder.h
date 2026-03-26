@@ -67,13 +67,37 @@ class Encoder
         sw_.SetUpdateRate(update_rate);
     }
 
+    /**
+     * Sets quadrature steps required per reported increment.
+     * Typical values: 1 (most sensitive), 2 (balanced), 4 (conservative).
+     */
+    inline void SetStepsPerDetent(uint8_t steps_per_detent)
+    {
+      if(steps_per_detent < 1)
+        steps_per_detent_ = 1;
+      else if(steps_per_detent > 4)
+        steps_per_detent_ = 4;
+      else
+        steps_per_detent_ = steps_per_detent;
+    }
+
+    /** Sets reported direction polarity. Use +1 for normal, -1 to invert. */
+    inline void SetDirection(int8_t direction)
+    {
+        direction_ = (direction < 0) ? -1 : 1;
+    }
+
   private:
     uint32_t last_update_;
     float    update_rate_;
     Switch   sw_;
     GPIO     hw_a_, hw_b_;
     uint8_t  state_;
+    uint8_t  sample_candidate_state_;
+    uint8_t  sample_stability_count_;
     int8_t   step_accumulator_;
+    uint8_t  steps_per_detent_;
+    int8_t   direction_;
     int32_t  inc_;
 };
 

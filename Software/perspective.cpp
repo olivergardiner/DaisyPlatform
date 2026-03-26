@@ -38,8 +38,7 @@ void Perspective::Init() {
 
 void Perspective::Exec() {
     while(true) {
-        hardware.SetProcessing(true); // Indicate that we're processing controls/events
-
+        hardware.ProcessControls();
         eventHandler_.ProcessEvents();
         
         // Update tuner display when in tuner mode
@@ -47,13 +46,19 @@ void Perspective::Exec() {
             UpdateTunerDisplay();
         }
 
-        hardware.SetProcessing(false); // Done processing controls/events
-
         hardware.DelayMs(1); // Small delay to allow events to accumulate
     }
 }     
 void Perspective::AudioCallbackImpl(AudioHandle::InputBuffer in, AudioHandle::OutputBuffer out, size_t size) {
     float ledPulseBrightness = 0.0f;
+
+    if (switchingEffect_) {
+        for (size_t i = 0; i < size; i++) {
+            out[0][i] = in[0][i];
+            out[1][i] = in[1][i];
+        }
+        return;
+    }
 
     if (tunerMode_ && tunerEffect_) {
         // Tuner mode: process for pitch detection but mute output
@@ -371,19 +376,25 @@ void Perspective::SetCurrentEffect(size_t index) {
         return; // Invalid index
     }
 
+    switchingEffect_ = true;
+
+    Effect* nextEffect = effects_[index];
+
     if (currentEffect_) {
         currentEffect_->OnDeselected();
     }
-    
-    currentEffectIndex_ = index;
-    currentEffect_ = effects_[index];
-    currentEffect_->OnSelected();
+
+    nextEffect->OnSelected();
     
     // Propagate global metronome state to new effect (propagates through compound effect hierarchy)
-    currentEffect_->SetMetronomeEnabled(metronomeEnabled_);
+    nextEffect->SetMetronomeEnabled(metronomeEnabled_);
     
     // Update effect to apply metronome state propagation through compound effect children
-    currentEffect_->Update();
+    nextEffect->Update();
+
+    currentEffectIndex_ = index;
+    currentEffect_ = nextEffect;
+    switchingEffect_ = false;
     
     // Clear the display before showing new effect
     hardware.ClearDisplay();

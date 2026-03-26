@@ -50,6 +50,7 @@ protected:
 
     bool bypassMode_ = false;
     BypassType bypassType_ = BypassType::PASSTHROUGH;
+    bool switchingEffect_ = false;
     bool tunerMode_ = false;
     TunerEffect* tunerEffect_ = nullptr;
     bool metronomeEnabled_ = false;  // Global metronome state

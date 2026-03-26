@@ -1,6 +1,7 @@
 #include "uieventhandler.h"
 #include "knob.h"
 #include "../hardware.h"
+#include "daisy_seed.h"
 
 #include <algorithm>
 
@@ -21,10 +22,12 @@ void UIEventHandler::RegisterListenerByIndex(UIEventCallback callback, UIEventTy
 }
 
 void UIEventHandler::PushEvent(const UIEvent& event) {
+    daisy::ScopedIrqBlocker sIrqBl;
     eventQueue_.push(event);
 }
 
 UIEvent UIEventHandler::PopEvent() {
+    daisy::ScopedIrqBlocker sIrqBl;
     UIEvent event = eventQueue_.front();
     eventQueue_.pop();
     return event;
@@ -35,7 +38,7 @@ void UIEventHandler::QueueEvent(const UIEvent& event) {
 }
 
 void UIEventHandler::ProcessEvents() {
-    while (!eventQueue_.empty()) {
+    while (GetQueueSize() > 0) {
         UIEvent event = PopEvent();
         if (event.type == UIEventType::KNOB_CHANGED) {
             Knob *knob = static_cast<Knob*>(event.source);
@@ -46,11 +49,12 @@ void UIEventHandler::ProcessEvents() {
 }
 
 size_t UIEventHandler::GetQueueSize() const {
+    daisy::ScopedIrqBlocker sIrqBl;
     return eventQueue_.size();
 }
 
 void UIEventHandler::ClearQueue() {
-    while (!eventQueue_.empty()) {
+    while (GetQueueSize() > 0) {
         PopEvent();
     }
 }

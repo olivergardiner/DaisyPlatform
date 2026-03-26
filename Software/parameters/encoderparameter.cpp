@@ -23,6 +23,13 @@ float EncoderParameter::GetStepSize() const {
 }
 
 void EncoderParameter::Increment(int steps) {
+    // For discrete parameters, use discrete increment logic
+    if (displayType_ == DisplayType::DISCRETE && discreteValueCount_ > 0) {
+        IncrementDiscrete(steps);
+        return;
+    }
+    
+    // For continuous parameters, use continuous increment logic
     uint32_t now = System::GetNow();
     
     // Check if this is a continuous turn (within threshold)
@@ -40,11 +47,19 @@ void EncoderParameter::Increment(int steps) {
     
     lastTurnTime_ = now;
     
-    currentValue_ -= steps * stepSize_ * accelerationMultiplier_;
+    // Inverted direction: + instead of -
+    currentValue_ += steps * stepSize_ * accelerationMultiplier_;
     currentValue_ = clamp(currentValue_, minValue_, maxValue_);
 }
 
 void EncoderParameter::Decrement(int steps) {
+    // For discrete parameters, use discrete decrement logic
+    if (displayType_ == DisplayType::DISCRETE && discreteValueCount_ > 0) {
+        DecrementDiscrete(steps);
+        return;
+    }
+    
+    // For continuous parameters, use continuous decrement logic
     uint32_t now = System::GetNow();
     
     // Check if this is a continuous turn (within threshold)
@@ -61,8 +76,57 @@ void EncoderParameter::Decrement(int steps) {
     
     lastTurnTime_ = now;
     
-    currentValue_ += steps * stepSize_ * accelerationMultiplier_;
+    // Inverted direction: - instead of +
+    currentValue_ -= steps * stepSize_ * accelerationMultiplier_;
     currentValue_ = clamp(currentValue_, minValue_, maxValue_);
+}
+
+void EncoderParameter::IncrementDiscrete(int steps) {
+    // For discrete parameters: move to next option(s) with wrapping
+    if (discreteValueCount_ <= 0) return;
+    
+    // Get current index in discrete values
+    int currentIndex = GetValueAsInt(discreteValueCount_ - 1);
+    
+    // Increment with wrapping
+    int newIndex = (currentIndex + steps) % discreteValueCount_;
+    if (newIndex < 0) {
+        newIndex += discreteValueCount_;  // Handle negative modulo
+    }
+    
+    Hardware::PrintLine("DiscreteIncrement parameter '%s': %d -> %d", GetName(), currentIndex, newIndex);
+    
+    // Convert index back to float value
+    if (discreteValueCount_ > 1) {
+        float normalizedValue = static_cast<float>(newIndex) / (discreteValueCount_ - 1);
+        currentValue_ = minValue_ + (normalizedValue * (maxValue_ - minValue_));
+    } else {
+        currentValue_ = minValue_;
+    }
+}
+
+void EncoderParameter::DecrementDiscrete(int steps) {
+    // For discrete parameters: move to previous option(s) with wrapping
+    if (discreteValueCount_ <= 0) return;
+    
+    // Get current index in discrete values
+    int currentIndex = GetValueAsInt(discreteValueCount_ - 1);
+    
+    // Decrement with wrapping
+    int newIndex = (currentIndex - steps) % discreteValueCount_;
+    if (newIndex < 0) {
+        newIndex += discreteValueCount_;  // Handle negative modulo
+    }
+    
+    Hardware::PrintLine("DiscreteDecrement parameter '%s': %d -> %d", GetName(), currentIndex, newIndex);
+    
+    // Convert index back to float value
+    if (discreteValueCount_ > 1) {
+        float normalizedValue = static_cast<float>(newIndex) / (discreteValueCount_ - 1);
+        currentValue_ = minValue_ + (normalizedValue * (maxValue_ - minValue_));
+    } else {
+        currentValue_ = minValue_;
+    }
 }
 
 ParameterType EncoderParameter::GetType() const {
