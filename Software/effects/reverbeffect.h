@@ -24,6 +24,12 @@ public:
     void SetLpFreq(float lpFreq);
 
 private:
+    enum ParamIndex {
+        kParamMix = 0,
+        kParamFeedback,
+        kParamCutoffHz
+    };
+
     daisysp::ReverbSc* reverb_;
     float mix_;
     float feedback_;

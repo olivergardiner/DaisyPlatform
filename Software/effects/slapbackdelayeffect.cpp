@@ -57,8 +57,8 @@ void SlapbackDelayEffect::Process(float* in, float* out, size_t size) {
     }
     
     // Get parameters
-    float mix = parameters_.size() > 0 ? parameters_[0]->GetValue() : 0.5f;
-    float feedback = parameters_.size() > 1 ? parameters_[1]->GetValue() : 0.25f;
+    float mix = parameters_.size() > 0 ? parameters_[kParamMix]->GetValue() : 0.5f;
+    float feedback = parameters_.size() > 1 ? parameters_[kParamFeedback]->GetValue() : 0.25f;
     
     // Process with wet/dry blend
     for (size_t i = 0; i < size; i++) {
@@ -80,8 +80,8 @@ void SlapbackDelayEffect::ProcessStereo(float* inL, float* inR, float* outL, flo
     }
     
     // Get parameters
-    float mix = parameters_.size() > 0 ? parameters_[0]->GetValue() : 0.5f;
-    float feedback = parameters_.size() > 1 ? parameters_[1]->GetValue() : 0.25f;
+    float mix = parameters_.size() > 0 ? parameters_[kParamMix]->GetValue() : 0.5f;
+    float feedback = parameters_.size() > 1 ? parameters_[kParamFeedback]->GetValue() : 0.25f;
     
     // Process stereo signal with independent delays
     for (size_t i = 0; i < size; i++) {
@@ -103,7 +103,7 @@ void SlapbackDelayEffect::Update() {
         // Feedback parameter (index 1) - handled in Process
         
         // Time parameter (index 2) - in milliseconds
-        float timeMs = parameters_[2]->GetValue();
+        float timeMs = parameters_[kParamTimeMs]->GetValue();
         delayTime_ = timeMs / 1000.0f; // Convert ms to seconds
         
         // Update delay line only when parameters change

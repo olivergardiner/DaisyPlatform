@@ -34,6 +34,17 @@ protected:
     float ComputeTargetCutoffHz(float baseFreq, float sensitivityHz, float envelope, bool useLogCurve = true) const;
     float ComputeCompensatedResonance(float resonance, float cutoffHz) const;
 
+    enum ParamIndex {
+        kParamMix = 0,
+        kParamResonance,
+        kParamFrequency,
+        kParamAttackMs,
+        kParamReleaseMs,
+        kParamSensitivity,
+        kParamVoice,
+        kParamDownBoost
+    };
+
     Svf filterL_;
     Svf filterR_;
 

@@ -39,7 +39,7 @@ void WahEffect::Process(float* in, float* out, size_t size) {
     }
 
     // Get mix parameter
-    float mix = parameters_.size() > 0 ? parameters_[0]->GetValue() : 0.5f;
+    float mix = parameters_.size() > 0 ? parameters_[kParamMix]->GetValue() : 0.5f;
 
     // Process with wet/dry blend
     for (size_t i = 0; i < size; i++) {
@@ -60,7 +60,7 @@ void WahEffect::ProcessStereo(float* inL, float* inR, float* outL, float* outR, 
     }
 
     // Get mix parameter
-    float mix = parameters_.size() > 0 ? parameters_[0]->GetValue() : 0.5f;
+    float mix = parameters_.size() > 0 ? parameters_[kParamMix]->GetValue() : 0.5f;
 
     // Process stereo signal with independent filters
     for (size_t i = 0; i < size; i++) {
@@ -80,14 +80,14 @@ void WahEffect::Update() {
     if (parameters_.size() >= 5) {
         // Mix parameter (index 0) - handled in Process
 
-        float lowFreq = parameters_[3]->GetValue();
-        float highFreq = parameters_[4]->GetValue();
+        float lowFreq = parameters_[kParamLowFreq]->GetValue();
+        float highFreq = parameters_[kParamHighFreq]->GetValue();
         if (highFreq < lowFreq + 10.0f) {
             highFreq = lowFreq + 10.0f;
         }
 
         // Keep the expression sweep position normalized, but display/value in true frequency.
-        EffectParameter* sweepParam = parameters_[2];
+        EffectParameter* sweepParam = parameters_[kParamSweep];
         float sweepNormalized = sweepParam->GetNormalizedValue();
         sweepParam->SetRange(lowFreq, highFreq);
         sweepParam->SetNormalizedValue(sweepNormalized);
@@ -100,7 +100,7 @@ void WahEffect::Update() {
         RequestParameterDisplayUpdate(2);
 
         // Resonance parameter (index 1) maps directly to the SVF resonance input
-        float resonance = parameters_[1]->GetValue();
+        float resonance = parameters_[kParamResonance]->GetValue();
         filterL_.SetRes(resonance);
         filterR_.SetRes(resonance);
     }

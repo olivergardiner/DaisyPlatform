@@ -76,11 +76,11 @@ void StreetsEffect::Init(float sampleRate) {
 
     // Initialize startup timing modes/values:
     // Delay 1: tempo mode at reference BPM.
-    parameters_[8]->SetValue(1.0f);
-    parameters_[6]->SetValue(60000.0f / kReferenceBpm);
+    parameters_[kParamTempoMode]->SetValue(1.0f);
+    parameters_[kParamTime1]->SetValue(60000.0f / kReferenceBpm);
 
     // Delay 2 tracks Delay 1 timing ratio, starting at 510ms-equivalent feel.
-    parameters_[7]->SetValue(kSecondaryLinkedMs);
+    parameters_[kParamTime2]->SetValue(kSecondaryLinkedMs);
 
     // Note: Metronome is now controlled globally by Perspective via SetMetronomeEnabled()
     
@@ -100,15 +100,15 @@ void StreetsEffect::Init(float sampleRate) {
 void StreetsEffect::Update() {
     // Update parallel delay parameters from our parameters
     if (parameters_.size() >= 9 && parallelDelay_ && parallelDelay_->GetParameterCount() >= 10) {
-        if (parameters_[6]->GetType() != ParameterType::ENCODER ||
-            parameters_[7]->GetType() != ParameterType::ENCODER ||
-            parameters_[8]->GetType() != ParameterType::TOGGLE) {
+        if (parameters_[kParamTime1]->GetType() != ParameterType::ENCODER ||
+            parameters_[kParamTime2]->GetType() != ParameterType::ENCODER ||
+            parameters_[kParamTempoMode]->GetType() != ParameterType::TOGGLE) {
             return;
         }
 
-        TimeParameter* timeParam1 = static_cast<TimeParameter*>(parameters_[6]);
-        TimeParameter* timeParam2 = static_cast<TimeParameter*>(parameters_[7]);
-        ToggleParameter* tempoToggle1 = static_cast<ToggleParameter*>(parameters_[8]);
+        TimeParameter* timeParam1 = static_cast<TimeParameter*>(parameters_[kParamTime1]);
+        TimeParameter* timeParam2 = static_cast<TimeParameter*>(parameters_[kParamTime2]);
+        ToggleParameter* tempoToggle1 = static_cast<ToggleParameter*>(parameters_[kParamTempoMode]);
 
         // Force Delay 1 to dotted 8th when using tempo mode, and derive Delay 2 from Delay 1.
         float masterMs = tempoToggle1->GetState()
@@ -126,11 +126,11 @@ void StreetsEffect::Update() {
         }
 
         // Explicitly map streets controls into parallel delay controls.
-        parallelDelay_->GetParameter(0)->SetValue(parameters_[0]->GetValue());
-        parallelDelay_->GetParameter(1)->SetValue(parameters_[1]->GetValue());
-        parallelDelay_->GetParameter(2)->SetValue(tempoToggle1->GetState() ? 2.0f : parameters_[2]->GetValue());
-        parallelDelay_->GetParameter(3)->SetValue(parameters_[3]->GetValue());
-        parallelDelay_->GetParameter(4)->SetValue(parameters_[4]->GetValue());
+        parallelDelay_->GetParameter(0)->SetValue(parameters_[kParamMix]->GetValue());
+        parallelDelay_->GetParameter(1)->SetValue(parameters_[kParamFeedback]->GetValue());
+        parallelDelay_->GetParameter(2)->SetValue(tempoToggle1->GetState() ? 2.0f : parameters_[kParamSubdivision]->GetValue());
+        parallelDelay_->GetParameter(3)->SetValue(parameters_[kParamMix2]->GetValue());
+        parallelDelay_->GetParameter(4)->SetValue(parameters_[kParamFeedback2]->GetValue());
         parallelDelay_->GetParameter(5)->SetValue(3.0f);    // fixed quarter multiplier in time mode
         parallelDelay_->GetParameter(6)->SetValue(timeParam1->GetValueAsMs());
         parallelDelay_->GetParameter(7)->SetValue(linkedMs); // linked secondary time
@@ -155,7 +155,7 @@ void StreetsEffect::Update() {
     // Update the slapback delay (keep it at 50ms)
     if (slapbackDelay_) {
         if (slapbackDelay_->GetParameterCount() >= 1 && parameters_.size() > 5) {
-            slapbackDelay_->GetParameter(0)->SetValue(parameters_[5]->GetValue());
+            slapbackDelay_->GetParameter(0)->SetValue(parameters_[kParamSlapMix]->GetValue());
         }
         slapbackDelay_->Update();
     }

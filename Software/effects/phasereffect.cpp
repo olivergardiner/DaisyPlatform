@@ -95,13 +95,13 @@ void PhaserEffect::Process(float* in, float* out, size_t size) {
         return;
     }
 
-    float mix = Clamp(parameters_[0]->GetValue(), 0.0f, 1.0f);
-    float depth = Clamp(parameters_[1]->GetValue(), 0.0f, 1.0f);
-    float rateHz = parameters_[2]->GetValue();
-    float feedback = parameters_[3]->GetValue();
-    float centerHz = parameters_[4]->GetValue();
-    int stages = static_cast<int>(Clamp(parameters_[5]->GetValue(), 2.0f, 8.0f));
-    int waveShape = static_cast<int>(parameters_[6]->GetValue());
+    float mix = Clamp(parameters_[kParamMix]->GetValue(), 0.0f, 1.0f);
+    float depth = Clamp(parameters_[kParamDepth]->GetValue(), 0.0f, 1.0f);
+    float rateHz = parameters_[kParamRate]->GetValue();
+    float feedback = parameters_[kParamFeedback]->GetValue();
+    float centerHz = parameters_[kParamCenterHz]->GetValue();
+    int stages = static_cast<int>(Clamp(parameters_[kParamStages]->GetValue(), 2.0f, 8.0f));
+    int waveShape = static_cast<int>(parameters_[kParamWave]->GetValue());
 
     if (stages < 2) {
         stages = 2;
@@ -146,13 +146,13 @@ void PhaserEffect::ProcessStereo(float* inL, float* inR, float* outL, float* out
         return;
     }
 
-    float mix = Clamp(parameters_[0]->GetValue(), 0.0f, 1.0f);
-    float depth = Clamp(parameters_[1]->GetValue(), 0.0f, 1.0f);
-    float rateHz = parameters_[2]->GetValue();
-    float feedback = parameters_[3]->GetValue();
-    float centerHz = parameters_[4]->GetValue();
-    int stages = static_cast<int>(Clamp(parameters_[5]->GetValue(), 2.0f, 8.0f));
-    int waveShape = static_cast<int>(parameters_[6]->GetValue());
+    float mix = Clamp(parameters_[kParamMix]->GetValue(), 0.0f, 1.0f);
+    float depth = Clamp(parameters_[kParamDepth]->GetValue(), 0.0f, 1.0f);
+    float rateHz = parameters_[kParamRate]->GetValue();
+    float feedback = parameters_[kParamFeedback]->GetValue();
+    float centerHz = parameters_[kParamCenterHz]->GetValue();
+    int stages = static_cast<int>(Clamp(parameters_[kParamStages]->GetValue(), 2.0f, 8.0f));
+    int waveShape = static_cast<int>(parameters_[kParamWave]->GetValue());
 
     if (stages < 2) {
         stages = 2;

@@ -14,6 +14,17 @@ public:
     void Update() override;
 
 private:
+    enum ParamIndex {
+        kParamWahMix = 0,
+        kParamSweep,
+        kParamFlange,
+        kParamMotion,
+        kParamEcho,
+        kParamSpace,
+        kParamTime,
+        kParamDownBoost
+    };
+
     class AutowahV2Effect* autowahV2Effect_;
     class FlangerEffect* flangerEffect_;
     class DelayEffect* delayEffect_;

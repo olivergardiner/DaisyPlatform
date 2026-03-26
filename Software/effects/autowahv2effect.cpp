@@ -224,15 +224,15 @@ void AutowahV2Effect::Process(float* in, float* out, size_t size) {
         return;
     }
 
-    float mix = parameters_.size() > 0 ? parameters_[0]->GetValue() : 0.5f;
-    float resonance = parameters_.size() >= 6 ? parameters_[1]->GetValue() : 0.85f;
-    float baseFreq = parameters_.size() >= 6 ? parameters_[2]->GetValue() : 1000.0f;
-    float attackSec = parameters_.size() >= 6 ? parameters_[3]->GetValue() : 0.2f;
-    float releaseSec = parameters_.size() >= 6 ? parameters_[4]->GetValue() : 0.01f;
-    float sensitivityHz = parameters_.size() >= 6 ? parameters_[5]->GetValue() : 1600.0f;
-    int voiceMode = parameters_.size() >= 7 ? static_cast<int>(std::round(parameters_[6]->GetValue())) : kVoiceRefined;
+    float mix = parameters_.size() > 0 ? parameters_[kParamMix]->GetValue() : 0.5f;
+    float resonance = parameters_.size() >= 6 ? parameters_[kParamResonance]->GetValue() : 0.85f;
+    float baseFreq = parameters_.size() >= 6 ? parameters_[kParamFrequency]->GetValue() : 1000.0f;
+    float attackSec = parameters_.size() >= 6 ? parameters_[kParamAttackMs]->GetValue() : 0.2f;
+    float releaseSec = parameters_.size() >= 6 ? parameters_[kParamReleaseMs]->GetValue() : 0.01f;
+    float sensitivityHz = parameters_.size() >= 6 ? parameters_[kParamSensitivity]->GetValue() : 1600.0f;
+    int voiceMode = parameters_.size() >= 7 ? static_cast<int>(std::round(parameters_[kParamVoice]->GetValue())) : kVoiceRefined;
     voiceMode = static_cast<int>(ClampValue(static_cast<float>(voiceMode), 0.0f, 3.0f));
-    int downBoostMode = parameters_.size() >= 8 ? static_cast<int>(std::round(parameters_[7]->GetValue())) : 1;
+    int downBoostMode = parameters_.size() >= 8 ? static_cast<int>(std::round(parameters_[kParamDownBoost]->GetValue())) : 1;
     downBoostMode = static_cast<int>(ClampValue(static_cast<float>(downBoostMode), 0.0f, 3.0f));
 
     float detectorGain = DetectorGainFromAttack(attackSec);
@@ -282,15 +282,15 @@ void AutowahV2Effect::ProcessStereo(float* inL, float* inR, float* outL, float* 
         return;
     }
 
-    float mix = parameters_.size() > 0 ? parameters_[0]->GetValue() : 0.5f;
-    float resonance = parameters_.size() >= 6 ? parameters_[1]->GetValue() : 0.85f;
-    float baseFreq = parameters_.size() >= 6 ? parameters_[2]->GetValue() : 1000.0f;
-    float attackSec = parameters_.size() >= 6 ? parameters_[3]->GetValue() : 0.2f;
-    float releaseSec = parameters_.size() >= 6 ? parameters_[4]->GetValue() : 0.01f;
-    float sensitivityHz = parameters_.size() >= 6 ? parameters_[5]->GetValue() : 1600.0f;
-    int voiceMode = parameters_.size() >= 7 ? static_cast<int>(std::round(parameters_[6]->GetValue())) : kVoiceRefined;
+    float mix = parameters_.size() > 0 ? parameters_[kParamMix]->GetValue() : 0.5f;
+    float resonance = parameters_.size() >= 6 ? parameters_[kParamResonance]->GetValue() : 0.85f;
+    float baseFreq = parameters_.size() >= 6 ? parameters_[kParamFrequency]->GetValue() : 1000.0f;
+    float attackSec = parameters_.size() >= 6 ? parameters_[kParamAttackMs]->GetValue() : 0.2f;
+    float releaseSec = parameters_.size() >= 6 ? parameters_[kParamReleaseMs]->GetValue() : 0.01f;
+    float sensitivityHz = parameters_.size() >= 6 ? parameters_[kParamSensitivity]->GetValue() : 1600.0f;
+    int voiceMode = parameters_.size() >= 7 ? static_cast<int>(std::round(parameters_[kParamVoice]->GetValue())) : kVoiceRefined;
     voiceMode = static_cast<int>(ClampValue(static_cast<float>(voiceMode), 0.0f, 3.0f));
-    int downBoostMode = parameters_.size() >= 8 ? static_cast<int>(std::round(parameters_[7]->GetValue())) : 1;
+    int downBoostMode = parameters_.size() >= 8 ? static_cast<int>(std::round(parameters_[kParamDownBoost]->GetValue())) : 1;
     downBoostMode = static_cast<int>(ClampValue(static_cast<float>(downBoostMode), 0.0f, 3.0f));
 
     float detectorGain = DetectorGainFromAttack(attackSec);

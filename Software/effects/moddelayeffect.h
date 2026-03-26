@@ -18,6 +18,18 @@ public:
     void ProcessStereo(float* inL, float* inR, float* outL, float* outR, size_t size) override;
     void Update() override;
 
+private:
+    enum ParamIndex {
+        kParamMix = 0,
+        kParamFeedback,
+        kParamModRate,
+        kParamModDepth,
+        kParamSubdivision,
+        kParamTime,
+        kParamWaveShape,
+        kParamTempoMode
+    };
+
 protected:
     // Modulation
     Oscillator lfoL_;

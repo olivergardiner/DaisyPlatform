@@ -97,9 +97,9 @@ void ModDelayEffect::Process(float* in, float* out, size_t size) {
     }
     
     // Get parameters
-    float mix = parameters_.size() > 0 ? parameters_[0]->GetValue() : 0.5f;
-    float feedback = parameters_.size() > 1 ? parameters_[1]->GetValue() : 0.5f;
-    float modDepth = parameters_.size() > 3 ? parameters_[3]->GetValue() : 0.0f;
+    float mix = parameters_.size() > 0 ? parameters_[kParamMix]->GetValue() : 0.5f;
+    float feedback = parameters_.size() > 1 ? parameters_[kParamFeedback]->GetValue() : 0.5f;
+    float modDepth = parameters_.size() > 3 ? parameters_[kParamModDepth]->GetValue() : 0.0f;
     
     // Use cached effective delay time (updated in Update())
     float effectiveDelayTime = effectiveDelayTime_;
@@ -140,9 +140,9 @@ void ModDelayEffect::ProcessStereo(float* inL, float* inR, float* outL, float* o
     }
     
     // Get parameters
-    float mix = parameters_.size() > 0 ? parameters_[0]->GetValue() : 0.5f;
-    float feedback = parameters_.size() > 1 ? parameters_[1]->GetValue() : 0.5f;
-    float modDepth = parameters_.size() > 3 ? parameters_[3]->GetValue() : 0.0f;
+    float mix = parameters_.size() > 0 ? parameters_[kParamMix]->GetValue() : 0.5f;
+    float feedback = parameters_.size() > 1 ? parameters_[kParamFeedback]->GetValue() : 0.5f;
+    float modDepth = parameters_.size() > 3 ? parameters_[kParamModDepth]->GetValue() : 0.0f;
     
     // Use cached effective delay time (updated in Update())
     float effectiveDelayTime = effectiveDelayTime_;
@@ -196,7 +196,7 @@ void ModDelayEffect::Update() {
         // Feedback parameter (index 1) - handled in Process
         
         // ModRate parameter (index 2)
-        float modRate = parameters_[2]->GetValue();
+        float modRate = parameters_[kParamModRate]->GetValue();
         lfoL_.SetFreq(modRate);
         // Offset right channel LFO by 90 degrees for stereo width
         lfoR_.SetFreq(modRate);
@@ -206,18 +206,18 @@ void ModDelayEffect::Update() {
         // Subdivision parameter (index 4) - handled in CalculateDelayTimeFromTempo
         
         // Time parameter (index 5) - TimeParameter stores value in milliseconds
-        TimeParameter* timeParam = static_cast<TimeParameter*>(parameters_[5]);
+        TimeParameter* timeParam = static_cast<TimeParameter*>(parameters_[kParamTime]);
         baseDelayTime_ = timeParam->GetValueAsMs() / 1000.0f; // Convert ms to seconds
 
         // Wave shape parameter (index 6) - controlled by Encoder 2
-        int waveform = static_cast<int>(parameters_[6]->GetValue());
+        int waveform = static_cast<int>(parameters_[kParamWaveShape]->GetValue());
         waveform = clamp(waveform, 0, static_cast<int>(Oscillator::WAVE_LAST - 1));
         lfoL_.SetWaveform(static_cast<uint8_t>(waveform));
         lfoR_.SetWaveform(static_cast<uint8_t>(waveform));
         
         // TempoMode toggle (index 7)
-        if (parameters_[7]->GetType() == ParameterType::TOGGLE) {
-            ToggleParameter* toggleParam = static_cast<ToggleParameter*>(parameters_[7]);
+        if (parameters_[kParamTempoMode]->GetType() == ParameterType::TOGGLE) {
+            ToggleParameter* toggleParam = static_cast<ToggleParameter*>(parameters_[kParamTempoMode]);
             bool newTempoMode = toggleParam->GetState();
             
             // Only update display if the mode actually changed

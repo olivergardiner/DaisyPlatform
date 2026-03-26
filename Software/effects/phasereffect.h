@@ -16,6 +16,16 @@ public:
     void Update() override;
 
 private:
+    enum ParamIndex {
+        kParamMix = 0,
+        kParamDepth,
+        kParamRate,
+        kParamFeedback,
+        kParamCenterHz,
+        kParamStages,
+        kParamWave
+    };
+
     static constexpr int kMaxStages = 8;
 
     struct AllpassStage {

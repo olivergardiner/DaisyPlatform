@@ -51,10 +51,10 @@ void MotorWahEffect::Process(float* in, float* out, size_t size) {
         return;
     }
 
-    float mix = parameters_.size() > 0 ? parameters_[0]->GetValue() : 0.6f;
-    float resonance = parameters_.size() > 1 ? parameters_[1]->GetValue() : 0.9f;
-    float baseFreq = parameters_.size() > 2 ? parameters_[2]->GetValue() : 850.0f;
-    float depthHz = parameters_.size() > 4 ? parameters_[4]->GetValue() : 1800.0f;
+    float mix = parameters_.size() > 0 ? parameters_[kParamMix]->GetValue() : 0.6f;
+    float resonance = parameters_.size() > 1 ? parameters_[kParamResonance]->GetValue() : 0.9f;
+    float baseFreq = parameters_.size() > 2 ? parameters_[kParamFrequency]->GetValue() : 850.0f;
+    float depthHz = parameters_.size() > 4 ? parameters_[kParamDepth]->GetValue() : 1800.0f;
 
     for (size_t i = 0; i < size; ++i) {
         float lfoValue = 0.5f * (lfo_.Process() + 1.0f);
@@ -75,10 +75,10 @@ void MotorWahEffect::ProcessStereo(float* inL, float* inR, float* outL, float* o
         return;
     }
 
-    float mix = parameters_.size() > 0 ? parameters_[0]->GetValue() : 0.6f;
-    float resonance = parameters_.size() > 1 ? parameters_[1]->GetValue() : 0.9f;
-    float baseFreq = parameters_.size() > 2 ? parameters_[2]->GetValue() : 850.0f;
-    float depthHz = parameters_.size() > 4 ? parameters_[4]->GetValue() : 1800.0f;
+    float mix = parameters_.size() > 0 ? parameters_[kParamMix]->GetValue() : 0.6f;
+    float resonance = parameters_.size() > 1 ? parameters_[kParamResonance]->GetValue() : 0.9f;
+    float baseFreq = parameters_.size() > 2 ? parameters_[kParamFrequency]->GetValue() : 850.0f;
+    float depthHz = parameters_.size() > 4 ? parameters_[kParamDepth]->GetValue() : 1800.0f;
 
     for (size_t i = 0; i < size; ++i) {
         float lfoValue = 0.5f * (lfo_.Process() + 1.0f);
@@ -91,8 +91,8 @@ void MotorWahEffect::ProcessStereo(float* inL, float* inR, float* outL, float* o
 
 void MotorWahEffect::Update() {
     if (parameters_.size() >= 6) {
-        float rateHz = parameters_[3]->GetValue();
-        int waveform = static_cast<int>(std::round(parameters_[5]->GetValue()));
+        float rateHz = parameters_[kParamRateHz]->GetValue();
+        int waveform = static_cast<int>(std::round(parameters_[kParamWave]->GetValue()));
 
         lfo_.SetFreq(rateHz);
         lfo_.SetWaveform(static_cast<uint8_t>(waveform));

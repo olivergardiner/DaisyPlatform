@@ -16,6 +16,15 @@ public:
     void Update() override;
 
 private:
+    enum ParamIndex {
+        kParamMix = 0,
+        kParamDepth,
+        kParamRate,
+        kParamFeedback,
+        kParamDelayMs,
+        kParamWave
+    };
+
     static constexpr int kMaxDelaySamples = 8192;
 
     float delayBufferL_[kMaxDelaySamples];

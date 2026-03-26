@@ -59,13 +59,13 @@ void AutowahEffect::Process(float* in, float* out, size_t size) {
     }
     
     // Get mix parameter
-    float mix = parameters_.size() > 0 ? parameters_[0]->GetValue() : 0.5f;
+    float mix = parameters_.size() > 0 ? parameters_[kParamMix]->GetValue() : 0.5f;
 
     // Get parameters
-    float baseFreq = parameters_.size() >= 6 ? parameters_[2]->GetValue() : 1000.0f;
-    float attackTime = parameters_.size() >= 6 ? parameters_[3]->GetValue() : 0.1f;
-    float releaseTime = parameters_.size() >= 6 ? parameters_[4]->GetValue() : 0.001f;
-    float sensitivityHz = parameters_.size() >= 6 ? parameters_[5]->GetValue() : 1600.0f;
+    float baseFreq = parameters_.size() >= 6 ? parameters_[kParamFrequency]->GetValue() : 1000.0f;
+    float attackTime = parameters_.size() >= 6 ? parameters_[kParamAttackMs]->GetValue() : 0.1f;
+    float releaseTime = parameters_.size() >= 6 ? parameters_[kParamReleaseMs]->GetValue() : 0.001f;
+    float sensitivityHz = parameters_.size() >= 6 ? parameters_[kParamSensitivity]->GetValue() : 1600.0f;
 
     // Convert attack/release times to one-pole coefficients.
     float attackSec = std::max(0.0001f, attackTime);
@@ -113,13 +113,13 @@ void AutowahEffect::ProcessStereo(float* inL, float* inR, float* outL, float* ou
     }
     
     // Get mix parameter
-    float mix = parameters_.size() > 0 ? parameters_[0]->GetValue() : 0.5f;
+    float mix = parameters_.size() > 0 ? parameters_[kParamMix]->GetValue() : 0.5f;
     
     // Get parameters
-    float baseFreq = parameters_.size() >= 6 ? parameters_[2]->GetValue() : 1000.0f;
-    float attackTime = parameters_.size() >= 6 ? parameters_[3]->GetValue() : 0.1f;
-    float releaseTime = parameters_.size() >= 6 ? parameters_[4]->GetValue() : 0.001f;
-    float sensitivityHz = parameters_.size() >= 6 ? parameters_[5]->GetValue() : 1600.0f;
+    float baseFreq = parameters_.size() >= 6 ? parameters_[kParamFrequency]->GetValue() : 1000.0f;
+    float attackTime = parameters_.size() >= 6 ? parameters_[kParamAttackMs]->GetValue() : 0.1f;
+    float releaseTime = parameters_.size() >= 6 ? parameters_[kParamReleaseMs]->GetValue() : 0.001f;
+    float sensitivityHz = parameters_.size() >= 6 ? parameters_[kParamSensitivity]->GetValue() : 1600.0f;
 
     float attackSec = std::max(0.0001f, attackTime);
     float releaseSec = std::max(0.0001f, releaseTime);
@@ -172,7 +172,7 @@ void AutowahEffect::Update() {
         // Sensitivity parameter (index 5) - handled in Process
         
         // Resonance parameter (index 1) maps directly to the SVF resonance input
-        float resonance = parameters_[1]->GetValue();
+        float resonance = parameters_[kParamResonance]->GetValue();
         filterL_.SetRes(resonance);
         filterR_.SetRes(resonance);
     }

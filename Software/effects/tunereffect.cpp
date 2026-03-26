@@ -80,7 +80,7 @@ void TunerEffect::ProcessStereo(float* inL, float* inR, float* outL, float* outR
 void TunerEffect::Update() {
     // Update tuning reference from parameter
     if (parameters_.size() > 0) {
-        tuningReference_ = parameters_[0]->GetValue();
+        tuningReference_ = parameters_[kParamTuningReference]->GetValue();
     }
 }
 

@@ -72,14 +72,14 @@ void MysteriousEffect::Update() {
         return;
     }
 
-    float wahMix = parameters_[0]->GetValue();
-    float sweepHz = parameters_[1]->GetValue();
-    float flangeAmount = parameters_[2]->GetValue();
-    float motionRate = parameters_[3]->GetValue();
-    float delayMix = parameters_[4]->GetValue();
-    float space = parameters_[5]->GetValue();
-    TimeParameter* delayTime = static_cast<TimeParameter*>(parameters_[6]);
-    float downBoost = parameters_[7]->GetValue();
+    float wahMix = parameters_[kParamWahMix]->GetValue();
+    float sweepHz = parameters_[kParamSweep]->GetValue();
+    float flangeAmount = parameters_[kParamFlange]->GetValue();
+    float motionRate = parameters_[kParamMotion]->GetValue();
+    float delayMix = parameters_[kParamEcho]->GetValue();
+    float space = parameters_[kParamSpace]->GetValue();
+    TimeParameter* delayTime = static_cast<TimeParameter*>(parameters_[kParamTime]);
+    float downBoost = parameters_[kParamDownBoost]->GetValue();
 
     if (autowahV2Effect_ && autowahV2Effect_->GetParameterCount() >= 8) {
         autowahV2Effect_->GetParameter(0)->SetValue(wahMix);

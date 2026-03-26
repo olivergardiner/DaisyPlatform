@@ -17,6 +17,15 @@ public:
     float GetTempoPulseBrightness() const override;
 
 private:
+    enum ParamIndex {
+        kParamMix = 0,
+        kParamResonance,
+        kParamFrequency,
+        kParamRateHz,
+        kParamDepth,
+        kParamWave
+    };
+
     Oscillator lfo_;
 };
 

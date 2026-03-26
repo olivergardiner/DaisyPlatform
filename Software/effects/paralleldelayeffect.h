@@ -15,6 +15,19 @@ public:
     void Update() override;
 
 private:
+    enum ParamIndex {
+        kParamD1Mix = 0,
+        kParamD1Feedback,
+        kParamD1Subdivision,
+        kParamD2Mix,
+        kParamD2Feedback,
+        kParamD2Subdivision,
+        kParamD1Time,
+        kParamD2Time,
+        kParamD1TempoMode,
+        kParamD2TempoMode
+    };
+
     // Child delay effects
     DelayEffect* delay1_;
     DelayEffect* delay2_;

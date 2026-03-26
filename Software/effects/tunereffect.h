@@ -38,6 +38,10 @@ private:
     float FrequencyToCents(float frequency, float targetFrequency);
     
     // Tuning reference (A4 = 440 Hz by default)
+    enum ParamIndex {
+        kParamTuningReference = 0
+    };
+
     float tuningReference_;
     
     // Detection state

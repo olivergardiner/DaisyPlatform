@@ -16,6 +16,18 @@ public:
     void Update() override;
 
 private:
+    enum ParamIndex {
+        kParamMix = 0,
+        kParamFeedback,
+        kParamSubdivision,
+        kParamMix2,
+        kParamFeedback2,
+        kParamSlapMix,
+        kParamTime1,
+        kParamTime2,
+        kParamTempoMode
+    };
+
     ParallelDelayEffect* parallelDelay_;
     SlapbackDelayEffect* slapbackDelay_;
 

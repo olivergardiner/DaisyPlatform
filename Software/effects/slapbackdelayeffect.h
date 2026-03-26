@@ -19,6 +19,12 @@ public:
     void Update() override;
 
 private:
+    enum ParamIndex {
+        kParamMix = 0,
+        kParamFeedback,
+        kParamTimeMs
+    };
+
     float delayTime_ = 0.125f;  // Default 125ms (typical slapback range)
     float currentDelaySamples_ = 0.0f;  // Cache current delay time in samples
 };

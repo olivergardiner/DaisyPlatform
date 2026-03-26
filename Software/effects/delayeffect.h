@@ -24,6 +24,14 @@ public:
     void OnDeselected() override;
 
 private:
+    enum ParamIndex {
+        kParamMix = 0,
+        kParamFeedback,
+        kParamSubdivision,
+        kParamTime,
+        kParamTempoMode
+    };
+
     float currentDelaySamples_ = 0.0f;  // Cache current delay time in samples
     
     // Pointer to delay lines (allocated from static pool) - kept valid to avoid race conditions

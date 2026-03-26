@@ -112,12 +112,12 @@ void FlangerEffect::Process(float* in, float* out, size_t size) {
         return;
     }
 
-    float mix = Clamp01(parameters_[0]->GetValue());
-    float depth = Clamp01(parameters_[1]->GetValue());
-    float rateHz = parameters_[2]->GetValue();
-    float feedback = parameters_[3]->GetValue();
-    float manualMs = parameters_[4]->GetValue();
-    int waveShape = static_cast<int>(parameters_[5]->GetValue());
+    float mix = Clamp01(parameters_[kParamMix]->GetValue());
+    float depth = Clamp01(parameters_[kParamDepth]->GetValue());
+    float rateHz = parameters_[kParamRate]->GetValue();
+    float feedback = parameters_[kParamFeedback]->GetValue();
+    float manualMs = parameters_[kParamManualMs]->GetValue();
+    int waveShape = static_cast<int>(parameters_[kParamWave]->GetValue());
 
     float maxSweepMs = 6.0f;
     float phaseInc = rateHz / sampleRate_;
@@ -151,12 +151,12 @@ void FlangerEffect::ProcessStereo(float* inL, float* inR, float* outL, float* ou
         return;
     }
 
-    float mix = Clamp01(parameters_[0]->GetValue());
-    float depth = Clamp01(parameters_[1]->GetValue());
-    float rateHz = parameters_[2]->GetValue();
-    float feedback = parameters_[3]->GetValue();
-    float manualMs = parameters_[4]->GetValue();
-    int waveShape = static_cast<int>(parameters_[5]->GetValue());
+    float mix = Clamp01(parameters_[kParamMix]->GetValue());
+    float depth = Clamp01(parameters_[kParamDepth]->GetValue());
+    float rateHz = parameters_[kParamRate]->GetValue();
+    float feedback = parameters_[kParamFeedback]->GetValue();
+    float manualMs = parameters_[kParamManualMs]->GetValue();
+    int waveShape = static_cast<int>(parameters_[kParamWave]->GetValue());
 
     float maxSweepMs = 6.0f;
     float phaseInc = rateHz / sampleRate_;

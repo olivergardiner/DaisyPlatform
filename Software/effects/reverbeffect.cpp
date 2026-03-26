@@ -121,9 +121,9 @@ void ReverbEffect::Update() {
         return;
     }
 
-    float mix = Clamp01(parameters_[0]->GetValue());
-    float feedback = Clamp01(parameters_[1]->GetValue());
-    float lpFreq = parameters_[2]->GetValue();
+    float mix = Clamp01(parameters_[kParamMix]->GetValue());
+    float feedback = Clamp01(parameters_[kParamFeedback]->GetValue());
+    float lpFreq = parameters_[kParamCutoffHz]->GetValue();
 
     SetMix(mix);
     SetFeedback(feedback);

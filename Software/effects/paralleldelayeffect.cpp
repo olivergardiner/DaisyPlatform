@@ -87,24 +87,24 @@ void ParallelDelayEffect::Update() {
     // Update our custom parameters into the child delay effects
     if (parameters_.size() >= 10 && delay1_ && delay2_) {
         // Get parameter values from our parameters
-        float mix1 = parameters_[0]->GetValue();
-        float feedback1 = parameters_[1]->GetValue();
-        float subdivision1 = parameters_[2]->GetValue();
-        float mix2 = parameters_[3]->GetValue();
-        float feedback2 = parameters_[4]->GetValue();
-        float subdivision2 = parameters_[5]->GetValue();
+        float mix1 = parameters_[kParamD1Mix]->GetValue();
+        float feedback1 = parameters_[kParamD1Feedback]->GetValue();
+        float subdivision1 = parameters_[kParamD1Subdivision]->GetValue();
+        float mix2 = parameters_[kParamD2Mix]->GetValue();
+        float feedback2 = parameters_[kParamD2Feedback]->GetValue();
+        float subdivision2 = parameters_[kParamD2Subdivision]->GetValue();
         
         // Delay 1 time parameter (index 6) - TimeParameter stores value in milliseconds
-        TimeParameter* timeParam1 = static_cast<TimeParameter*>(parameters_[6]);
+        TimeParameter* timeParam1 = static_cast<TimeParameter*>(parameters_[kParamD1Time]);
         float delayTime1 = timeParam1->GetValue();
         
         // Delay 2 time parameter (index 7) - TimeParameter stores value in milliseconds
-        TimeParameter* timeParam2 = static_cast<TimeParameter*>(parameters_[7]);
+        TimeParameter* timeParam2 = static_cast<TimeParameter*>(parameters_[kParamD2Time]);
         float delayTime2 = timeParam2->GetValue();
         
         // Delay 1 TempoMode toggle (index 8)
-        if (parameters_[8]->GetType() == ParameterType::TOGGLE) {
-            ToggleParameter* toggleParam1 = static_cast<ToggleParameter*>(parameters_[8]);
+        if (parameters_[kParamD1TempoMode]->GetType() == ParameterType::TOGGLE) {
+            ToggleParameter* toggleParam1 = static_cast<ToggleParameter*>(parameters_[kParamD1TempoMode]);
             bool newTempoMode1 = toggleParam1->GetState();
             
             // Only update display if the mode actually changed
@@ -127,8 +127,8 @@ void ParallelDelayEffect::Update() {
         }
         
         // Delay 2 TempoMode toggle (index 9)
-        if (parameters_[9]->GetType() == ParameterType::TOGGLE) {
-            ToggleParameter* toggleParam2 = static_cast<ToggleParameter*>(parameters_[9]);
+        if (parameters_[kParamD2TempoMode]->GetType() == ParameterType::TOGGLE) {
+            ToggleParameter* toggleParam2 = static_cast<ToggleParameter*>(parameters_[kParamD2TempoMode]);
             bool newTempoMode2 = toggleParam2->GetState();
             
             // Only update display if the mode actually changed

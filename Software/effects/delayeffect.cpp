@@ -130,8 +130,8 @@ void DelayEffect::Process(float* in, float* out, size_t size) {
     }
     
     // Get parameters
-    float mix = parameters_.size() > 0 ? parameters_[0]->GetValue() : 0.5f;
-    float feedback = parameters_.size() > 1 ? parameters_[1]->GetValue() : 0.5f;
+    float mix = parameters_.size() > 0 ? parameters_[kParamMix]->GetValue() : 0.5f;
+    float feedback = parameters_.size() > 1 ? parameters_[kParamFeedback]->GetValue() : 0.5f;
     
     // Process with wet/dry blend
     for (size_t i = 0; i < size; i++) {
@@ -153,8 +153,8 @@ void DelayEffect::ProcessStereo(float* inL, float* inR, float* outL, float* outR
     }
     
     // Get parameters
-    float mix = parameters_.size() > 0 ? parameters_[0]->GetValue() : 0.5f;
-    float feedback = parameters_.size() > 1 ? parameters_[1]->GetValue() : 0.5f;
+    float mix = parameters_.size() > 0 ? parameters_[kParamMix]->GetValue() : 0.5f;
+    float feedback = parameters_.size() > 1 ? parameters_[kParamFeedback]->GetValue() : 0.5f;
     
     // Process stereo signal with independent delays
     for (size_t i = 0; i < size; i++) {
@@ -184,12 +184,12 @@ void DelayEffect::Update() {
         // Subdivision parameter (index 2) - handled in CalculateDelayTimeFromTempo
         
         // Time parameter (index 3) - TimeParameter stores value in milliseconds
-        TimeParameter* timeParam = static_cast<TimeParameter*>(parameters_[3]);
+        TimeParameter* timeParam = static_cast<TimeParameter*>(parameters_[kParamTime]);
         baseDelayTime_ = timeParam->GetValueAsMs() / 1000.0f; // Convert ms to seconds
         
         // TempoMode toggle (index 4)
-        if (parameters_[4]->GetType() == ParameterType::TOGGLE) {
-            ToggleParameter* toggleParam = static_cast<ToggleParameter*>(parameters_[4]);
+        if (parameters_[kParamTempoMode]->GetType() == ParameterType::TOGGLE) {
+            ToggleParameter* toggleParam = static_cast<ToggleParameter*>(parameters_[kParamTempoMode]);
             bool newTempoMode = toggleParam->GetState();
             
             // Only update display if the mode actually changed

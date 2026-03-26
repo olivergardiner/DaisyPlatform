@@ -20,6 +20,15 @@ public:
     float GetTempoPulseBrightness() const override;
 
 private:
+    enum ParamIndex {
+        kParamMix = 0,
+        kParamResonance,
+        kParamFrequency,
+        kParamAttackMs,
+        kParamReleaseMs,
+        kParamSensitivity
+    };
+
     Svf filterL_;
     Svf filterR_;
     float envelope_;

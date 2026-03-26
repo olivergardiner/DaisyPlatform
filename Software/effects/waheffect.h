@@ -19,6 +19,14 @@ public:
     void Update() override;
 
 private:
+    enum ParamIndex {
+        kParamMix = 0,
+        kParamResonance,
+        kParamSweep,
+        kParamLowFreq,
+        kParamHighFreq
+    };
+
     Svf filterL_;
     Svf filterR_;
 };
