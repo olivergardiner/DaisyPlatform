@@ -4,11 +4,12 @@
 #include "parameters/potentiometerparameter.h"
 #include "parameters/encoderparameter.h"
 #include "parameters/toggleparameter.h"
+#include "parameters/timeparameter.h"
 #include "effects/effectfactory.h"
 
 using namespace perspective;
 
-static Perspective* g_perspective = nullptr;
+Perspective* g_perspective = nullptr;
 
 static void AudioCallback(AudioHandle::InputBuffer in, AudioHandle::OutputBuffer out, size_t size) {
     if (g_perspective) {
@@ -16,9 +17,24 @@ static void AudioCallback(AudioHandle::InputBuffer in, AudioHandle::OutputBuffer
     }
 }
 
+
+
 Perspective::Perspective() 
     : currentEffect_(nullptr) {
     g_perspective = this;
+
+    // Create settings parameters (unified model)
+    // Tuning reference (EncoderParameter, matches TunerEffect)
+    settingsParameters_.push_back(new EncoderParameter("Tuner Ref", 420.0f, 460.0f, 440.0f, 0.5f, ENCODER_1_IDX, 0));
+    // Metronome volume (PotentiometerParameter, log taper)
+    settingsParameters_.push_back(new PotentiometerParameter("Met Vol", 0.0f, 1.0f, 0.7f, PotCurve::LOG, KNOB_1_IDX, 1));
+
+    // Metronome mode (PotentiometerParameter, discrete, knob 3)
+    static const char* kMetronomeModes[] = {"Bass", "Snare", "Click", "High"};
+    auto* modeParam = new PotentiometerParameter("Met Mode", 0.0f, 3.0f, 0.0f, PotCurve::LIN, KNOB_3_IDX, 2);
+    modeParam->SetDisplayType(DisplayType::DISCRETE);
+    modeParam->SetDiscreteValues(kMetronomeModes, 4);
+    settingsParameters_.push_back(modeParam);
 }
 
 Perspective::~Perspective() {
@@ -38,12 +54,26 @@ void Perspective::Init() {
 
 void Perspective::Exec() {
     while(true) {
-        hardware.ProcessControls();
-        eventHandler_.ProcessEvents();
-        
-        // Update tuner display when in tuner mode
-        if (tunerMode_) {
-            UpdateTunerDisplay();
+        if (mode_ == PerspectiveMode::TUNER) {
+            // In tuner mode skip control/event processing - only sw1 raw poll needed for exit.
+            perspective::Switch* sw1 = hardware.GetSwitch(0);
+            if (sw1) {
+                bool pressed = sw1->RawState();
+                if (!tunerSw1ReleasedOnce_) {
+                    if (!pressed) tunerSw1ReleasedOnce_ = true;
+                } else if (pressed) {
+                    ExitTunerMode();
+                }
+            }
+
+            uint32_t now = System::GetNow();
+            if (now - lastTunerDisplayTime_ >= 100) {
+                lastTunerDisplayTime_ = now;
+                UpdateTunerDisplay();
+            }
+        } else {
+            hardware.ProcessControls();
+            eventHandler_.ProcessEvents();
         }
 
         hardware.DelayMs(1); // Small delay to allow events to accumulate
@@ -60,9 +90,15 @@ void Perspective::AudioCallbackImpl(AudioHandle::InputBuffer in, AudioHandle::Ou
         return;
     }
 
-    if (tunerMode_ && tunerEffect_) {
+    if (mode_ == PerspectiveMode::TUNER && tunerEffect_) {
         // Tuner mode: process for pitch detection but mute output
         tunerEffect_->ProcessStereo(const_cast<float*>(in[0]), const_cast<float*>(in[1]), out[0], out[1], size);
+        for (size_t i = 0; i < size; i++) {
+            out[0][i] = 0.0f;
+            out[1][i] = 0.0f;
+        }
+    } else if (mode_ == PerspectiveMode::PRESET && presetMuted_) {
+        // Preset mode with empty slot: mute output
         for (size_t i = 0; i < size; i++) {
             out[0][i] = 0.0f;
             out[1][i] = 0.0f;
@@ -104,6 +140,7 @@ void Perspective::RegisterEventListeners() {
     // Generic listener for knob changes - updates effect parameters
     eventHandler_.RegisterListener(
         [this](const UIEvent& event) {
+            if (mode_ != PerspectiveMode::EFFECT) return;
             if (!currentEffect_) return;
             
             // Find parameter with matching index
@@ -137,8 +174,13 @@ void Perspective::RegisterEventListeners() {
     // Generic listener for encoder changes - updates effect parameters
     eventHandler_.RegisterListener(
         [this](const UIEvent& event) {
+            if (mode_ != PerspectiveMode::EFFECT && mode_ != PerspectiveMode::PRESET) return;
             if (!currentEffect_) return;
-            
+            if (mode_ == PerspectiveMode::PRESET && presetEditMode_) return;
+            // In preset mode, only allow encoder 1 changes for tempo effects
+            if (mode_ == PerspectiveMode::PRESET
+                && (!currentEffect_->HasTempoMode() || event.controlIndex != ENCODER_1_IDX)) return;
+
             // Find parameter with matching index
             for (size_t i = 0; i < currentEffect_->GetParameterCount(); i++) {
                 EffectParameter* param = currentEffect_->GetParameter(i);
@@ -168,11 +210,61 @@ void Perspective::RegisterEventListeners() {
         },
         UIEventType::ENCODER_CHANGED
     );
+
+
+    // Settings mode: handle all settings parameters (knob/encoder)
+    eventHandler_.RegisterListener(
+        [this](const UIEvent& event) {
+            if (mode_ != PerspectiveMode::SETTINGS) return;
+            for (size_t i = 0; i < settingsParameters_.size(); i++) {
+                EffectParameter* param = settingsParameters_[i];
+                if (param && param->GetIndex() == event.controlIndex) {
+                    if (param->GetType() == ParameterType::ENCODER) {
+                        EncoderParameter* encParam = static_cast<EncoderParameter*>(param);
+                        if (event.value > 0) {
+                            encParam->Increment(event.value);
+                        } else if (event.value < 0) {
+                            encParam->Decrement(-event.value);
+                        }
+                    } else if (param->GetType() == ParameterType::POTENTIOMETER) {
+                        PotentiometerParameter* potParam = static_cast<PotentiometerParameter*>(param);
+                        Knob* knob = static_cast<Knob*>(event.source);
+                        float normalizedValue = knob->Value();
+                        potParam->SetNormalizedValueWithCurve(normalizedValue);
+                    }
+                    // Update display
+                    UpdateParameterDisplay(param, param->GetDisplayIndex() + 1);
+                }
+            }
+        },
+        UIEventType::ENCODER_CHANGED
+    );
+    eventHandler_.RegisterListener(
+        [this](const UIEvent& event) {
+            if (mode_ != PerspectiveMode::SETTINGS) return;
+            for (size_t i = 0; i < settingsParameters_.size(); i++) {
+                EffectParameter* param = settingsParameters_[i];
+                if (param && param->GetIndex() == event.controlIndex && param->GetType() == ParameterType::POTENTIOMETER) {
+                    PotentiometerParameter* potParam = static_cast<PotentiometerParameter*>(param);
+                    Knob* knob = static_cast<Knob*>(event.source);
+                    float normalizedValue = knob->Value();
+                    potParam->SetNormalizedValueWithCurve(normalizedValue);
+                    UpdateParameterDisplay(param, param->GetDisplayIndex() + 1);
+                }
+            }
+        },
+        UIEventType::KNOB_CHANGED
+    );
     
     // Generic listener for button presses - updates toggle parameters
     eventHandler_.RegisterListener(
         [this](const UIEvent& event) {
+            if (mode_ != PerspectiveMode::EFFECT && mode_ != PerspectiveMode::PRESET) return;
             if (!currentEffect_) return;
+            if (mode_ == PerspectiveMode::PRESET && presetEditMode_) return;
+            // In preset mode, only allow encoder 1 button toggles for tempo effects
+            if (mode_ == PerspectiveMode::PRESET
+                && (!currentEffect_->HasTempoMode() || event.controlIndex != ENCODER_1_BUTTON_IDX)) return;
             
             // Find parameter with matching index
             for (size_t i = 0; i < currentEffect_->GetParameterCount(); i++) {
@@ -200,9 +292,21 @@ void Perspective::RegisterEventListeners() {
         UIEventType::BUTTON_RELEASED
     );
     
-    // Register listener for Switch_1 being pressed (next effect)
+    // Register listener for Switch_1 being pressed (next effect / exit settings / preset up)
+    // Note: tuner exit is handled via direct polling in Exec() to bypass event timing issues
     eventHandler_.RegisterListenerByIndex(
         [this](const UIEvent& event) {
+            if (mode_ == PerspectiveMode::SETTINGS) {
+                ExitSettingsMode();
+                return;
+            }
+            if (mode_ == PerspectiveMode::PRESET) {
+                if (presetEditMode_) return;
+                currentPresetSlot_ = (currentPresetSlot_ + 1) % PRESET_COUNT;
+                LoadPresetAtIndex(currentPresetSlot_);
+                return;
+            }
+            if (mode_ != PerspectiveMode::EFFECT) return;
             if (effects_.empty()) return;
             
             // Navigate to next effect (wrap around)
@@ -215,23 +319,79 @@ void Perspective::RegisterEventListeners() {
         UIEventType::BUTTON_RELEASED,
         0  // Index 0 = Switch_1
     );
-    
-    // Register listener for Switch_1 being held (tuner mode toggle)
+
+    // Preset mode: encoder 2 rotation selects edit option (only when in edit sub-mode)
     eventHandler_.RegisterListenerByIndex(
         [this](const UIEvent& event) {
-            if (tunerMode_) {
-                ExitTunerMode();
+            if (mode_ != PerspectiveMode::PRESET) return;
+            if (!presetEditMode_) return;
+            
+            int optionCount = static_cast<int>(PresetEditOption::COUNT);
+            if (event.value > 0) {
+                presetEditSelection_ = (presetEditSelection_ + 1) % optionCount;
+            } else if (event.value < 0) {
+                presetEditSelection_ = (presetEditSelection_ + optionCount - 1) % optionCount;
+            }
+            UpdatePresetDisplay();
+        },
+        UIEventType::ENCODER_CHANGED,
+        1  // Index 1 = Encoder 2
+    );
+
+    // Preset mode: encoder 2 button toggles edit sub-mode / confirms action
+    eventHandler_.RegisterListenerByIndex(
+        [this](const UIEvent& event) {
+            if (mode_ != PerspectiveMode::PRESET) return;
+            
+            if (!presetEditMode_) {
+                EnterPresetEditMode();
             } else {
-                EnterTunerMode();
+                ExecutePresetEditAction();
+            }
+        },
+        UIEventType::BUTTON_RELEASED,
+        ENCODER_2_BUTTON_IDX
+    );
+    
+    // Register listener for Switch_1 being held (enter preset mode / exit preset mode)
+    eventHandler_.RegisterListenerByIndex(
+        [this](const UIEvent& event) {
+            if (mode_ == PerspectiveMode::PRESET) {
+                if (presetEditMode_) return;
+                ExitPresetMode();
+                return;
+            }
+            if (mode_ == PerspectiveMode::EFFECT) {
+                EnterPresetMode();
             }
         },
         UIEventType::BUTTON_HELD,
         0  // Index 0 = Switch_1
     );
+
+    // Register listener for Switch_1 + Switch_2 held together (enter settings mode)
+    eventHandler_.RegisterListener(
+        [this](const UIEvent& event) {
+            if (mode_ != PerspectiveMode::EFFECT) return;
+            bool isSwitch1And2 = (event.controlIndex == 0 && event.previousValue == 1)
+                              || (event.controlIndex == 1 && event.previousValue == 0);
+            if (isSwitch1And2) {
+                EnterSettingsMode();
+            }
+        },
+        UIEventType::BUTTONS_HELD_TOGETHER
+    );
     
-    // Register listener for Switch_2 being pressed (previous effect)
+    // Register listener for Switch_2 being pressed (previous effect / preset down)
     eventHandler_.RegisterListenerByIndex(
         [this](const UIEvent& event) {
+            if (mode_ == PerspectiveMode::PRESET) {
+                if (presetEditMode_) return;
+                currentPresetSlot_ = (currentPresetSlot_ + PRESET_COUNT - 1) % PRESET_COUNT;
+                LoadPresetAtIndex(currentPresetSlot_);
+                return;
+            }
+            if (mode_ != PerspectiveMode::EFFECT) return;
             if (effects_.empty()) return;
             
             // Navigate to previous effect (wrap around)
@@ -242,39 +402,54 @@ void Perspective::RegisterEventListeners() {
             }
         },
         UIEventType::BUTTON_RELEASED,
-         1  // Index 1 = Switch_2
-   );
-    
-    // Register listener for Switch_3 being pressed (bypass toggle)
+        1  // Index 1 = Switch_2
+    );
+
+    // Register listener for Switch_2 being held (enter tuner mode)
     eventHandler_.RegisterListenerByIndex(
         [this](const UIEvent& event) {
+            if (mode_ == PerspectiveMode::EFFECT) {
+                EnterTunerMode();
+            }
+        },
+        UIEventType::BUTTON_HELD,
+        1  // Index 1 = Switch_2
+    );
+    
+    // Register listener for Switch_3 being pressed (bypass toggle) - works in EFFECT and PRESET modes
+    eventHandler_.RegisterListenerByIndex(
+        [this](const UIEvent& event) {
+            if (mode_ != PerspectiveMode::EFFECT && mode_ != PerspectiveMode::PRESET) return;
             ToggleBypass();
         },
         UIEventType::BUTTON_RELEASED,
         2  // Index 2 = Switch_3
     );
     
-    // Register listener for Switch_3 being held (bypass type toggle)
+    // Register listener for Switch_3 being held (bypass type toggle) - works in EFFECT and PRESET modes
     eventHandler_.RegisterListenerByIndex(
         [this](const UIEvent& event) {
+            if (mode_ != PerspectiveMode::EFFECT && mode_ != PerspectiveMode::PRESET) return;
             ToggleBypassType();
         },
         UIEventType::BUTTON_HELD,
         2  // Index 2 = Switch_3
     );
     
-    // Register listener for Switch_4 being pressed (tap tempo)
+    // Register listener for Switch_4 being pressed (tap tempo) - works in EFFECT and PRESET modes
     eventHandler_.RegisterListenerByIndex(
         [this](const UIEvent& event) {
+            if (mode_ != PerspectiveMode::EFFECT && mode_ != PerspectiveMode::PRESET) return;
             HandleTapTempo();
         },
         UIEventType::BUTTON_RELEASED,
         3  // Index 3 = Switch_4
     );
     
-    // Register listener for Switch_4 being held (metronome toggle)
+    // Register listener for Switch_4 being held (metronome toggle) - works in EFFECT and PRESET modes
     eventHandler_.RegisterListenerByIndex(
         [this](const UIEvent& event) {
+            if (mode_ != PerspectiveMode::EFFECT && mode_ != PerspectiveMode::PRESET) return;
             ToggleMetronome();
         },
         UIEventType::BUTTON_HELD,
@@ -345,6 +520,7 @@ void Perspective::ToggleMetronome() {
     
     // Propagate to current effect
     currentEffect_->SetMetronomeEnabled(metronomeEnabled_);
+    currentEffect_->SetMetronomeLevel(metronomeLevel_);
     currentEffect_->Update();
     
     UpdateStatusDisplay();
@@ -363,7 +539,20 @@ void Perspective::LoadEffects() {
     // Set display update callback for all effects
     for (auto* effect : effects_) {
         effect->SetDisplayUpdateCallback([this](EffectParameter* param, size_t displayIndex) {
-            this->UpdateParameterDisplay(param, displayIndex + 1); // +1 to skip effect name display
+            if (switchingEffect_) return; // Suppress during effect switching
+            if (mode_ == PerspectiveMode::PRESET) {
+                // In preset mode, only encoder 1 params on tempo effects are highlighted
+                bool controllable = currentEffect_ && currentEffect_->HasTempoMode()
+                    && param->GetType() == ParameterType::ENCODER
+                    && param->GetIndex() == ENCODER_1_IDX;
+                if (controllable) {
+                    this->UpdateParameterDisplayHighlighted(param, displayIndex + 1);
+                } else {
+                    this->UpdateParameterDisplay(param, displayIndex + 1);
+                }
+            } else {
+                this->UpdateParameterDisplay(param, displayIndex + 1); // +1 to skip effect name display
+            }
         });
     }
     
@@ -388,6 +577,7 @@ void Perspective::SetCurrentEffect(size_t index) {
     
     // Propagate global metronome state to new effect (propagates through compound effect hierarchy)
     nextEffect->SetMetronomeEnabled(metronomeEnabled_);
+    nextEffect->SetMetronomeLevel(metronomeLevel_);
     
     // Update effect to apply metronome state propagation through compound effect children
     nextEffect->Update();
@@ -421,6 +611,14 @@ void Perspective::UpdateParameterDisplay(EffectParameter* param, size_t displayI
     hardware.SetParameterDisplay(displayIndex, param->GetName(), valueStr);
 }
 
+void Perspective::UpdateParameterDisplayHighlighted(EffectParameter* param, size_t displayIndex) {
+    if (!param) return;
+    
+    char valueStr[16];
+    param->GetValueAsString(valueStr, sizeof(valueStr));
+    hardware.SetParameterDisplayHighlighted(displayIndex, param->GetName(), valueStr);
+}
+
 void Perspective::UpdateStatusDisplay() {
     const char* bypassText = "";
     if (bypassMode_) {
@@ -433,56 +631,271 @@ void Perspective::UpdateStatusDisplay() {
 void Perspective::EnterTunerMode() {
     if (!tunerEffect_) return;
     
-    tunerMode_ = true;
+    mode_ = PerspectiveMode::TUNER;
     bypassMode_ = false;  // Disable bypass when entering tuner mode
+
+    // Init direct-poll state for exit detection
+    tunerSw1ReleasedOnce_ = false;
+    lastTunerDisplayTime_ = 0;  // Force immediate first update
     
-    // Clear display and show tuner interface
+    // Clear parameter text and enable full-screen tuner overlay
     hardware.ClearDisplay();
-    hardware.SetParameterDisplay(0, "TUNER MODE", "");
     
     // Initial tuner display
     UpdateTunerDisplay();
 }
 
 void Perspective::ExitTunerMode() {
-    tunerMode_ = false;
+    mode_ = PerspectiveMode::EFFECT;
+    hardware.HideTunerOverlay();
     
     // Restore current effect display
     SetCurrentEffect(currentEffectIndex_);
 }
 
-void Perspective::UpdateTunerDisplay() {
-    if (!tunerEffect_ || !tunerMode_) return;
-    
-    char noteStr[16];
-    char freqStr[16];
-    char centsStr[16];
-    
-    if (tunerEffect_->IsSignalDetected()) {
-        // Format note name with octave
-        snprintf(noteStr, sizeof(noteStr), "%s%d", 
-                 tunerEffect_->GetNoteName(), 
-                 tunerEffect_->GetNoteOctave());
-        
-        // Format frequency
-        snprintf(freqStr, sizeof(freqStr), "%.1f Hz", 
-                 tunerEffect_->GetDetectedFrequency());
-        
-        // Format cents offset with sign
-        float cents = tunerEffect_->GetCentsOffset();
-        if (cents > 0) {
-            snprintf(centsStr, sizeof(centsStr), "+%.0f", cents);
-        } else {
-            snprintf(centsStr, sizeof(centsStr), "%.0f", cents);
+void Perspective::EnterSettingsMode() {
+    mode_ = PerspectiveMode::SETTINGS;
+    hardware.ClearDisplay();
+    hardware.SetParameterDisplay(0, "Settings", "");
+    // Show all settings parameters
+    for (size_t i = 0; i < settingsParameters_.size(); i++) {
+        EffectParameter* param = settingsParameters_[i];
+        if (param && param->GetDisplayIndex() >= 0) {
+            UpdateParameterDisplay(param, param->GetDisplayIndex() + 1);
         }
-    } else {
-        snprintf(noteStr, sizeof(noteStr), "--");
-        snprintf(freqStr, sizeof(freqStr), "---");
-        snprintf(centsStr, sizeof(centsStr), "--");
+    }
+}
+
+void Perspective::ExitSettingsMode() {
+    // On exit, propagate settings parameter values to global state
+    // Tuning reference
+    if (settingsParameters_.size() > kSettingsParamTuningReference) {
+        float ref = settingsParameters_[kSettingsParamTuningReference]->GetValue();
+        if (tunerEffect_ && tunerEffect_->GetParameterCount() > 0) {
+            tunerEffect_->GetParameter(0)->SetValue(ref);
+            tunerEffect_->Update();
+        }
+    }
+    // Metronome level
+    if (settingsParameters_.size() > kSettingsParamMetronomeLevel) {
+        metronomeLevel_ = settingsParameters_[kSettingsParamMetronomeLevel]->GetValue();
+        if (currentEffect_) {
+            currentEffect_->SetMetronomeLevel(metronomeLevel_);
+        }
+    }
+    // Metronome mode
+    if (settingsParameters_.size() > kSettingsParamMetronomeMode) {
+        metronomeMode_ = settingsParameters_[kSettingsParamMetronomeMode]->GetValueAsInt(3);
+    }
+    mode_ = PerspectiveMode::EFFECT;
+    SetCurrentEffect(currentEffectIndex_);
+}
+
+void Perspective::EnterPresetMode() {
+    CacheCurrentEffect();
+    mode_ = PerspectiveMode::PRESET;
+    presetEditMode_ = false;
+    presetEditSelection_ = 0;
+    LoadPresetAtIndex(currentPresetSlot_);
+}
+
+void Perspective::ExitPresetMode() {
+    presetEditMode_ = false;
+    mode_ = PerspectiveMode::EFFECT;
+    RestoreCachedEffect();
+}
+
+void Perspective::CacheCurrentEffect() {
+    cachedEffectIndex_ = currentEffectIndex_;
+    cachedParamCount_ = 0;
+    if (currentEffect_) {
+        size_t count = currentEffect_->GetParameterCount();
+        if (count > PRESET_MAX_PARAMS) count = PRESET_MAX_PARAMS;
+        for (size_t i = 0; i < count; i++) {
+            EffectParameter* p = currentEffect_->GetParameter(i);
+            cachedParamValues_[i] = p ? p->GetValue() : 0.0f;
+        }
+        cachedParamCount_ = count;
+    }
+}
+
+void Perspective::RestoreCachedEffect() {
+    if (cachedEffectIndex_ >= effects_.size()) {
+        SetCurrentEffect(0);
+        return;
     }
     
-    hardware.SetParameterDisplay(1, "Note", noteStr);
-    hardware.SetParameterDisplay(2, "Frequency", freqStr);
-    hardware.SetParameterDisplay(3, "Cents", centsStr);
+    // Switch to the cached effect
+    SetCurrentEffect(cachedEffectIndex_);
+    
+    // Restore cached parameter values
+    if (currentEffect_) {
+        size_t count = currentEffect_->GetParameterCount();
+        if (count > cachedParamCount_) count = cachedParamCount_;
+        for (size_t i = 0; i < count; i++) {
+            EffectParameter* p = currentEffect_->GetParameter(i);
+            if (p) p->SetValue(cachedParamValues_[i]);
+        }
+        currentEffect_->Update();
+        
+        // Refresh display with restored values
+        hardware.ClearDisplay();
+        hardware.SetParameterDisplay(0, currentEffect_->GetName(), "");
+        for (size_t i = 0; i < currentEffect_->GetParameterCount(); i++) {
+            EffectParameter* param = currentEffect_->GetParameter(i);
+            if (param && param->GetDisplayIndex() >= 0) {
+                UpdateParameterDisplay(param, param->GetDisplayIndex() + 1);
+            }
+        }
+        UpdateStatusDisplay();
+    }
+}
+
+void Perspective::LoadPresetAtIndex(size_t slot) {
+    if (slot >= PRESET_COUNT) return;
+    
+    presetMuted_ = !presetBank_.IsOccupied(slot);
+    
+    if (presetMuted_) {
+        // Empty slot - show empty label, mute output
+        hardware.ClearDisplay();
+        char title[32];
+        snprintf(title, sizeof(title), "P%d ** Empty **", static_cast<int>(slot + 1));
+        hardware.SetParameterDisplay(0, title, "");
+        UpdateStatusDisplay();
+        return;
+    }
+    
+    const PresetData& preset = presetBank_.Get(slot);
+    
+    if (preset.effectIndex >= effects_.size()) {
+        presetMuted_ = true;
+        hardware.ClearDisplay();
+        char title[32];
+        snprintf(title, sizeof(title), "P%d ?? Invalid ??", static_cast<int>(slot + 1));
+        hardware.SetParameterDisplay(0, title, "");
+        return;
+    }
+    
+    // Switch to the preset's effect
+    switchingEffect_ = true;
+    
+    Effect* presetEffect = effects_[preset.effectIndex];
+    if (currentEffect_) {
+        currentEffect_->OnDeselected();
+    }
+    presetEffect->OnSelected();
+    
+    // Restore parameter values from preset
+    size_t count = presetEffect->GetParameterCount();
+    if (count > preset.paramCount) count = preset.paramCount;
+    for (size_t i = 0; i < count; i++) {
+        EffectParameter* p = presetEffect->GetParameter(i);
+        if (p) p->SetValue(preset.params[i].value);
+    }
+    
+    presetEffect->SetMetronomeEnabled(metronomeEnabled_);
+    presetEffect->SetMetronomeLevel(metronomeLevel_);
+    presetEffect->Update();
+    
+    currentEffectIndex_ = preset.effectIndex;
+    currentEffect_ = presetEffect;
+    switchingEffect_ = false;
+    
+    UpdatePresetDisplay();
+}
+
+void Perspective::UpdatePresetDisplay() {
+    hardware.ClearDisplay();
+    
+    char title[32];
+    if (presetBank_.IsOccupied(currentPresetSlot_)) {
+        const PresetData& preset = presetBank_.Get(currentPresetSlot_);
+        snprintf(title, sizeof(title), "P%d %s", static_cast<int>(currentPresetSlot_ + 1), preset.name);
+    } else {
+        snprintf(title, sizeof(title), "P%d ** Empty **", static_cast<int>(currentPresetSlot_ + 1));
+    }
+    hardware.SetParameterDisplay(0, title, "");
+    
+    // Show all parameters; grey out those that can't be controlled in preset mode
+    if (!presetMuted_ && currentEffect_) {
+        bool hasTempo = currentEffect_->HasTempoMode();
+        for (size_t i = 0; i < currentEffect_->GetParameterCount(); i++) {
+            EffectParameter* param = currentEffect_->GetParameter(i);
+            if (param && param->GetDisplayIndex() >= 0) {
+                size_t slot = param->GetDisplayIndex() + 1;
+                bool controllable = hasTempo && param->GetType() == ParameterType::ENCODER
+                    && param->GetIndex() == ENCODER_1_IDX;
+                if (controllable) {
+                    UpdateParameterDisplayHighlighted(param, slot);
+                } else {
+                    UpdateParameterDisplay(param, slot);
+                }
+            }
+        }
+    }
+    
+    // Show edit options if in edit sub-mode
+    if (presetEditMode_) {
+        static const char* editOptionNames[] = { "Save", "Overwrite", "Delete", "Cancel" };
+        hardware.SetParameterDisplay(8, "Edit:", editOptionNames[presetEditSelection_]);
+    }
+    
+    UpdateStatusDisplay();
+}
+
+void Perspective::EnterPresetEditMode() {
+    presetEditMode_ = true;
+    presetEditSelection_ = 0;
+    UpdatePresetDisplay();
+}
+
+void Perspective::ExitPresetEditMode() {
+    presetEditMode_ = false;
+    UpdatePresetDisplay();
+}
+
+void Perspective::ExecutePresetEditAction() {
+    PresetEditOption action = static_cast<PresetEditOption>(presetEditSelection_);
+    
+    switch (action) {
+        case PresetEditOption::SAVE: {
+            if (!presetBank_.IsOccupied(currentPresetSlot_)) {
+                presetBank_.Save(currentPresetSlot_, cachedEffectIndex_,
+                    effects_[cachedEffectIndex_]->GetName(), cachedParamValues_, cachedParamCount_);
+                LoadPresetAtIndex(currentPresetSlot_);
+            }
+            break;
+        }
+        case PresetEditOption::OVERWRITE: {
+            presetBank_.Save(currentPresetSlot_, cachedEffectIndex_,
+                effects_[cachedEffectIndex_]->GetName(), cachedParamValues_, cachedParamCount_);
+            LoadPresetAtIndex(currentPresetSlot_);
+            break;
+        }
+        case PresetEditOption::DELETE: {
+            presetBank_.ClearSlot(currentPresetSlot_);
+            LoadPresetAtIndex(currentPresetSlot_);
+            break;
+        }
+        case PresetEditOption::CANCEL:
+        default:
+            break;
+    }
+    
+    ExitPresetEditMode();
+}
+
+void Perspective::UpdateTunerDisplay() {
+    if (!tunerEffect_ || mode_ != PerspectiveMode::TUNER) return;
+
+    hardware.ShowTunerOverlay(
+        tunerEffect_->GetNoteName(),
+        tunerEffect_->GetNoteOctave(),
+        tunerEffect_->GetCentsOffset(),
+        tunerEffect_->GetDetectedFrequency(),
+        tunerEffect_->GetTuningReference(),
+        tunerEffect_->IsSignalDetected()
+    );
 }
 

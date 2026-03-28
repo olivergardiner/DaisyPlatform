@@ -14,6 +14,8 @@ public:
     TempoEffect(const char* name);
     virtual ~TempoEffect();
     float GetTempoPulseBrightness() const override;
+    bool HasTempoMode() const override { return true; }
+    void SetMetronomeLevel(float level) override { metronomeLevel_ = level; }
 
     // Canonical subdivision glyph strings (shared by all delay-based effects)
     static const char* kSubdivisionGlyphs[8];
@@ -24,17 +26,22 @@ protected:
     float effectiveDelayTime_;  // Cached effective delay time (updated in Update())
     bool tempoMode_ = false;    // false = Time mode (seconds), true = Tempo mode (BPM-based)
     // Note: metronomeEnabled_ is now inherited from Effect base class (global state from Perspective)
-    
-    // Metronome
+
+    // Metronome sound generators
     AnalogBassDrum metronomeDrum_;
+    AnalogSnareDrum metronomeSnare_;
+    HiHat<> metronomeHiHat_;
+    float clickEnv_ = 0.0f;
+    float clickDecay_ = 0.0f;
+
     float samplesUntilNextBeat_ = 0.0f;
     float metronomeLevel_ = 0.7f;  // Mix level for metronome
     float tempoPulseBrightness_ = 0.0f;
-    
+
     // Get metronome sample for current audio frame (call once per sample in derived classes)
     // Returns the metronome audio sample to mix with effect output
     float ProcessMetronome();
-    
+
     // Calculate delay time based on tempo and subdivision
     float CalculateDelayTimeFromTempo();
     

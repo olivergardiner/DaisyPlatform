@@ -23,7 +23,9 @@ public:
     void Update() override;
     void SetTempo(float tempoHz) override;
     void SetMetronomeEnabled(bool enabled) override;
+    void SetMetronomeLevel(float level) override;
     float GetTempoPulseBrightness() const override;
+    bool HasTempoMode() const override;
     void OnSelected() override;
     void OnDeselected() override;
 

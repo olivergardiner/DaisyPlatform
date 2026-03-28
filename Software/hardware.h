@@ -37,7 +37,6 @@ namespace perspective {
         void Init(UIEventHandler* eventHandler = nullptr);
         void ProcessControls();
         void ForceKnobValueChangedEvents();
-        void SetControlUpdateRate(float rate);
         inline void SetProcessing(bool processing) { this->processing = processing; }
         inline void SetLedBrightness(int index, float brightness) {
             if (index >= 0 && index < numLeds) {
@@ -65,6 +64,11 @@ namespace perspective {
             return nullptr;
         }
 
+        inline bool IsSwitchPressed(int index) const {
+            if (index < 0 || index >= numSwitches) return false;
+            return switches[index].Pressed();
+        }
+
         inline perspective::Encoder* GetEncoder(int index) {
             if (index >= 0 && index < numEncoders) {
                 return &encoders[index];
@@ -80,15 +84,16 @@ namespace perspective {
         }
 
         void SetParameterDisplay(int layerIndex, const char* paramName, const char* valueText);
+        void SetParameterDisplayHighlighted(int layerIndex, const char* paramName, const char* valueText);
         void ClearDisplay();
+        void ShowTunerOverlay(const char* noteName, int octave, float centsOffset, float frequency, float referenceFrequency, bool signalDetected);
+        void HideTunerOverlay();
 
     protected:
         void InitControls();
         void InitGFX2Display();
 
         bool boost = true;
-        float controlUpdateRate = 0.0f; // in Hz
-        bool timerRunning=false;
         bool processing = false;
 
         std::vector<Knob> knobs;
@@ -108,7 +113,10 @@ namespace perspective {
         UIEventHandler* eventHandler_;
 
         std::vector<DadGFX::cLayer*> paramLayers;
+        DadGFX::cLayer* tunerLayer_ = nullptr;
         DadGFX::cFont* Arial14;
+        DadGFX::cFont* GillSans72 = nullptr;
+        DadGFX::cFont* GillSans36 = nullptr;
 
         // Track if hold event has been fired for each switch
         bool switchHoldFired_[6] = {false, false, false, false, false, false};
@@ -125,8 +133,6 @@ namespace perspective {
         GPIO rightOut;
         GPIO expression;
         GPIO trueBypass;
-
-        TimerHandle controlTimer;
 
         int knobValues_[7] = {0};
     };

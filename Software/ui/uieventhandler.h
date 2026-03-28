@@ -13,6 +13,7 @@ enum class UIEventType {
     BUTTON_PRESSED,
     BUTTON_RELEASED,
     BUTTON_HELD,
+    BUTTONS_HELD_TOGETHER,
     ENCODER_CHANGED
 };
 
@@ -80,6 +81,7 @@ public:
     void QueueButtonPressed(void* button, int controlIndex);
     void QueueButtonReleased(void* button, int controlIndex);
     void QueueButtonHeld(void* button, int controlIndex, float holdTimeMs);
+    void QueueButtonsHeldTogether(void* button, int controlIndex, int otherControlIndex, float holdTimeMs);
     void QueueEncoderChanged(void* encoder, int controlIndex, int increment);
     
     // Remove all listeners

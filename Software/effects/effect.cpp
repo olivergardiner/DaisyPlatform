@@ -43,6 +43,10 @@ bool Effect::GetMetronomeEnabled() const {
     return metronomeEnabled_;
 }
 
+void Effect::SetMetronomeLevel(float level) {
+    // Base class no-op; TempoEffect overrides
+}
+
 float Effect::GetTempoPulseBrightness() const {
     return 0.0f;
 }
@@ -114,4 +118,8 @@ void Effect::RequestParameterDisplayUpdate(size_t parameterIndex) {
             displayUpdateCallback_(param, param->GetDisplayIndex());
         }
     }
+}
+
+bool Effect::HasTempoMode() const {
+    return false;
 }

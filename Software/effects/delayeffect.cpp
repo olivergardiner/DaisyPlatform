@@ -88,12 +88,27 @@ void DelayEffect::Init(float sampleRate) {
     // Claim delay buffers once at startup (before audio thread starts).
     TryAllocateDelayLines();
     
-    // Initialize metronome bass drum
+    // Initialize metronome sound generators
     metronomeDrum_.Init(sampleRate);
     metronomeDrum_.SetFreq(60.0f);  // Low bass frequency
     metronomeDrum_.SetTone(0.5f);
     metronomeDrum_.SetDecay(0.3f);
     metronomeDrum_.SetAccent(0.8f);
+
+    metronomeSnare_.Init(sampleRate);
+    metronomeSnare_.SetFreq(180.0f); // Snare freq
+    metronomeSnare_.SetTone(0.7f);
+    metronomeSnare_.SetDecay(0.18f);
+    metronomeSnare_.SetAccent(0.8f);
+    metronomeSnare_.SetSnappy(1.0f); // Full snare
+
+    metronomeHiHat_.Init(sampleRate);
+    metronomeHiHat_.SetFreq(8000.0f);
+    metronomeHiHat_.SetTone(0.7f);
+    metronomeHiHat_.SetDecay(0.08f);
+    metronomeHiHat_.SetAccent(0.8f);
+    metronomeHiHat_.SetNoisiness(0.8f);
+    metronomeHiHat_.SetSustain(false);
     samplesUntilNextBeat_ = 0.0f;
     
     // Add parameters: Mix, Feedback, Subdivision, Time, TempoToggle

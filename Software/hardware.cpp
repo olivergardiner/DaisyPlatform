@@ -4,6 +4,10 @@
 
 #include "cDisplay.h"
 #include "fonts/Arial_14p.h"
+#include "fonts/Gill_Sans_Ultra_Bold_72p.h"
+#include "fonts/Gill_Sans_Ultra_Bold_36p.h"
+#include <cstdio>
+#include <cmath>
 
 using namespace daisy;
 using namespace perspective;
@@ -20,13 +24,7 @@ DECLARE_LAYER(ParamLayer_6,220,32)
 DECLARE_LAYER(ParamLayer_7,220,32)
 DECLARE_LAYER(ParamLayer_8,220,32)
 DECLARE_LAYER(ParamLayer_9,220,32)
-
-void timerCallback(void* data)
-{
-    Hardware* hardware = static_cast<Hardware *>(data);
-
-    hardware->ProcessControls();
-}
+DECLARE_LAYER(TunerOverlay,240,320)
 
 Hardware::Hardware() {}
 
@@ -45,48 +43,7 @@ void Hardware::Init(UIEventHandler* eventHandler)
 
     System::Delay(1000); // Allow time for everything to settle
 
-    SetControlUpdateRate(UPDATE_RATE);
-
     PrintLine("Tick Frequency: %d Hz", System::GetTickFreq());
-}
-
-void perspective::Hardware::SetControlUpdateRate(float rate)
-{
-    PrintLine("Setting control update rate to %.2f Hz", rate);
-    for (int i = 0; i < numKnobs; i++) {
-        knobs[i].SetSampleRate(rate / KNOB_DIVISOR);
-    }
-
-    for (int i = 0; i < numSwitches; i++) {
-        switches[i].SetUpdateRate(rate / SWITCH_DIVISOR);
-    }
-
-    for (int i = 0; i < numEncoders; i++) {
-        encoders[i].SetUpdateRate(rate / ENCODER_DIVISOR);
-    }
-
-    for (int i = 0; i < numLeds; i++) {
-        leds[i].SetSampleRate(rate);
-    }
-
-    float tickRate = (boost) ? 24000.0f : 20000.0f; //NB: These values are for a prescaler of 9999 (i.e. the default tick rate / 10000)
-    int period = static_cast<int>(tickRate / rate) - 1;
-
-    TimerHandle::Config config;
-    config.dir = TimerHandle::Config::CounterDir::UP;
-    config.enable_irq = true;
-    config.period = period;
-    config.periph = TimerHandle::Config::Peripheral::TIM_5;
-
-    if (timerRunning) controlTimer.Stop();
-    controlTimer.Init(config);
-    controlTimer.SetPrescaler(9999);
-    controlTimer.SetCallback(timerCallback, this);
-    // Control scanning runs in the main loop to avoid ISR interaction with UI/event processing.
-    //controlTimer.Start();
-    controlUpdateRate = rate;
-
-    timerRunning = true;
 }
 
 void Hardware::ProcessControls() {
@@ -147,12 +104,31 @@ void Hardware::ProcessControls() {
                 // Button is being held - check if threshold reached
                 int holdTime = switches[i].TimeHeld();
                 if (!switchHoldFired_[i] && holdTime >= BUTTON_HOLD_THRESHOLD_MS) {
+                    // Check if any other switch is currently pressed (combo)
+                    int partnerIndex = -1;
+                    for (int j = 0; j < numSwitches; j++) {
+                        if (j != i && switches[j].Pressed()) {
+                            partnerIndex = j;
+                            break;
+                        }
+                    }
                     switchHoldFired_[i] = true;
-                    eventHandler_->QueueButtonHeld(
-                        &switches[i],
-                        i,
-                        holdTime
-                    );
+                    if (partnerIndex >= 0) {
+                        // Suppress partner's held and released events too
+                        switchHoldFired_[partnerIndex] = true;
+                        eventHandler_->QueueButtonsHeldTogether(
+                            &switches[i],
+                            i,
+                            partnerIndex,
+                            holdTime
+                        );
+                    } else {
+                        eventHandler_->QueueButtonHeld(
+                            &switches[i],
+                            i,
+                            holdTime
+                        );
+                    }
                 }
             }
         }
@@ -205,7 +181,7 @@ void Hardware::InitControls()
 
     for (int i = 0; i < numKnobs; i++) {
         Knob newKnob;
-        newKnob.Init(DaisySeed::adc.GetPtr(i), controlUpdateRate / KNOB_DIVISOR);
+        newKnob.Init(DaisySeed::adc.GetPtr(i), UPDATE_RATE / KNOB_DIVISOR);
 
         // Expression pedal calibration: observed physical sweep is ~30%..95%.
         // Map that range to normalized 0..1 for effect parameters.
@@ -221,7 +197,7 @@ void Hardware::InitControls()
 
     for (int i = 0; i < numSwitches; i++) {
         perspective::Switch newSwitch;
-        newSwitch.Init(switchPins[i], controlUpdateRate / SWITCH_DIVISOR);
+        newSwitch.Init(switchPins[i], UPDATE_RATE / SWITCH_DIVISOR);
         switches.push_back(newSwitch);
     }
 
@@ -229,7 +205,7 @@ void Hardware::InitControls()
  
     for (int i = 0; i < numEncoders; i++) {
         perspective::Encoder newEncoder;
-        newEncoder.Init(encoderPins[i][0], encoderPins[i][1], encoderPins[i][2], controlUpdateRate / ENCODER_DIVISOR);
+        newEncoder.Init(encoderPins[i][0], encoderPins[i][1], encoderPins[i][2], UPDATE_RATE / ENCODER_DIVISOR);
         newEncoder.SetStepsPerDetent(ENCODER_STEPS_PER_DETENT);
         newEncoder.SetDirection(ENCODER_DIRECTION);
         encoders.push_back(newEncoder);
@@ -242,7 +218,7 @@ void Hardware::InitControls()
 
     for (int i = 0; i < numLeds; i++) {
         Led newLed;
-        newLed.Init(ledPins[i], false, controlUpdateRate);
+        newLed.Init(ledPins[i], false, UPDATE_RATE);
         leds.push_back(newLed);
     }
 
@@ -280,6 +256,8 @@ void Hardware::InitGFX2Display()
     pBackground->drawFillRect(0,0,240, 320, DadGFX::sColor(9, 111, 148, 255));
 
     Arial14 = new DadGFX::cFont(&__Arial_14p);
+    GillSans72 = new DadGFX::cFont(&__Gill_Sans_Ultra_Bold_72p);
+    GillSans36 = new DadGFX::cFont(&__Gill_Sans_Ultra_Bold_36p);
     // Add EffectName layer and ParamLayers at 32 pixel intervals
     DadGFX::cLayer* pEffectName = ADD_LAYER(EffectName, 10, 0, 2);
     pEffectName->setFont(Arial14);
@@ -311,6 +289,9 @@ void Hardware::InitGFX2Display()
     DadGFX::cLayer* pParam9 = ADD_LAYER(ParamLayer_9, 10, 288, 2);
     pParam9->setFont(Arial14);
     paramLayers.push_back(pParam9);
+
+    tunerLayer_ = ADD_LAYER(TunerOverlay, 0, 0, 3);
+    tunerLayer_->eraseLayer(DadGFX::sColor(0, 0, 0, 0));
     
     __Display.flush();
 }
@@ -336,11 +317,141 @@ void Hardware::SetParameterDisplay(int layerIndex, const char* paramName, const 
     __Display.flush();
 }
 
+void Hardware::SetParameterDisplayHighlighted(int layerIndex, const char* paramName, const char* valueText)
+{
+    if (layerIndex < 0 || layerIndex >= static_cast<int>(paramLayers.size())) {
+        return;
+    }
+
+    DadGFX::cLayer* layer = paramLayers[layerIndex];
+    layer->eraseLayer(DadGFX::sColor(0, 0, 0, 0));
+    layer->setTextFrontColor(DadGFX::sColor(255, 220, 50, 255));
+    
+    // Draw parameter name
+    layer->setCursor(0, 0);
+    layer->drawText(paramName);
+    
+    // Draw value at 160 pixels to the right
+    layer->setCursor(160, 0);
+    layer->drawText(valueText);
+    
+    __Display.flush();
+}
+
 void Hardware::ClearDisplay()
 {
     // Clear all parameter layers
     for (auto* layer : paramLayers) {
         layer->eraseLayer(DadGFX::sColor(0, 0, 0, 0));
     }
+    __Display.flush();
+}
+
+void Hardware::ShowTunerOverlay(const char* noteName, int octave, float centsOffset, float frequency, float referenceFrequency, bool signalDetected)
+{
+    if(!tunerLayer_ || !GillSans72 || !GillSans36)
+    {
+        return;
+    }
+
+    const DadGFX::sColor bgColor(9, 111, 148, 255);
+    const DadGFX::sColor textColor(255, 255, 255, 255);
+    const DadGFX::sColor mutedColor(180, 180, 180, 255);
+    const DadGFX::sColor sharpColor(255, 159, 64, 255); // orange
+    const DadGFX::sColor flatColor(88, 190, 255, 255);  // blue/cyan
+    const DadGFX::sColor inTuneColor(88, 190, 255, 255);
+    const float inTuneThreshold = 2.5f;
+    const float arrowThreshold = 3.0f;
+    const float meterRange = 25.0f;
+
+    tunerLayer_->eraseLayer(bgColor);
+
+    const bool hasNote = signalDetected && noteName && noteName[0] != '-' && noteName[1] != '-';
+
+    char statusText[32];
+    std::snprintf(statusText, sizeof(statusText), "Tuner");
+    tunerLayer_->setFont(Arial14);
+    tunerLayer_->setTextFrontColor(textColor);
+    tunerLayer_->setCursor((240 - Arial14->getTextWidth(statusText)) / 2, 12);
+    tunerLayer_->drawText(statusText);
+
+    // Note + octave
+    char noteDisplay[16];
+    if(hasNote)
+    {
+        std::snprintf(noteDisplay, sizeof(noteDisplay), "%s%d", noteName, octave);
+    }
+    else
+    {
+        std::snprintf(noteDisplay, sizeof(noteDisplay), "-");
+    }
+
+    tunerLayer_->setFont(GillSans72);
+    tunerLayer_->setTextFrontColor(textColor);
+    int noteTextWidth = GillSans72->getTextWidth(noteDisplay);
+    tunerLayer_->setCursor((240 - noteTextWidth) / 2, 52);
+    tunerLayer_->drawText(noteDisplay);
+
+    // Cents meter
+    const int meterX = 24;
+    const int meterY = 224;
+    const int meterW = 192;
+    const int meterH = 18;
+    const int centerX = meterX + meterW / 2;
+    tunerLayer_->drawFillRect(meterX, meterY, meterW, meterH, DadGFX::sColor(15, 35, 45, 255));
+    tunerLayer_->drawFillRect(centerX - 1, meterY - 4, 3, meterH + 8, textColor);
+
+    if(hasNote)
+    {
+        const float absCents = fabsf(centsOffset);
+        const bool isSharp = centsOffset > arrowThreshold;
+        const bool inTune = absCents <= inTuneThreshold;
+        const DadGFX::sColor activeColor = inTune ? inTuneColor : (isSharp ? sharpColor : flatColor);
+
+        float clamped = centsOffset;
+        if(clamped < -meterRange) clamped = -meterRange;
+        if(clamped > meterRange) clamped = meterRange;
+        int offsetPx = static_cast<int>((clamped / meterRange) * (meterW / 2 - 6));
+        if(offsetPx >= 0)
+        {
+            tunerLayer_->drawFillRect(centerX, meterY + 2, offsetPx, meterH - 4, activeColor);
+        }
+        else
+        {
+            tunerLayer_->drawFillRect(centerX + offsetPx, meterY + 2, -offsetPx, meterH - 4, activeColor);
+        }
+    }
+
+    // Bottom text
+    if(hasNote)
+    {
+        char freqStr[32];
+        snprintf(freqStr, sizeof(freqStr), "REF %.1f Hz", referenceFrequency);
+            tunerLayer_->setFont(Arial14);
+        tunerLayer_->setTextFrontColor(textColor);
+            tunerLayer_->setCursor((240 - Arial14->getTextWidth(freqStr)) / 2, 286);
+        tunerLayer_->drawText(freqStr);
+    }
+    else
+    {
+        char freqStr[32];
+        snprintf(freqStr, sizeof(freqStr), "REF %.1f Hz", referenceFrequency);
+            tunerLayer_->setFont(Arial14);
+        tunerLayer_->setTextFrontColor(mutedColor);
+            tunerLayer_->setCursor((240 - Arial14->getTextWidth(freqStr)) / 2, 286);
+        tunerLayer_->drawText(freqStr);
+    }
+
+    __Display.flush();
+}
+
+void Hardware::HideTunerOverlay()
+{
+    if(!tunerLayer_)
+    {
+        return;
+    }
+
+    tunerLayer_->eraseLayer(DadGFX::sColor(0, 0, 0, 0));
     __Display.flush();
 }

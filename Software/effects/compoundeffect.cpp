@@ -189,6 +189,14 @@ void CompoundEffect::SetMetronomeEnabled(bool enabled) {
     }
 }
 
+void CompoundEffect::SetMetronomeLevel(float level) {
+    for (Effect* effect : effects_) {
+        if (effect) {
+            effect->SetMetronomeLevel(level);
+        }
+    }
+}
+
 float CompoundEffect::GetTempoPulseBrightness() const {
     float maxBrightness = 0.0f;
     for (const Effect* effect : effects_) {
@@ -244,4 +252,11 @@ void CompoundEffect::SetScaleParallel(bool scaleParallel) {
 
 bool CompoundEffect::GetScaleParallel() const {
     return scaleParallel_;
+}
+
+bool CompoundEffect::HasTempoMode() const {
+    for (const auto* effect : effects_) {
+        if (effect->HasTempoMode()) return true;
+    }
+    return false;
 }

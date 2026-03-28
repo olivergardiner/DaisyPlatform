@@ -38,7 +38,9 @@ public:
     // Set/get metronome enabled state (global from Perspective)
     virtual void SetMetronomeEnabled(bool enabled);
     bool GetMetronomeEnabled() const;
+    virtual void SetMetronomeLevel(float level);
     virtual float GetTempoPulseBrightness() const;
+    virtual bool HasTempoMode() const;
 
     // Lifecycle hooks when an effect becomes current or is no longer current.
     virtual void OnSelected();

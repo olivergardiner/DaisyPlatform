@@ -5,7 +5,6 @@
 using namespace perspective;
 using namespace daisysp;
 
-// Note names for display
 static const char* NOTE_NAMES[12] = {
     "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"
 };
@@ -19,126 +18,156 @@ TunerEffect::TunerEffect()
     , noteOctave_(0)
     , signalDetected_(false)
     , signalLevel_(0.0f)
-    , pitchDetector_(nullptr)
-    , signalConditioner_(nullptr) {
+    , yinWritePos_(0)
+    , yinEnergyAccum_(0.0f)
+    , noteHoldFrames_(0) {
+    for (int i = 0; i < YIN_BUFFER_SIZE; i++) yinBuffer_[i] = 0.0f;
 }
 
 TunerEffect::~TunerEffect() {
-    delete pitchDetector_;
-    delete signalConditioner_;
 }
 
 void TunerEffect::Init(float sampleRate) {
     sampleRate_ = sampleRate;
-    
-    // Add parameter: Tuning Reference (default A4 = 440Hz, range 430-450Hz)
-    AddParameter(new PotentiometerParameter("Reference", 430.0f, 450.0f, 440.0f, PotCurve::LIN, KNOB_1_IDX));
-    
-    // Initialize cycfi/q pitch detector
-    // Constructor: pitch_detector(lowest_freq, highest_freq, sps, hysteresis)
-    cycfi::q::frequency lowest = MIN_FREQUENCY * 1_Hz;
-    cycfi::q::frequency highest = MAX_FREQUENCY * 1_Hz;
-    pitchDetector_ = new cycfi::q::pitch_detector(lowest, highest, sampleRate, -45_dB);
-    
-    // Initialize signal conditioner with default config
-    auto sc_conf = cycfi::q::signal_conditioner::config{};
-    signalConditioner_ = new cycfi::q::signal_conditioner(sc_conf, lowest, highest, sampleRate);
-    
-    // Reset detection state
+
+    yinWritePos_    = 0;
+    yinEnergyAccum_ = 0.0f;
     detectedFrequency_ = 0.0f;
-    centsOffset_ = 0.0f;
-    noteName_ = "--";
-    noteOctave_ = 0;
-    signalDetected_ = false;
-    signalLevel_ = 0.0f;
-    
+    centsOffset_       = 0.0f;
+    noteName_          = "--";
+    noteOctave_        = 0;
+    signalDetected_    = false;
+    signalLevel_       = 0.0f;
+    noteHoldFrames_    = 0;
+
+    if (parameters_.empty()) {
+        AddParameter(new EncoderParameter("Tuner Ref", 420.0f, 460.0f, 440.0f, 0.5f, ENCODER_1_IDX, 0));
+    }
+
     Update();
 }
 
 void TunerEffect::Process(float* in, float* out, size_t size) {
-    // Tuner passes through the input signal unchanged
-    // But analyzes the signal for pitch detection
-    
-    // Process each sample through signal conditioner and pitch detector
     for (size_t i = 0; i < size; i++) {
-        out[i] = in[i];  // Pass through
-        DetectPitch(in[i]);
+        out[i] = in[i];
+        ProcessSample(in[i]);
     }
 }
 
 void TunerEffect::ProcessStereo(float* inL, float* inR, float* outL, float* outR, size_t size) {
-    // For stereo, analyze the left channel and pass through both
-    
-    // Process each sample
     for (size_t i = 0; i < size; i++) {
-        outL[i] = inL[i];  // Pass through
-        outR[i] = inR[i];  // Pass through
-        DetectPitch(inL[i]);  // Analyze left channel
+        outL[i] = inL[i];
+        outR[i] = inR[i];
+        ProcessSample(inL[i]);
     }
 }
 
 void TunerEffect::Update() {
-    // Update tuning reference from parameter
-    if (parameters_.size() > 0) {
-        tuningReference_ = parameters_[kParamTuningReference]->GetValue();
+    tuningReference_ = parameters_.size() > kParamTuningReference
+        ? parameters_[kParamTuningReference]->GetValue()
+        : 440.0f;
+}
+
+void TunerEffect::ProcessSample(float sample) {
+    yinBuffer_[yinWritePos_] = sample;
+    yinEnergyAccum_ += sample * sample;
+    yinWritePos_++;
+
+    if (yinWritePos_ >= YIN_BUFFER_SIZE) {
+        float rms = sqrtf(yinEnergyAccum_ / YIN_BUFFER_SIZE);
+        signalLevel_ = rms;
+
+        if (rms >= SIGNAL_RMS_THRESHOLD) {
+            signalDetected_ = true;
+            RunYIN();
+        } else {
+            if(noteHoldFrames_ > 0) {
+                noteHoldFrames_--;
+            } else {
+                signalDetected_    = false;
+                detectedFrequency_ = 0.0f;
+                centsOffset_       = 0.0f;
+                noteName_          = "-";
+                noteOctave_        = 0;
+            }
+        }
+
+        yinWritePos_    = 0;
+        yinEnergyAccum_ = 0.0f;
     }
 }
 
-void TunerEffect::DetectPitch(float sample) {
-    if (!pitchDetector_ || !signalConditioner_) {
-        return;
-    }
-    
-    // Condition the signal
-    float conditioned = (*signalConditioner_)(sample);
-    
-    // Update signal level from conditioner
-    signalLevel_ = signalConditioner_->signal_env();
-    
-    // Check gate state
-    signalDetected_ = signalConditioner_->gate();
-    
-    // Feed sample to pitch detector
-    bool is_ready = (*pitchDetector_)(conditioned);
-    
-    // Get frequency when ready
-    if (is_ready && signalDetected_) {
-        float frequency = pitchDetector_->get_frequency();
-        if (frequency > 0.0f) {
-            detectedFrequency_ = frequency;
-            UpdateNoteInfo();
+void TunerEffect::RunYIN() {
+    // YIN algorithm (de Cheveigne & Kawahara, 2002)
+    // Step 1+2: Difference function + cumulative mean normalised difference (CMNDF)
+    yinDiff_[0]        = 1.0f;
+    float runningSum   = 0.0f;
+
+    for (int tau = 1; tau < YIN_HALF_SIZE; tau++) {
+        float diff = 0.0f;
+        for (int j = 0; j < YIN_HALF_SIZE; j++) {
+            float delta = yinBuffer_[j] - yinBuffer_[j + tau];
+            diff += delta * delta;
         }
-    } else if (!signalDetected_) {
-        // No signal, reset
-        detectedFrequency_ = 0.0f;
-        centsOffset_ = 0.0f;
-        noteName_ = "--";
-        noteOctave_ = 0;
+        runningSum += diff;
+        yinDiff_[tau] = (runningSum > 0.0f) ? diff * tau / runningSum : 0.0f;
+    }
+
+    // Step 3: Absolute threshold — first local minimum below threshold
+    int tau = 2;
+    while (tau < YIN_HALF_SIZE - 1) {
+        if (yinDiff_[tau] < YIN_THRESHOLD) {
+            while (tau + 1 < YIN_HALF_SIZE - 1 && yinDiff_[tau + 1] < yinDiff_[tau]) {
+                tau++;
+            }
+            break;
+        }
+        tau++;
+    }
+
+    if (tau >= YIN_HALF_SIZE - 1) {
+        if(noteHoldFrames_ > 0) {
+            noteHoldFrames_--;
+        }
+        return; // No reliable pitch found; keep last valid reading
+    }
+
+    // Step 4: Parabolic interpolation for sub-sample accuracy
+    float betterTau;
+    {
+        float s0    = yinDiff_[tau - 1];
+        float s1    = yinDiff_[tau];
+        float s2    = yinDiff_[tau + 1];
+        float denom = 2.0f * s1 - s0 - s2;
+        betterTau   = (denom != 0.0f) ? tau + (s2 - s0) / (2.0f * denom) : (float)tau;
+    }
+
+    float frequency = sampleRate_ / betterTau;
+    if (frequency >= MIN_FREQUENCY && frequency <= MAX_FREQUENCY) {
+        detectedFrequency_ = (detectedFrequency_ > 0.0f)
+            ? detectedFrequency_ + FREQUENCY_SMOOTHING * (frequency - detectedFrequency_)
+            : frequency;
+        noteHoldFrames_ = NOTE_HOLD_MAX_FRAMES;
+        UpdateNoteInfo();
     }
 }
 
 void TunerEffect::UpdateNoteInfo() {
     if (detectedFrequency_ <= 0.0f) {
-        noteName_ = "--";
-        noteOctave_ = 0;
+        noteName_    = "-";
+        noteOctave_  = 0;
         centsOffset_ = 0.0f;
         return;
     }
-    
-    // Calculate MIDI note number from frequency
-    // MIDI note = 12 * log2(f / 440) + 69
-    float midiNote = 12.0f * log2f(detectedFrequency_ / tuningReference_) + 69.0f;
-    
-    // Round to nearest note
-    int nearestNote = static_cast<int>(roundf(midiNote));
-    
-    // Calculate cents offset from nearest note
-    centsOffset_ = 100.0f * (midiNote - nearestNote);
-    
-    // Get note name and octave
-    int noteIndex = nearestNote % 12;
+
+    float midiNote   = 12.0f * log2f(detectedFrequency_ / tuningReference_) + 69.0f;
+    int nearestNote  = static_cast<int>(roundf(midiNote));
+    float targetCents = 100.0f * (midiNote - nearestNote);
+    centsOffset_ = centsOffset_ + CENTS_SMOOTHING * (targetCents - centsOffset_);
+
+    if (nearestNote < 0) nearestNote = 0;
     noteOctave_ = (nearestNote / 12) - 1;
-    noteName_ = NOTE_NAMES[noteIndex];
+    noteName_   = NOTE_NAMES[nearestNote % 12];
 }
 
 float TunerEffect::FrequencyToCents(float frequency, float targetFrequency) {

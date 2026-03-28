@@ -112,6 +112,16 @@ void UIEventHandler::QueueButtonHeld(void* button, int controlIndex, float holdT
     QueueEvent(event);
 }
 
+void UIEventHandler::QueueButtonsHeldTogether(void* button, int controlIndex, int otherControlIndex, float holdTimeMs) {
+    UIEvent event;
+    event.type = UIEventType::BUTTONS_HELD_TOGETHER;
+    event.source = button;
+    event.controlIndex = controlIndex;
+    event.previousValue = otherControlIndex;
+    event.value = holdTimeMs;
+    QueueEvent(event);
+}
+
 void UIEventHandler::QueueEncoderChanged(void* encoder, int controlIndex, int increment) {
     UIEvent event;
     event.type = UIEventType::ENCODER_CHANGED;

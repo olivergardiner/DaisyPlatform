@@ -1,3 +1,5 @@
+#include "../perspective.h"
+extern perspective::Perspective* g_perspective;
 #include "tempoeffect.h"
 #include "../parameters/timeparameter.h"
 #include "../parameters/potentiometerparameter.h"
@@ -8,9 +10,12 @@ const char* TempoEffect::kSubdivisionGlyphs[8] = {
     "_", "^", "^ `", "]", "] _", "] `", "] ` `", "\\"
 };
 
+
 TempoEffect::TempoEffect(const char* name)
     : Effect(name) {
-    // Initialize metronome bass drum (will be properly initialized in derived class Init())
+    // All metronome sound generators will be initialized in derived class Init()
+    clickEnv_ = 0.0f;
+    clickDecay_ = 0.0f;
 }
 
 TempoEffect::~TempoEffect() {
@@ -72,30 +77,53 @@ float TempoEffect::ProcessMetronome() {
         tempoPulseBrightness_ = 0.0f;
         return 0.0f;
     }
-    
+
     // Get BPM from TimeParameter or tap tempo
     float bpm = 120.0f; // Default
     if (timeParamIndex_ >= 0 && static_cast<size_t>(timeParamIndex_) < parameters_.size()) {
         TimeParameter* timeParam = static_cast<TimeParameter*>(parameters_[timeParamIndex_]);
         bpm = timeParam->GetValueAsBPM();
     }
-    
+
     // Use tap tempo if available
     if (tempo_ > 0.0f) {
         bpm = tempo_ * 60.0f; // Convert Hz to BPM
     }
-    
+
     // Calculate samples per quarter note beat
     float secondsPerBeat = 60.0f / bpm;
     float samplesPerBeat = sampleRate_ * secondsPerBeat;
-    
+
     // Countdown to next beat
     samplesUntilNextBeat_ -= 1.0f;
-    
-    // Trigger drum on beat
+
+    // Get metronome mode from Perspective (default to Bass if not available)
+    int metronomeMode = 0;
+    if (g_perspective) {
+        metronomeMode = g_perspective->GetMetronomeMode();
+    }
+
+    // Trigger sound on beat
     if (samplesUntilNextBeat_ <= 0.0f) {
         if (metronomeEnabled_) {
-            metronomeDrum_.Trig();
+            switch (metronomeMode) {
+                case 0: // Bass
+                    metronomeDrum_.Trig();
+                    break;
+                case 1: // Snare
+                    metronomeSnare_.Trig();
+                    break;
+                case 2: // Click
+                    clickEnv_ = 1.0f;
+                    clickDecay_ = 0.0f;
+                    break;
+                case 3: // High
+                    metronomeHiHat_.Trig();
+                    break;
+                default:
+                    metronomeDrum_.Trig();
+                    break;
+            }
         }
         samplesUntilNextBeat_ = samplesPerBeat;
         tempoPulseBrightness_ = 1.0f;
@@ -103,12 +131,36 @@ float TempoEffect::ProcessMetronome() {
 
     float pulseDecayPerSample = 1.0f / (sampleRate_ * TEMPO_PULSE_DECAY_TIME);
     tempoPulseBrightness_ = fmaxf(0.0f, tempoPulseBrightness_ - pulseDecayPerSample);
-    
+
     if (!metronomeEnabled_) {
         return 0.0f;
     }
 
-    // Get metronome sample and apply level
-    return metronomeDrum_.Process() * metronomeLevel_;
+    float out = 0.0f;
+    switch (metronomeMode) {
+        case 0: // Bass
+            out = metronomeDrum_.Process();
+            break;
+        case 1: // Snare
+            out = metronomeSnare_.Process();
+            break;
+        case 2: // Click (short pulse)
+            if (clickEnv_ > 0.0001f) {
+                out = clickEnv_;
+                clickDecay_ += 1.0f / (sampleRate_ * 0.02f); // 20ms decay
+                clickEnv_ = 1.0f - clickDecay_;
+                if (clickEnv_ < 0.0f) clickEnv_ = 0.0f;
+            } else {
+                out = 0.0f;
+            }
+            break;
+        case 3: // High
+            out = metronomeHiHat_.Process();
+            break;
+        default:
+            out = metronomeDrum_.Process();
+            break;
+    }
+    return out * metronomeLevel_;
 }
 

@@ -3,7 +3,7 @@ TARGET = Perspective
 APP_TYPE = BOOT_SRAM
 
 # Sources
-CPP_SOURCES = application.cpp hardware.cpp ui/knob.cpp ui/switch.cpp ui/encoder.cpp ui/uieventhandler.cpp ui/ui.cpp perspective.cpp 
+CPP_SOURCES = application.cpp hardware.cpp ui/knob.cpp ui/switch.cpp ui/encoder.cpp ui/uieventhandler.cpp ui/ui.cpp perspective.cpp preset.cpp
 CPP_SOURCES += effects/effect.cpp effects/tempoeffect.cpp effects/compoundeffect.cpp
 CPP_SOURCES += parameters/effectparameter.cpp parameters/potentiometerparameter.cpp parameters/encoderparameter.cpp parameters/toggleparameter.cpp parameters/timeparameter.cpp
 CPP_SOURCES += effects/choruseffect.cpp effects/delayeffect.cpp effects/moddelayeffect.cpp effects/flangereffect.cpp effects/reverbeffect.cpp effects/waheffect.cpp
@@ -17,13 +17,9 @@ LIBDAISY_DIR ?= dependencies/libDaisy
 DAISYSP_DIR ?= dependencies/DaisySP
 DAISYSP_LGPL_DIR ?= dependencies/DaisySP/DaisySP-LGPL
 DAISYGFX2_DIR ?= dependencies/DaisySeedGFX2
-CYCFI_Q_DIR ?= dependencies/cycfi/q/q_lib
-CYCFI_INFRA_DIR ?= dependencies/cycfi/infra
-
 USE_DAISYSP_LGPL=1
 LDFLAGS = -u _printf_float
 
-# Set C++ standard to C++20 for cycfi/q library support
 CPP_STANDARD = -std=gnu++20
 
 # Core location, and generic makefile.
@@ -36,8 +32,6 @@ LDFLAGS += -L$(DAISYSP_DIR)/DaisySP-LGPL/build
 C_INCLUDES += -I$(DAISYSP_DIR)/src
 C_INCLUDES += -I$(DAISYSP_LGPL_DIR)/src
 C_INCLUDES += -I$(DAISYGFX2_DIR)
-C_INCLUDES += -I$(CYCFI_Q_DIR)/include
-C_INCLUDES += -I$(CYCFI_INFRA_DIR)/include
 
 # Build dependencies
 .PHONY: libdaisy daisysp daisysp-lgpl libs
