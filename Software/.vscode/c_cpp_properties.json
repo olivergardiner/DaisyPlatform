@@ -16,8 +16,6 @@
                 "${workspaceFolder}/dependencies/libDaisy/**",
                 "${workspaceFolder}/dependencies/DaisySP/**",
                 "${workspaceFolder}/dependencies/DaisySeedGFX2/**",
-                "${workspaceFolder}/dependencies/cycfi/q/q_lib/include/**",
-                "${workspaceFolder}/dependencies/cycfi/infra/include/infra/**",
                 "${workspaceFolder}/dependencies/NeuralAmpModelerCore/NAM/**"
             ],
             "name": "Win32",

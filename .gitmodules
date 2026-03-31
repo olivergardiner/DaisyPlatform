@@ -7,12 +7,6 @@
 [submodule "dependencies/DaisySeedGFX2"]
 	path = Software/dependencies/DaisySeedGFX2
 	url = https://github.com/DADDesign-Projects/DaisySeedGFX2.git
-[submodule "dependencies/cycfi/q"]
-	path = Software/dependencies/cycfi/q
-	url = https://github.com/cycfi/q.git
-[submodule "dependencies/cycfi/infra"]
-	path = Software/dependencies/cycfi/infra
-	url = https://github.com/cycfi/infra.git
 [submodule "dependencies/NeuralAmpModelerCore"]
 	path = Software/dependencies/NeuralAmpModelerCore
 	url = https://github.com/sdatkinson/NeuralAmpModelerCore.git
