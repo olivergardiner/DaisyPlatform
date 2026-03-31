@@ -25,13 +25,13 @@ Perspective::Perspective()
 
     // Create settings parameters (unified model)
     // Tuning reference (EncoderParameter, matches TunerEffect)
-    settingsParameters_.push_back(new EncoderParameter("Tuner Ref", 420.0f, 460.0f, 440.0f, 0.5f, ENCODER_1_IDX, 0));
+    settingsParameters_.push_back(new EncoderParameter("E1 Tuner Ref", 420.0f, 460.0f, 440.0f, 0.5f, ENCODER_1_IDX, 2));
     // Metronome volume (PotentiometerParameter, log taper)
-    settingsParameters_.push_back(new PotentiometerParameter("Met Vol", 0.0f, 1.0f, 0.7f, PotCurve::LOG, KNOB_1_IDX, 1));
+    settingsParameters_.push_back(new PotentiometerParameter("K1 Met Vol", 0.0f, 1.0f, 0.7f, PotCurve::LOG, KNOB_1_IDX, 0));
 
     // Metronome mode (PotentiometerParameter, discrete, knob 3)
-    static const char* kMetronomeModes[] = {"Bass", "Snare", "Click", "High"};
-    auto* modeParam = new PotentiometerParameter("Met Mode", 0.0f, 3.0f, 0.0f, PotCurve::LIN, KNOB_3_IDX, 2);
+    static const char* kMetronomeModes[] = {"Bass", "Snare", "High", "Click"};
+    auto* modeParam = new PotentiometerParameter("K2 Met Mode", 0.0f, 3.0f, 0.0f, PotCurve::LIN, KNOB_2_IDX, 1);
     modeParam->SetDisplayType(DisplayType::DISCRETE);
     modeParam->SetDiscreteValues(kMetronomeModes, 4);
     settingsParameters_.push_back(modeParam);

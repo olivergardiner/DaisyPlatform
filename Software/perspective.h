@@ -79,7 +79,7 @@ protected:
     static constexpr int kSettingsParamMetronomeLevel = 1;
     static constexpr int kSettingsParamMetronomeMode = 2;
 
-    // Metronome mode (0 = Bass, 1 = Snare, 2 = Click, 3 = High)
+    // Metronome mode (0 = Bass, 1 = Snare, 2 = High, 3 = Click)
     int metronomeMode_ = 0;
 
     bool bypassMode_ = false;

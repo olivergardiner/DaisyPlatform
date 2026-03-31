@@ -14,7 +14,10 @@ public:
 
     void SetStepSize(float stepSize);
     float GetStepSize() const;
-    
+
+    void SetReversed(bool reversed);
+    bool IsReversed() const;
+
     // Increment/decrement by step amount
     virtual void Increment(int steps = 1);
     virtual void Decrement(int steps = 1);
@@ -27,6 +30,7 @@ public:
 
 private:
     float stepSize_;
+    bool reversed_;
     uint32_t lastTurnTime_;
     float accelerationMultiplier_;
     

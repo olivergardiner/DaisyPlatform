@@ -65,8 +65,9 @@ void StreetsEffect::Init(float sampleRate) {
     parameters_.back()->SetDisplayType(DisplayType::SCALED);
     parameters_.back()->SetScaleFactor(100.0f);
 
-    // Delay 1 time parameter (Encoder 1)
+    // Delay 1 time parameter (Encoder 1) — reversed so CW increases BPM / decreases delay time
     AddParameter(new TimeParameter("E1 Time", 250.0f, 2000.0f, 500.0f, 1.0f, ENCODER_1_IDX, "E1 Tempo", 3));
+    static_cast<EncoderParameter*>(parameters_.back())->SetReversed(true);
     
     // Delay 2 time parameter (Encoder 2)
     AddParameter(new TimeParameter("E2 Perc", 250.0f, 2000.0f, 510.0f, 1.0f, ENCODER_2_IDX, "E2 Perc", 7));
@@ -79,8 +80,8 @@ void StreetsEffect::Init(float sampleRate) {
     parameters_[kParamTempoMode]->SetValue(1.0f);
     parameters_[kParamTime1]->SetValue(60000.0f / kReferenceBpm);
 
-    // Delay 2 tracks Delay 1 timing ratio, starting at 510ms-equivalent feel.
-    parameters_[kParamTime2]->SetValue(kSecondaryLinkedMs);
+    // Delay 2 starts at 510ms.
+    parameters_[kParamTime2]->SetValue(510.0f);
 
     // Note: Metronome is now controlled globally by Perspective via SetMetronomeEnabled()
     
@@ -110,20 +111,17 @@ void StreetsEffect::Update() {
         TimeParameter* timeParam2 = static_cast<TimeParameter*>(parameters_[kParamTime2]);
         ToggleParameter* tempoToggle1 = static_cast<ToggleParameter*>(parameters_[kParamTempoMode]);
 
-        // Force Delay 1 to dotted 8th when using tempo mode, and derive Delay 2 from Delay 1.
-        float masterMs = tempoToggle1->GetState()
-            ? ((60000.0f / timeParam1->GetValueAsBPM()) * kPrimarySubdivision)
+        // Delay 1: pass the raw beat period to the child delay so it can apply
+        // subdivision itself — this keeps the metronome at the correct BPM.
+        // (Pre-multiplying by kPrimarySubdivision here caused the child delay to
+        // double-apply subdivision, making the metronome run 33% too fast.)
+        float beatPeriodMs = tempoToggle1->GetState()
+            ? (60000.0f / timeParam1->GetValueAsBPM())
             : timeParam1->GetValueAsMs();
-        masterMs = std::max(80.0f, std::min(masterMs, 2000.0f));
+        beatPeriodMs = std::max(80.0f, std::min(beatPeriodMs, 2000.0f));
 
-        float linkedMs = masterMs * kSecondaryRatio;
-        linkedMs = std::max(250.0f, std::min(linkedMs, 2000.0f));
-
-        // Keep the visible secondary parameter in sync with the linked value.
-        if (std::abs(timeParam2->GetValueAsMs() - linkedMs) > 0.5f) {
-            timeParam2->SetValue(linkedMs);
-            RequestParameterDisplayUpdate(7);
-        }
+        // Delay 2 is independent — use its own time parameter directly.
+        float delay2Ms = timeParam2->GetValueAsMs();
 
         // Explicitly map streets controls into parallel delay controls.
         parallelDelay_->GetParameter(0)->SetValue(parameters_[kParamMix]->GetValue());
@@ -132,8 +130,8 @@ void StreetsEffect::Update() {
         parallelDelay_->GetParameter(3)->SetValue(parameters_[kParamMix2]->GetValue());
         parallelDelay_->GetParameter(4)->SetValue(parameters_[kParamFeedback2]->GetValue());
         parallelDelay_->GetParameter(5)->SetValue(3.0f);    // fixed quarter multiplier in time mode
-        parallelDelay_->GetParameter(6)->SetValue(timeParam1->GetValueAsMs());
-        parallelDelay_->GetParameter(7)->SetValue(linkedMs); // linked secondary time
+        parallelDelay_->GetParameter(6)->SetValue(beatPeriodMs); // raw beat period; child applies subdivision
+        parallelDelay_->GetParameter(7)->SetValue(delay2Ms);
         parallelDelay_->GetParameter(8)->SetValue(tempoToggle1->GetState() ? 1.0f : 0.0f);
         parallelDelay_->GetParameter(9)->SetValue(0.0f);    // Delay 2 always time mode
         

@@ -46,6 +46,7 @@ void FlyEffect::Init(float sampleRate) {
     TimeParameter* timeParam = new TimeParameter("E1 Time", 10.0f, 2000.0f, 556.0f, 1.0f, ENCODER_1_IDX, "E1 Tempo");
     // Start in tempo mode (true)
     timeParam->SetDisplayMode(TimeDisplayMode::TEMPO_BPM);
+    timeParam->SetReversed(true);
     AddParameter(timeParam);
     timeParamIndex_ = 5;
     

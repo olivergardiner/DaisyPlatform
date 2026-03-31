@@ -113,12 +113,12 @@ float TempoEffect::ProcessMetronome() {
                 case 1: // Snare
                     metronomeSnare_.Trig();
                     break;
-                case 2: // Click
+                case 2: // High
+                    metronomeHiHat_.Trig();
+                    break;
+                case 3: // Click
                     clickEnv_ = 1.0f;
                     clickDecay_ = 0.0f;
-                    break;
-                case 3: // High
-                    metronomeHiHat_.Trig();
                     break;
                 default:
                     metronomeDrum_.Trig();
@@ -144,7 +144,10 @@ float TempoEffect::ProcessMetronome() {
         case 1: // Snare
             out = metronomeSnare_.Process();
             break;
-        case 2: // Click (short pulse)
+        case 2: // High
+            out = metronomeHiHat_.Process();
+            break;
+        case 3: // Click (short pulse)
             if (clickEnv_ > 0.0001f) {
                 out = clickEnv_;
                 clickDecay_ += 1.0f / (sampleRate_ * 0.02f); // 20ms decay
@@ -153,9 +156,6 @@ float TempoEffect::ProcessMetronome() {
             } else {
                 out = 0.0f;
             }
-            break;
-        case 3: // High
-            out = metronomeHiHat_.Process();
             break;
         default:
             out = metronomeDrum_.Process();

@@ -50,38 +50,30 @@ TimeDisplayMode TimeParameter::GetDisplayMode() const {
 
 void TimeParameter::Increment(int steps) {
     if (displayMode_ == TimeDisplayMode::TEMPO_BPM) {
-        // In tempo mode, increment BPM (which means decrement ms)
-        // So we swap the operation: decrement by BPM_STEP_SIZE * steps
         float currentBpm = GetValueAsBPM();
-        float newBpm = currentBpm - (BPM_STEP_SIZE * steps);
-        
-        // Clamp BPM to valid range (30-200 BPM corresponds to 2000-300 ms)
+        // Reversed: CW increases BPM; normal: CW decreases BPM (increases ms)
+        float newBpm = IsReversed()
+            ? currentBpm + (BPM_STEP_SIZE * steps)
+            : currentBpm - (BPM_STEP_SIZE * steps);
         newBpm = clamp(newBpm, 30.0f, 200.0f);
-        
-        // Convert back to milliseconds
-        float newMs = 60000.0f / newBpm;
-        SetValue(newMs);
+        SetValue(60000.0f / newBpm);
     } else {
-        // In time mode, use base class stepping
+        // In time mode, base class handles reversed_ flag
         EncoderParameter::Increment(steps);
     }
 }
 
 void TimeParameter::Decrement(int steps) {
     if (displayMode_ == TimeDisplayMode::TEMPO_BPM) {
-        // In tempo mode, decrement BPM (which means increment ms)
-        // So we swap the operation: increment by BPM_STEP_SIZE * steps
         float currentBpm = GetValueAsBPM();
-        float newBpm = currentBpm + (BPM_STEP_SIZE * steps);
-        
-        // Clamp BPM to valid range (30-200 BPM corresponds to 2000-300 ms)
+        // Reversed: CCW decreases BPM; normal: CCW increases BPM (decreases ms)
+        float newBpm = IsReversed()
+            ? currentBpm - (BPM_STEP_SIZE * steps)
+            : currentBpm + (BPM_STEP_SIZE * steps);
         newBpm = clamp(newBpm, 30.0f, 200.0f);
-        
-        // Convert back to milliseconds
-        float newMs = 60000.0f / newBpm;
-        SetValue(newMs);
+        SetValue(60000.0f / newBpm);
     } else {
-        // In time mode, use base class stepping
+        // In time mode, base class handles reversed_ flag
         EncoderParameter::Decrement(steps);
     }
 }

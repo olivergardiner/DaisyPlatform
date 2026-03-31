@@ -93,7 +93,7 @@ void DelayEffect::Init(float sampleRate) {
     metronomeDrum_.SetFreq(60.0f);  // Low bass frequency
     metronomeDrum_.SetTone(0.5f);
     metronomeDrum_.SetDecay(0.3f);
-    metronomeDrum_.SetAccent(0.8f);
+    metronomeDrum_.SetAccent(1.0f);
 
     metronomeSnare_.Init(sampleRate);
     metronomeSnare_.SetFreq(180.0f); // Snare freq
@@ -104,10 +104,10 @@ void DelayEffect::Init(float sampleRate) {
 
     metronomeHiHat_.Init(sampleRate);
     metronomeHiHat_.SetFreq(8000.0f);
-    metronomeHiHat_.SetTone(0.7f);
-    metronomeHiHat_.SetDecay(0.08f);
+    metronomeHiHat_.SetTone(0.8f);
+    metronomeHiHat_.SetDecay(0.85f);
     metronomeHiHat_.SetAccent(0.8f);
-    metronomeHiHat_.SetNoisiness(0.8f);
+    metronomeHiHat_.SetNoisiness(0.9f);
     metronomeHiHat_.SetSustain(false);
     samplesUntilNextBeat_ = 0.0f;
     

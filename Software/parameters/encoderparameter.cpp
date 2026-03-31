@@ -8,6 +8,7 @@ using namespace daisy;
 EncoderParameter::EncoderParameter(const char* name, float minValue, float maxValue, float defaultValue, float stepSize, int index, int displayIndex)
     : EffectParameter(name, minValue, maxValue, defaultValue, index, displayIndex)
     , stepSize_(stepSize)
+    , reversed_(false)
     , lastTurnTime_(0)
     , accelerationMultiplier_(1.0f)
 {}
@@ -22,7 +23,33 @@ float EncoderParameter::GetStepSize() const {
     return stepSize_;
 }
 
+void EncoderParameter::SetReversed(bool reversed) {
+    reversed_ = reversed;
+}
+
+bool EncoderParameter::IsReversed() const {
+    return reversed_;
+}
+
 void EncoderParameter::Increment(int steps) {
+    // If reversed, swap direction without recursion
+    if (reversed_) {
+        if (displayType_ == DisplayType::DISCRETE && discreteValueCount_ > 0) {
+            DecrementDiscrete(steps);
+            return;
+        }
+        uint32_t now = System::GetNow();
+        if (now - lastTurnTime_ <= ACCELERATION_THRESHOLD_MS && lastTurnTime_ > 0) {
+            accelerationMultiplier_ += ACCELERATION_INCREMENT;
+            if (accelerationMultiplier_ > MAX_ACCELERATION) accelerationMultiplier_ = MAX_ACCELERATION;
+        } else {
+            accelerationMultiplier_ = 1.0f;
+        }
+        lastTurnTime_ = now;
+        currentValue_ -= steps * stepSize_ * accelerationMultiplier_;
+        currentValue_ = clamp(currentValue_, minValue_, maxValue_);
+        return;
+    }
     // For discrete parameters, use discrete increment logic
     if (displayType_ == DisplayType::DISCRETE && discreteValueCount_ > 0) {
         IncrementDiscrete(steps);
@@ -53,6 +80,24 @@ void EncoderParameter::Increment(int steps) {
 }
 
 void EncoderParameter::Decrement(int steps) {
+    // If reversed, swap direction without recursion
+    if (reversed_) {
+        if (displayType_ == DisplayType::DISCRETE && discreteValueCount_ > 0) {
+            IncrementDiscrete(steps);
+            return;
+        }
+        uint32_t now = System::GetNow();
+        if (now - lastTurnTime_ <= ACCELERATION_THRESHOLD_MS && lastTurnTime_ > 0) {
+            accelerationMultiplier_ += ACCELERATION_INCREMENT;
+            if (accelerationMultiplier_ > MAX_ACCELERATION) accelerationMultiplier_ = MAX_ACCELERATION;
+        } else {
+            accelerationMultiplier_ = 1.0f;
+        }
+        lastTurnTime_ = now;
+        currentValue_ += steps * stepSize_ * accelerationMultiplier_;
+        currentValue_ = clamp(currentValue_, minValue_, maxValue_);
+        return;
+    }
     // For discrete parameters, use discrete decrement logic
     if (displayType_ == DisplayType::DISCRETE && discreteValueCount_ > 0) {
         DecrementDiscrete(steps);

@@ -4,6 +4,7 @@
 #include "delayeffect.h"
 #include "flangereffect.h"
 #include "reverbeffect.h"
+#include "twelvestringeffect.h"
 #include "../controls.h"
 #include "../parameters/encoderparameter.h"
 #include "../parameters/potentiometerparameter.h"
@@ -22,10 +23,12 @@ static const char* kDownBoostLabels[4] = {
 
 MysteriousEffect::MysteriousEffect()
     : CompoundEffect("Mysterious", RoutingMode::SERIES)
+    , twelveStringEffect_(new TwelveStringEffect())
     , autowahV2Effect_(new AutowahV2Effect())
     , flangerEffect_(new FlangerEffect())
     , delayEffect_(new DelayEffect())
     , reverbEffect_(new ReverbEffect()) {
+    AddEffect(twelveStringEffect_);
     AddEffect(autowahV2Effect_);
     AddEffect(flangerEffect_);
     AddEffect(delayEffect_);
@@ -80,6 +83,15 @@ void MysteriousEffect::Update() {
     float space = parameters_[kParamSpace]->GetValue();
     TimeParameter* delayTime = static_cast<TimeParameter*>(parameters_[kParamTime]);
     float downBoost = parameters_[kParamDownBoost]->GetValue();
+
+    if (twelveStringEffect_ && twelveStringEffect_->GetParameterCount() >= 5) {
+        twelveStringEffect_->GetParameter(0)->SetValue(1.0f);   // Octave 100%
+        twelveStringEffect_->GetParameter(1)->SetValue(0.4f);   // Detune 40%
+        twelveStringEffect_->GetParameter(2)->SetValue(0.4f);   // Rate 0.4 Hz
+        twelveStringEffect_->GetParameter(3)->SetValue(0.4f);   // Chorus 40%
+        twelveStringEffect_->GetParameter(4)->SetValue(1.0f);   // Level 100%
+        twelveStringEffect_->Update();
+    }
 
     if (autowahV2Effect_ && autowahV2Effect_->GetParameterCount() >= 8) {
         autowahV2Effect_->GetParameter(0)->SetValue(wahMix);

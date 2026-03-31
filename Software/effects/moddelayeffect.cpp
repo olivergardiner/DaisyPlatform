@@ -39,7 +39,7 @@ void ModDelayEffect::Init(float sampleRate) {
     metronomeDrum_.SetFreq(60.0f);  // Low bass frequency
     metronomeDrum_.SetTone(0.5f);
     metronomeDrum_.SetDecay(0.3f);
-    metronomeDrum_.SetAccent(0.8f);
+    metronomeDrum_.SetAccent(1.0f);
     samplesUntilNextBeat_ = 0.0f;
     
     // Initialize modulation LFOs

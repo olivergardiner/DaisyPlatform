@@ -25,6 +25,7 @@ private:
         kParamDownBoost
     };
 
+    class TwelveStringEffect* twelveStringEffect_;
     class AutowahV2Effect* autowahV2Effect_;
     class FlangerEffect* flangerEffect_;
     class DelayEffect* delayEffect_;

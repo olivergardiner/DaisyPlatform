@@ -21,6 +21,7 @@
 #include "slapbackdelayeffect.h"
 #include "streetseffect.h"
 #include "tunereffect.h"
+#include "twelvestringeffect.h"
 #include "waheffect.h"
 
 namespace perspective {
@@ -109,6 +110,11 @@ inline void PopulateEffects(std::vector<Effect*>* effects, float sampleRate) {
     MysteriousEffect* mysteriousEffect = new MysteriousEffect();
     mysteriousEffect->Init(sampleRate);
     effects->push_back(mysteriousEffect);
+
+    // Add 12-string guitar emulation effect
+    TwelveStringEffect* twelveStringEffect = new TwelveStringEffect();
+    twelveStringEffect->Init(sampleRate);
+    effects->push_back(twelveStringEffect);
 
     Hardware::PrintLine("Done populating effects.");
 }
