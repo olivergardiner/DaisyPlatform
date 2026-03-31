@@ -83,6 +83,12 @@ namespace perspective {
             return nullptr;
         }
 
+        inline bool IsJackLeftInInserted()     const { return jackLeftIn_; }
+        inline bool IsJackRightInInserted()    const { return jackRightIn_; }
+        inline bool IsJackLeftOutInserted()    const { return jackLeftOut_; }
+        inline bool IsJackRightOutInserted()   const { return jackRightOut_; }
+        inline bool IsJackExpressionInserted() const { return jackExpression_; }
+
         void SetParameterDisplay(int layerIndex, const char* paramName, const char* valueText);
         void SetParameterDisplayHighlighted(int layerIndex, const char* paramName, const char* valueText);
         void ClearDisplay();
@@ -133,6 +139,12 @@ namespace perspective {
         GPIO rightOut;
         GPIO expression;
         GPIO trueBypass;
+
+        bool jackLeftIn_     = false;
+        bool jackRightIn_    = false;
+        bool jackLeftOut_    = false;
+        bool jackRightOut_   = false;
+        bool jackExpression_ = false;
 
         int knobValues_[7] = {0};
     };

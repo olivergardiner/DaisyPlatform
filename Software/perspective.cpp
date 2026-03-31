@@ -35,6 +35,13 @@ Perspective::Perspective()
     modeParam->SetDisplayType(DisplayType::DISCRETE);
     modeParam->SetDiscreteValues(kMetronomeModes, 4);
     settingsParameters_.push_back(modeParam);
+
+    // Bypass type (EncoderParameter, encoder 2)
+    static const char* kBypassTypeLabels[] = {"Passthru", "True"};
+    auto* bypassParam = new EncoderParameter("E2 Bypass", 0.0f, 1.0f, 0.0f, 1.0f, ENCODER_2_IDX, 3);
+    bypassParam->SetDisplayType(DisplayType::DISCRETE);
+    bypassParam->SetDiscreteValues(kBypassTypeLabels, 2);
+    settingsParameters_.push_back(bypassParam);
 }
 
 Perspective::~Perspective() {
@@ -45,6 +52,8 @@ void Perspective::Init() {
     hardware.Init(GetEventHandler());
 
     LoadEffects(); // Load effects before registering listeners so we can populate effect selection menu
+
+    LoadPresetsFromFlash();
 
     // Initialize perspective-specific UI elements
     RegisterEventListeners();
@@ -74,6 +83,15 @@ void Perspective::Exec() {
         } else {
             hardware.ProcessControls();
             eventHandler_.ProcessEvents();
+        }
+
+        // Service deferred flash save outside the audio ISR to avoid a glitch.
+        // switchingEffect_ mutes the audio callback for the duration of the write.
+        if (pendingFlashSave_) {
+            pendingFlashSave_ = false;
+            switchingEffect_ = true;
+            SavePresetsToFlash();
+            switchingEffect_ = false;
         }
 
         hardware.DelayMs(1); // Small delay to allow events to accumulate
@@ -429,8 +447,7 @@ void Perspective::RegisterEventListeners() {
     // Register listener for Switch_3 being held (bypass type toggle) - works in EFFECT and PRESET modes
     eventHandler_.RegisterListenerByIndex(
         [this](const UIEvent& event) {
-            if (mode_ != PerspectiveMode::EFFECT && mode_ != PerspectiveMode::PRESET) return;
-            ToggleBypassType();
+            // Bypass type is now configured in settings mode; hold is a no-op here.
         },
         UIEventType::BUTTON_HELD,
         2  // Index 2 = Switch_3
@@ -655,6 +672,13 @@ void Perspective::ExitTunerMode() {
 
 void Perspective::EnterSettingsMode() {
     mode_ = PerspectiveMode::SETTINGS;
+
+    // Sync bypass type parameter to current runtime state before showing it
+    if (settingsParameters_.size() > kSettingsParamBypassType) {
+        settingsParameters_[kSettingsParamBypassType]->SetValue(
+            bypassType_ == BypassType::TRUE_BYPASS ? 1.0f : 0.0f);
+    }
+
     hardware.ClearDisplay();
     hardware.SetParameterDisplay(0, "Settings", "");
     // Show all settings parameters
@@ -686,6 +710,17 @@ void Perspective::ExitSettingsMode() {
     // Metronome mode
     if (settingsParameters_.size() > kSettingsParamMetronomeMode) {
         metronomeMode_ = settingsParameters_[kSettingsParamMetronomeMode]->GetValueAsInt(3);
+    }
+    // Bypass type
+    if (settingsParameters_.size() > kSettingsParamBypassType) {
+        int val = settingsParameters_[kSettingsParamBypassType]->GetValueAsInt(1);
+        bypassType_ = (val == 1) ? BypassType::TRUE_BYPASS : BypassType::PASSTHROUGH;
+        // Re-apply relay state with new bypass type
+        if (bypassMode_ && bypassType_ == BypassType::TRUE_BYPASS) {
+            hardware.SetTrueBypass(true);
+        } else {
+            hardware.SetTrueBypass(false);
+        }
     }
     mode_ = PerspectiveMode::EFFECT;
     SetCurrentEffect(currentEffectIndex_);
@@ -863,6 +898,7 @@ void Perspective::ExecutePresetEditAction() {
             if (!presetBank_.IsOccupied(currentPresetSlot_)) {
                 presetBank_.Save(currentPresetSlot_, cachedEffectIndex_,
                     effects_[cachedEffectIndex_]->GetName(), cachedParamValues_, cachedParamCount_);
+                pendingFlashSave_ = true;
                 LoadPresetAtIndex(currentPresetSlot_);
             }
             break;
@@ -870,11 +906,13 @@ void Perspective::ExecutePresetEditAction() {
         case PresetEditOption::OVERWRITE: {
             presetBank_.Save(currentPresetSlot_, cachedEffectIndex_,
                 effects_[cachedEffectIndex_]->GetName(), cachedParamValues_, cachedParamCount_);
+            pendingFlashSave_ = true;
             LoadPresetAtIndex(currentPresetSlot_);
             break;
         }
         case PresetEditOption::DELETE: {
             presetBank_.ClearSlot(currentPresetSlot_);
+            pendingFlashSave_ = true;
             LoadPresetAtIndex(currentPresetSlot_);
             break;
         }
@@ -899,3 +937,78 @@ void Perspective::UpdateTunerDisplay() {
     );
 }
 
+// ---------------------------------------------------------------------------
+// Preset flash persistence
+//
+// Storage layout (one 4 KB sector at the end of the 8 MB IS25LP064A):
+//   Offset 0x7FF000 : uint32_t magic   (0x50525354 = "PRST")
+//   Offset 0x7FF004 : uint32_t version (currently 1)
+//   Offset 0x7FF008 : PresetData[PRESET_COUNT]
+//
+// The QSPI peripheral is initialised in MEMORY_MAPPED mode by DaisySeed::Init().
+// Writing requires a temporary switch to INDIRECT_POLLING mode, then back.
+// Running from BOOT_SRAM means we are never executing from QSPI, so the mode
+// switch is safe at any time (outside the audio ISR).
+// ---------------------------------------------------------------------------
+
+static constexpr uint32_t kPresetFlashOffset = 0x7FF000; // last 4 KB of 8 MB IS25LP064A
+static constexpr uint32_t kPresetMagic       = 0x50525354; // "PRST"
+static constexpr uint32_t kPresetVersion     = 1;
+
+struct PresetFlashHeader {
+    uint32_t magic;
+    uint32_t version;
+};
+
+void Perspective::LoadPresetsFromFlash() {
+    // In MEMORY_MAPPED mode the flash contents are directly readable via GetData().
+    const auto* hdr = static_cast<const PresetFlashHeader*>(hardware.qspi.GetData(kPresetFlashOffset));
+
+    if (hdr->magic != kPresetMagic || hdr->version != kPresetVersion) {
+        // First boot or layout change – start with a blank bank.
+        presetBank_.Clear();
+        Hardware::PrintLine("Presets: no valid flash data, starting empty.");
+        return;
+    }
+
+    const auto* src = reinterpret_cast<const PresetData*>(hdr + 1);
+    for (size_t i = 0; i < PRESET_COUNT; ++i) {
+        if (src[i].occupied) {
+            presetBank_.Save(i, src[i].effectIndex, src[i].name,
+                             &src[i].params[0].value, src[i].paramCount);
+        } else {
+            presetBank_.ClearSlot(i);
+        }
+    }
+    Hardware::PrintLine("Presets: loaded from flash.");
+}
+
+void Perspective::SavePresetsToFlash() {
+    // Build the sector image in a static buffer to avoid a large stack allocation.
+    static constexpr size_t kBufSize = sizeof(PresetFlashHeader) + sizeof(PresetData) * PRESET_COUNT;
+    static uint8_t buf[kBufSize];
+
+    auto* hdr = reinterpret_cast<PresetFlashHeader*>(buf);
+    hdr->magic   = kPresetMagic;
+    hdr->version = kPresetVersion;
+
+    auto* dst = reinterpret_cast<PresetData*>(hdr + 1);
+    for (size_t i = 0; i < PRESET_COUNT; ++i) {
+        dst[i] = presetBank_.Get(i);
+    }
+
+    // Switch QSPI to indirect-polling mode for erase/write.
+    hardware.qspi.DeInit();
+    hardware.qspi_config.mode = QSPIHandle::Config::Mode::INDIRECT_POLLING;
+    hardware.qspi.Init(hardware.qspi_config);
+
+    hardware.qspi.EraseSector(kPresetFlashOffset);
+    hardware.qspi.Write(kPresetFlashOffset, kBufSize, buf);
+
+    // Restore memory-mapped mode.
+    hardware.qspi.DeInit();
+    hardware.qspi_config.mode = QSPIHandle::Config::Mode::MEMORY_MAPPED;
+    hardware.qspi.Init(hardware.qspi_config);
+
+    Hardware::PrintLine("Presets: saved to flash.");
+}

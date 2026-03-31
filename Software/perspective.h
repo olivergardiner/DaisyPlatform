@@ -66,6 +66,8 @@ protected:
     void UpdateParameterDisplay(EffectParameter* param, size_t displayIndex);
     void UpdateParameterDisplayHighlighted(EffectParameter* param, size_t displayIndex);
     void UpdateStatusDisplay();
+    void LoadPresetsFromFlash();
+    void SavePresetsToFlash();
 
     Hardware hardware;
     Effect* currentEffect_ = nullptr;
@@ -78,6 +80,7 @@ protected:
     static constexpr int kSettingsParamTuningReference = 0;
     static constexpr int kSettingsParamMetronomeLevel = 1;
     static constexpr int kSettingsParamMetronomeMode = 2;
+    static constexpr int kSettingsParamBypassType = 3;
 
     // Metronome mode (0 = Bass, 1 = Snare, 2 = High, 3 = Click)
     int metronomeMode_ = 0;
@@ -107,6 +110,7 @@ protected:
     bool presetMuted_ = true;       // Mute when empty preset selected
     bool presetEditMode_ = false;   // Encoder 2 edit sub-mode
     int presetEditSelection_ = 0;   // Current edit option index
+    bool pendingFlashSave_ = false; // Set by preset actions; serviced in Exec() to avoid audio glitch
 };
 
 } // namespace perspective

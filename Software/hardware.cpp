@@ -57,6 +57,13 @@ void Hardware::ProcessControls() {
         return; // No event handler registered, skip processing controls
     }
 
+    // Poll jack insertion pins (high = jack inserted)
+    jackLeftIn_     = leftIn.Read();
+    jackRightIn_    = rightIn.Read();
+    jackLeftOut_    = leftOut.Read();
+    jackRightOut_   = rightOut.Read();
+    jackExpression_ = expression.Read();
+
     // Process knobs and fire knob change events
     if (++knob_divider >= KNOB_DIVISOR) {
         knob_divider = 0;

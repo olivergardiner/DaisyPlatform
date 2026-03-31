@@ -3,7 +3,6 @@
 #include "../parameters/potentiometerparameter.h"
 
 #include <cmath>
-#include <cstring>
 #include <algorithm>
 
 using namespace perspective;
@@ -101,7 +100,9 @@ void TwelveStringEffect::OnSelected() {
     // which permanently poisons both the pitch-shifter output and the chorus
     // buffers, producing the audible noise burst on first selection.
     // Zeroing the entire object before Init() eliminates all SDRAM garbage.
-    memset(pitchShifter_, 0, sizeof(*pitchShifter_));
+    std::fill(reinterpret_cast<char*>(pitchShifter_),
+              reinterpret_cast<char*>(pitchShifter_) + sizeof(*pitchShifter_),
+              '\0');
 
     pitchShifter_->Init(sampleRate_);
     pitchShifter_->SetDelSize(4800);

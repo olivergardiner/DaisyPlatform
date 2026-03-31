@@ -73,3 +73,4 @@
 [0326/075523.503:WARNING:net\dns\dns_config_service_win.cc:605] Failed to read DnsConfig.
 [0326/075523.581:WARNING:net\dns\dns_config_service_win.cc:605] Failed to read DnsConfig.
 [0326/075523.698:WARNING:net\dns\dns_config_service_win.cc:605] Failed to read DnsConfig.
+[0331/143544.878:WARNING:chrome\browser\process_singleton_win.cc:467] Lock file exists but is writable.

@@ -95,7 +95,14 @@ inline void PopulateEffects(std::vector<Effect*>* effects, float sampleRate) {
     WahEffect* wahEffect = new WahEffect();
     wahEffect->Init(sampleRate);
     effects->push_back(wahEffect);
+
+    // Add 12-string guitar emulation effect
+    TwelveStringEffect* twelveStringEffect = new TwelveStringEffect();
+    twelveStringEffect->Init(sampleRate);
+    effects->push_back(twelveStringEffect);
     
+    // --- Compound effects below this line ---
+
     // Add streets effect
     StreetsEffect* streetsEffect = new StreetsEffect();
     streetsEffect->Init(sampleRate);
@@ -110,11 +117,6 @@ inline void PopulateEffects(std::vector<Effect*>* effects, float sampleRate) {
     MysteriousEffect* mysteriousEffect = new MysteriousEffect();
     mysteriousEffect->Init(sampleRate);
     effects->push_back(mysteriousEffect);
-
-    // Add 12-string guitar emulation effect
-    TwelveStringEffect* twelveStringEffect = new TwelveStringEffect();
-    twelveStringEffect->Init(sampleRate);
-    effects->push_back(twelveStringEffect);
 
     Hardware::PrintLine("Done populating effects.");
 }
