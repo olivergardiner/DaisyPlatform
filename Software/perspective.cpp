@@ -37,7 +37,7 @@ Perspective::Perspective()
     settingsParameters_.push_back(modeParam);
 
     // Bypass type (EncoderParameter, encoder 2)
-    static const char* kBypassTypeLabels[] = {"Passthru", "True"};
+    static const char* kBypassTypeLabels[] = {"Pass", "True"};
     auto* bypassParam = new EncoderParameter("E2 Bypass", 0.0f, 1.0f, 0.0f, 1.0f, ENCODER_2_IDX, 3);
     bypassParam->SetDisplayType(DisplayType::DISCRETE);
     bypassParam->SetDiscreteValues(kBypassTypeLabels, 2);
@@ -110,7 +110,7 @@ void Perspective::AudioCallbackImpl(AudioHandle::InputBuffer in, AudioHandle::Ou
 
     if (mode_ == PerspectiveMode::TUNER && tunerEffect_) {
         // Tuner mode: process for pitch detection but mute output
-        tunerEffect_->ProcessStereo(const_cast<float*>(in[0]), const_cast<float*>(in[1]), out[0], out[1], size);
+        tunerEffect_->ProcessStereo(in[0], in[1], out[0], out[1], size);
         for (size_t i = 0; i < size; i++) {
             out[0][i] = 0.0f;
             out[1][i] = 0.0f;
@@ -123,27 +123,10 @@ void Perspective::AudioCallbackImpl(AudioHandle::InputBuffer in, AudioHandle::Ou
         }
     } else if (currentEffect_ && !bypassMode_) {
         // Process with current effect
-        // Note: ProcessStereo requires non-const pointers, but won't modify input
-        currentEffect_->ProcessStereo(const_cast<float*>(in[0]), const_cast<float*>(in[1]), out[0], out[1], size);
+        currentEffect_->ProcessStereo(in[0], in[1], out[0], out[1], size);
         ledPulseBrightness = currentEffect_->GetTempoPulseBrightness();
-    } else if (bypassMode_) {
-        // Bypass mode
-        if (bypassType_ == BypassType::PASSTHROUGH) {
-            // Passthrough - pass audio unprocessed
-            for (size_t i = 0; i < size; i++){
-                out[0][i] = in[0][i];
-                out[1][i] = in[1][i];
-            }
-        } else {
-            // True bypass - hardware relay handles routing, pass through DSP
-            // (Audio is routed by hardware when TRUE_BYPASS_PIN is driven low)
-            for (size_t i = 0; i < size; i++){
-                out[0][i] = in[0][i];
-                out[1][i] = in[1][i];
-            }
-        }
     } else {
-        // Fallback - pass through
+        // Bypass or fallback: pass input through unchanged
         for (size_t i = 0; i < size; i++){
             out[0][i] = in[0][i];
             out[1][i] = in[1][i];
@@ -298,8 +281,6 @@ void Perspective::RegisterEventListeners() {
                             UpdateParameterDisplay(param, param->GetDisplayIndex() + 1);
                         }
                         
-                        Hardware::PrintLine("%s: %d", toggleParam->GetName(), static_cast<int>(toggleParam->GetValue()));
-
                         // Update effect with new parameter value
                         currentEffect_->Update();
                         break;
@@ -488,25 +469,6 @@ void Perspective::ToggleBypass() {
     UpdateStatusDisplay();
 }
 
-void Perspective::ToggleBypassType() {
-    // Toggle between true bypass and passthrough
-    if (bypassType_ == BypassType::TRUE_BYPASS) {
-        bypassType_ = BypassType::PASSTHROUGH;
-    } else {
-        bypassType_ = BypassType::TRUE_BYPASS;
-    }
-    
-    // Update hardware relay state
-    if (bypassMode_ && bypassType_ == BypassType::TRUE_BYPASS) {
-        hardware.SetTrueBypass(true);  // Drive pin LOW to activate relay
-    } else {
-        hardware.SetTrueBypass(false); // Drive pin HIGH to deactivate relay
-    }
-    
-    UpdateStatusDisplay();
-    hardware.ForceKnobValueChangedEvents();
-}
-
 void Perspective::HandleTapTempo() {
     if (!currentEffect_) return;
     
@@ -541,7 +503,6 @@ void Perspective::ToggleMetronome() {
     currentEffect_->Update();
     
     UpdateStatusDisplay();
-    Hardware::PrintLine("Metronome: %s", metronomeEnabled_ ? "ON" : "OFF");
 }
 
 void Perspective::LoadEffects() {

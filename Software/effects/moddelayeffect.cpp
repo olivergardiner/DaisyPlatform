@@ -87,7 +87,7 @@ void ModDelayEffect::Init(float sampleRate) {
     Update();
 }
 
-void ModDelayEffect::Process(float* in, float* out, size_t size) {
+void ModDelayEffect::Process(const float* in, float* out, size_t size) {
     if (!enabled_) {
         // Bypass - pass through dry signal
         for (size_t i = 0; i < size; i++) {
@@ -129,7 +129,7 @@ void ModDelayEffect::Process(float* in, float* out, size_t size) {
     }
 }
 
-void ModDelayEffect::ProcessStereo(float* inL, float* inR, float* outL, float* outR, size_t size) {
+void ModDelayEffect::ProcessStereo(const float* inL, const float* inR, float* outL, float* outR, size_t size) {
     if (!enabled_) {
         // Bypass - pass through dry signal
         for (size_t i = 0; i < size; i++) {

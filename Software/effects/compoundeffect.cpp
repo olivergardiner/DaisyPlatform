@@ -48,7 +48,7 @@ void CompoundEffect::Init(float sampleRate) {
     tempBufferR_ = new float[bufferSize_];
 }
 
-void CompoundEffect::Process(float* in, float* out, size_t size) {
+void CompoundEffect::Process(const float* in, float* out, size_t size) {
     if (!enabled_ || effects_.empty()) {
         // Bypass - pass through dry signal
         std::memcpy(out, in, size * sizeof(float));
@@ -96,7 +96,7 @@ void CompoundEffect::Process(float* in, float* out, size_t size) {
     }
 }
 
-void CompoundEffect::ProcessStereo(float* inL, float* inR, float* outL, float* outR, size_t size) {
+void CompoundEffect::ProcessStereo(const float* inL, const float* inR, float* outL, float* outR, size_t size) {
     if (!enabled_ || effects_.empty()) {
         // Bypass - pass through dry signal
         std::memcpy(outL, inL, size * sizeof(float));

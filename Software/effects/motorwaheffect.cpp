@@ -42,7 +42,7 @@ void MotorWahEffect::Init(float sampleRate) {
     Update();
 }
 
-void MotorWahEffect::Process(float* in, float* out, size_t size) {
+void MotorWahEffect::Process(const float* in, float* out, size_t size) {
     if (!enabled_) {
         detectorInput_ = 0.0f;
         for (size_t i = 0; i < size; ++i) {
@@ -65,7 +65,7 @@ void MotorWahEffect::Process(float* in, float* out, size_t size) {
     }
 }
 
-void MotorWahEffect::ProcessStereo(float* inL, float* inR, float* outL, float* outR, size_t size) {
+void MotorWahEffect::ProcessStereo(const float* inL, const float* inR, float* outL, float* outR, size_t size) {
     if (!enabled_) {
         detectorInput_ = 0.0f;
         for (size_t i = 0; i < size; ++i) {

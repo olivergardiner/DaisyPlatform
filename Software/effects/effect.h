@@ -24,10 +24,10 @@ public:
     virtual void Init(float sampleRate) = 0;
 
     // Process audio - must be implemented by derived classes
-    virtual void Process(float* in, float* out, size_t size) = 0;
+    virtual void Process(const float* in, float* out, size_t size) = 0;
 
     // Process stereo audio (default implementation calls mono Process)
-    virtual void ProcessStereo(float* inL, float* inR, float* outL, float* outR, size_t size);
+    virtual void ProcessStereo(const float* inL, const float* inR, float* outL, float* outR, size_t size);
 
     // Update effect parameters - called when parameters change
     virtual void Update() = 0;
@@ -70,7 +70,7 @@ protected:
     // Request a parameter display update (calls the callback if set)
     void RequestParameterDisplayUpdate(size_t parameterIndex);
 
-    char* name_;
+    const char* name_;
     std::vector<EffectParameter*> parameters_;
     bool enabled_;
     bool wetOnly_;  // If true, output wet signal only (for parallel compound effects)

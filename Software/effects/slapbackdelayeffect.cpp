@@ -47,7 +47,7 @@ void SlapbackDelayEffect::Init(float sampleRate) {
     Update();
 }
 
-void SlapbackDelayEffect::Process(float* in, float* out, size_t size) {
+void SlapbackDelayEffect::Process(const float* in, float* out, size_t size) {
     if (!enabled_) {
         // Bypass - pass through dry signal
         for (size_t i = 0; i < size; i++) {
@@ -69,7 +69,7 @@ void SlapbackDelayEffect::Process(float* in, float* out, size_t size) {
     }
 }
 
-void SlapbackDelayEffect::ProcessStereo(float* inL, float* inR, float* outL, float* outR, size_t size) {
+void SlapbackDelayEffect::ProcessStereo(const float* inL, const float* inR, float* outL, float* outR, size_t size) {
     if (!enabled_) {
         // Bypass - pass through dry signal
         for (size_t i = 0; i < size; i++) {

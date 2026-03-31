@@ -18,8 +18,8 @@ public:
     virtual ~CompoundEffect() override;
 
     void Init(float sampleRate) override;
-    void Process(float* in, float* out, size_t size) override;
-    void ProcessStereo(float* inL, float* inR, float* outL, float* outR, size_t size) override;
+    void Process(const float* in, float* out, size_t size) override;
+    void ProcessStereo(const float* inL, const float* inR, float* outL, float* outR, size_t size) override;
     void Update() override;
     void SetTempo(float tempoHz) override;
     void SetMetronomeEnabled(bool enabled) override;

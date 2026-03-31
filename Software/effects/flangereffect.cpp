@@ -104,7 +104,7 @@ void FlangerEffect::Init(float sampleRate) {
     Update();
 }
 
-void FlangerEffect::Process(float* in, float* out, size_t size) {
+void FlangerEffect::Process(const float* in, float* out, size_t size) {
     if (!enabled_) {
         for (size_t i = 0; i < size; ++i) {
             out[i] = in[i];
@@ -142,7 +142,7 @@ void FlangerEffect::Process(float* in, float* out, size_t size) {
     }
 }
 
-void FlangerEffect::ProcessStereo(float* inL, float* inR, float* outL, float* outR, size_t size) {
+void FlangerEffect::ProcessStereo(const float* inL, const float* inR, float* outL, float* outR, size_t size) {
     if (!enabled_) {
         for (size_t i = 0; i < size; ++i) {
             outL[i] = inL[i];

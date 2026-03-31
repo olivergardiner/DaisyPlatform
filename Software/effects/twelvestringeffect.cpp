@@ -119,7 +119,7 @@ void TwelveStringEffect::OnSelected() {
 }
 
 // Mono Process — falls through to stereo with duplicated channel
-void TwelveStringEffect::Process(float* in, float* out, size_t size) {
+void TwelveStringEffect::Process(const float* in, float* out, size_t size) {
     if (!enabled_) {
         for (size_t i = 0; i < size; ++i) out[i] = in[i];
         return;
@@ -127,7 +127,7 @@ void TwelveStringEffect::Process(float* in, float* out, size_t size) {
     ProcessStereo(in, in, out, out, size);
 }
 
-void TwelveStringEffect::ProcessStereo(float* inL, float* inR,
+void TwelveStringEffect::ProcessStereo(const float* inL, const float* inR,
                                        float* outL, float* outR, size_t size) {
     if (!enabled_) {
         for (size_t i = 0; i < size; ++i) {

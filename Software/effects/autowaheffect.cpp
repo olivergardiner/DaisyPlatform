@@ -48,7 +48,7 @@ void AutowahEffect::Init(float sampleRate) {
     Update();
 }
 
-void AutowahEffect::Process(float* in, float* out, size_t size) {
+void AutowahEffect::Process(const float* in, float* out, size_t size) {
     if (!enabled_) {
         detectorInput_ = 0.0f;
         // Bypass - pass through dry signal
@@ -101,7 +101,7 @@ void AutowahEffect::Process(float* in, float* out, size_t size) {
     }
 }
 
-void AutowahEffect::ProcessStereo(float* inL, float* inR, float* outL, float* outR, size_t size) {
+void AutowahEffect::ProcessStereo(const float* inL, const float* inR, float* outL, float* outR, size_t size) {
     if (!enabled_) {
         detectorInput_ = 0.0f;
         // Bypass - pass through dry signal

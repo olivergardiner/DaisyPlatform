@@ -1,31 +1,24 @@
 #include "effect.h"
-#include <cstring>
 
 using namespace perspective;
 
 Effect::Effect(const char* name)
-    : name_(nullptr)
+    : name_(name)
     , enabled_(true)
     , wetOnly_(false)
     , metronomeEnabled_(false)
     , sampleRate_(48000.0f)
     , tempo_(0.0f)
 {
-    if (name) {
-        size_t len = strlen(name);
-        name_ = new char[len + 1];
-        strcpy(name_, name);
-    }
 }
 
 Effect::~Effect() {
-    if (name_) {
-        delete[] name_;
-        name_ = nullptr;
+    for (auto* p : parameters_) {
+        delete p;
     }
 }
 
-void Effect::ProcessStereo(float* inL, float* inR, float* outL, float* outR, size_t size) {
+void Effect::ProcessStereo(const float* inL, const float* inR, float* outL, float* outR, size_t size) {
     // Default implementation: process left and right channels separately
     Process(inL, outL, size);
     Process(inR, outR, size);

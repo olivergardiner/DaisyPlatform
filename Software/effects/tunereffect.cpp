@@ -47,14 +47,14 @@ void TunerEffect::Init(float sampleRate) {
     Update();
 }
 
-void TunerEffect::Process(float* in, float* out, size_t size) {
+void TunerEffect::Process(const float* in, float* out, size_t size) {
     for (size_t i = 0; i < size; i++) {
         out[i] = in[i];
         ProcessSample(in[i]);
     }
 }
 
-void TunerEffect::ProcessStereo(float* inL, float* inR, float* outL, float* outR, size_t size) {
+void TunerEffect::ProcessStereo(const float* inL, const float* inR, float* outL, float* outR, size_t size) {
     for (size_t i = 0; i < size; i++) {
         outL[i] = inL[i];
         outR[i] = inR[i];

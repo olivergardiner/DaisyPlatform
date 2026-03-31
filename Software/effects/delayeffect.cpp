@@ -135,7 +135,7 @@ void DelayEffect::Init(float sampleRate) {
     Update();
 }
 
-void DelayEffect::Process(float* in, float* out, size_t size) {
+void DelayEffect::Process(const float* in, float* out, size_t size) {
     if (!enabled_ || !delayBuffersAllocated_ || !delayL_) {
         // Bypass - pass through dry signal
         for (size_t i = 0; i < size; i++) {
@@ -157,7 +157,7 @@ void DelayEffect::Process(float* in, float* out, size_t size) {
     }
 }
 
-void DelayEffect::ProcessStereo(float* inL, float* inR, float* outL, float* outR, size_t size) {
+void DelayEffect::ProcessStereo(const float* inL, const float* inR, float* outL, float* outR, size_t size) {
     if (!enabled_ || !delayBuffersAllocated_ || !delayL_ || !delayR_) {
         // Bypass - pass through dry signal
         for (size_t i = 0; i < size; i++) {

@@ -15,8 +15,8 @@ public:
     ~TunerEffect() override;
 
     void Init(float sampleRate) override;
-    void Process(float* in, float* out, size_t size) override;
-    void ProcessStereo(float* inL, float* inR, float* outL, float* outR, size_t size) override;
+    void Process(const float* in, float* out, size_t size) override;
+    void ProcessStereo(const float* inL, const float* inR, float* outL, float* outR, size_t size) override;
     void Update() override;
 
     // Tuner-specific methods

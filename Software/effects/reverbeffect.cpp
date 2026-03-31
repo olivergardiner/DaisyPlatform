@@ -93,11 +93,11 @@ void ReverbEffect::OnDeselected() {
     ReleaseReverb();
 }
 
-void ReverbEffect::Process(float* in, float* out, size_t size) {
+void ReverbEffect::Process(const float* in, float* out, size_t size) {
     ProcessStereo(in, in, out, out, size);
 }
 
-void ReverbEffect::ProcessStereo(float* inL, float* inR, float* outL, float* outR, size_t size) {
+void ReverbEffect::ProcessStereo(const float* inL, const float* inR, float* outL, float* outR, size_t size) {
     if (!enabled_ || !reverbAllocated_ || !reverb_) {
         for (size_t i = 0; i < size; ++i) {
             outL[i] = inL[i];

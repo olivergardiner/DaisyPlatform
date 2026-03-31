@@ -215,7 +215,7 @@ float AutowahV2Effect::ComputeCompensatedResonance(float resonance, float cutoff
     return ClampValue(resonance * compensation, 0.0f, 1.0f);
 }
 
-void AutowahV2Effect::Process(float* in, float* out, size_t size) {
+void AutowahV2Effect::Process(const float* in, float* out, size_t size) {
     if (!enabled_) {
         detectorInput_ = 0.0f;
         for (size_t i = 0; i < size; ++i) {
@@ -272,7 +272,7 @@ void AutowahV2Effect::Process(float* in, float* out, size_t size) {
     }
 }
 
-void AutowahV2Effect::ProcessStereo(float* inL, float* inR, float* outL, float* outR, size_t size) {
+void AutowahV2Effect::ProcessStereo(const float* inL, const float* inR, float* outL, float* outR, size_t size) {
     if (!enabled_) {
         detectorInput_ = 0.0f;
         for (size_t i = 0; i < size; ++i) {

@@ -46,7 +46,6 @@ protected:
     void RegisterEventListeners();
     void LoadEffects();
     void ToggleBypass();
-    void ToggleBypassType();
     void HandleTapTempo();
     void ToggleMetronome();
     void EnterTunerMode();
