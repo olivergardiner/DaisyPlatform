@@ -324,6 +324,28 @@ void Hardware::SetParameterDisplay(int layerIndex, const char* paramName, const 
     __Display.flush();
 }
 
+void Hardware::SetStatusDisplay(const char* left, const char* middle, const char* right)
+{
+    // Layer 9 is reserved for status; three fixed columns across the 220px layer.
+    const int kLayerIndex = 9;
+    if (kLayerIndex >= static_cast<int>(paramLayers.size())) return;
+
+    DadGFX::cLayer* layer = paramLayers[kLayerIndex];
+    layer->eraseLayer(DadGFX::sColor(0, 0, 0, 0));
+    layer->setTextFrontColor(DadGFX::sColor(255, 255, 255, 255));
+
+    layer->setCursor(0, 0);
+    layer->drawText(left);
+
+    layer->setCursor(90, 0);
+    layer->drawText(middle);
+
+    layer->setCursor(170, 0);
+    layer->drawText(right);
+
+    __Display.flush();
+}
+
 void Hardware::SetParameterDisplayHighlighted(int layerIndex, const char* paramName, const char* valueText)
 {
     if (layerIndex < 0 || layerIndex >= static_cast<int>(paramLayers.size())) {

@@ -48,6 +48,10 @@ protected:
     void ToggleBypass();
     void HandleTapTempo();
     void ToggleMetronome();
+    void EnterVolumeMode();
+    void ExitVolumeMode();
+    void UpdateVolumeLevel();
+    bool CanEnterVolumeMode() const;
     void EnterTunerMode();
     void ExitTunerMode();
     void UpdateTunerDisplay();
@@ -86,6 +90,8 @@ protected:
 
     bool bypassMode_ = false;
     BypassType bypassType_ = BypassType::PASSTHROUGH;
+    bool volumeMode_ = false;       // Expression pedal controls overall volume
+    float volumeLevel_ = 1.0f;      // Current volume (0-1), written by Exec, read by audio ISR
     bool switchingEffect_ = false;
     PerspectiveMode mode_ = PerspectiveMode::EFFECT;
     TunerEffect* tunerEffect_ = nullptr;

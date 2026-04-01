@@ -44,6 +44,10 @@ float Effect::GetTempoPulseBrightness() const {
     return 0.0f;
 }
 
+bool Effect::UsesExpressionPedal() const {
+    return false;
+}
+
 void Effect::OnSelected() {
 }
 

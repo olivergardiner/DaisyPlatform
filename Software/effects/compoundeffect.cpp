@@ -32,6 +32,13 @@ CompoundEffect::~CompoundEffect() {
     }
 }
 
+bool CompoundEffect::UsesExpressionPedal() const {
+    for (const Effect* eff : effects_) {
+        if (eff && eff->UsesExpressionPedal()) return true;
+    }
+    return false;
+}
+
 void CompoundEffect::Init(float sampleRate) {
     sampleRate_ = sampleRate;
     

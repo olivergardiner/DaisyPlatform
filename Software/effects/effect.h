@@ -41,6 +41,7 @@ public:
     virtual void SetMetronomeLevel(float level);
     virtual float GetTempoPulseBrightness() const;
     virtual bool HasTempoMode() const;
+    virtual bool UsesExpressionPedal() const;
 
     // Lifecycle hooks when an effect becomes current or is no longer current.
     virtual void OnSelected();

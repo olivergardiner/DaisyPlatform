@@ -75,6 +75,10 @@ void WahEffect::ProcessStereo(const float* inL, const float* inR, float* outL, f
     }
 }
 
+bool WahEffect::UsesExpressionPedal() const {
+    return true;
+}
+
 void WahEffect::Update() {
     // Update filter parameters from effect parameters
     if (parameters_.size() >= 5) {

@@ -17,6 +17,7 @@ public:
     void Process(const float* in, float* out, size_t size) override;
     void ProcessStereo(const float* inL, const float* inR, float* outL, float* outR, size_t size) override;
     void Update() override;
+    bool UsesExpressionPedal() const override;
 
 private:
     enum ParamIndex {

@@ -28,6 +28,7 @@ public:
     bool HasTempoMode() const override;
     void OnSelected() override;
     void OnDeselected() override;
+    bool UsesExpressionPedal() const override;
 
 protected:
     // Add an effect to the compound effect

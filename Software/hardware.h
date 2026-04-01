@@ -91,6 +91,7 @@ namespace perspective {
 
         void SetParameterDisplay(int layerIndex, const char* paramName, const char* valueText);
         void SetParameterDisplayHighlighted(int layerIndex, const char* paramName, const char* valueText);
+        void SetStatusDisplay(const char* left, const char* middle, const char* right);
         void ClearDisplay();
         void ShowTunerOverlay(const char* noteName, int octave, float centsOffset, float frequency, float referenceFrequency, bool signalDetected);
         void HideTunerOverlay();

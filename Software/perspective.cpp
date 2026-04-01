@@ -94,6 +94,10 @@ void Perspective::Exec() {
             switchingEffect_ = false;
         }
 
+        if (volumeMode_) {
+            UpdateVolumeLevel();
+        }
+
         hardware.DelayMs(1); // Small delay to allow events to accumulate
     }
 }     
@@ -105,10 +109,7 @@ void Perspective::AudioCallbackImpl(AudioHandle::InputBuffer in, AudioHandle::Ou
             out[0][i] = in[0][i];
             out[1][i] = in[1][i];
         }
-        return;
-    }
-
-    if (mode_ == PerspectiveMode::TUNER && tunerEffect_) {
+    } else if (mode_ == PerspectiveMode::TUNER && tunerEffect_) {
         // Tuner mode: process for pitch detection but mute output
         tunerEffect_->ProcessStereo(in[0], in[1], out[0], out[1], size);
         for (size_t i = 0; i < size; i++) {
@@ -132,6 +133,15 @@ void Perspective::AudioCallbackImpl(AudioHandle::InputBuffer in, AudioHandle::Ou
             out[1][i] = in[1][i];
         }
     }
+
+    if (volumeMode_) {
+        float vol = volumeLevel_;
+        for (size_t i = 0; i < size; i++) {
+            out[0][i] *= vol;
+            out[1][i] *= vol;
+        }
+    }
+
     hardware.SetLedBrightness(LED_1_IDX, ledPulseBrightness);
 }
 
@@ -425,10 +435,15 @@ void Perspective::RegisterEventListeners() {
         2  // Index 2 = Switch_3
     );
     
-    // Register listener for Switch_3 being held (bypass type toggle) - works in EFFECT and PRESET modes
+    // Register listener for Switch_3 being held (enter/exit volume mode)
     eventHandler_.RegisterListenerByIndex(
         [this](const UIEvent& event) {
-            // Bypass type is now configured in settings mode; hold is a no-op here.
+            if (mode_ != PerspectiveMode::EFFECT && mode_ != PerspectiveMode::PRESET) return;
+            if (volumeMode_) {
+                ExitVolumeMode();
+            } else if (CanEnterVolumeMode()) {
+                EnterVolumeMode();
+            }
         },
         UIEventType::BUTTON_HELD,
         2  // Index 2 = Switch_3
@@ -505,6 +520,34 @@ void Perspective::ToggleMetronome() {
     UpdateStatusDisplay();
 }
 
+void Perspective::EnterVolumeMode() {
+    volumeMode_ = true;
+    UpdateStatusDisplay();
+}
+
+void Perspective::ExitVolumeMode() {
+    volumeMode_ = false;
+    volumeLevel_ = 1.0f;
+    UpdateStatusDisplay();
+}
+
+void Perspective::UpdateVolumeLevel() {
+    Knob* expKnob = hardware.GetKnob(KNOB_EXP_IDX);
+    if (!expKnob) return;
+    expKnob->Process(); // refresh raw_ from ADC
+    expKnob->Filter();  // apply smoothing, update raw_val_
+    float v = expKnob->Value(); // calibrated 0-1
+    if (v < 0.0f) v = 0.0f;
+    if (v > 1.0f) v = 1.0f;
+    volumeLevel_ = taperFunction(v, 0.12f); // LOG taper (ym=0.12)
+}
+
+bool Perspective::CanEnterVolumeMode() const {
+    return hardware.IsJackExpressionInserted()
+        && currentEffect_
+        && !currentEffect_->UsesExpressionPedal();
+}
+
 void Perspective::LoadEffects() {
     // Populate effects vector using the factory function
     float sampleRate = hardware.AudioSampleRate();
@@ -563,7 +606,12 @@ void Perspective::SetCurrentEffect(size_t index) {
     currentEffectIndex_ = index;
     currentEffect_ = nextEffect;
     switchingEffect_ = false;
-    
+
+    // Auto-exit volume mode if the new effect uses the expression pedal
+    if (volumeMode_ && currentEffect_->UsesExpressionPedal()) {
+        ExitVolumeMode();
+    }
+
     // Clear the display before showing new effect
     hardware.ClearDisplay();
     
@@ -598,12 +646,10 @@ void Perspective::UpdateParameterDisplayHighlighted(EffectParameter* param, size
 }
 
 void Perspective::UpdateStatusDisplay() {
-    const char* bypassText = "";
-    if (bypassMode_) {
-        bypassText = (bypassType_ == BypassType::TRUE_BYPASS) ? "Bypass" : "Pass Thru";
-    }
-    const char* metroText = metronomeEnabled_ ? "Met" : "";
-    hardware.SetParameterDisplay(9, bypassText, metroText);
+    const char* bypassText = bypassMode_ ? "BP" : "";
+    const char* volText    = volumeMode_ ? "Vol" : "";
+    const char* metroText  = metronomeEnabled_ ? "Met" : "";
+    hardware.SetStatusDisplay(bypassText, volText, metroText);
 }
 
 void Perspective::EnterTunerMode() {
@@ -797,7 +843,12 @@ void Perspective::LoadPresetAtIndex(size_t slot) {
     currentEffectIndex_ = preset.effectIndex;
     currentEffect_ = presetEffect;
     switchingEffect_ = false;
-    
+
+    // Auto-exit volume mode if the preset effect uses the expression pedal
+    if (volumeMode_ && currentEffect_->UsesExpressionPedal()) {
+        ExitVolumeMode();
+    }
+
     UpdatePresetDisplay();
 }
 
