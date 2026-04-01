@@ -126,6 +126,7 @@ void Perspective::AudioCallbackImpl(AudioHandle::InputBuffer in, AudioHandle::Ou
         // Process with current effect
         currentEffect_->ProcessStereo(in[0], in[1], out[0], out[1], size);
         ledPulseBrightness = currentEffect_->GetTempoPulseBrightness();
+        hardware.SetLedBrightness(LED_2_IDX, currentEffect_->GetEnvelopeBrightness());
     } else {
         // Bypass or fallback: pass input through unchanged
         for (size_t i = 0; i < size; i++){

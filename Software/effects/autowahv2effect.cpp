@@ -29,7 +29,7 @@ enum VoiceMode {
 };
 
 static const char* kVoiceLabels[4] = {
-    "Classic", "Classic Lin", "Refined", "Refined Lin"
+    "C Log", "C Lin", "R Log", "R Lin"
 };
 
 static const char* kDownBoostLabels[4] = {
@@ -340,6 +340,6 @@ void AutowahV2Effect::Update() {
     }
 }
 
-float AutowahV2Effect::GetTempoPulseBrightness() const {
+float AutowahV2Effect::GetEnvelopeBrightness() const {
     return detectorInput_;
 }

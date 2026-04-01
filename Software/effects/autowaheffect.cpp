@@ -178,6 +178,6 @@ void AutowahEffect::Update() {
     }
 }
 
-float AutowahEffect::GetTempoPulseBrightness() const {
+float AutowahEffect::GetEnvelopeBrightness() const {
     return std::min(detectorInput_, 1.0f);
 }

@@ -40,6 +40,7 @@ public:
     bool GetMetronomeEnabled() const;
     virtual void SetMetronomeLevel(float level);
     virtual float GetTempoPulseBrightness() const;
+    virtual float GetEnvelopeBrightness() const;
     virtual bool HasTempoMode() const;
     virtual bool UsesExpressionPedal() const;
 

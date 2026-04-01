@@ -17,10 +17,12 @@
 #include "moddelayeffect.h"
 #include "paralleldelayeffect.h"
 #include "phasereffect.h"
+#include "tremoloeffect.h"
 #include "reverbeffect.h"
 #include "slapbackdelayeffect.h"
 #include "streetseffect.h"
 #include "tunereffect.h"
+#include "pitchshiftereffect.h"
 #include "twelvestringeffect.h"
 #include "waheffect.h"
 
@@ -75,6 +77,11 @@ inline void PopulateEffects(std::vector<Effect*>* effects, float sampleRate) {
     PhaserEffect* phaserEffect = new PhaserEffect();
     phaserEffect->Init(sampleRate);
     effects->push_back(phaserEffect);
+
+    // Add tremolo effect
+    TremoloEffect* tremoloEffect = new TremoloEffect();
+    tremoloEffect->Init(sampleRate);
+    effects->push_back(tremoloEffect);
     
     // Add autowah effect
     AutowahEffect* autowahEffect = new AutowahEffect();

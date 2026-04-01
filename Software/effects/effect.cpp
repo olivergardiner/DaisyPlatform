@@ -44,6 +44,10 @@ float Effect::GetTempoPulseBrightness() const {
     return 0.0f;
 }
 
+float Effect::GetEnvelopeBrightness() const {
+    return 0.0f;
+}
+
 bool Effect::UsesExpressionPedal() const {
     return false;
 }

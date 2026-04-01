@@ -95,13 +95,13 @@ void MysteriousEffect::Update() {
 
     if (autowahV2Effect_ && autowahV2Effect_->GetParameterCount() >= 8) {
         autowahV2Effect_->GetParameter(0)->SetValue(wahMix);
-        autowahV2Effect_->GetParameter(1)->SetValue(0.82f);
-        autowahV2Effect_->GetParameter(2)->SetValue(1200.0f);
-        autowahV2Effect_->GetParameter(3)->SetValue(0.09f);
-        autowahV2Effect_->GetParameter(4)->SetValue(0.14f);
-        autowahV2Effect_->GetParameter(5)->SetValue(-sweepHz);
-        autowahV2Effect_->GetParameter(6)->SetValue(0.0f);
-        autowahV2Effect_->GetParameter(7)->SetValue(downBoost);
+        autowahV2Effect_->GetParameter(1)->SetValue(0.82f);     // Resonance
+        autowahV2Effect_->GetParameter(2)->SetValue(1200.0f);   // Frequency
+        autowahV2Effect_->GetParameter(3)->SetValue(0.09f);     // Attack
+        autowahV2Effect_->GetParameter(4)->SetValue(0.14f);     // Release
+        autowahV2Effect_->GetParameter(5)->SetValue(-sweepHz);  // Sensitivity (negative to invert sweep direction)
+        autowahV2Effect_->GetParameter(6)->SetValue(0.0f);      // Voice: "C Log"
+        autowahV2Effect_->GetParameter(7)->SetValue(downBoost); // Down boost
         autowahV2Effect_->Update();
     }
 
