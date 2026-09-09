@@ -2,6 +2,7 @@
 #define PERSPECTIVE_MYSTERIOUSEFFECT_H
 
 #include "compoundeffect.h"
+#include "compressoreffect.h"
 
 namespace perspective {
 
@@ -25,8 +26,9 @@ private:
         kParamDownBoost
     };
 
+    CompressorEffect* compressorEffect_;
     class TwelveStringEffect* twelveStringEffect_;
-    class AutowahV2Effect* autowahV2Effect_;
+    Effect* wahEffect_;   // AutowahEffect (V1) or AutowahV2Effect (V2) — see MYSTERIOUS_WAH_V2 in .cpp
     class FlangerEffect* flangerEffect_;
     class DelayEffect* delayEffect_;
     class ReverbEffect* reverbEffect_;

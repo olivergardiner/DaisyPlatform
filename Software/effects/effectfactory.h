@@ -9,6 +9,7 @@
 #include "autowahv2effect.h"
 #include "choruseffect.h"
 #include "compoundeffect.h"
+#include "compressoreffect.h"
 #include "delayeffect.h"
 #include "flangereffect.h"
 #include "flyeffect.h"
@@ -22,7 +23,6 @@
 #include "slapbackdelayeffect.h"
 #include "streetseffect.h"
 #include "tunereffect.h"
-#include "pitchshiftereffect.h"
 #include "twelvestringeffect.h"
 #include "waheffect.h"
 
@@ -43,11 +43,6 @@ inline void PopulateEffects(std::vector<Effect*>* effects, float sampleRate) {
     delayEffect->Init(sampleRate);
     effects->push_back(delayEffect);
     
-    // Add parallel delay effect
-    ParallelDelayEffect* parallelDelayEffect = new ParallelDelayEffect();
-    parallelDelayEffect->Init(sampleRate);
-    effects->push_back(parallelDelayEffect);
-    
     // Add mod delay effect
     ModDelayEffect* modDelayEffect = new ModDelayEffect();
     modDelayEffect->Init(sampleRate);
@@ -62,6 +57,11 @@ inline void PopulateEffects(std::vector<Effect*>* effects, float sampleRate) {
     ReverbEffect* reverbEffect = new ReverbEffect();
     reverbEffect->Init(sampleRate);
     effects->push_back(reverbEffect);
+    
+    // Add parallel delay effect
+    ParallelDelayEffect* parallelDelayEffect = new ParallelDelayEffect();
+    parallelDelayEffect->Init(sampleRate);
+    effects->push_back(parallelDelayEffect);
     
     // Add chorus effect
     ChorusEffect* chorusEffect = new ChorusEffect();
@@ -107,7 +107,12 @@ inline void PopulateEffects(std::vector<Effect*>* effects, float sampleRate) {
     TwelveStringEffect* twelveStringEffect = new TwelveStringEffect();
     twelveStringEffect->Init(sampleRate);
     effects->push_back(twelveStringEffect);
-    
+
+    // Add compressor effect
+    CompressorEffect* compressorEffect = new CompressorEffect();
+    compressorEffect->Init(sampleRate);
+    effects->push_back(compressorEffect);
+
     // --- Compound effects below this line ---
 
     // Add streets effect

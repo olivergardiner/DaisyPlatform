@@ -19,6 +19,10 @@ using namespace daisy;
 #define SWITCH_DIVISOR 1 // Process switches every control tick for responsive edge detection
 #define KNOB_DIVISOR 16 // Process knob changes every 16th call to control timer for better responsiveness
 
+// Set to GPIO::Pull::PULLUP to use the Daisy Seed's internal pull-ups on switches and digital inputs.
+// Set to GPIO::Pull::NOPULL when using external pull-down resistors (hardware revision with discrete resistors).
+#define SWITCH_INPUT_PULL GPIO::Pull::PULLUP
+
 namespace DadGFX {
     class cLayer;
     class cFont;

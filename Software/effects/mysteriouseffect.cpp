@@ -1,5 +1,12 @@
 #include "mysteriouseffect.h"
+#include "compressoreffect.h"
 
+// ---- Compile-time wah version switch ----
+// Set to 1 to use AutowahV2Effect, 0 to use AutowahEffect (V1)
+#define MYSTERIOUS_WAH_V2 1
+// -----------------------------------------
+
+#include "autowaheffect.h"
 #include "autowahv2effect.h"
 #include "delayeffect.h"
 #include "flangereffect.h"
@@ -23,13 +30,19 @@ static const char* kDownBoostLabels[4] = {
 
 MysteriousEffect::MysteriousEffect()
     : CompoundEffect("Mysterious", RoutingMode::SERIES)
+    , compressorEffect_(new CompressorEffect())
     , twelveStringEffect_(new TwelveStringEffect())
-    , autowahV2Effect_(new AutowahV2Effect())
+#if MYSTERIOUS_WAH_V2
+    , wahEffect_(new AutowahV2Effect())
+#else
+    , wahEffect_(new AutowahEffect())
+#endif
     , flangerEffect_(new FlangerEffect())
     , delayEffect_(new DelayEffect())
     , reverbEffect_(new ReverbEffect()) {
+    AddEffect(compressorEffect_);
     AddEffect(twelveStringEffect_);
-    AddEffect(autowahV2Effect_);
+    AddEffect(wahEffect_);
     AddEffect(flangerEffect_);
     AddEffect(delayEffect_);
     AddEffect(reverbEffect_);
@@ -84,6 +97,17 @@ void MysteriousEffect::Update() {
     TimeParameter* delayTime = static_cast<TimeParameter*>(parameters_[kParamTime]);
     float downBoost = parameters_[kParamDownBoost]->GetValue();
 
+    // Light front-end compression: 2:1, -18 dB threshold, fast attack, gentle release
+    if (compressorEffect_ && compressorEffect_->GetParameterCount() >= 6) {
+        compressorEffect_->GetParameter(0)->SetValue(-18.0f);  // Threshold
+        compressorEffect_->GetParameter(1)->SetValue(2.0f);    // Ratio 2:1
+        compressorEffect_->GetParameter(2)->SetValue(5.0f);    // Attack 5 ms
+        compressorEffect_->GetParameter(3)->SetValue(80.0f);   // Release 80 ms
+        compressorEffect_->GetParameter(4)->SetValue(2.0f);    // Makeup 2 dB
+        compressorEffect_->GetParameter(5)->SetValue(1.0f);    // Mix 100%
+        compressorEffect_->Update();
+    }
+
     if (twelveStringEffect_ && twelveStringEffect_->GetParameterCount() >= 5) {
         twelveStringEffect_->GetParameter(0)->SetValue(1.0f);   // Octave 100%
         twelveStringEffect_->GetParameter(1)->SetValue(0.4f);   // Detune 40%
@@ -93,17 +117,30 @@ void MysteriousEffect::Update() {
         twelveStringEffect_->Update();
     }
 
-    if (autowahV2Effect_ && autowahV2Effect_->GetParameterCount() >= 8) {
-        autowahV2Effect_->GetParameter(0)->SetValue(wahMix);
-        autowahV2Effect_->GetParameter(1)->SetValue(0.82f);     // Resonance
-        autowahV2Effect_->GetParameter(2)->SetValue(1200.0f);   // Frequency
-        autowahV2Effect_->GetParameter(3)->SetValue(0.09f);     // Attack
-        autowahV2Effect_->GetParameter(4)->SetValue(0.14f);     // Release
-        autowahV2Effect_->GetParameter(5)->SetValue(-sweepHz);  // Sensitivity (negative to invert sweep direction)
-        autowahV2Effect_->GetParameter(6)->SetValue(0.0f);      // Voice: "C Log"
-        autowahV2Effect_->GetParameter(7)->SetValue(downBoost); // Down boost
-        autowahV2Effect_->Update();
+#if MYSTERIOUS_WAH_V2
+    if (wahEffect_ && wahEffect_->GetParameterCount() >= 8) {
+        AutowahV2Effect* wah = static_cast<AutowahV2Effect*>(wahEffect_);
+        wah->GetParameter(0)->SetValue(wahMix);
+        wah->GetParameter(1)->SetValue(0.82f);     // Resonance
+        wah->GetParameter(2)->SetValue(1200.0f);   // Frequency
+        wah->GetParameter(3)->SetValue(0.09f);     // Attack
+        wah->GetParameter(4)->SetValue(0.14f);     // Release
+        wah->GetParameter(5)->SetValue(-sweepHz);  // Sensitivity
+        wah->GetParameter(6)->SetValue(0.0f);      // Voice: "C Log"
+        wah->GetParameter(7)->SetValue(downBoost); // Down boost
+        wah->Update();
     }
+#else
+    if (wahEffect_ && wahEffect_->GetParameterCount() >= 6) {
+        wahEffect_->GetParameter(0)->SetValue(wahMix);
+        wahEffect_->GetParameter(1)->SetValue(0.82f);     // Resonance
+        wahEffect_->GetParameter(2)->SetValue(1200.0f);   // Frequency
+        wahEffect_->GetParameter(3)->SetValue(0.09f);     // Attack
+        wahEffect_->GetParameter(4)->SetValue(0.14f);     // Release
+        wahEffect_->GetParameter(5)->SetValue(-sweepHz);  // Sensitivity
+        wahEffect_->Update();
+    }
+#endif
 
     if (flangerEffect_ && flangerEffect_->GetParameterCount() >= 6) {
         flangerEffect_->GetParameter(0)->SetValue(0.06f + (flangeAmount * 0.18f));

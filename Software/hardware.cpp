@@ -204,7 +204,7 @@ void Hardware::InitControls()
 
     for (int i = 0; i < numSwitches; i++) {
         perspective::Switch newSwitch;
-        newSwitch.Init(switchPins[i], UPDATE_RATE / SWITCH_DIVISOR);
+        newSwitch.Init(switchPins[i], UPDATE_RATE / SWITCH_DIVISOR, perspective::Switch::TYPE_MOMENTARY, perspective::Switch::POLARITY_INVERTED, SWITCH_INPUT_PULL);
         switches.push_back(newSwitch);
     }
 
@@ -230,11 +230,11 @@ void Hardware::InitControls()
     }
 
     // Jack insertion detection
-    leftIn.Init(AUDIO_IN_L_PIN, GPIO::Mode::INPUT);
-    rightIn.Init(AUDIO_IN_R_PIN, GPIO::Mode::INPUT);
-    leftOut.Init(AUDIO_OUT_L_PIN, GPIO::Mode::INPUT);
-    rightOut.Init(AUDIO_OUT_R_PIN, GPIO::Mode::INPUT);
-    expression.Init(EXPRESSION_PEDAL_PIN, GPIO::Mode::INPUT);
+    leftIn.Init(AUDIO_IN_L_PIN, GPIO::Mode::INPUT, SWITCH_INPUT_PULL);
+    rightIn.Init(AUDIO_IN_R_PIN, GPIO::Mode::INPUT, SWITCH_INPUT_PULL);
+    leftOut.Init(AUDIO_OUT_L_PIN, GPIO::Mode::INPUT, SWITCH_INPUT_PULL);
+    rightOut.Init(AUDIO_OUT_R_PIN, GPIO::Mode::INPUT, SWITCH_INPUT_PULL);
+    expression.Init(EXPRESSION_PEDAL_PIN, GPIO::Mode::INPUT, SWITCH_INPUT_PULL);
 
     // True bypass control
     trueBypass.Init(TRUE_BYPASS_PIN, GPIO::Mode::OUTPUT);
