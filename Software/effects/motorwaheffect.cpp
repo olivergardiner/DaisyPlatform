@@ -30,11 +30,14 @@ void MotorWahEffect::Init(float sampleRate) {
     lfo_.SetWaveform(Oscillator::WAVE_SIN);
     lfo_.SetFreq(0.8f);
 
-    AddParameter(new PotentiometerParameter("K1 Mix", 0.0f, 1.0f, 0.6f, PotCurve::LIN, KNOB_1_IDX));
-    AddParameter(new PotentiometerParameter("K2 Resonance", 0.0f, 1.0f, 0.9f, PotCurve::LIN, KNOB_2_IDX));
-    AddParameter(new PotentiometerParameter("K3 Frequency", 250.0f, 2000.0f, 850.0f, PotCurve::LOG, KNOB_3_IDX));
-    AddParameter(new PotentiometerParameter("K4 Rate Hz", 0.05f, 12.0f, 0.8f, PotCurve::LOG, KNOB_4_IDX));
-    AddParameter(new PotentiometerParameter("K5 Depth", 0.0f, 3000.0f, 1800.0f, PotCurve::LIN, KNOB_5_IDX));
+    AddParameter(new PotentiometerParameter("K1 Mix", 0.0f, 1.0f, 0.6f, PotCurve::LIN, MACRO_KNOB_MIX_IDX));
+    parameters_.back()->SetMacroRole(MacroRole::MIX);
+    AddParameter(new PotentiometerParameter("Resonance", 0.0f, 1.0f, 0.9f, PotCurve::LIN, -1));
+    AddParameter(new PotentiometerParameter("Frequency", 250.0f, 2000.0f, 850.0f, PotCurve::LOG, -1));
+    AddParameter(new PotentiometerParameter("K3 Rate Hz", 0.05f, 12.0f, 0.8f, PotCurve::LOG, MACRO_KNOB_RATE_IDX));
+    parameters_.back()->SetMacroRole(MacroRole::RATE);
+    AddParameter(new PotentiometerParameter("K2 Depth", 0.0f, 3000.0f, 1800.0f, PotCurve::LIN, MACRO_KNOB_DEPTH_IDX));
+    parameters_.back()->SetMacroRole(MacroRole::DEPTH);
     AddParameter(new EncoderParameter("E2 Wave", 0.0f, static_cast<float>(Oscillator::WAVE_LAST - 1), 0.0f, 1.0f, ENCODER_2_IDX));
     parameters_.back()->SetDisplayType(DisplayType::DISCRETE);
     parameters_.back()->SetDiscreteValues(lfoWaveShapes, 8);

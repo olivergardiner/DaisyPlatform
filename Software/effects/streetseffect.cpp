@@ -39,31 +39,37 @@ void StreetsEffect::Init(float sampleRate) {
     
     // Add top-level controls.
     // Delay 1 controls
-    AddParameter(new PotentiometerParameter("K1 Mix", 0.0f, 1.0f, 0.50f, PotCurve::LIN, KNOB_1_IDX, 0));
+    AddParameter(new PotentiometerParameter("K1 Mix", 0.0f, 1.0f, 0.50f, PotCurve::LIN, MACRO_KNOB_MIX_IDX, 0));
     parameters_.back()->SetDisplayType(DisplayType::SCALED);
     parameters_.back()->SetScaleFactor(100.0f);
+    parameters_.back()->SetMacroRole(MacroRole::MIX);
     
-    AddParameter(new PotentiometerParameter("K2 Feedback", 0.0f, 0.95f, 0.5f, PotCurve::LIN, KNOB_2_IDX, 1));
+    AddParameter(new PotentiometerParameter("K4 Feedback", 0.0f, 0.95f, 0.5f, PotCurve::LIN, MACRO_KNOB_FEEDBACK_IDX, 1));
     parameters_.back()->SetDisplayType(DisplayType::SCALED);
     parameters_.back()->SetScaleFactor(100.0f);
+    parameters_.back()->SetMacroRole(MacroRole::FEEDBACK);
     
-    AddParameter(new PotentiometerParameter("K3 Subdivision", 0.0f, 7.0f, 2.0f, PotCurve::LIN, KNOB_3_IDX, 2));
+    AddParameter(new PotentiometerParameter("K5 Subdivision 1", 0.0f, 7.0f, 2.0f, PotCurve::LIN, MACRO_KNOB_SUBDIVISION_IDX, 2));
     parameters_.back()->SetDisplayType(DisplayType::DISCRETE);
     parameters_.back()->SetDiscreteValues(TempoEffect::kSubdivisionGlyphs, 8);
+    parameters_.back()->SetMacroRole(MacroRole::SUBDIVISION);
     
-    // Delay 2 controls
-    AddParameter(new PotentiometerParameter("K4 Mix", 0.0f, 1.0f, 0.35f, PotCurve::LIN, KNOB_4_IDX, 4));
+    // Delay 2 controls (second instance - not macro-pot controllable)
+    AddParameter(new PotentiometerParameter("Mix 2", 0.0f, 1.0f, 0.35f, PotCurve::LIN, -1, 4));
     parameters_.back()->SetDisplayType(DisplayType::SCALED);
     parameters_.back()->SetScaleFactor(100.0f);
+    parameters_.back()->SetMacroRole(MacroRole::MIX, /*isPrimary=*/false);
     
-    AddParameter(new PotentiometerParameter("K5 Feedback", 0.0f, 0.95f, 0.5f, PotCurve::LIN, KNOB_5_IDX, 5));
+    AddParameter(new PotentiometerParameter("Feedback 2", 0.0f, 0.95f, 0.5f, PotCurve::LIN, -1, 5));
     parameters_.back()->SetDisplayType(DisplayType::SCALED);
     parameters_.back()->SetScaleFactor(100.0f);
+    parameters_.back()->SetMacroRole(MacroRole::FEEDBACK, /*isPrimary=*/false);
     
     // Slapback blend
     AddParameter(new PotentiometerParameter("K6 Slap Mix", 0.0f, 0.75f, 0.50f, PotCurve::LIN, KNOB_6_IDX, 6));
     parameters_.back()->SetDisplayType(DisplayType::SCALED);
     parameters_.back()->SetScaleFactor(100.0f);
+    parameters_.back()->SetMacroRole(MacroRole::MIX, /*isPrimary=*/false);
 
     // Delay 1 time parameter (Encoder 1) — reversed so CW increases BPM / decreases delay time
     AddParameter(new TimeParameter("E1 Time", 250.0f, 2000.0f, 500.0f, 1.0f, ENCODER_1_IDX, "E1 Tempo", 3));

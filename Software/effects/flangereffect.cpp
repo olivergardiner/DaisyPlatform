@@ -90,11 +90,15 @@ void FlangerEffect::Init(float sampleRate) {
         delayBufferR_[i] = 0.0f;
     }
 
-    AddParameter(new PotentiometerParameter("K1 Mix", 0.0f, 1.0f, 0.45f, PotCurve::LIN, KNOB_1_IDX));
-    AddParameter(new PotentiometerParameter("K2 Depth", 0.0f, 1.0f, 0.7f, PotCurve::LIN, KNOB_2_IDX));
-    AddParameter(new PotentiometerParameter("K3 Rate", 0.02f, 2.0f, 0.25f, PotCurve::LOG, KNOB_3_IDX));
-    AddParameter(new PotentiometerParameter("K4 Feedback", -0.95f, 0.95f, 0.35f, PotCurve::LIN, KNOB_4_IDX));
-    AddParameter(new PotentiometerParameter("K5 Manual ms", 0.2f, 4.0f, 1.2f, PotCurve::LIN, KNOB_5_IDX));
+    AddParameter(new PotentiometerParameter("K1 Mix", 0.0f, 1.0f, 0.45f, PotCurve::LIN, MACRO_KNOB_MIX_IDX));
+    parameters_.back()->SetMacroRole(MacroRole::MIX);
+    AddParameter(new PotentiometerParameter("K2 Depth", 0.0f, 1.0f, 0.7f, PotCurve::LIN, MACRO_KNOB_DEPTH_IDX));
+    parameters_.back()->SetMacroRole(MacroRole::DEPTH);
+    AddParameter(new PotentiometerParameter("K3 Rate", 0.02f, 2.0f, 0.25f, PotCurve::LOG, MACRO_KNOB_RATE_IDX));
+    parameters_.back()->SetMacroRole(MacroRole::RATE);
+    AddParameter(new PotentiometerParameter("K4 Feedback", -0.95f, 0.95f, 0.35f, PotCurve::LIN, MACRO_KNOB_FEEDBACK_IDX));
+    parameters_.back()->SetMacroRole(MacroRole::FEEDBACK);
+    AddParameter(new PotentiometerParameter("Manual ms", 0.2f, 4.0f, 1.2f, PotCurve::LIN, -1));
     AddParameter(new EncoderParameter("E2 Wave", 0.0f, 3.0f, 0.0f, 1.0f, ENCODER_2_IDX));
 
     static const char* kWaveNames[] = {"Sine", "Tri", "Saw", "Square"};

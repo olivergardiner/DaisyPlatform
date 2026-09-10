@@ -112,17 +112,20 @@ void DelayEffect::Init(float sampleRate) {
     samplesUntilNextBeat_ = 0.0f;
     
     // Add parameters: Mix, Feedback, Subdivision, Time, TempoToggle
-    AddParameter(new PotentiometerParameter("K1 Mix", 0.0f, 1.0f, 0.50f, PotCurve::LIN, KNOB_1_IDX));
+    AddParameter(new PotentiometerParameter("K1 Mix", 0.0f, 1.0f, 0.50f, PotCurve::LIN, MACRO_KNOB_MIX_IDX));
     parameters_.back()->SetDisplayType(DisplayType::SCALED);
     parameters_.back()->SetScaleFactor(100.0f); // Display mix as percentage
+    parameters_.back()->SetMacroRole(MacroRole::MIX);
     
-    AddParameter(new PotentiometerParameter("K2 Feedback", 0.0f, 0.95f, 0.5f, PotCurve::LIN, KNOB_2_IDX));
+    AddParameter(new PotentiometerParameter("K4 Feedback", 0.0f, 0.95f, 0.5f, PotCurve::LIN, MACRO_KNOB_FEEDBACK_IDX));
     parameters_.back()->SetDisplayType(DisplayType::SCALED);
     parameters_.back()->SetScaleFactor(100.0f); // Display feedback as percentage
+    parameters_.back()->SetMacroRole(MacroRole::FEEDBACK);
     
-    AddParameter(new PotentiometerParameter("K3 Subdivision", 0.0f, 7.0f, 3.0f, PotCurve::LIN, KNOB_3_IDX));
+    AddParameter(new PotentiometerParameter("K5 Subdivision", 0.0f, 7.0f, 3.0f, PotCurve::LIN, MACRO_KNOB_SUBDIVISION_IDX));
     parameters_.back()->SetDisplayType(DisplayType::DISCRETE);
     parameters_.back()->SetDiscreteValues(kSubdivisionGlyphs, 8);
+    parameters_.back()->SetMacroRole(MacroRole::SUBDIVISION);
     subdivisionParamIndex_ = 2;  // Track subdivision parameter index
     
     // TimeParameter with milliseconds range (10-2000 ms), 1ms step in time mode, 0.5 BPM in tempo mode

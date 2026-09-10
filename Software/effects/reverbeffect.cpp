@@ -77,9 +77,11 @@ void ReverbEffect::ReleaseReverb() {
 void ReverbEffect::Init(float sampleRate) {
     sampleRate_ = sampleRate;
 
-    AddParameter(new PotentiometerParameter("K1 Mix", 0.0f, 1.0f, 0.15f, PotCurve::LIN, KNOB_1_IDX));
-    AddParameter(new PotentiometerParameter("K2 Feedback", 0.0f, 1.0f, 0.82f, PotCurve::LIN, KNOB_2_IDX));
-    AddParameter(new PotentiometerParameter("K3 Cutoff Hz", 200.0f, 12000.0f, 2800.0f, PotCurve::LOG, KNOB_3_IDX));
+    AddParameter(new PotentiometerParameter("K1 Mix", 0.0f, 1.0f, 0.15f, PotCurve::LIN, MACRO_KNOB_MIX_IDX));
+    parameters_.back()->SetMacroRole(MacroRole::MIX);
+    AddParameter(new PotentiometerParameter("K4 Feedback", 0.0f, 1.0f, 0.82f, PotCurve::LIN, MACRO_KNOB_FEEDBACK_IDX));
+    parameters_.back()->SetMacroRole(MacroRole::FEEDBACK);
+    AddParameter(new PotentiometerParameter("Cutoff Hz", 200.0f, 12000.0f, 2800.0f, PotCurve::LOG, -1));
 
     Update();
 }

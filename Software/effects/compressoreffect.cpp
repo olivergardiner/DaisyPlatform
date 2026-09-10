@@ -73,23 +73,24 @@ CompressorEffect::~CompressorEffect() {
 void CompressorEffect::Init(float sampleRate) {
     sampleRate_ = sampleRate;
 
-    // K1: Threshold — sets the level above which compression starts (-60 to 0 dB)
-    AddParameter(new PotentiometerParameter("K1 Threshold", -60.0f, 0.0f, -20.0f, PotCurve::LIN, KNOB_1_IDX));
+    // Threshold — sets the level above which compression starts (-60 to 0 dB)
+    AddParameter(new PotentiometerParameter("Threshold", -60.0f, 0.0f, -20.0f, PotCurve::LIN, -1));
 
-    // K2: Ratio — compression ratio (1:1 = bypass, 20:1 ≈ limiting)
-    AddParameter(new PotentiometerParameter("K2 Ratio", 1.0f, 20.0f, 4.0f, PotCurve::LOG, KNOB_2_IDX));
+    // Ratio — compression ratio (1:1 = bypass, 20:1 ≈ limiting)
+    AddParameter(new PotentiometerParameter("Ratio", 1.0f, 20.0f, 4.0f, PotCurve::LOG, -1));
 
-    // K3: Attack — time for the compressor to engage (0.1 ms – 200 ms)
-    AddParameter(new PotentiometerParameter("K3 Attack", 0.1f, 200.0f, 10.0f, PotCurve::LOG, KNOB_3_IDX));
+    // Attack — time for the compressor to engage (0.1 ms – 200 ms)
+    AddParameter(new PotentiometerParameter("Attack", 0.1f, 200.0f, 10.0f, PotCurve::LOG, -1));
 
-    // K4: Release — time for the compressor to disengage (10 ms – 2000 ms)
-    AddParameter(new PotentiometerParameter("K4 Release", 10.0f, 2000.0f, 100.0f, PotCurve::LOG, KNOB_4_IDX));
+    // Release — time for the compressor to disengage (10 ms – 2000 ms)
+    AddParameter(new PotentiometerParameter("Release", 10.0f, 2000.0f, 100.0f, PotCurve::LOG, -1));
 
     // K5: Makeup Gain — post-compression gain (0 – 30 dB)
-    AddParameter(new PotentiometerParameter("K5 Makeup", 0.0f, 30.0f, 6.0f, PotCurve::LIN, KNOB_5_IDX));
+    AddParameter(new PotentiometerParameter("Makeup", 0.0f, 30.0f, 6.0f, PotCurve::LIN, -1));
 
-    // K6: Mix — wet/dry blend (0 = dry, 1 = full compression)
-    AddParameter(new PotentiometerParameter("K6 Mix", 0.0f, 1.0f, 1.0f, PotCurve::LIN, KNOB_6_IDX));
+    // Mix — wet/dry blend (0 = dry, 1 = full compression)
+    AddParameter(new PotentiometerParameter("K1 Mix", 0.0f, 1.0f, 1.0f, PotCurve::LIN, MACRO_KNOB_MIX_IDX));
+    parameters_.back()->SetMacroRole(MacroRole::MIX);
 
     Update();
 }

@@ -22,6 +22,8 @@ EffectParameter::EffectParameter(const char* name, float minValue, float maxValu
     , scaleFactor_(1.0f)
     , discreteValues_(nullptr)
     , discreteValueCount_(0)
+    , macroRole_(MacroRole::NONE)
+    , macroPrimary_(true)
 {
     if (name) {
         size_t len = strlen(name);
@@ -68,6 +70,14 @@ int EffectParameter::GetDisplayIndex() const {
     return displayIndex_;
 }
 
+DisplayType EffectParameter::GetDisplayType() const {
+    return displayType_;
+}
+
+int EffectParameter::GetDiscreteValueCount() const {
+    return discreteValueCount_;
+}
+
 void EffectParameter::SetValue(float value) {
     currentValue_ = clamp(value, minValue_, maxValue_);
 }
@@ -83,6 +93,19 @@ void EffectParameter::SetIndex(int index) {
 
 void EffectParameter::SetDisplayIndex(int displayIndex) {
     displayIndex_ = displayIndex;
+}
+
+void EffectParameter::SetMacroRole(MacroRole role, bool isPrimary) {
+    macroRole_ = role;
+    macroPrimary_ = isPrimary;
+}
+
+MacroRole EffectParameter::GetMacroRole() const {
+    return macroRole_;
+}
+
+bool EffectParameter::IsMacroPrimary() const {
+    return macroPrimary_;
 }
 
 void EffectParameter::SetDisplayType(DisplayType type) {

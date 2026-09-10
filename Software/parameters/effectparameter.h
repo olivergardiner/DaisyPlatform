@@ -33,6 +33,21 @@ enum class ControlType {
     ENCODER
 };
 
+// Semantic macro role for parameters that are statically mapped to the
+// dedicated macro potentiometers (Mix/Depth/Rate/Feedback), plus Subdivision
+// which stays encoder-controlled but is grouped with the other macros.
+// Effects with two instances of the same macro (e.g. dual delay lines) tag
+// the first instance as primary (macro-pot controllable) and the second as
+// non-primary (encoder select/edit only).
+enum class MacroRole {
+    NONE,
+    MIX,
+    DEPTH,
+    RATE,
+    FEEDBACK,
+    SUBDIVISION
+};
+
 // Base class for effect parameters
 // NB: The index is used to map parameters to physical controls, and does not indicate the order of the parameter itself.
 // For PotentiometerParameter and EncoderParameter, index corresponds to a physical potentiometer or encoder number respectively.
@@ -53,6 +68,8 @@ public:
     int GetDisplayIndex() const;
     virtual ParameterType GetType() const = 0;  // Pure virtual - must be implemented
     virtual void GetValueAsString(char* buffer, size_t bufferSize) const;
+    DisplayType GetDisplayType() const;
+    int GetDiscreteValueCount() const;
     
     // Display type configuration
     void SetDisplayType(DisplayType type);
@@ -69,6 +86,12 @@ public:
     
     // Bravura font control
     bool GetUseBravura() const;
+
+    // Macro role tagging (used to statically map the first instance of a
+    // Mix/Depth/Rate/Feedback parameter to its dedicated macro potentiometer)
+    void SetMacroRole(MacroRole role, bool isPrimary = true);
+    MacroRole GetMacroRole() const;
+    bool IsMacroPrimary() const;
     
     // Convert value to integer with configurable maximum
     int GetValueAsInt(int maxInt) const;
@@ -84,6 +107,8 @@ protected:
     float scaleFactor_;
     const char **discreteValues_;
     int discreteValueCount_;
+    MacroRole macroRole_;
+    bool macroPrimary_;
 };
 
 } // namespace perspective

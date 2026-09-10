@@ -1,9 +1,8 @@
 #include "encoder.h"
 
 using namespace daisy;
-using namespace perspective;
 
-void Encoder::Init(Pin a, Pin b, Pin click, float update_rate)
+void perspective::Encoder::Init(Pin a, Pin b, Pin click, float update_rate)
 {
     last_update_  = System::GetNow();
     update_rate_  = update_rate;
@@ -25,7 +24,7 @@ void Encoder::Init(Pin a, Pin b, Pin click, float update_rate)
     direction_              = 1;
 }
 
-void Encoder::Process()
+void perspective::Encoder::Process()
 {
     static constexpr int8_t transition_lut[16]
         = {0, -1, 1, 0, 1, 0, 0, -1, -1, 0, 0, 1, 0, 1, -1, 0};
@@ -49,7 +48,7 @@ void Encoder::Process()
         return;
     }
 
-    if(sample_stability_count_ < 1)
+    if(sample_stability_count_ < kStabilityConfirmSamples)
     {
         sample_stability_count_++;
         return;

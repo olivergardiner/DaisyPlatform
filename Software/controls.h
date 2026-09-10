@@ -18,6 +18,17 @@ namespace perspective {
 
 #define NUM_KNOBS       7
 
+// ========== MACRO KNOB ASSIGNMENT ==========
+// Knobs 1-5 are statically dedicated to macro roles across all effects.
+// An effect only responds to a macro knob if it tags a parameter with the
+// matching MacroRole (see parameters/effectparameter.h).
+#define MACRO_KNOB_MIX_IDX         KNOB_1_IDX
+#define MACRO_KNOB_DEPTH_IDX       KNOB_2_IDX
+#define MACRO_KNOB_RATE_IDX        KNOB_3_IDX
+#define MACRO_KNOB_FEEDBACK_IDX    KNOB_4_IDX
+#define MACRO_KNOB_SUBDIVISION_IDX KNOB_5_IDX
+#define NUM_MACRO_KNOBS            5
+
 // ========== SWITCH INDICES ==========
 // Momentary switches (digital inputs)
 #define SWITCH_1_IDX    0

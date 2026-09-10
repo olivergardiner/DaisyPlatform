@@ -54,19 +54,24 @@ void ModDelayEffect::Init(float sampleRate) {
     lfoR_.SetFreq(0.5f);
     
     // Add parameters: Mix, Feedback, ModRate, ModDepth, Subdivision, Time/Tempo, Wave Shape, TempoToggle
-    AddParameter(new PotentiometerParameter("K1 Mix", 0.0f, 1.0f, 0.50f, PotCurve::LIN, KNOB_1_IDX));
+    AddParameter(new PotentiometerParameter("K1 Mix", 0.0f, 1.0f, 0.50f, PotCurve::LIN, MACRO_KNOB_MIX_IDX));
     parameters_.back()->SetDisplayType(DisplayType::SCALED);
     parameters_.back()->SetScaleFactor(100.0f); // Display mix as percentage
-    AddParameter(new PotentiometerParameter("K2 Feedback", 0.0f, 0.95f, 0.5f, PotCurve::LIN, KNOB_2_IDX));
+    parameters_.back()->SetMacroRole(MacroRole::MIX);
+    AddParameter(new PotentiometerParameter("K4 Feedback", 0.0f, 0.95f, 0.5f, PotCurve::LIN, MACRO_KNOB_FEEDBACK_IDX));
     parameters_.back()->SetDisplayType(DisplayType::SCALED);
     parameters_.back()->SetScaleFactor(100.0f); // Display feedback as percentage
-    AddParameter(new PotentiometerParameter("K3 Mod Rate", 0.0f, 10.0f, 0.5f, PotCurve::LOG, KNOB_3_IDX));
-    AddParameter(new PotentiometerParameter("K4 Mod Depth", 0.0f, 1.0f, 0.0f, PotCurve::LIN, KNOB_4_IDX));
+    parameters_.back()->SetMacroRole(MacroRole::FEEDBACK);
+    AddParameter(new PotentiometerParameter("K3 Mod Rate", 0.0f, 10.0f, 0.5f, PotCurve::LOG, MACRO_KNOB_RATE_IDX));
+    parameters_.back()->SetMacroRole(MacroRole::RATE);
+    AddParameter(new PotentiometerParameter("K2 Mod Depth", 0.0f, 1.0f, 0.0f, PotCurve::LIN, MACRO_KNOB_DEPTH_IDX));
     parameters_.back()->SetDisplayType(DisplayType::SCALED);
     parameters_.back()->SetScaleFactor(100.0f); // Display depth as percentage
-    AddParameter(new PotentiometerParameter("K5 Subdivision", 0.0f, 7.0f, 3.0f, PotCurve::LIN, KNOB_5_IDX)); // 8 subdivisions: 1-8 sixteenths, default to quarter note (4 sixteenths)
+    parameters_.back()->SetMacroRole(MacroRole::DEPTH);
+    AddParameter(new PotentiometerParameter("K5 Subdivision", 0.0f, 7.0f, 3.0f, PotCurve::LIN, MACRO_KNOB_SUBDIVISION_IDX)); // 8 subdivisions: 1-8 sixteenths, default to quarter note (4 sixteenths)
     parameters_.back()->SetDisplayType(DisplayType::DISCRETE);
     parameters_.back()->SetDiscreteValues(kSubdivisionGlyphs, 8);
+    parameters_.back()->SetMacroRole(MacroRole::SUBDIVISION);
     subdivisionParamIndex_ = 4;  // Track subdivision parameter index
     char valueStr[16];
     parameters_.back()->GetValueAsString(valueStr, sizeof(valueStr));

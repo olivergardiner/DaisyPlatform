@@ -6,6 +6,7 @@
 #include "parameters/toggleparameter.h"
 #include "parameters/timeparameter.h"
 #include "effects/effectfactory.h"
+#include <cmath>
 
 using namespace perspective;
 
@@ -97,8 +98,6 @@ void Perspective::Exec() {
         if (volumeMode_) {
             UpdateVolumeLevel();
         }
-
-        hardware.DelayMs(1); // Small delay to allow events to accumulate
     }
 }     
 void Perspective::AudioCallbackImpl(AudioHandle::InputBuffer in, AudioHandle::OutputBuffer out, size_t size) {
@@ -164,11 +163,26 @@ void Perspective::RegisterEventListeners() {
                         PotentiometerParameter* potParam = static_cast<PotentiometerParameter*>(param);
                         Knob* knob = static_cast<Knob*>(event.source);
                         float normalizedValue = knob->Value(); // Get processed value from knob
+
+                        // Macro knobs (Mix/Depth/Rate/Feedback) require the physical pot to be
+                        // moved within kMacroKnobCatchThreshold of the stored value before it
+                        // takes control, avoiding value jumps on effect/preset change.
+                        int macroSlot = MacroKnobSlotForControlIndex(event.controlIndex);
+                        if (macroSlot >= 0 && param->GetMacroRole() != MacroRole::NONE && param->IsMacroPrimary()) {
+                            if (!macroKnobCaught_[macroSlot]) {
+                                float target = param->GetNormalizedValue();
+                                if (fabsf(normalizedValue - target) > kMacroKnobCatchThreshold) {
+                                    break; // Not caught yet - ignore this movement
+                                }
+                                macroKnobCaught_[macroSlot] = true;
+                            }
+                        }
+
                         potParam->SetNormalizedValueWithCurve(normalizedValue);
                         
                         // Update display (only if not hidden)
                         if (param->GetDisplayIndex() >= 0) {
-                            UpdateParameterDisplay(param, param->GetDisplayIndex() + 1);
+                            UpdateParameterRow(param, param->GetDisplayIndex() + 1);
                         }
                         
                         //Hardware::PrintLine("%s: %d", potParam->GetName(), static_cast<int>(event.value * 100));
@@ -182,16 +196,41 @@ void Perspective::RegisterEventListeners() {
         },
         UIEventType::KNOB_CHANGED
     );
-    
-    // Generic listener for encoder changes - updates effect parameters
+
+    // Effect mode: Encoder 2 rotate = select parameter, Encoder 1 rotate = set value of selected parameter (while editing)
+    eventHandler_.RegisterListenerByIndex(
+        [this](const UIEvent& event) {
+            if (mode_ != PerspectiveMode::EFFECT) return;
+            if (!currentEffect_) return;
+            if (paramEditMode_) return; // Selection locked while editing
+            if (event.value > 0) {
+                SelectAdjacentParameter(1);
+            } else if (event.value < 0) {
+                SelectAdjacentParameter(-1);
+            }
+        },
+        UIEventType::ENCODER_CHANGED,
+        ENCODER_2_IDX
+    );
+    eventHandler_.RegisterListenerByIndex(
+        [this](const UIEvent& event) {
+            if (mode_ != PerspectiveMode::EFFECT) return;
+            if (!currentEffect_) return;
+            if (!paramEditMode_) return; // Rotation only adjusts value while editing
+            AdjustSelectedParameter(event.value);
+        },
+        UIEventType::ENCODER_CHANGED,
+        ENCODER_1_IDX
+    );
+
+    // Preset mode: encoder changes only pass through for the tempo effect's Encoder 1 (unchanged behavior)
     eventHandler_.RegisterListener(
         [this](const UIEvent& event) {
-            if (mode_ != PerspectiveMode::EFFECT && mode_ != PerspectiveMode::PRESET) return;
+            if (mode_ != PerspectiveMode::PRESET) return;
             if (!currentEffect_) return;
-            if (mode_ == PerspectiveMode::PRESET && presetEditMode_) return;
+            if (presetEditMode_) return;
             // In preset mode, only allow encoder 1 changes for tempo effects
-            if (mode_ == PerspectiveMode::PRESET
-                && (!currentEffect_->HasTempoMode() || event.controlIndex != ENCODER_1_IDX)) return;
+            if (!currentEffect_->HasTempoMode() || event.controlIndex != ENCODER_1_IDX) return;
 
             // Find parameter with matching index
             for (size_t i = 0; i < currentEffect_->GetParameterCount(); i++) {
@@ -210,8 +249,6 @@ void Perspective::RegisterEventListeners() {
                         if (param->GetDisplayIndex() >= 0) {
                             UpdateParameterDisplay(param, param->GetDisplayIndex() + 1);
                         }
-                        
-                        //Hardware::PrintLine("%s: %f", encParam->GetName(), encParam->GetValue());
 
                         // Update effect with new parameter value
                         currentEffect_->Update();
@@ -349,14 +386,19 @@ void Perspective::RegisterEventListeners() {
     );
 
     // Preset mode: encoder 2 button toggles edit sub-mode / confirms action
+    // Effect mode: encoder 2 button toggles parameter edit mode
     eventHandler_.RegisterListenerByIndex(
         [this](const UIEvent& event) {
-            if (mode_ != PerspectiveMode::PRESET) return;
-            
-            if (!presetEditMode_) {
-                EnterPresetEditMode();
-            } else {
-                ExecutePresetEditAction();
+            if (mode_ == PerspectiveMode::PRESET) {
+                if (!presetEditMode_) {
+                    EnterPresetEditMode();
+                } else {
+                    ExecutePresetEditAction();
+                }
+                return;
+            }
+            if (mode_ == PerspectiveMode::EFFECT) {
+                ToggleParameterEditMode();
             }
         },
         UIEventType::BUTTON_RELEASED,
@@ -572,6 +614,14 @@ void Perspective::LoadEffects() {
                 } else {
                     this->UpdateParameterDisplay(param, displayIndex + 1);
                 }
+            } else if (mode_ == PerspectiveMode::EFFECT && (int)displayIndex == param->GetDisplayIndex()
+                       && selectedParamIndex_ >= 0 && currentEffect_
+                       && currentEffect_->GetParameter(selectedParamIndex_) == param) {
+                if (paramEditMode_) {
+                    this->UpdateParameterDisplayEditing(param, displayIndex + 1);
+                } else {
+                    this->UpdateParameterDisplayHighlighted(param, displayIndex + 1);
+                }
             } else {
                 this->UpdateParameterDisplay(param, displayIndex + 1); // +1 to skip effect name display
             }
@@ -608,6 +658,9 @@ void Perspective::SetCurrentEffect(size_t index) {
     currentEffect_ = nextEffect;
     switchingEffect_ = false;
 
+    ArmMacroKnobCatch();
+    ResetParameterSelection();
+
     // Auto-exit volume mode if the new effect uses the expression pedal
     if (volumeMode_ && currentEffect_->UsesExpressionPedal()) {
         ExitVolumeMode();
@@ -618,14 +671,8 @@ void Perspective::SetCurrentEffect(size_t index) {
     
     hardware.SetParameterDisplay(0, currentEffect_->GetName(), "");
     
-    // Display initial values for visible parameters only
-    for (size_t i = 0; i < currentEffect_->GetParameterCount(); i++) {
-        EffectParameter* param = currentEffect_->GetParameter(i);
-        // Only display parameters with displayIndex >= 0 (not hidden)
-        if (param && param->GetDisplayIndex() >= 0) {
-            UpdateParameterDisplay(param, param->GetDisplayIndex() + 1);
-        }
-    }
+    // Display initial values for visible parameters only, highlighting the selected one
+    RefreshParameterDisplays();
     
     UpdateStatusDisplay();
 }
@@ -646,11 +693,147 @@ void Perspective::UpdateParameterDisplayHighlighted(EffectParameter* param, size
     hardware.SetParameterDisplayHighlighted(displayIndex, param->GetName(), valueStr);
 }
 
+void Perspective::UpdateParameterDisplayEditing(EffectParameter* param, size_t displayIndex) {
+    if (!param) return;
+    
+    char valueStr[16];
+    param->GetValueAsString(valueStr, sizeof(valueStr));
+    hardware.SetParameterDisplayEditing(displayIndex, param->GetName(), valueStr);
+}
+
+void Perspective::UpdateParameterRow(EffectParameter* param, size_t displayIndex) {
+    if (!param) return;
+
+    // Preserve the select/edit highlight when a macro pot or other control updates a
+    // row that happens to be the parameter currently selected via the encoders.
+    bool isSelected = mode_ == PerspectiveMode::EFFECT && selectedParamIndex_ >= 0
+        && currentEffect_ && currentEffect_->GetParameter(static_cast<size_t>(selectedParamIndex_)) == param;
+
+    if (isSelected && paramEditMode_) {
+        UpdateParameterDisplayEditing(param, displayIndex);
+    } else if (isSelected) {
+        UpdateParameterDisplayHighlighted(param, displayIndex);
+    } else {
+        UpdateParameterDisplay(param, displayIndex);
+    }
+}
+
 void Perspective::UpdateStatusDisplay() {
     const char* bypassText = bypassMode_ ? "BP" : "";
     const char* volText    = volumeMode_ ? "Vol" : "";
     const char* metroText  = metronomeEnabled_ ? "Met" : "";
     hardware.SetStatusDisplay(bypassText, volText, metroText);
+}
+
+int Perspective::MacroKnobSlotForControlIndex(int controlIndex) {
+    switch (controlIndex) {
+        case MACRO_KNOB_MIX_IDX:         return 0;
+        case MACRO_KNOB_DEPTH_IDX:       return 1;
+        case MACRO_KNOB_RATE_IDX:        return 2;
+        case MACRO_KNOB_FEEDBACK_IDX:    return 3;
+        case MACRO_KNOB_SUBDIVISION_IDX: return 4;
+        default: return -1;
+    }
+}
+
+void Perspective::ArmMacroKnobCatch() {
+    for (int i = 0; i < NUM_MACRO_KNOBS; i++) {
+        macroKnobCaught_[i] = false;
+    }
+}
+
+void Perspective::ResetParameterSelection() {
+    selectedParamIndex_ = -1;
+    paramEditMode_ = false;
+    if (!currentEffect_) return;
+    // Auto-select the first visible parameter
+    for (size_t i = 0; i < currentEffect_->GetParameterCount(); i++) {
+        EffectParameter* param = currentEffect_->GetParameter(i);
+        if (param && param->GetDisplayIndex() >= 0) {
+            selectedParamIndex_ = static_cast<int>(i);
+            break;
+        }
+    }
+}
+
+void Perspective::SelectAdjacentParameter(int direction) {
+    if (!currentEffect_) return;
+    size_t count = currentEffect_->GetParameterCount();
+    if (count == 0) return;
+
+    int start = selectedParamIndex_;
+    int idx = start;
+    for (size_t step = 0; step < count; step++) {
+        idx = static_cast<int>((idx + direction + static_cast<int>(count)) % static_cast<int>(count));
+        EffectParameter* param = currentEffect_->GetParameter(static_cast<size_t>(idx));
+        if (param && param->GetDisplayIndex() >= 0) {
+            selectedParamIndex_ = idx;
+            break;
+        }
+    }
+
+    RefreshParameterDisplays();
+}
+
+void Perspective::ToggleParameterEditMode() {
+    if (!currentEffect_) return;
+    if (selectedParamIndex_ < 0) return;
+    paramEditMode_ = !paramEditMode_;
+    RefreshParameterDisplays();
+}
+
+void Perspective::AdjustSelectedParameter(int steps) {
+    if (!currentEffect_ || selectedParamIndex_ < 0 || steps == 0) return;
+    EffectParameter* param = currentEffect_->GetParameter(static_cast<size_t>(selectedParamIndex_));
+    if (!param) return;
+
+    switch (param->GetType()) {
+        case ParameterType::ENCODER: {
+            EncoderParameter* encParam = static_cast<EncoderParameter*>(param);
+            if (steps > 0) encParam->Increment(steps);
+            else encParam->Decrement(-steps);
+            break;
+        }
+        case ParameterType::POTENTIOMETER: {
+            if (param->GetDisplayType() == DisplayType::DISCRETE) {
+                // Discrete pots (e.g. Subdivision) step by one whole value per detent.
+                param->SetValue(param->GetValue() + steps);
+            } else {
+                static constexpr float kStepPerTick = 0.01f; // 1% of range per encoder tick
+                float normalized = param->GetNormalizedValue() + (steps * kStepPerTick);
+                param->SetNormalizedValue(normalized);
+            }
+            break;
+        }
+        case ParameterType::TOGGLE: {
+            ToggleParameter* toggleParam = static_cast<ToggleParameter*>(param);
+            toggleParam->Toggle();
+            break;
+        }
+    }
+
+    if (param->GetDisplayIndex() >= 0) {
+        UpdateParameterDisplayEditing(param, param->GetDisplayIndex() + 1);
+    }
+    currentEffect_->Update();
+}
+
+void Perspective::RefreshParameterDisplays() {
+    if (!currentEffect_) return;
+    for (size_t i = 0; i < currentEffect_->GetParameterCount(); i++) {
+        EffectParameter* param = currentEffect_->GetParameter(i);
+        if (!param || param->GetDisplayIndex() < 0) continue;
+        size_t displayIndex = static_cast<size_t>(param->GetDisplayIndex()) + 1;
+        if (static_cast<int>(i) == selectedParamIndex_) {
+            if (paramEditMode_) {
+                UpdateParameterDisplayEditing(param, displayIndex);
+            } else {
+                UpdateParameterDisplayHighlighted(param, displayIndex);
+            }
+        } else {
+            UpdateParameterDisplay(param, displayIndex);
+        }
+    }
 }
 
 void Perspective::EnterTunerMode() {
@@ -781,15 +964,11 @@ void Perspective::RestoreCachedEffect() {
         }
         currentEffect_->Update();
         
-        // Refresh display with restored values
+        // Refresh display with restored values, re-arming macro knob catch since values changed
+        ArmMacroKnobCatch();
         hardware.ClearDisplay();
         hardware.SetParameterDisplay(0, currentEffect_->GetName(), "");
-        for (size_t i = 0; i < currentEffect_->GetParameterCount(); i++) {
-            EffectParameter* param = currentEffect_->GetParameter(i);
-            if (param && param->GetDisplayIndex() >= 0) {
-                UpdateParameterDisplay(param, param->GetDisplayIndex() + 1);
-            }
-        }
+        RefreshParameterDisplays();
         UpdateStatusDisplay();
     }
 }
@@ -844,6 +1023,9 @@ void Perspective::LoadPresetAtIndex(size_t slot) {
     currentEffectIndex_ = preset.effectIndex;
     currentEffect_ = presetEffect;
     switchingEffect_ = false;
+
+    ArmMacroKnobCatch();
+    ResetParameterSelection();
 
     // Auto-exit volume mode if the preset effect uses the expression pedal
     if (volumeMode_ && currentEffect_->UsesExpressionPedal()) {

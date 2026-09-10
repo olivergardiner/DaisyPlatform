@@ -33,13 +33,14 @@ void AutowahEffect::Init(float sampleRate) {
     filterR_.Init(sampleRate);
     
     // Add parameters: Mix, Resonance, Frequency, Attack, Release, Sensitivity (signed Hz offset)
-    AddParameter(new PotentiometerParameter("K1 Mix", 0.0f, 1.0f, 0.5f, PotCurve::LIN, KNOB_1_IDX));
-    AddParameter(new PotentiometerParameter("K2 Resonance", 0.0f, 1.0f, 0.85f, PotCurve::LIN, KNOB_2_IDX));
-    AddParameter(new PotentiometerParameter("K3 Frequency", 400.0f, 2000.0f, 1000.0f, PotCurve::LOG, KNOB_3_IDX));
-    AddParameter(new PotentiometerParameter("K4 Attack ms", 0.001f, 1.0f, 0.2f, PotCurve::LOG, KNOB_4_IDX));
+    AddParameter(new PotentiometerParameter("K1 Mix", 0.0f, 1.0f, 0.5f, PotCurve::LIN, MACRO_KNOB_MIX_IDX));
+    parameters_.back()->SetMacroRole(MacroRole::MIX);
+    AddParameter(new PotentiometerParameter("Resonance", 0.0f, 1.0f, 0.85f, PotCurve::LIN, -1));
+    AddParameter(new PotentiometerParameter("Frequency", 400.0f, 2000.0f, 1000.0f, PotCurve::LOG, -1));
+    AddParameter(new PotentiometerParameter("Attack ms", 0.001f, 1.0f, 0.2f, PotCurve::LOG, -1));
     parameters_.back()->SetDisplayType(DisplayType::SCALED);
     parameters_.back()->SetScaleFactor(1000.0f);
-    AddParameter(new PotentiometerParameter("K5 Release ms", 0.001f, 0.5f, 0.01f, PotCurve::LOG, KNOB_5_IDX));
+    AddParameter(new PotentiometerParameter("Release ms", 0.001f, 0.5f, 0.01f, PotCurve::LOG, -1));
     parameters_.back()->SetDisplayType(DisplayType::SCALED);
     parameters_.back()->SetScaleFactor(1000.0f);
     AddParameter(new PotentiometerParameter("K6 Sensitivity", -3000.0f, 3000.0f, 1600.0f, PotCurve::LIN, KNOB_6_IDX));

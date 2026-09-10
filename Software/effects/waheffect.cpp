@@ -19,11 +19,12 @@ void WahEffect::Init(float sampleRate) {
     filterR_.Init(sampleRate);
 
     // Add parameters: Mix, Resonance, EP sweep, Low Freq, High Freq
-    AddParameter(new PotentiometerParameter("K1 Mix", 0.0f, 1.0f, 0.5f, PotCurve::LIN, KNOB_1_IDX, 0));
-    AddParameter(new PotentiometerParameter("K2 Resonance", 0.0f, 1.0f, 0.85f, PotCurve::LIN, KNOB_2_IDX, 1));
+    AddParameter(new PotentiometerParameter("K1 Mix", 0.0f, 1.0f, 0.5f, PotCurve::LIN, MACRO_KNOB_MIX_IDX, 0));
+    parameters_.back()->SetMacroRole(MacroRole::MIX);
+    AddParameter(new PotentiometerParameter("Resonance", 0.0f, 1.0f, 0.85f, PotCurve::LIN, -1, 1));
     AddParameter(new PotentiometerParameter("EP Sweep", 0.0f, 1.0f, 0.5f, PotCurve::REVERSE_LOG, KNOB_EXP_IDX, 4));
-    AddParameter(new PotentiometerParameter("K4 Low Freq", 80.0f, 2000.0f, 400.0f, PotCurve::LOG, KNOB_4_IDX, 2));
-    AddParameter(new PotentiometerParameter("K5 High Freq", 200.0f, 5000.0f, 2000.0f, PotCurve::LOG, KNOB_5_IDX, 3));
+    AddParameter(new PotentiometerParameter("Low Freq", 80.0f, 2000.0f, 400.0f, PotCurve::LOG, -1, 2));
+    AddParameter(new PotentiometerParameter("High Freq", 200.0f, 5000.0f, 2000.0f, PotCurve::LOG, -1, 3));
 
     // Set default filter parameters
     Update();

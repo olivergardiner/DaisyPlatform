@@ -88,6 +88,12 @@ class Encoder
     }
 
   private:
+    // Number of consecutive matching raw samples required before a quadrature
+    // state change is accepted. Must stay low - each additional sample costs
+    // one Process() tick of dwell time, and a brisk turn moves through each
+    // quadrature state in only a few ticks.
+    static constexpr uint8_t kStabilityConfirmSamples = 1;
+
     uint32_t last_update_;
     float    update_rate_;
     Switch   sw_;

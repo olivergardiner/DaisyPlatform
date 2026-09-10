@@ -14,10 +14,18 @@ using namespace daisy;
 
 #define UPDATE_RATE 1000.0f // in Hz
 #define ENCODER_DIVISOR 1 // Process encoder changes every control tick for best quadrature tracking
-#define ENCODER_STEPS_PER_DETENT 2 // 1=quarter-step, 2=half-step, 4=full detent
+// 2 (half-step): the 3rd/4th quadrature edges of each detent are too brief to survive
+// digital-only debounce at this poll rate and get lost to a resync, so only 2 of the
+// 4 edges are ever reliably confirmed per physical detent.
+#define ENCODER_STEPS_PER_DETENT 2
 #define ENCODER_DIRECTION 1 // Set to 1 or -1 to match physical clockwise/counter-clockwise direction
 #define SWITCH_DIVISOR 1 // Process switches every control tick for responsive edge detection
 #define KNOB_DIVISOR 16 // Process knob changes every 16th call to control timer for better responsiveness
+// Raw ADC values are scaled to a 16-bit range (0-65535); with no analog filtering, a
+// stationary pot's raw reading still dithers by several counts between samples. This
+// deadband must exceed that noise floor so a stationary wiper never fires a KNOB_CHANGED
+// event and overrides an encoder-set macro value.
+#define KNOB_CHANGE_THRESHOLD 48
 
 // Set to GPIO::Pull::PULLUP to use the Daisy Seed's internal pull-ups on switches and digital inputs.
 // Set to GPIO::Pull::NOPULL when using external pull-down resistors (hardware revision with discrete resistors).
@@ -95,6 +103,7 @@ namespace perspective {
 
         void SetParameterDisplay(int layerIndex, const char* paramName, const char* valueText);
         void SetParameterDisplayHighlighted(int layerIndex, const char* paramName, const char* valueText);
+        void SetParameterDisplayEditing(int layerIndex, const char* paramName, const char* valueText);
         void SetStatusDisplay(const char* left, const char* middle, const char* right);
         void ClearDisplay();
         void ShowTunerOverlay(const char* noteName, int octave, float centsOffset, float frequency, float referenceFrequency, bool signalDetected);

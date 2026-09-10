@@ -41,25 +41,29 @@ void TwelveStringEffect::Init(float sampleRate) {
     }
 
     // K1: Octave mix — how much of the +12 layer to blend in
-    AddParameter(new PotentiometerParameter("K1 Octave", 0.0f, 1.0f, 0.35f, PotCurve::LIN, KNOB_1_IDX));
+    AddParameter(new PotentiometerParameter("K1 Octave", 0.0f, 1.0f, 0.35f, PotCurve::LIN, MACRO_KNOB_MIX_IDX));
     parameters_.back()->SetDisplayType(DisplayType::SCALED);
     parameters_.back()->SetScaleFactor(100.0f);
+    parameters_.back()->SetMacroRole(MacroRole::MIX);
 
     // K2: Detune depth — chorus sweep width (gives the paired-string shimmer)
-    AddParameter(new PotentiometerParameter("K2 Detune", 0.0f, 1.0f, 0.6f, PotCurve::LIN, KNOB_2_IDX));
+    AddParameter(new PotentiometerParameter("K2 Detune", 0.0f, 1.0f, 0.6f, PotCurve::LIN, MACRO_KNOB_DEPTH_IDX));
     parameters_.back()->SetDisplayType(DisplayType::SCALED);
     parameters_.back()->SetScaleFactor(100.0f);
+    parameters_.back()->SetMacroRole(MacroRole::DEPTH);
 
     // K3: Detune rate — chorus LFO rate in Hz
-    AddParameter(new PotentiometerParameter("K3 Rate", 0.05f, 2.0f, 0.4f, PotCurve::LOG, KNOB_3_IDX));
+    AddParameter(new PotentiometerParameter("K3 Rate", 0.05f, 2.0f, 0.4f, PotCurve::LOG, MACRO_KNOB_RATE_IDX));
+    parameters_.back()->SetMacroRole(MacroRole::RATE);
 
     // K4: Chorus mix — wet level of the detuned layer
-    AddParameter(new PotentiometerParameter("K4 Chorus", 0.0f, 1.0f, 0.6f, PotCurve::LIN, KNOB_4_IDX));
+    AddParameter(new PotentiometerParameter("Chorus Mix", 0.0f, 1.0f, 0.6f, PotCurve::LIN, -1));
     parameters_.back()->SetDisplayType(DisplayType::SCALED);
     parameters_.back()->SetScaleFactor(100.0f);
+    parameters_.back()->SetMacroRole(MacroRole::MIX, /*isPrimary=*/false);
 
     // K5: Output level trim
-    AddParameter(new PotentiometerParameter("K5 Level", 0.0f, 1.0f, 0.85f, PotCurve::LIN, KNOB_5_IDX));
+    AddParameter(new PotentiometerParameter("Level", 0.0f, 1.0f, 0.85f, PotCurve::LIN, -1));
     parameters_.back()->SetDisplayType(DisplayType::SCALED);
     parameters_.back()->SetScaleFactor(100.0f);
 

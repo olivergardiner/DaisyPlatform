@@ -73,7 +73,7 @@ void Hardware::ProcessControls() {
             int newIntValue = knobs[i].GetRawValue();
             int delta = abs(newIntValue - previousIntValue);
 
-            if (delta > 8) { // Only fire event if change is significant to avoid noise
+            if (delta > KNOB_CHANGE_THRESHOLD) { // Only fire event if change exceeds the noise floor
                 eventHandler_->QueueKnobChanged(
                     &knobs[i],
                     i,
@@ -361,6 +361,28 @@ void Hardware::SetParameterDisplayHighlighted(int layerIndex, const char* paramN
     layer->drawText(paramName);
     
     // Draw value at 160 pixels to the right
+    layer->setCursor(160, 0);
+    layer->drawText(valueText);
+    
+    __Display.flush();
+}
+
+void Hardware::SetParameterDisplayEditing(int layerIndex, const char* paramName, const char* valueText)
+{
+    if (layerIndex < 0 || layerIndex >= static_cast<int>(paramLayers.size())) {
+        return;
+    }
+
+    // Inverse video: filled gold background with black text, distinct from the
+    // plain gold-on-black used for selection so edit mode is unambiguous.
+    DadGFX::cLayer* layer = paramLayers[layerIndex];
+    layer->eraseLayer(DadGFX::sColor(0, 0, 0, 0));
+    layer->drawFillRect(0, 0, 220, 32, DadGFX::sColor(255, 220, 50, 255));
+    layer->setTextFrontColor(DadGFX::sColor(0, 0, 0, 255));
+    
+    layer->setCursor(0, 0);
+    layer->drawText(paramName);
+    
     layer->setCursor(160, 0);
     layer->drawText(valueText);
     

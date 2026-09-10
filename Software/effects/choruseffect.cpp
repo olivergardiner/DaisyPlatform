@@ -94,11 +94,15 @@ void ChorusEffect::Init(float sampleRate) {
         delayBufferR_[i] = 0.0f;
     }
 
-    AddParameter(new PotentiometerParameter("K1 Mix", 0.0f, 1.0f, 0.45f, PotCurve::LIN, KNOB_1_IDX));
-    AddParameter(new PotentiometerParameter("K2 Depth", 0.0f, 1.0f, 0.65f, PotCurve::LIN, KNOB_2_IDX));
-    AddParameter(new PotentiometerParameter("K3 Rate", 0.05f, 3.0f, 0.35f, PotCurve::LOG, KNOB_3_IDX));
-    AddParameter(new PotentiometerParameter("K4 Feedback", -0.75f, 0.75f, 0.1f, PotCurve::LIN, KNOB_4_IDX));
-    AddParameter(new PotentiometerParameter("K5 Delay ms", 5.0f, 25.0f, 12.0f, PotCurve::LIN, KNOB_5_IDX));
+    AddParameter(new PotentiometerParameter("K1 Mix", 0.0f, 1.0f, 0.45f, PotCurve::LIN, MACRO_KNOB_MIX_IDX));
+    parameters_.back()->SetMacroRole(MacroRole::MIX);
+    AddParameter(new PotentiometerParameter("K2 Depth", 0.0f, 1.0f, 0.65f, PotCurve::LIN, MACRO_KNOB_DEPTH_IDX));
+    parameters_.back()->SetMacroRole(MacroRole::DEPTH);
+    AddParameter(new PotentiometerParameter("K3 Rate", 0.05f, 3.0f, 0.35f, PotCurve::LOG, MACRO_KNOB_RATE_IDX));
+    parameters_.back()->SetMacroRole(MacroRole::RATE);
+    AddParameter(new PotentiometerParameter("K4 Feedback", -0.75f, 0.75f, 0.1f, PotCurve::LIN, MACRO_KNOB_FEEDBACK_IDX));
+    parameters_.back()->SetMacroRole(MacroRole::FEEDBACK);
+    AddParameter(new PotentiometerParameter("Delay ms", 5.0f, 25.0f, 12.0f, PotCurve::LIN, -1));
     AddParameter(new EncoderParameter("E2 Wave", 0.0f, 3.0f, 0.0f, 1.0f, ENCODER_2_IDX));
 
     static const char* kWaveNames[] = {"Sine", "Tri", "Saw", "Square"};

@@ -68,9 +68,22 @@ protected:
     void ExecutePresetEditAction();
     void UpdateParameterDisplay(EffectParameter* param, size_t displayIndex);
     void UpdateParameterDisplayHighlighted(EffectParameter* param, size_t displayIndex);
+    void UpdateParameterDisplayEditing(EffectParameter* param, size_t displayIndex);
+    void UpdateParameterRow(EffectParameter* param, size_t displayIndex);
     void UpdateStatusDisplay();
     void LoadPresetsFromFlash();
     void SavePresetsToFlash();
+
+    // Parameter select/edit (Encoder 2 = select + click to toggle edit, Encoder 1 = set value while editing)
+    void SelectAdjacentParameter(int direction);
+    void ToggleParameterEditMode();
+    void AdjustSelectedParameter(int steps);
+    void RefreshParameterDisplays();
+    void ResetParameterSelection();
+
+    // Macro knob (Mix/Depth/Rate/Feedback) soft take-over
+    void ArmMacroKnobCatch();
+    static int MacroKnobSlotForControlIndex(int controlIndex);
 
     Hardware hardware;
     Effect* currentEffect_ = nullptr;
@@ -116,6 +129,14 @@ protected:
     bool presetEditMode_ = false;   // Encoder 2 edit sub-mode
     int presetEditSelection_ = 0;   // Current edit option index
     bool pendingFlashSave_ = false; // Set by preset actions; serviced in Exec() to avoid audio glitch
+
+    // Parameter select/edit state (EFFECT mode)
+    int selectedParamIndex_ = -1;   // Index into currentEffect_'s parameters_ vector, -1 = none
+    bool paramEditMode_ = false;    // true while the selected parameter is being edited via Encoder 1
+
+    // Macro knob (Mix/Depth/Rate/Feedback) soft take-over "catch" state, one per macro slot (0..3)
+    bool macroKnobCaught_[NUM_MACRO_KNOBS] = {false, false, false, false};
+    static constexpr float kMacroKnobCatchThreshold = 0.1f; // 10% proximity required to take control
 };
 
 } // namespace perspective

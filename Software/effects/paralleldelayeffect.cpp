@@ -37,30 +37,36 @@ void ParallelDelayEffect::Init(float sampleRate) {
     if (delay2_) delay2_->SetWetOnly(true);
     
     // Add parameters for Delay 1
-    AddParameter(new PotentiometerParameter("K1 Mix", 0.0f, 1.0f, 0.50f, PotCurve::LIN, KNOB_1_IDX));
+    AddParameter(new PotentiometerParameter("K1 Mix", 0.0f, 1.0f, 0.50f, PotCurve::LIN, MACRO_KNOB_MIX_IDX));
     parameters_.back()->SetDisplayType(DisplayType::SCALED);
     parameters_.back()->SetScaleFactor(100.0f); // Display mix as percentage
+    parameters_.back()->SetMacroRole(MacroRole::MIX);
     
-    AddParameter(new PotentiometerParameter("K2 Feedback", 0.0f, 0.95f, 0.5f, PotCurve::LIN, KNOB_2_IDX));
+    AddParameter(new PotentiometerParameter("K4 Feedback", 0.0f, 0.95f, 0.5f, PotCurve::LIN, MACRO_KNOB_FEEDBACK_IDX));
     parameters_.back()->SetDisplayType(DisplayType::SCALED);
     parameters_.back()->SetScaleFactor(100.0f); // Display feedback as percentage
+    parameters_.back()->SetMacroRole(MacroRole::FEEDBACK);
     
-    AddParameter(new PotentiometerParameter("K3 Subdivision", 0.0f, 7.0f, 3.0f, PotCurve::LIN, KNOB_3_IDX));
+    AddParameter(new PotentiometerParameter("K5 Subdivision 1", 0.0f, 7.0f, 3.0f, PotCurve::LIN, MACRO_KNOB_SUBDIVISION_IDX));
     parameters_.back()->SetDisplayType(DisplayType::DISCRETE);
     parameters_.back()->SetDiscreteValues(TempoEffect::kSubdivisionGlyphs, 8);
+    parameters_.back()->SetMacroRole(MacroRole::SUBDIVISION);
     
-    // Add parameters for Delay 2
-    AddParameter(new PotentiometerParameter("K4 Mix", 0.0f, 1.0f, 0.50f, PotCurve::LIN, KNOB_4_IDX));
+    // Add parameters for Delay 2 (second instance - not macro-pot controllable)
+    AddParameter(new PotentiometerParameter("Mix 2", 0.0f, 1.0f, 0.50f, PotCurve::LIN, -1));
     parameters_.back()->SetDisplayType(DisplayType::SCALED);
     parameters_.back()->SetScaleFactor(100.0f); // Display mix as percentage
+    parameters_.back()->SetMacroRole(MacroRole::MIX, /*isPrimary=*/false);
     
-    AddParameter(new PotentiometerParameter("K5 Feedback", 0.0f, 0.95f, 0.5f, PotCurve::LIN, KNOB_5_IDX));
+    AddParameter(new PotentiometerParameter("Feedback 2", 0.0f, 0.95f, 0.5f, PotCurve::LIN, -1));
     parameters_.back()->SetDisplayType(DisplayType::SCALED);
     parameters_.back()->SetScaleFactor(100.0f); // Display feedback as percentage
+    parameters_.back()->SetMacroRole(MacroRole::FEEDBACK, /*isPrimary=*/false);
     
-    AddParameter(new PotentiometerParameter("K6 Subdivision", 0.0f, 7.0f, 3.0f, PotCurve::LIN, KNOB_6_IDX));
+    AddParameter(new PotentiometerParameter("K6 Subdivision 2", 0.0f, 7.0f, 3.0f, PotCurve::LIN, KNOB_6_IDX));
     parameters_.back()->SetDisplayType(DisplayType::DISCRETE);
     parameters_.back()->SetDiscreteValues(TempoEffect::kSubdivisionGlyphs, 8);
+    parameters_.back()->SetMacroRole(MacroRole::SUBDIVISION, /*isPrimary=*/false);
     
     // Add delay 1 time parameter (Encoder 1) - TimeParameter with ms range (250-2000 ms = 240-30 BPM)
     AddParameter(new TimeParameter("E1 Time 1", 250.0f, 2000.0f, 500.0f, 1.0f, ENCODER_1_IDX, "E1 Tempo 1"));

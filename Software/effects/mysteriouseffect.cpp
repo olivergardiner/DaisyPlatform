@@ -54,19 +54,20 @@ MysteriousEffect::~MysteriousEffect() {
 void MysteriousEffect::Init(float sampleRate) {
     CompoundEffect::Init(sampleRate);
 
-    AddParameter(new PotentiometerParameter("K1 Wah Mix", 0.0f, 1.0f, 0.62f, PotCurve::LIN, KNOB_1_IDX, 0));
+    AddParameter(new PotentiometerParameter("K1 Wah Mix", 0.0f, 1.0f, 0.62f, PotCurve::LIN, MACRO_KNOB_MIX_IDX, 0));
+    parameters_.back()->SetDisplayType(DisplayType::SCALED);
+    parameters_.back()->SetScaleFactor(100.0f);
+    parameters_.back()->SetMacroRole(MacroRole::MIX);
+
+    AddParameter(new PotentiometerParameter("Sweep", 300.0f, 2600.0f, 1100.0f, PotCurve::LOG, -1, 1));
+
+    AddParameter(new PotentiometerParameter("Flange", 0.0f, 1.0f, 0.20f, PotCurve::LIN, -1, 2));
     parameters_.back()->SetDisplayType(DisplayType::SCALED);
     parameters_.back()->SetScaleFactor(100.0f);
 
-    AddParameter(new PotentiometerParameter("K2 Sweep", 300.0f, 2600.0f, 1100.0f, PotCurve::LOG, KNOB_2_IDX, 1));
+    AddParameter(new PotentiometerParameter("Motion", 0.05f, 0.8f, 0.14f, PotCurve::LOG, -1, 3));
 
-    AddParameter(new PotentiometerParameter("K3 Flange", 0.0f, 1.0f, 0.20f, PotCurve::LIN, KNOB_3_IDX, 2));
-    parameters_.back()->SetDisplayType(DisplayType::SCALED);
-    parameters_.back()->SetScaleFactor(100.0f);
-
-    AddParameter(new PotentiometerParameter("K4 Motion", 0.05f, 0.8f, 0.14f, PotCurve::LOG, KNOB_4_IDX, 3));
-
-    AddParameter(new PotentiometerParameter("K5 Echo", 0.0f, 0.65f, 0.22f, PotCurve::LIN, KNOB_5_IDX, 4));
+    AddParameter(new PotentiometerParameter("Echo", 0.0f, 0.65f, 0.22f, PotCurve::LIN, -1, 4));
     parameters_.back()->SetDisplayType(DisplayType::SCALED);
     parameters_.back()->SetScaleFactor(100.0f);
 

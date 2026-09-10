@@ -35,11 +35,13 @@ void FlyEffect::Init(float sampleRate) {
     CompoundEffect::Init(sampleRate);
     
     // Top-level macros tuned for external drive before the loop.
-    AddParameter(new PotentiometerParameter("K1 Wah Mix", 0.0f, 1.0f, 0.88f, PotCurve::LIN, KNOB_1_IDX));
-    AddParameter(new PotentiometerParameter("K2 Sweep Hz", 250.0f, 1600.0f, 680.0f, PotCurve::LOG, KNOB_2_IDX));
-    AddParameter(new PotentiometerParameter("K3 Sens", 300.0f, 2200.0f, 1200.0f, PotCurve::LIN, KNOB_3_IDX));
-    AddParameter(new PotentiometerParameter("K4 Echo Mix", 0.0f, 0.8f, 0.58f, PotCurve::LIN, KNOB_4_IDX));
-    AddParameter(new PotentiometerParameter("K5 Echo Fdbk", 0.0f, 0.65f, 0.26f, PotCurve::LIN, KNOB_5_IDX));
+    AddParameter(new PotentiometerParameter("K1 Wah Mix", 0.0f, 1.0f, 0.88f, PotCurve::LIN, MACRO_KNOB_MIX_IDX));
+    parameters_.back()->SetMacroRole(MacroRole::MIX);
+    AddParameter(new PotentiometerParameter("Sweep Hz", 250.0f, 1600.0f, 680.0f, PotCurve::LOG, -1));
+    AddParameter(new PotentiometerParameter("Sens", 300.0f, 2200.0f, 1200.0f, PotCurve::LIN, -1));
+    AddParameter(new PotentiometerParameter("Echo Mix", 0.0f, 0.8f, 0.58f, PotCurve::LIN, -1));
+    parameters_.back()->SetMacroRole(MacroRole::MIX, /*isPrimary=*/false);
+    AddParameter(new PotentiometerParameter("Echo Fdbk", 0.0f, 0.65f, 0.26f, PotCurve::LIN, -1));
 
     // Add E1 Time/Tempo parameter (defaults to 556ms ≈ 108 BPM)
     // TimeParameter with milliseconds range (10-2000 ms), 1ms step in time mode, 0.5 BPM in tempo mode

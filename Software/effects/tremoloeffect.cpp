@@ -56,11 +56,13 @@ TremoloEffect::~TremoloEffect() {
 void TremoloEffect::Init(float sampleRate) {
     sampleRate_ = sampleRate;
 
-    // K1: Depth — how much the volume is modulated (0 = no tremolo, 1 = cuts to silence)
-    AddParameter(new PotentiometerParameter("K1 Depth",  0.0f, 1.0f, 0.75f, PotCurve::LIN, KNOB_1_IDX));
+    // K2: Depth — how much the volume is modulated (0 = no tremolo, 1 = cuts to silence)
+    AddParameter(new PotentiometerParameter("K2 Depth",  0.0f, 1.0f, 0.75f, PotCurve::LIN, MACRO_KNOB_DEPTH_IDX));
+    parameters_.back()->SetMacroRole(MacroRole::DEPTH);
 
-    // K2: Rate — LFO frequency in Hz
-    AddParameter(new PotentiometerParameter("K2 Rate",   0.1f, 10.0f, 5.0f, PotCurve::LOG, KNOB_2_IDX));
+    // K3: Rate — LFO frequency in Hz
+    AddParameter(new PotentiometerParameter("K3 Rate",   0.1f, 10.0f, 5.0f, PotCurve::LOG, MACRO_KNOB_RATE_IDX));
+    parameters_.back()->SetMacroRole(MacroRole::RATE);
 
     // E1: Wave shape — Sine / Triangle / Square
     AddParameter(new EncoderParameter("E1 Wave", 0.0f, 2.0f, 0.0f, 1.0f, ENCODER_1_IDX));
@@ -68,8 +70,8 @@ void TremoloEffect::Init(float sampleRate) {
     parameters_.back()->SetDisplayType(DisplayType::DISCRETE);
     parameters_.back()->SetDiscreteValues(kWaveNames, 3);
 
-    // K3: Stereo offset — phase difference between L and R LFOs (0 = mono, 0.5 = full anti-phase)
-    AddParameter(new PotentiometerParameter("K3 Stereo", 0.0f, 0.5f, 0.25f, PotCurve::LIN, KNOB_3_IDX));
+    // K5: Stereo offset — phase difference between L and R LFOs (0 = mono, 0.5 = full anti-phase)
+    AddParameter(new PotentiometerParameter("Stereo", 0.0f, 0.5f, 0.25f, PotCurve::LIN, -1));
     parameters_.back()->SetDisplayType(DisplayType::SCALED);
     parameters_.back()->SetScaleFactor(200.0f); // shows 0–100 (%)
 
