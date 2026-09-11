@@ -80,6 +80,7 @@ protected:
     void AdjustSelectedParameter(int steps);
     void RefreshParameterDisplays();
     void ResetParameterSelection();
+    bool IsSelectedParameterPairedTempoTime(EffectParameter* tempoModeToggle) const;
 
     // Macro knob (Mix/Depth/Rate/Feedback) soft take-over
     void ArmMacroKnobCatch();

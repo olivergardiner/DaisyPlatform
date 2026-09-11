@@ -68,6 +68,7 @@ public:
     int GetDisplayIndex() const;
     virtual ParameterType GetType() const = 0;  // Pure virtual - must be implemented
     virtual void GetValueAsString(char* buffer, size_t bufferSize) const;
+    virtual bool IsTimeParameter() const { return false; } // Overridden by TimeParameter (RTTI is disabled)
     DisplayType GetDisplayType() const;
     int GetDiscreteValueCount() const;
     

@@ -16,6 +16,8 @@ public:
     TimeParameter(const char* name, float minValue, float maxValue, float defaultValue, float stepSize = 0.01f, int index = -1, const char* tempoModeName = nullptr, int displayIndex = -2);
     virtual ~TimeParameter();
 
+    bool IsTimeParameter() const override { return true; }
+
     // Set display mode
     void SetDisplayMode(TimeDisplayMode mode);
     TimeDisplayMode GetDisplayMode() const;

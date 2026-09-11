@@ -48,8 +48,8 @@ namespace perspective {
 // ========== ENCODER BUTTON INDICES ==========
 // Encoder push buttons (offset by NUM_SWITCHES for unique indices)
 // These are used as toggle/button controls separate from rotation
-#define ENCODER_1_BUTTON_IDX    (NUM_SWITCHES + 0)  // 4
-#define ENCODER_2_BUTTON_IDX    (NUM_SWITCHES + 1)  // 5
+#define ENCODER_1_BUTTON_IDX    (NUM_SWITCHES + 1)  // 5
+#define ENCODER_2_BUTTON_IDX    (NUM_SWITCHES + 0)  // 4
 
 // ========== LED INDICES ==========
 #define LED_1_IDX       0

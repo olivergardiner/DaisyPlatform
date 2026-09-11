@@ -7,6 +7,7 @@
 #include "parameters/timeparameter.h"
 #include "effects/effectfactory.h"
 #include <cmath>
+#include <cstring>
 
 using namespace perspective;
 
@@ -197,7 +198,7 @@ void Perspective::RegisterEventListeners() {
         UIEventType::KNOB_CHANGED
     );
 
-    // Effect mode: Encoder 2 rotate = select parameter, Encoder 1 rotate = set value of selected parameter (while editing)
+    // Effect mode: Encoder 1 rotate = select parameter, Encoder 2 rotate = set value of selected parameter (while editing)
     eventHandler_.RegisterListenerByIndex(
         [this](const UIEvent& event) {
             if (mode_ != PerspectiveMode::EFFECT) return;
@@ -210,7 +211,7 @@ void Perspective::RegisterEventListeners() {
             }
         },
         UIEventType::ENCODER_CHANGED,
-        ENCODER_2_IDX
+        ENCODER_1_IDX
     );
     eventHandler_.RegisterListenerByIndex(
         [this](const UIEvent& event) {
@@ -220,7 +221,7 @@ void Perspective::RegisterEventListeners() {
             AdjustSelectedParameter(event.value);
         },
         UIEventType::ENCODER_CHANGED,
-        ENCODER_1_IDX
+        ENCODER_2_IDX
     );
 
     // Preset mode: encoder changes only pass through for the tempo effect's Encoder 1 (unchanged behavior)
@@ -322,6 +323,13 @@ void Perspective::RegisterEventListeners() {
                     // Update parameter based on type
                     if (param->GetType() == ParameterType::TOGGLE) {
                         ToggleParameter* toggleParam = static_cast<ToggleParameter*>(param);
+
+                        // Tempo Mode toggles only fire while their paired Time parameter is selected in edit mode
+                        if (mode_ == PerspectiveMode::EFFECT && strcmp(param->GetName(), "Tempo Mode") == 0
+                            && !IsSelectedParameterPairedTempoTime(param)) {
+                            break;
+                        }
+
                         toggleParam->Toggle();
                         
                         // Update display (only if not hidden)
@@ -780,6 +788,30 @@ void Perspective::ToggleParameterEditMode() {
     if (selectedParamIndex_ < 0) return;
     paramEditMode_ = !paramEditMode_;
     RefreshParameterDisplays();
+}
+
+// Tempo Mode toggles are paired with the Nth TimeParameter by declaration order within the effect
+bool Perspective::IsSelectedParameterPairedTempoTime(EffectParameter* tempoModeToggle) const {
+    if (!currentEffect_ || !tempoModeToggle || selectedParamIndex_ < 0) return false;
+    EffectParameter* selected = currentEffect_->GetParameter(static_cast<size_t>(selectedParamIndex_));
+    if (!selected) return false;
+
+    int toggleOrdinal = -1;
+    int timeOrdinal = -1;
+    int toggleCount = 0;
+    int timeCount = 0;
+    for (size_t i = 0; i < currentEffect_->GetParameterCount(); i++) {
+        EffectParameter* p = currentEffect_->GetParameter(i);
+        if (!p) continue;
+        if (p->GetType() == ParameterType::TOGGLE && strcmp(p->GetName(), "Tempo Mode") == 0) {
+            if (p == tempoModeToggle) toggleOrdinal = toggleCount;
+            toggleCount++;
+        } else if (p->IsTimeParameter()) {
+            if (p == selected) timeOrdinal = timeCount;
+            timeCount++;
+        }
+    }
+    return toggleOrdinal >= 0 && toggleOrdinal == timeOrdinal;
 }
 
 void Perspective::AdjustSelectedParameter(int steps) {
