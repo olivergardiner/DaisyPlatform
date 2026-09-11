@@ -10,3 +10,6 @@
 [submodule "dependencies/NeuralAmpModelerCore"]
 	path = Software/dependencies/NeuralAmpModelerCore
 	url = https://github.com/sdatkinson/NeuralAmpModelerCore.git
+[submodule "Software/dependencies/CMSIS-DSP"]
+	path = Software/dependencies/CMSIS-DSP
+	url = https://github.com/ARM-software/CMSIS-DSP/

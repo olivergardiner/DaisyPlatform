@@ -17,6 +17,7 @@ LIBDAISY_DIR ?= dependencies/libDaisy
 DAISYSP_DIR ?= dependencies/DaisySP
 DAISYSP_LGPL_DIR ?= dependencies/DaisySP/DaisySP-LGPL
 DAISYGFX2_DIR ?= dependencies/DaisySeedGFX2
+CMSIS_DSP_DIR ?= dependencies/CMSIS-DSP
 USE_DAISYSP_LGPL=1
 LDFLAGS = -u _printf_float
 
@@ -32,6 +33,7 @@ LDFLAGS += -L$(DAISYSP_DIR)/DaisySP-LGPL/build
 C_INCLUDES += -I$(DAISYSP_DIR)/src
 C_INCLUDES += -I$(DAISYSP_LGPL_DIR)/src
 C_INCLUDES += -I$(DAISYGFX2_DIR)
+C_INCLUDES += -I$(CMSIS_DSP_DIR)/Include
 
 # Build dependencies
 .PHONY: libdaisy daisysp daisysp-lgpl libs
