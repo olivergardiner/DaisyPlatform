@@ -3,7 +3,6 @@
 #include "noisegateeffect.h"
 #include "driveeffect.h"
 #include "tonestackeffect.h"
-#include "cabsimeffect.h"
 #include "../controls.h"
 #include "../parameters/potentiometerparameter.h"
 
@@ -17,7 +16,6 @@ static const char* kStageNames[] = {"2", "3"};
 enum GateParam { kGateThreshold = 0, kGateHysteresis, kGateAttack, kGateHold, kGateRelease };
 enum DriveParam { kDriveGain = 0, kDriveStages, kDriveAsym, kDriveScoop, kDriveScoopFreq, kDriveLevel };
 enum ToneParam { kToneBass = 0, kToneMid, kToneMidFreq, kToneTreble, kToneLevel };
-enum CabParam { kCabLowCut = 0, kCabReso, kCabPresence, kCabRolloff, kCabLevel };
 
 } // namespace
 
@@ -29,8 +27,7 @@ SandmanEffect::SandmanEffect()
     : CompoundEffect("Sandman", RoutingMode::SERIES)
     , gate_(nullptr)
     , drive_(nullptr)
-    , tone_(nullptr)
-    , cab_(nullptr) {
+    , tone_(nullptr) {
 }
 
 SandmanEffect::~SandmanEffect() {
@@ -54,9 +51,6 @@ void SandmanEffect::Init(float sampleRate) {
     tone_ = new ToneStackEffect();
     AddEffect(tone_);
 
-    cab_ = new CabSimEffect();
-    AddEffect(cab_);
-
     // Initializes the children and allocates the series temp buffers
     CompoundEffect::Init(sampleRate);
 
@@ -74,8 +68,9 @@ void SandmanEffect::Init(float sampleRate) {
     // Scoop — mid dip ahead of each clipping stage
     AddParameter(new PotentiometerParameter("Scoop", 0.0f, 18.0f, 10.0f, PotCurve::LIN, -1));
 
-    // Presence — cab presence peak
-    AddParameter(new PotentiometerParameter("Presence", -6.0f, 9.0f, 4.5f, PotCurve::LIN, -1));
+    // Treble — tone stack high shelf. Cab presence is a global setting now,
+    // so top-end shaping inside the preset happens here.
+    AddParameter(new PotentiometerParameter("Treble", -15.0f, 15.0f, 3.5f, PotCurve::LIN, -1));
 
     // Stages — 3 for the album grind, 2 if it feels too compressed
     PotentiometerParameter* stagesParam =
@@ -101,7 +96,7 @@ void SandmanEffect::Update() {
     const float gain_db = GetParameter(kParamGain)->GetValue();
     const float gate_db = GetParameter(kParamGate)->GetValue();
     const float scoop_db = GetParameter(kParamScoop)->GetValue();
-    const float presence_db = GetParameter(kParamPresence)->GetValue();
+    const float treble_db = GetParameter(kParamTreble)->GetValue();
     const float stages = GetParameter(kParamStages)->GetValue();
 
     // Gate: fast open, short hold, quick release. Long enough not to chatter on
@@ -126,23 +121,14 @@ void SandmanEffect::Update() {
     }
 
     // Tone stack: a little low-end lift, a narrower dip higher up than the
-    // drive's scoop, and some top back to keep the picking audible.
+    // drive's scoop, and the Treble macro on top. Also carries the output trim,
+    // since this is now the last stage in the chain.
     if (tone_ && tone_->GetParameterCount() >= 5) {
         tone_->GetParameter(kToneBass)->SetValue(3.0f);
         tone_->GetParameter(kToneMid)->SetValue(-5.0f);
         tone_->GetParameter(kToneMidFreq)->SetValue(900.0f);
-        tone_->GetParameter(kToneTreble)->SetValue(3.5f);
-        tone_->GetParameter(kToneLevel)->SetValue(0.0f);
-    }
-
-    // Cab: rolloff at 4 kHz is doing most of the work of making the cascade
-    // sound like an amp rather than a fuzz.
-    if (cab_ && cab_->GetParameterCount() >= 5) {
-        cab_->GetParameter(kCabLowCut)->SetValue(90.0f);
-        cab_->GetParameter(kCabReso)->SetValue(3.5f);
-        cab_->GetParameter(kCabPresence)->SetValue(presence_db);
-        cab_->GetParameter(kCabRolloff)->SetValue(4000.0f);
-        cab_->GetParameter(kCabLevel)->SetValue(level_db);
+        tone_->GetParameter(kToneTreble)->SetValue(treble_db);
+        tone_->GetParameter(kToneLevel)->SetValue(level_db);
     }
 
     CompoundEffect::Update();

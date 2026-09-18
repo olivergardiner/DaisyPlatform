@@ -5,11 +5,14 @@
 
 namespace perspective {
 
-// Sandman: gate -> cascaded asymmetric drive -> tone stack -> cab sim.
+// Sandman: gate -> cascaded asymmetric drive -> tone stack.
 //
 // A high-gain rhythm voice in the Enter Sandman mould. The children are held at
 // fixed, tuned values and only a handful of macros are exposed at the top level,
 // so the preset lands on the sound rather than on twenty knobs.
+//
+// No cab stage: on the amp platform the cab sim sits on channel 2, outside the
+// chain, so this effect is the signal that feeds a real amp.
 class SandmanEffect : public CompoundEffect {
 public:
     SandmanEffect();
@@ -26,14 +29,13 @@ private:
         kParamGain,
         kParamGate,
         kParamScoop,
-        kParamPresence,
+        kParamTreble,
         kParamStages
     };
 
     class NoiseGateEffect* gate_;
     class DriveEffect* drive_;
     class ToneStackEffect* tone_;
-    class CabSimEffect* cab_;
 };
 
 } // namespace perspective

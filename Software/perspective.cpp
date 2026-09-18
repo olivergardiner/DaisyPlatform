@@ -44,6 +44,16 @@ Perspective::Perspective()
     bypassParam->SetDisplayType(DisplayType::DISCRETE);
     bypassParam->SetDiscreteValues(kBypassTypeLabels, 2);
     settingsParameters_.push_back(bypassParam);
+
+#if defined(PERSPECTIVE_PLATFORM_AMP)
+    // Cab sim controls. The cab is permanently in circuit on channel 2, so
+    // these are global settings rather than per-effect parameters. Low cut and
+    // cone resonance are left at the cab's own defaults; these three are the
+    // ones worth reaching for when matching a desk or a power amp.
+    settingsParameters_.push_back(new PotentiometerParameter("K3 Cab Roll", 2500.0f, 7000.0f, 4200.0f, PotCurve::LOG, KNOB_3_IDX, 4));
+    settingsParameters_.push_back(new PotentiometerParameter("K4 Cab Pres", -6.0f, 9.0f, 4.0f, PotCurve::LIN, KNOB_4_IDX, 5));
+    settingsParameters_.push_back(new PotentiometerParameter("K5 Cab Vol", -12.0f, 12.0f, 0.0f, PotCurve::LIN, KNOB_5_IDX, 6));
+#endif
 }
 
 Perspective::~Perspective() {
@@ -131,9 +141,14 @@ void Perspective::AudioCallbackImpl(AudioHandle::InputBuffer in, AudioHandle::Ou
         // detector-driven effects can follow the guitar rather than their own input.
         currentEffect_->SetKeyInput(in[0], size);
 #if defined(PERSPECTIVE_PLATFORM_AMP)
-        // Mono: channel 0 carries the effect chain, channel 1 is passed through
+        // Mono FX on channel 1, the same signal through the cab sim on
+        // channel 2 — one output for a real amp, one for a desk or interface.
         currentEffect_->Process(in[0], out[0], size);
-        for (size_t i = 0; i < size; i++) out[1][i] = in[1][i];
+        if (cabSimEffect_) {
+            cabSimEffect_->Process(out[0], out[1], size);
+        } else {
+            for (size_t i = 0; i < size; i++) out[1][i] = out[0][i];
+        }
 #else
         currentEffect_->ProcessStereo(in[0], in[1], out[0], out[1], size);
 #endif
@@ -619,6 +634,13 @@ void Perspective::LoadEffects() {
     // Initialize tuner separately (not part of effects list)
     tunerEffect_ = new TunerEffect();
     tunerEffect_->Init(sampleRate);
+
+#if defined(PERSPECTIVE_PLATFORM_AMP)
+    // Likewise the cab sim: a platform fixture on channel 2, not selectable
+    cabSimEffect_ = new CabSimEffect();
+    cabSimEffect_->Init(sampleRate);
+    ApplyCabSettings();
+#endif
     
     // Set display update callback for all effects
     for (auto* effect : effects_) {
@@ -957,9 +979,27 @@ void Perspective::ExitSettingsMode() {
             hardware.SetTrueBypass(false);
         }
     }
+#if defined(PERSPECTIVE_PLATFORM_AMP)
+    ApplyCabSettings();
+#endif
     mode_ = PerspectiveMode::EFFECT;
     SetCurrentEffect(currentEffectIndex_);
 }
+
+#if defined(PERSPECTIVE_PLATFORM_AMP)
+// Push the cab settings into the channel-2 cab sim. Called at startup and on
+// leaving settings mode.
+void Perspective::ApplyCabSettings() {
+    if (!cabSimEffect_ || cabSimEffect_->GetParameterCount() < 5) return;
+    if (settingsParameters_.size() <= static_cast<size_t>(kSettingsParamCabLevel)) return;
+
+    // CabSimEffect params: [0]=Low Cut, [1]=Reso, [2]=Presence, [3]=Rolloff, [4]=Level
+    cabSimEffect_->GetParameter(3)->SetValue(settingsParameters_[kSettingsParamCabRolloff]->GetValue());
+    cabSimEffect_->GetParameter(2)->SetValue(settingsParameters_[kSettingsParamCabPresence]->GetValue());
+    cabSimEffect_->GetParameter(4)->SetValue(settingsParameters_[kSettingsParamCabLevel]->GetValue());
+    cabSimEffect_->Update();
+}
+#endif
 
 void Perspective::EnterPresetMode() {
     CacheCurrentEffect();

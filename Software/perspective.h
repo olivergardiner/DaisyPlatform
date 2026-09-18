@@ -10,6 +10,9 @@
 #include "parameters/toggleparameter.h"
 #include "ui/ui.h"
 #include "effects/tunereffect.h"
+#if defined(PERSPECTIVE_PLATFORM_AMP)
+#include "effects/cabsimeffect.h"
+#endif
 #include "preset.h"
 
 #include <vector>
@@ -75,6 +78,9 @@ protected:
     void LoadPresetsFromFlash();
     void SavePresetsToFlash();
     void SeedFactoryPresets();
+#if defined(PERSPECTIVE_PLATFORM_AMP)
+    void ApplyCabSettings();
+#endif
 
     // Parameter select/edit (Encoder 2 = select + click to toggle edit, Encoder 1 = set value while editing)
     void SelectAdjacentParameter(int direction);
@@ -100,6 +106,13 @@ protected:
     static constexpr int kSettingsParamMetronomeLevel = 1;
     static constexpr int kSettingsParamMetronomeMode = 2;
     static constexpr int kSettingsParamBypassType = 3;
+#if defined(PERSPECTIVE_PLATFORM_AMP)
+    // The cab sim is a platform fixture on channel 2 rather than a chain
+    // effect, so its controls live in settings alongside the other globals.
+    static constexpr int kSettingsParamCabRolloff = 4;
+    static constexpr int kSettingsParamCabPresence = 5;
+    static constexpr int kSettingsParamCabLevel = 6;
+#endif
 
     // Metronome mode (0 = Bass, 1 = Snare, 2 = High, 3 = Click)
     int metronomeMode_ = 0;
@@ -111,6 +124,12 @@ protected:
     bool switchingEffect_ = false;
     PerspectiveMode mode_ = PerspectiveMode::EFFECT;
     TunerEffect* tunerEffect_ = nullptr;
+#if defined(PERSPECTIVE_PLATFORM_AMP)
+    // Channel 1 carries the mono FX chain; channel 2 carries that same signal
+    // through the cab sim, so one output can feed a real amp and the other a
+    // desk or interface. Not part of effects_ — it is always in circuit.
+    CabSimEffect* cabSimEffect_ = nullptr;
+#endif
     bool tunerSw1ReleasedOnce_ = false;  // true once sw1 has been released after hold-to-enter
     uint32_t lastTunerDisplayTime_ = 0;  // timestamp of last tuner display update
     bool metronomeEnabled_ = false;  // Global metronome state

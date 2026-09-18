@@ -160,12 +160,11 @@ inline void PopulateEffects(std::vector<Effect*>* effects, float sampleRate) {
     toneStackEffect->Init(sampleRate);
     effects->push_back(toneStackEffect);
 
-    // Add cab sim effect
-    CabSimEffect* cabSimEffect = new CabSimEffect();
-    cabSimEffect->Init(sampleRate);
-    effects->push_back(cabSimEffect);
+    // NB: no CabSimEffect here. On the amp platform the cab sim is a fixture
+    // on channel 2, owned by Perspective and always in circuit, so registering
+    // it as a selectable effect as well would only let you cab the signal twice.
 
-    // Add Sandman compound effect (gate + drive + tone stack + cab)
+    // Add Sandman compound effect (gate + drive + tone stack)
     SandmanEffect* sandmanEffect = new SandmanEffect();
     sandmanEffect->Init(sampleRate);
     effects->push_back(sandmanEffect);
