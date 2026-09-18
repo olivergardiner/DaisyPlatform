@@ -7,9 +7,16 @@ Effect::Effect(const char* name)
     , enabled_(true)
     , wetOnly_(false)
     , metronomeEnabled_(false)
+    , keyInput_(nullptr)
+    , keySize_(0)
     , sampleRate_(48000.0f)
     , tempo_(0.0f)
 {
+}
+
+void Effect::SetKeyInput(const float* key, size_t size) {
+    keyInput_ = key;
+    keySize_ = size;
 }
 
 Effect::~Effect() {

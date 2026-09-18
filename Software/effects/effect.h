@@ -32,6 +32,13 @@ public:
     // Update effect parameters - called when parameters change
     virtual void Update() = 0;
 
+    // Supply the pedal's own input block as a sidechain/key source for the
+    // coming block. Effects whose detector should follow the dry guitar rather
+    // than whatever feeds them — a noise gate sitting after a drive stage, say
+    // — key off this instead of their own input buffer. Set once per block,
+    // before Process(). The pointer is only valid for that block.
+    virtual void SetKeyInput(const float* key, size_t size);
+
     // Set tempo (called from tap tempo)
     virtual void SetTempo(float tempo);
     
@@ -77,6 +84,11 @@ protected:
     bool enabled_;
     bool wetOnly_;  // If true, output wet signal only (for parallel compound effects)
     bool metronomeEnabled_;  // Global metronome state (set by Perspective)
+
+    // Sidechain key source for the current block; null when none was supplied
+    const float* keyInput_;
+    size_t keySize_;
+
     float sampleRate_;
     float tempo_;
     std::function<void(EffectParameter*, size_t)> displayUpdateCallback_;

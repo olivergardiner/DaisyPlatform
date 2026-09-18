@@ -110,8 +110,12 @@ void Perspective::AudioCallbackImpl(AudioHandle::InputBuffer in, AudioHandle::Ou
             out[1][i] = in[1][i];
         }
     } else if (mode_ == PerspectiveMode::TUNER && tunerEffect_) {
-        // Tuner mode: process for pitch detection but mute output
-        tunerEffect_->ProcessStereo(in[0], in[1], out[0], out[1], size);
+        // Tuner mode: process for pitch detection but mute output.
+        // Mono on both platforms — the output is zeroed regardless, and the
+        // stereo path would feed the detector channel 0 then channel 1 through
+        // the same state, so on a mono guitar rig it saw signal interleaved
+        // with silence.
+        tunerEffect_->Process(in[0], out[0], size);
         for (size_t i = 0; i < size; i++) {
             out[0][i] = 0.0f;
             out[1][i] = 0.0f;
@@ -123,8 +127,16 @@ void Perspective::AudioCallbackImpl(AudioHandle::InputBuffer in, AudioHandle::Ou
             out[1][i] = 0.0f;
         }
     } else if (currentEffect_ && !bypassMode_) {
-        // Process with current effect
+        // Hand the dry input down as a sidechain key before processing, so
+        // detector-driven effects can follow the guitar rather than their own input.
+        currentEffect_->SetKeyInput(in[0], size);
+#if defined(PERSPECTIVE_PLATFORM_AMP)
+        // Mono: channel 0 carries the effect chain, channel 1 is passed through
+        currentEffect_->Process(in[0], out[0], size);
+        for (size_t i = 0; i < size; i++) out[1][i] = in[1][i];
+#else
         currentEffect_->ProcessStereo(in[0], in[1], out[0], out[1], size);
+#endif
         ledPulseBrightness = currentEffect_->GetTempoPulseBrightness();
         hardware.SetLedBrightness(LED_2_IDX, currentEffect_->GetEnvelopeBrightness());
     } else {
@@ -1192,9 +1204,11 @@ void Perspective::LoadPresetsFromFlash() {
     const auto* hdr = static_cast<const PresetFlashHeader*>(hardware.qspi.GetData(kPresetFlashOffset));
 
     if (hdr->magic != kPresetMagic || hdr->version != kPresetVersion) {
-        // First boot or layout change – start with a blank bank.
+        // First boot or layout change – start with a blank bank plus whatever
+        // factory presets we ship.
         presetBank_.Clear();
-        Hardware::PrintLine("Presets: no valid flash data, starting empty.");
+        SeedFactoryPresets();
+        Hardware::PrintLine("Presets: no valid flash data, seeded factory presets.");
         return;
     }
 
@@ -1208,6 +1222,45 @@ void Perspective::LoadPresetsFromFlash() {
         }
     }
     Hardware::PrintLine("Presets: loaded from flash.");
+}
+
+// Populate the factory presets. Each entry captures an effect's own default
+// parameter values, so the tone lives with the effect rather than being
+// duplicated as a table of magic numbers here.
+//
+// Effects are looked up by name, not index: the factory appends new effects
+// over time, so a hardcoded index would eventually point at the wrong one.
+void Perspective::SeedFactoryPresets() {
+    struct FactoryPreset {
+        const char* effectName;
+        const char* presetName;
+        size_t slot;
+    };
+
+    static const FactoryPreset kFactoryPresets[] = {
+        {"Sandman", "Sandman", 0},
+    };
+
+    for (const auto& factory : kFactoryPresets) {
+        for (size_t i = 0; i < effects_.size(); ++i) {
+            Effect* effect = effects_[i];
+            if (!effect || std::strcmp(effect->GetName(), factory.effectName) != 0) {
+                continue;
+            }
+
+            size_t count = effect->GetParameterCount();
+            if (count > PRESET_MAX_PARAMS) count = PRESET_MAX_PARAMS;
+
+            float values[PRESET_MAX_PARAMS];
+            for (size_t p = 0; p < count; ++p) {
+                EffectParameter* param = effect->GetParameter(p);
+                values[p] = param ? param->GetValue() : 0.0f;
+            }
+
+            presetBank_.Save(factory.slot, i, factory.presetName, values, count);
+            break;
+        }
+    }
 }
 
 void Perspective::SavePresetsToFlash() {

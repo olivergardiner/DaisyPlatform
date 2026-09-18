@@ -2,15 +2,21 @@
 #define PERSPECTIVE_EFFECTFACTORY_H
 
 #include <vector>
+#include "../platform.h"
 #include "effect.h"
 
 // Include all effect types
 #include "autowaheffect.h"
 #include "autowahv2effect.h"
+#include "cabsimeffect.h"
 #include "choruseffect.h"
 #include "compoundeffect.h"
 #include "compressoreffect.h"
 #include "delayeffect.h"
+#include "driveeffect.h"
+#include "noisegateeffect.h"
+#include "sandmaneffect.h"
+#include "tonestackeffect.h"
 #include "flangereffect.h"
 #include "flyeffect.h"
 #include "motorwaheffect.h"
@@ -129,6 +135,41 @@ inline void PopulateEffects(std::vector<Effect*>* effects, float sampleRate) {
     MysteriousEffect* mysteriousEffect = new MysteriousEffect();
     mysteriousEffect->Init(sampleRate);
     effects->push_back(mysteriousEffect);
+
+#if defined(PERSPECTIVE_PLATFORM_AMP)
+    // --- Amp chain (mono FX + cab sim platform only) ---
+    // These effects keep single-channel filter and envelope state, so they must
+    // not be driven through the default Effect::ProcessStereo(). See platform.h.
+    //
+    // NB: presets are persisted to flash by effect index, so new effects must
+    // be appended here. Inserting one above this point would silently remap
+    // every saved preset to a different effect.
+
+    // Add noise gate effect
+    NoiseGateEffect* noiseGateEffect = new NoiseGateEffect();
+    noiseGateEffect->Init(sampleRate);
+    effects->push_back(noiseGateEffect);
+
+    // Add drive effect (cascaded asymmetric stages, 2x oversampled)
+    DriveEffect* driveEffect = new DriveEffect();
+    driveEffect->Init(sampleRate);
+    effects->push_back(driveEffect);
+
+    // Add tone stack effect
+    ToneStackEffect* toneStackEffect = new ToneStackEffect();
+    toneStackEffect->Init(sampleRate);
+    effects->push_back(toneStackEffect);
+
+    // Add cab sim effect
+    CabSimEffect* cabSimEffect = new CabSimEffect();
+    cabSimEffect->Init(sampleRate);
+    effects->push_back(cabSimEffect);
+
+    // Add Sandman compound effect (gate + drive + tone stack + cab)
+    SandmanEffect* sandmanEffect = new SandmanEffect();
+    sandmanEffect->Init(sampleRate);
+    effects->push_back(sandmanEffect);
+#endif // PERSPECTIVE_PLATFORM_AMP
 
     Hardware::PrintLine("Done populating effects.");
 }

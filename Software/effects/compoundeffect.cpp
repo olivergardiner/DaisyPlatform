@@ -12,6 +12,7 @@ CompoundEffect::CompoundEffect(const char* name, RoutingMode mode)
     , tempBufferL_(nullptr)
     , tempBufferR_(nullptr)
     , bufferSize_(0)
+    , initialized_(false)
 {}
 
 CompoundEffect::~CompoundEffect() {
@@ -53,6 +54,18 @@ void CompoundEffect::Init(float sampleRate) {
     bufferSize_ = 128;
     tempBufferL_ = new float[bufferSize_];
     tempBufferR_ = new float[bufferSize_];
+
+    initialized_ = true;
+}
+
+void CompoundEffect::EnsureBufferSize(size_t size) {
+    if (size <= bufferSize_) return;
+
+    if (tempBufferL_) delete[] tempBufferL_;
+    if (tempBufferR_) delete[] tempBufferR_;
+    bufferSize_ = size;
+    tempBufferL_ = new float[bufferSize_];
+    tempBufferR_ = new float[bufferSize_];
 }
 
 void CompoundEffect::Process(const float* in, float* out, size_t size) {
@@ -61,7 +74,9 @@ void CompoundEffect::Process(const float* in, float* out, size_t size) {
         std::memcpy(out, in, size * sizeof(float));
         return;
     }
-    
+
+    EnsureBufferSize(size);
+
     if (routingMode_ == RoutingMode::SERIES) {
         // Series processing: output of one effect feeds into next
         // First effect processes input
@@ -111,15 +126,9 @@ void CompoundEffect::ProcessStereo(const float* inL, const float* inR, float* ou
         return;
     }
     
-    // Reallocate buffers if needed
-    if (size > bufferSize_) {
-        if (tempBufferL_) delete[] tempBufferL_;
-        if (tempBufferR_) delete[] tempBufferR_;
-        bufferSize_ = size;
-        tempBufferL_ = new float[bufferSize_];
-        tempBufferR_ = new float[bufferSize_];
-    }
-    
+    EnsureBufferSize(size);
+
+
     if (routingMode_ == RoutingMode::SERIES) {
         // Series processing: output of one effect feeds into next
         // First effect processes input
@@ -170,6 +179,20 @@ void CompoundEffect::Update() {
     for (Effect* effect : effects_) {
         if (effect) {
             effect->Update();
+        }
+    }
+}
+
+void CompoundEffect::SetKeyInput(const float* key, size_t size) {
+    keyInput_ = key;
+    keySize_ = size;
+
+    // Children need the pedal input, not this compound's input — the whole
+    // point is that a nested gate keys off the dry guitar regardless of how
+    // many effects sit ahead of it in the chain.
+    for (Effect* effect : effects_) {
+        if (effect) {
+            effect->SetKeyInput(key, size);
         }
     }
 }
@@ -233,9 +256,11 @@ void CompoundEffect::OnDeselected() {
 void CompoundEffect::AddEffect(Effect* effect) {
     if (effect) {
         effects_.push_back(effect);
-        
-        // If already initialized, initialize the new effect
-        if (sampleRate_ > 0) {
+
+        // Only initialize here if Init() has already run — otherwise Init()
+        // will pick this effect up, and doing it twice would duplicate the
+        // child's parameter list.
+        if (initialized_) {
             effect->Init(sampleRate_);
         }
     }

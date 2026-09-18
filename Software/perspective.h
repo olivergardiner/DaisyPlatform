@@ -2,6 +2,7 @@
 #ifndef PERSPECTIVE_PERSPECTIVE_H
 #define PERSPECTIVE_PERSPECTIVE_H
 
+#include "platform.h"
 #include "hardware.h"
 #include "parameters/effectparameter.h"
 #include "parameters/potentiometerparameter.h"
@@ -73,6 +74,7 @@ protected:
     void UpdateStatusDisplay();
     void LoadPresetsFromFlash();
     void SavePresetsToFlash();
+    void SeedFactoryPresets();
 
     // Parameter select/edit (Encoder 2 = select + click to toggle edit, Encoder 1 = set value while editing)
     void SelectAdjacentParameter(int direction);

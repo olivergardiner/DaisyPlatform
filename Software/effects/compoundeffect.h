@@ -21,6 +21,7 @@ public:
     void Process(const float* in, float* out, size_t size) override;
     void ProcessStereo(const float* inL, const float* inR, float* outL, float* outR, size_t size) override;
     void Update() override;
+    void SetKeyInput(const float* key, size_t size) override;
     void SetTempo(float tempoHz) override;
     void SetMetronomeEnabled(bool enabled) override;
     void SetMetronomeLevel(float level) override;
@@ -61,6 +62,15 @@ protected:
     float* tempBufferL_;
     float* tempBufferR_;
     size_t bufferSize_;
+
+    // True once Init() has run. AddEffect() uses this to decide whether a
+    // newly added effect still needs initializing: children added before Init()
+    // are initialized by Init() itself, so initializing them here as well would
+    // run their Init() twice and duplicate their parameter lists.
+    bool initialized_;
+
+    // Grow the temp buffers if a block larger than the current allocation arrives
+    void EnsureBufferSize(size_t size);
 };
 
 } // namespace perspective
