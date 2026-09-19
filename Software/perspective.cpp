@@ -114,6 +114,14 @@ void Perspective::Exec() {
 void Perspective::AudioCallbackImpl(AudioHandle::InputBuffer in, AudioHandle::OutputBuffer out, size_t size) {
     float ledPulseBrightness = 0.0f;
 
+#if !defined(PERSPECTIVE_PLATFORM_AMP)
+    // If nothing is plugged into the right input, duplicate the left input
+    // into it rather than feeding stereo effects a floating/silent channel.
+    // in[] is const (it is a DMA buffer), so this is a pointer choice, not a
+    // copy — everywhere below that would otherwise read in[1] reads rightIn.
+    const float* rightIn = hardware.IsJackRightInInserted() ? in[1] : in[0];
+#endif
+
 #if defined(PERSPECTIVE_PLATFORM_AMP)
     // Channel 2 is an independent path, not a branch of channel 1: the
     // analogue power amp simulator's output arrives on input 2 and leaves
@@ -134,7 +142,7 @@ void Perspective::AudioCallbackImpl(AudioHandle::InputBuffer in, AudioHandle::Ou
         for (size_t i = 0; i < size; i++) {
             out[0][i] = in[0][i];
 #if !defined(PERSPECTIVE_PLATFORM_AMP)
-            out[1][i] = in[1][i];
+            out[1][i] = rightIn[i];
 #endif
         }
     } else if (mode_ == PerspectiveMode::TUNER && tunerEffect_) {
@@ -166,7 +174,7 @@ void Perspective::AudioCallbackImpl(AudioHandle::InputBuffer in, AudioHandle::Ou
         // Mono FX loop insert; channel 2 was handled above
         currentEffect_->Process(in[0], out[0], size);
 #else
-        currentEffect_->ProcessStereo(in[0], in[1], out[0], out[1], size);
+        currentEffect_->ProcessStereo(in[0], rightIn, out[0], out[1], size);
 #endif
         ledPulseBrightness = currentEffect_->GetTempoPulseBrightness();
         hardware.SetLedBrightness(LED_2_IDX, currentEffect_->GetEnvelopeBrightness());
@@ -175,10 +183,22 @@ void Perspective::AudioCallbackImpl(AudioHandle::InputBuffer in, AudioHandle::Ou
         for (size_t i = 0; i < size; i++){
             out[0][i] = in[0][i];
 #if !defined(PERSPECTIVE_PLATFORM_AMP)
-            out[1][i] = in[1][i];
+            out[1][i] = rightIn[i];
 #endif
         }
     }
+
+#if !defined(PERSPECTIVE_PLATFORM_AMP)
+    // If nothing is plugged into the right output, fold the stereo image
+    // down to mono on the left output rather than losing whatever is on the
+    // right when it has nowhere to go. Placed after every branch above so it
+    // applies uniformly regardless of how out[0]/out[1] were produced.
+    if (!hardware.IsJackRightOutInserted()) {
+        for (size_t i = 0; i < size; i++) {
+            out[0][i] = 0.5f * (out[0][i] + out[1][i]);
+        }
+    }
+#endif
 
     if (volumeMode_) {
         float vol = volumeLevel_;
