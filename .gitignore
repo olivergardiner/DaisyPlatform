@@ -41,4 +41,10 @@
 *.dwo
 
 # Project build output
+# build-<platform>/ since each build target gets its own directory
 Software/build/
+Software/build-*/
+
+# Claude Code local permission grants (at any depth)
+**/.claude/settings.json
+**/.claude/settings.local.json
