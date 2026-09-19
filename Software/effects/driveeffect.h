@@ -54,13 +54,20 @@ private:
         return SoftClip(x + bias_[index]) - biasOffset_[index];
     }
 
+    // Anti-imaging/anti-aliasing filter order, in cascaded biquad sections.
+    // 4 sections = 8th-order. At 2x oversampling the fold frequency (24 kHz at
+    // the standard 48 kHz base rate) sits less than an octave above the
+    // cutoff, so a gentler filter gives almost no attenuation right where it
+    // matters — see DesignFilters() for the numbers.
+    static constexpr size_t kFilterSections = 4;
+
     // All the state a single audio channel needs. Held per channel so the
     // effect can run in stereo without L and R sharing filter memory.
     struct Channel {
-        Biquad scoop[kMaxStages];          // mid-scoop ahead of each stage
-        Biquad upFilterA, upFilterB;       // 4th-order Butterworth anti-imaging
-        Biquad downFilterA, downFilterB;   // and anti-aliasing, designed at 2x
-        float dcPrevIn = 0.0f;             // DC blocker on the cascade output
+        Biquad scoop[kMaxStages];              // mid-scoop ahead of each stage
+        Biquad upFilter[kFilterSections];      // anti-imaging, ahead of the cascade
+        Biquad downFilter[kFilterSections];    // anti-aliasing, after it — both at 2x
+        float dcPrevIn = 0.0f;                 // DC blocker on the cascade output
         float dcPrevOut = 0.0f;
     };
 

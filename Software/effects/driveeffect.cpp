@@ -9,12 +9,32 @@ using namespace perspective;
 
 namespace {
 
-// Butterworth Q values for a 4th-order lowpass built from two biquads.
-static constexpr float kButterQ1 = 0.54119610f;
-static constexpr float kButterQ2 = 1.30656296f;
+// Butterworth pole Qs for an 8th-order lowpass built from four cascaded
+// biquads (DriveEffect::kFilterSections of them).
+//
+// Why 8th order at this cutoff, not the 4th-order pair this used to be: at 2x
+// oversampling the fold frequency is the base Nyquist — 24 kHz at the usual
+// 48 kHz rate — and with the previous cutoff (0.45 * 48 kHz = 21.6 kHz) that
+// is only 1.11x above cutoff, less than a sixth of an octave of transition
+// band. Evaluating the actual digital transfer function, that gave only
+// -6.6 dB of attenuation at the fold frequency — nowhere near enough once a
+// high cascade gain pushes real energy up past 14 kHz: that energy folds back
+// into the band as inharmonic aliasing rather than clean harmonic buzz, and it
+// gets worse as gain goes up because the nonlinearity is generating more of
+// it. With the cutoff lowered to kCutoffFraction and this order, the same
+// calculation gives -46.8 dB at the fold frequency — a 40 dB improvement —
+// while the passband is essentially untouched below 12 kHz (-0.16 dB there),
+// for four extra biquad evaluations per sample that a Cortex-M7 does not
+// notice.
+static constexpr float kButterQ[4] = {
+    0.50979f, 0.60134f, 0.90000f, 2.56291f
+};
 
 // Anti-aliasing cutoff as a fraction of the base (pre-oversampling) rate.
-static constexpr float kCutoffFraction = 0.45f;
+// Content above this starts rolling off; everything downstream (tone stack,
+// cab) rolls off well before it anyway, so nothing audible is lost by cutting
+// here rather than right at the old 21.6 kHz.
+static constexpr float kCutoffFraction = 0.30f;
 
 // Inter-stage scoop bandwidth. Wide enough to hollow the mids without
 // sounding like a notch.
@@ -89,10 +109,10 @@ void DriveEffect::DesignFilters() {
     const float cutoff = sampleRate_ * kCutoffFraction;
 
     for (Channel& c : channels_) {
-        c.upFilterA.SetLowpass(cutoff, kButterQ1, osRate);
-        c.upFilterB.SetLowpass(cutoff, kButterQ2, osRate);
-        c.downFilterA.SetLowpass(cutoff, kButterQ1, osRate);
-        c.downFilterB.SetLowpass(cutoff, kButterQ2, osRate);
+        for (size_t f = 0; f < kFilterSections; ++f) {
+            c.upFilter[f].SetLowpass(cutoff, kButterQ[f], osRate);
+            c.downFilter[f].SetLowpass(cutoff, kButterQ[f], osRate);
+        }
     }
 }
 
@@ -164,9 +184,12 @@ void DriveEffect::ProcessChannel(Channel& channel, const float* in, float* out,
 
         // --- 2x upsample: zero-stuff, then lowpass. The factor of 2
         // compensates for the energy lost to the inserted zero.
-        float os[2];
-        os[0] = channel.upFilterB.Process(channel.upFilterA.Process(x * 2.0f));
-        os[1] = channel.upFilterB.Process(channel.upFilterA.Process(0.0f));
+        float os[2] = {x * 2.0f, 0.0f};
+        for (float& s : os) {
+            for (size_t f = 0; f < kFilterSections; ++f) {
+                s = channel.upFilter[f].Process(s);
+            }
+        }
 
         // --- Clipping cascade, at 2x
         for (size_t n = 0; n < 2; ++n) {
@@ -180,8 +203,9 @@ void DriveEffect::ProcessChannel(Channel& channel, const float* in, float* out,
 
         // --- 2x decimate: both samples must go through the filter to advance
         // its state, but only the second is kept.
-        channel.downFilterB.Process(channel.downFilterA.Process(os[0]));
-        const float y = channel.downFilterB.Process(channel.downFilterA.Process(os[1]));
+        for (size_t f = 0; f < kFilterSections; ++f) os[0] = channel.downFilter[f].Process(os[0]);
+        for (size_t f = 0; f < kFilterSections; ++f) os[1] = channel.downFilter[f].Process(os[1]);
+        const float y = os[1];
 
         // --- DC blocker; the asymmetric stages leave a small offset behind
         const float blocked = y - channel.dcPrevIn + 0.9995f * channel.dcPrevOut;
