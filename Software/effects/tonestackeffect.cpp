@@ -65,18 +65,18 @@ void ToneStackEffect::Update() {
 
     if (std::fabsf(bass_db - bass_db_) > 0.01f) {
         bass_db_ = bass_db;
-        bass_.SetLowShelf(kBassFreq, kShelfSlope, bass_db_, sampleRate_);
+        for (Channel& c : channels_) c.bass.SetLowShelf(kBassFreq, kShelfSlope, bass_db_, sampleRate_);
     }
 
     if (std::fabsf(mid_db - mid_db_) > 0.01f || std::fabsf(mid_freq - mid_freq_) > 0.5f) {
         mid_db_ = mid_db;
         mid_freq_ = mid_freq;
-        mid_.SetPeaking(mid_freq_, kMidQ, mid_db_, sampleRate_);
+        for (Channel& c : channels_) c.mid.SetPeaking(mid_freq_, kMidQ, mid_db_, sampleRate_);
     }
 
     if (std::fabsf(treble_db - treble_db_) > 0.01f) {
         treble_db_ = treble_db;
-        treble_.SetHighShelf(kTrebleFreq, kShelfSlope, treble_db_, sampleRate_);
+        for (Channel& c : channels_) c.treble.SetHighShelf(kTrebleFreq, kShelfSlope, treble_db_, sampleRate_);
     }
 
     level_lin_ = std::powf(10.0f, parameters_[kParamLevel]->GetValue() / 20.0f);
@@ -86,16 +86,31 @@ void ToneStackEffect::Update() {
 // Process (mono)
 // ---------------------------------------------------------------------------
 
+void ToneStackEffect::ProcessChannel(Channel& channel, const float* in, float* out, size_t size) {
+    for (size_t i = 0; i < size; ++i) {
+        float v = channel.bass.Process(in[i]);
+        v = channel.mid.Process(v);
+        v = channel.treble.Process(v);
+        out[i] = v * level_lin_;
+    }
+}
+
 void ToneStackEffect::Process(const float* in, float* out, size_t size) {
     if (!enabled_) {
         for (size_t i = 0; i < size; ++i) out[i] = in[i];
         return;
     }
 
-    for (size_t i = 0; i < size; ++i) {
-        float v = bass_.Process(in[i]);
-        v = mid_.Process(v);
-        v = treble_.Process(v);
-        out[i] = v * level_lin_;
+    ProcessChannel(channels_[0], in, out, size);
+}
+
+void ToneStackEffect::ProcessStereo(const float* inL, const float* inR,
+                                    float* outL, float* outR, size_t size) {
+    if (!enabled_) {
+        for (size_t i = 0; i < size; ++i) { outL[i] = inL[i]; outR[i] = inR[i]; }
+        return;
     }
+
+    ProcessChannel(channels_[0], inL, outL, size);
+    ProcessChannel(channels_[1], inR, outR, size);
 }

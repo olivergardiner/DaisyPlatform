@@ -3,6 +3,8 @@
 #include "noisegateeffect.h"
 #include "driveeffect.h"
 #include "tonestackeffect.h"
+#include "cabsimeffect.h"
+#include "../platform.h"
 #include "../controls.h"
 #include "../parameters/potentiometerparameter.h"
 
@@ -16,6 +18,7 @@ static const char* kStageNames[] = {"2", "3"};
 enum GateParam { kGateThreshold = 0, kGateHysteresis, kGateAttack, kGateHold, kGateRelease };
 enum DriveParam { kDriveGain = 0, kDriveStages, kDriveAsym, kDriveScoop, kDriveScoopFreq, kDriveLevel };
 enum ToneParam { kToneBass = 0, kToneMid, kToneMidFreq, kToneTreble, kToneLevel };
+enum CabParam { kCabLowCut = 0, kCabReso, kCabPresence, kCabRolloff, kCabLevel };
 
 } // namespace
 
@@ -27,7 +30,8 @@ SandmanEffect::SandmanEffect()
     : CompoundEffect("Sandman", RoutingMode::SERIES)
     , gate_(nullptr)
     , drive_(nullptr)
-    , tone_(nullptr) {
+    , tone_(nullptr)
+    , cab_(nullptr) {
 }
 
 SandmanEffect::~SandmanEffect() {
@@ -44,6 +48,14 @@ void SandmanEffect::Init(float sampleRate) {
 
     tone_ = new ToneStackEffect();
     AddEffect(tone_);
+
+#if !defined(PERSPECTIVE_PLATFORM_AMP)
+    // In the pedal there is no cab sim downstream, and a raw cascade into a
+    // desk or interface is all fizz. On the amp platform this stage is absent
+    // because the cab lives on channel 2 and this chain feeds a real amp.
+    cab_ = new CabSimEffect();
+    AddEffect(cab_);
+#endif
 
     // Gate last. Ahead of the cascade it could barely control the output at
     // all: with this much gain the drive simply re-amplifies whatever the gate
@@ -142,6 +154,16 @@ void SandmanEffect::Update() {
         tone_->GetParameter(kToneMidFreq)->SetValue(900.0f);
         tone_->GetParameter(kToneTreble)->SetValue(treble_db);
         tone_->GetParameter(kToneLevel)->SetValue(level_db);
+    }
+
+    // Pedal platform only. Rolloff at 4 kHz is doing most of the work of
+    // making the cascade sound like an amp rather than a fuzz.
+    if (cab_ && cab_->GetParameterCount() >= 5) {
+        cab_->GetParameter(kCabLowCut)->SetValue(90.0f);
+        cab_->GetParameter(kCabReso)->SetValue(3.5f);
+        cab_->GetParameter(kCabPresence)->SetValue(4.5f);
+        cab_->GetParameter(kCabRolloff)->SetValue(4000.0f);
+        cab_->GetParameter(kCabLevel)->SetValue(0.0f);
     }
 
     CompoundEffect::Update();

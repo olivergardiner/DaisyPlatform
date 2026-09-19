@@ -61,23 +61,25 @@ void CabSimEffect::Update() {
 
     if (std::fabsf(lowCut - lowCut_hz_) > 0.5f) {
         lowCut_hz_ = lowCut;
-        lowCut_.SetHighpass(lowCut_hz_, kLowCutQ, sampleRate_);
+        for (Channel& c : channels_) c.lowCut.SetHighpass(lowCut_hz_, kLowCutQ, sampleRate_);
     }
 
     if (std::fabsf(reso - resonance_db_) > 0.01f) {
         resonance_db_ = reso;
-        resonance_.SetPeaking(kResonanceFreq, kResonanceQ, resonance_db_, sampleRate_);
+        for (Channel& c : channels_) c.resonance.SetPeaking(kResonanceFreq, kResonanceQ, resonance_db_, sampleRate_);
     }
 
     if (std::fabsf(presence - presence_db_) > 0.01f) {
         presence_db_ = presence;
-        presence_.SetPeaking(kPresenceFreq, kPresenceQ, presence_db_, sampleRate_);
+        for (Channel& c : channels_) c.presence.SetPeaking(kPresenceFreq, kPresenceQ, presence_db_, sampleRate_);
     }
 
     if (std::fabsf(rolloff - rolloff_hz_) > 0.5f) {
         rolloff_hz_ = rolloff;
-        rolloffA_.SetLowpass(rolloff_hz_, kButterQ1, sampleRate_);
-        rolloffB_.SetLowpass(rolloff_hz_, kButterQ2, sampleRate_);
+        for (Channel& c : channels_) {
+            c.rolloffA.SetLowpass(rolloff_hz_, kButterQ1, sampleRate_);
+            c.rolloffB.SetLowpass(rolloff_hz_, kButterQ2, sampleRate_);
+        }
     }
 
     level_lin_ = std::powf(10.0f, parameters_[kParamLevel]->GetValue() / 20.0f);
@@ -87,18 +89,33 @@ void CabSimEffect::Update() {
 // Process (mono)
 // ---------------------------------------------------------------------------
 
+void CabSimEffect::ProcessChannel(Channel& channel, const float* in, float* out, size_t size) {
+    for (size_t i = 0; i < size; ++i) {
+        float v = channel.lowCut.Process(in[i]);
+        v = channel.resonance.Process(v);
+        v = channel.presence.Process(v);
+        v = channel.rolloffA.Process(v);
+        v = channel.rolloffB.Process(v);
+        out[i] = v * level_lin_;
+    }
+}
+
 void CabSimEffect::Process(const float* in, float* out, size_t size) {
     if (!enabled_) {
         for (size_t i = 0; i < size; ++i) out[i] = in[i];
         return;
     }
 
-    for (size_t i = 0; i < size; ++i) {
-        float v = lowCut_.Process(in[i]);
-        v = resonance_.Process(v);
-        v = presence_.Process(v);
-        v = rolloffA_.Process(v);
-        v = rolloffB_.Process(v);
-        out[i] = v * level_lin_;
+    ProcessChannel(channels_[0], in, out, size);
+}
+
+void CabSimEffect::ProcessStereo(const float* inL, const float* inR,
+                                 float* outL, float* outR, size_t size) {
+    if (!enabled_) {
+        for (size_t i = 0; i < size; ++i) { outL[i] = inL[i]; outR[i] = inR[i]; }
+        return;
     }
+
+    ProcessChannel(channels_[0], inL, outL, size);
+    ProcessChannel(channels_[1], inR, outR, size);
 }

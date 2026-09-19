@@ -35,8 +35,6 @@ DriveEffect::DriveEffect()
     , scoop_db_(-9.0f)
     , scoop_freq_(650.0f)
     , designedStages_(0)
-    , dcPrevIn_(0.0f)
-    , dcPrevOut_(0.0f)
     , envelope_(0.0f) {
     for (size_t i = 0; i < kMaxStages; ++i) {
         stageGain_[i] = 1.0f;
@@ -90,10 +88,12 @@ void DriveEffect::DesignFilters() {
     const float osRate = sampleRate_ * kOversample;
     const float cutoff = sampleRate_ * kCutoffFraction;
 
-    upFilterA_.SetLowpass(cutoff, kButterQ1, osRate);
-    upFilterB_.SetLowpass(cutoff, kButterQ2, osRate);
-    downFilterA_.SetLowpass(cutoff, kButterQ1, osRate);
-    downFilterB_.SetLowpass(cutoff, kButterQ2, osRate);
+    for (Channel& c : channels_) {
+        c.upFilterA.SetLowpass(cutoff, kButterQ1, osRate);
+        c.upFilterB.SetLowpass(cutoff, kButterQ2, osRate);
+        c.downFilterA.SetLowpass(cutoff, kButterQ1, osRate);
+        c.downFilterB.SetLowpass(cutoff, kButterQ2, osRate);
+    }
 }
 
 // The scoop sits ahead of every stage, so its depth compounds down the
@@ -104,8 +104,10 @@ void DriveEffect::DesignScoop() {
     const float osRate = sampleRate_ * kOversample;
     const float perStage = scoop_db_ / static_cast<float>(stageCount_);
 
-    for (size_t i = 0; i < kMaxStages; ++i) {
-        scoop_[i].SetPeaking(scoop_freq_, kScoopQ, -perStage, osRate);
+    for (Channel& c : channels_) {
+        for (size_t i = 0; i < kMaxStages; ++i) {
+            c.scoop[i].SetPeaking(scoop_freq_, kScoopQ, -perStage, osRate);
+        }
     }
 
     designedStages_ = stageCount_;
@@ -155,26 +157,22 @@ void DriveEffect::Update() {
 // Process (mono)
 // ---------------------------------------------------------------------------
 
-void DriveEffect::Process(const float* in, float* out, size_t size) {
-    if (!enabled_) {
-        for (size_t i = 0; i < size; ++i) out[i] = in[i];
-        return;
-    }
-
+void DriveEffect::ProcessChannel(Channel& channel, const float* in, float* out,
+                                 size_t size, bool trackEnvelope) {
     for (size_t i = 0; i < size; ++i) {
         const float x = in[i];
 
         // --- 2x upsample: zero-stuff, then lowpass. The factor of 2
         // compensates for the energy lost to the inserted zero.
         float os[2];
-        os[0] = upFilterB_.Process(upFilterA_.Process(x * 2.0f));
-        os[1] = upFilterB_.Process(upFilterA_.Process(0.0f));
+        os[0] = channel.upFilterB.Process(channel.upFilterA.Process(x * 2.0f));
+        os[1] = channel.upFilterB.Process(channel.upFilterA.Process(0.0f));
 
         // --- Clipping cascade, at 2x
         for (size_t n = 0; n < 2; ++n) {
             float v = os[n];
             for (size_t s = 0; s < stageCount_; ++s) {
-                v = scoop_[s].Process(v);
+                v = channel.scoop[s].Process(v);
                 v = Stage(v * stageGain_[s], s);
             }
             os[n] = v;
@@ -182,24 +180,48 @@ void DriveEffect::Process(const float* in, float* out, size_t size) {
 
         // --- 2x decimate: both samples must go through the filter to advance
         // its state, but only the second is kept.
-        downFilterB_.Process(downFilterA_.Process(os[0]));
-        const float y = downFilterB_.Process(downFilterA_.Process(os[1]));
+        channel.downFilterB.Process(channel.downFilterA.Process(os[0]));
+        const float y = channel.downFilterB.Process(channel.downFilterA.Process(os[1]));
 
         // --- DC blocker; the asymmetric stages leave a small offset behind
-        const float blocked = y - dcPrevIn_ + 0.9995f * dcPrevOut_;
-        dcPrevIn_ = y;
-        dcPrevOut_ = blocked;
+        const float blocked = y - channel.dcPrevIn + 0.9995f * channel.dcPrevOut;
+        channel.dcPrevIn = y;
+        channel.dcPrevOut = blocked;
 
         out[i] = blocked * level_lin_;
 
         // Envelope for the LED, tracked post-drive
-        const float mag = std::fabsf(out[i]);
-        if (mag > envelope_) {
-            envelope_ += (mag - envelope_) * 0.05f;
-        } else {
-            envelope_ += (mag - envelope_) * 0.0008f;
+        if (trackEnvelope) {
+            const float mag = std::fabsf(out[i]);
+            if (mag > envelope_) {
+                envelope_ += (mag - envelope_) * 0.05f;
+            } else {
+                envelope_ += (mag - envelope_) * 0.0008f;
+            }
         }
     }
+}
+
+void DriveEffect::Process(const float* in, float* out, size_t size) {
+    if (!enabled_) {
+        for (size_t i = 0; i < size; ++i) out[i] = in[i];
+        return;
+    }
+
+    ProcessChannel(channels_[0], in, out, size, /*trackEnvelope=*/true);
+}
+
+void DriveEffect::ProcessStereo(const float* inL, const float* inR,
+                                float* outL, float* outR, size_t size) {
+    if (!enabled_) {
+        for (size_t i = 0; i < size; ++i) { outL[i] = inL[i]; outR[i] = inR[i]; }
+        return;
+    }
+
+    // Independent state per channel. Sharing it would make the filters see an
+    // interleaved L/R stream and produce crosstalk rather than two channels.
+    ProcessChannel(channels_[0], inL, outL, size, /*trackEnvelope=*/true);
+    ProcessChannel(channels_[1], inR, outR, size, /*trackEnvelope=*/false);
 }
 
 // ---------------------------------------------------------------------------

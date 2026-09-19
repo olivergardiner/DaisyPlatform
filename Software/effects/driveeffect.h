@@ -23,6 +23,7 @@ public:
 
     void Init(float sampleRate) override;
     void Process(const float* in, float* out, size_t size) override;
+    void ProcessStereo(const float* inL, const float* inR, float* outL, float* outR, size_t size) override;
     void Update() override;
 
     float GetEnvelopeBrightness() const override;
@@ -53,8 +54,20 @@ private:
         return SoftClip(x + bias_[index]) - biasOffset_[index];
     }
 
+    // All the state a single audio channel needs. Held per channel so the
+    // effect can run in stereo without L and R sharing filter memory.
+    struct Channel {
+        Biquad scoop[kMaxStages];          // mid-scoop ahead of each stage
+        Biquad upFilterA, upFilterB;       // 4th-order Butterworth anti-imaging
+        Biquad downFilterA, downFilterB;   // and anti-aliasing, designed at 2x
+        float dcPrevIn = 0.0f;             // DC blocker on the cascade output
+        float dcPrevOut = 0.0f;
+    };
+
     void DesignFilters();
     void DesignScoop();
+    void ProcessChannel(Channel& channel, const float* in, float* out, size_t size,
+                        bool trackEnvelope);
 
     // Cached parameter values
     float stageGain_[kMaxStages];
@@ -66,18 +79,10 @@ private:
     float scoop_freq_;
     size_t designedStages_;  // stage count the scoop filters were designed for
 
-    // Mid-scoop ahead of each stage (runs at the oversampled rate)
-    Biquad scoop_[kMaxStages];
+    // Per-channel state: [0] is mono / left, [1] is right
+    Channel channels_[2];
 
-    // 4th-order Butterworth anti-imaging / anti-aliasing pair, designed at 2x
-    Biquad upFilterA_, upFilterB_;
-    Biquad downFilterA_, downFilterB_;
-
-    // DC blocker on the output of the cascade
-    float dcPrevIn_;
-    float dcPrevOut_;
-
-    // Envelope for the front-panel LED
+    // Envelope for the front-panel LED, tracked from the left channel only
     float envelope_;
 };
 

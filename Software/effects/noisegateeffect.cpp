@@ -89,6 +89,36 @@ void NoiseGateEffect::Update() {
 // Process (mono)
 // ---------------------------------------------------------------------------
 
+float NoiseGateEffect::NextGain(float keySample) {
+    const float mag = std::fabsf(keySample);
+
+    // Peak-ish detector
+    if (mag > detector_) {
+        detector_ += (mag - detector_) * kDetectorAttack;
+    } else {
+        detector_ += (mag - detector_) * kDetectorRelease;
+    }
+
+    // Open/close decision with hysteresis and hold
+    if (detector_ >= openLevel_) {
+        open_ = true;
+        holdCounter_ = holdSamples_;
+    } else if (detector_ < closeLevel_) {
+        if (holdCounter_ > 0) {
+            --holdCounter_;
+        } else {
+            open_ = false;
+        }
+    }
+
+    // Ramp the gain rather than switching it, or every note starts with a click
+    const float target = open_ ? 1.0f : 0.0f;
+    const float coeff = (target > gain_) ? attackCoeff_ : releaseCoeff_;
+    gain_ += (target - gain_) * coeff;
+
+    return gain_;
+}
+
 void NoiseGateEffect::Process(const float* in, float* out, size_t size) {
     if (!enabled_) {
         for (size_t i = 0; i < size; ++i) out[i] = in[i];
@@ -103,33 +133,28 @@ void NoiseGateEffect::Process(const float* in, float* out, size_t size) {
     const float* key = (keyInput_ && keySize_ == size) ? keyInput_ : in;
 
     for (size_t i = 0; i < size; ++i) {
-        const float mag = std::fabsf(key[i]);
+        out[i] = in[i] * NextGain(key[i]);
+    }
+}
 
-        // Peak-ish detector
-        if (mag > detector_) {
-            detector_ += (mag - detector_) * kDetectorAttack;
-        } else {
-            detector_ += (mag - detector_) * kDetectorRelease;
-        }
+void NoiseGateEffect::ProcessStereo(const float* inL, const float* inR,
+                                    float* outL, float* outR, size_t size) {
+    if (!enabled_) {
+        for (size_t i = 0; i < size; ++i) { outL[i] = inL[i]; outR[i] = inR[i]; }
+        return;
+    }
 
-        // Open/close decision with hysteresis and hold
-        if (detector_ >= openLevel_) {
-            open_ = true;
-            holdCounter_ = holdSamples_;
-        } else if (detector_ < closeLevel_) {
-            if (holdCounter_ > 0) {
-                --holdCounter_;
-            } else {
-                open_ = false;
-            }
-        }
+    // Falls back to the louder of the two inputs when no key was supplied, so
+    // a channel decaying faster than the other cannot close the gate early.
+    const bool haveKey = (keyInput_ && keySize_ == size);
 
-        // Ramp the gain rather than switching it, or every note starts with a click
-        const float target = open_ ? 1.0f : 0.0f;
-        const float coeff = (target > gain_) ? attackCoeff_ : releaseCoeff_;
-        gain_ += (target - gain_) * coeff;
-
-        out[i] = in[i] * gain_;
+    for (size_t i = 0; i < size; ++i) {
+        const float keySample = haveKey
+            ? keyInput_[i]
+            : std::max(std::fabsf(inL[i]), std::fabsf(inR[i]));
+        const float g = NextGain(keySample);
+        outL[i] = inL[i] * g;
+        outR[i] = inR[i] * g;
     }
 }
 

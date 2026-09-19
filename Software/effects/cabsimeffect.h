@@ -20,6 +20,7 @@ public:
 
     void Init(float sampleRate) override;
     void Process(const float* in, float* out, size_t size) override;
+    void ProcessStereo(const float* inL, const float* inR, float* outL, float* outR, size_t size) override;
     void Update() override;
 
 private:
@@ -38,11 +39,18 @@ private:
     static constexpr float kResonanceFreq = 110.0f;
     static constexpr float kPresenceFreq = 2400.0f;
 
-    Biquad lowCut_;
-    Biquad resonance_;
-    Biquad presence_;
-    Biquad rolloffA_;
-    Biquad rolloffB_;
+    // Per-channel filter state: [0] is mono / left, [1] is right
+    struct Channel {
+        Biquad lowCut;
+        Biquad resonance;
+        Biquad presence;
+        Biquad rolloffA;
+        Biquad rolloffB;
+    };
+
+    Channel channels_[2];
+
+    void ProcessChannel(Channel& channel, const float* in, float* out, size_t size);
 
     // Cached parameter values
     float lowCut_hz_;

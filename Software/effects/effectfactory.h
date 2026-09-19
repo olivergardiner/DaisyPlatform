@@ -136,10 +136,9 @@ inline void PopulateEffects(std::vector<Effect*>* effects, float sampleRate) {
     mysteriousEffect->Init(sampleRate);
     effects->push_back(mysteriousEffect);
 
-#if defined(PERSPECTIVE_PLATFORM_AMP)
-    // --- Amp chain (mono FX + cab sim platform only) ---
-    // These effects keep single-channel filter and envelope state, so they must
-    // not be driven through the default Effect::ProcessStereo(). See platform.h.
+    // --- Amp chain ---
+    // Available on both platforms. Each of these implements ProcessStereo with
+    // independent per-channel state, so they are safe in the stereo pedal.
     //
     // NB: presets are persisted to flash by effect index, so new effects must
     // be appended here. Inserting one above this point would silently remap
@@ -160,15 +159,19 @@ inline void PopulateEffects(std::vector<Effect*>* effects, float sampleRate) {
     toneStackEffect->Init(sampleRate);
     effects->push_back(toneStackEffect);
 
-    // NB: no CabSimEffect here. On the amp platform the cab sim is a fixture
-    // on channel 2, owned by Perspective and always in circuit, so registering
-    // it as a selectable effect as well would only let you cab the signal twice.
+#if !defined(PERSPECTIVE_PLATFORM_AMP)
+    // Cab sim is selectable only in the pedal. On the amp platform it is a
+    // fixture on channel 2, owned by Perspective and always in circuit, so
+    // registering it here as well would only let you cab the signal twice.
+    CabSimEffect* cabSimEffect = new CabSimEffect();
+    cabSimEffect->Init(sampleRate);
+    effects->push_back(cabSimEffect);
+#endif
 
-    // Add Sandman compound effect (drive + tone stack + gate)
+    // Add Sandman compound effect
     SandmanEffect* sandmanEffect = new SandmanEffect();
     sandmanEffect->Init(sampleRate);
     effects->push_back(sandmanEffect);
-#endif // PERSPECTIVE_PLATFORM_AMP
 
     Hardware::PrintLine("Done populating effects.");
 }

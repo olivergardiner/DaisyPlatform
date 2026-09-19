@@ -18,6 +18,7 @@ public:
 
     void Init(float sampleRate) override;
     void Process(const float* in, float* out, size_t size) override;
+    void ProcessStereo(const float* inL, const float* inR, float* outL, float* outR, size_t size) override;
     void Update() override;
 
     float GetEnvelopeBrightness() const override;
@@ -42,11 +43,16 @@ private:
     // Hold time in samples
     uint32_t holdSamples_;
 
-    // State
+    // State. Single detector and single gain ramp even in stereo: the key is
+    // mono, and gating the channels independently would let them open and
+    // close at different moments and wander the image.
     float detector_;
     float gain_;
     uint32_t holdCounter_;
     bool open_;
+
+    // Advance the detector and gain ramp by one sample, returning the gain
+    float NextGain(float keySample);
 };
 
 } // namespace perspective

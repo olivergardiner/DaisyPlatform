@@ -18,6 +18,7 @@ public:
 
     void Init(float sampleRate) override;
     void Process(const float* in, float* out, size_t size) override;
+    void ProcessStereo(const float* inL, const float* inR, float* outL, float* outR, size_t size) override;
     void Update() override;
 
 private:
@@ -29,9 +30,16 @@ private:
         kParamLevel
     };
 
-    Biquad bass_;
-    Biquad mid_;
-    Biquad treble_;
+    // Per-channel filter state: [0] is mono / left, [1] is right
+    struct Channel {
+        Biquad bass;
+        Biquad mid;
+        Biquad treble;
+    };
+
+    Channel channels_[2];
+
+    void ProcessChannel(Channel& channel, const float* in, float* out, size_t size);
 
     // Cached so Update() can skip redesigning filters that did not move
     float bass_db_;
