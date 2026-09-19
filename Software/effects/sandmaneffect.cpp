@@ -39,17 +39,26 @@ SandmanEffect::~SandmanEffect() {
 // ---------------------------------------------------------------------------
 
 void SandmanEffect::Init(float sampleRate) {
-    // Gate first, so it sees the guitar's own noise floor rather than the
-    // cascade's. Gating after the drive means gating a signal that has already
-    // been compressed to within a few dB of full scale.
-    gate_ = new NoiseGateEffect();
-    AddEffect(gate_);
-
     drive_ = new DriveEffect();
     AddEffect(drive_);
 
     tone_ = new ToneStackEffect();
     AddEffect(tone_);
+
+    // Gate last. Ahead of the cascade it could barely control the output at
+    // all: with this much gain the drive simply re-amplifies whatever the gate
+    // attenuates, so the gate has to slam fully shut before anything audible
+    // happens, and it does nothing about the noise the cascade makes itself.
+    //
+    // After the tone stack rather than before it, so nothing downstream can
+    // ring on once the gate has closed.
+    //
+    // This only works because the detector is keyed from the pedal input (see
+    // Effect::SetKeyInput) — a level detector looking at the cascade's own
+    // output would be watching a signal compressed to within a few dB of full
+    // scale, with no usable dynamic range to trigger on.
+    gate_ = new NoiseGateEffect();
+    AddEffect(gate_);
 
     // Initializes the children and allocates the series temp buffers
     CompoundEffect::Init(sampleRate);
@@ -101,6 +110,10 @@ void SandmanEffect::Update() {
 
     // Gate: fast open, short hold, quick release. Long enough not to chatter on
     // a sustained note, short enough that a palm mute stops dead.
+    //
+    // These are unchanged by the gate sitting last rather than first: the
+    // detector keys off the pedal input either way, so the same thresholds and
+    // timings apply. What changed is only what the gain ramp multiplies.
     if (gate_ && gate_->GetParameterCount() >= 5) {
         gate_->GetParameter(kGateThreshold)->SetValue(gate_db);
         gate_->GetParameter(kGateHysteresis)->SetValue(7.0f);

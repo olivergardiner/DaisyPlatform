@@ -164,7 +164,7 @@ inline void PopulateEffects(std::vector<Effect*>* effects, float sampleRate) {
     // on channel 2, owned by Perspective and always in circuit, so registering
     // it as a selectable effect as well would only let you cab the signal twice.
 
-    // Add Sandman compound effect (gate + drive + tone stack)
+    // Add Sandman compound effect (drive + tone stack + gate)
     SandmanEffect* sandmanEffect = new SandmanEffect();
     sandmanEffect->Init(sampleRate);
     effects->push_back(sandmanEffect);

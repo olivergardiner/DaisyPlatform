@@ -5,7 +5,7 @@
 
 namespace perspective {
 
-// Sandman: gate -> cascaded asymmetric drive -> tone stack.
+// Sandman: cascaded asymmetric drive -> tone stack -> gate.
 //
 // A high-gain rhythm voice in the Enter Sandman mould. The children are held at
 // fixed, tuned values and only a handful of macros are exposed at the top level,
