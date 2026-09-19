@@ -114,10 +114,28 @@ void Perspective::Exec() {
 void Perspective::AudioCallbackImpl(AudioHandle::InputBuffer in, AudioHandle::OutputBuffer out, size_t size) {
     float ledPulseBrightness = 0.0f;
 
+#if defined(PERSPECTIVE_PLATFORM_AMP)
+    // Channel 2 is an independent path, not a branch of channel 1: the
+    // analogue power amp simulator's output arrives on input 2 and leaves
+    // through the cab sim as a DI feed.
+    //
+    // It sits outside the mode handling below on purpose. Channel 1 is the FX
+    // loop insert, so bypass, tuner and empty presets are all about the loop —
+    // muting the DI because the player reached for the tuner would cut front
+    // of house mid-set.
+    if (cabSimEffect_) {
+        cabSimEffect_->Process(in[1], out[1], size);
+    } else {
+        for (size_t i = 0; i < size; i++) out[1][i] = in[1][i];
+    }
+#endif
+
     if (switchingEffect_) {
         for (size_t i = 0; i < size; i++) {
             out[0][i] = in[0][i];
+#if !defined(PERSPECTIVE_PLATFORM_AMP)
             out[1][i] = in[1][i];
+#endif
         }
     } else if (mode_ == PerspectiveMode::TUNER && tunerEffect_) {
         // Tuner mode: process for pitch detection but mute output.
@@ -128,27 +146,25 @@ void Perspective::AudioCallbackImpl(AudioHandle::InputBuffer in, AudioHandle::Ou
         tunerEffect_->Process(in[0], out[0], size);
         for (size_t i = 0; i < size; i++) {
             out[0][i] = 0.0f;
+#if !defined(PERSPECTIVE_PLATFORM_AMP)
             out[1][i] = 0.0f;
+#endif
         }
     } else if (mode_ == PerspectiveMode::PRESET && presetMuted_) {
         // Preset mode with empty slot: mute output
         for (size_t i = 0; i < size; i++) {
             out[0][i] = 0.0f;
+#if !defined(PERSPECTIVE_PLATFORM_AMP)
             out[1][i] = 0.0f;
+#endif
         }
     } else if (currentEffect_ && !bypassMode_) {
         // Hand the dry input down as a sidechain key before processing, so
         // detector-driven effects can follow the guitar rather than their own input.
         currentEffect_->SetKeyInput(in[0], size);
 #if defined(PERSPECTIVE_PLATFORM_AMP)
-        // Mono FX on channel 1, the same signal through the cab sim on
-        // channel 2 — one output for a real amp, one for a desk or interface.
+        // Mono FX loop insert; channel 2 was handled above
         currentEffect_->Process(in[0], out[0], size);
-        if (cabSimEffect_) {
-            cabSimEffect_->Process(out[0], out[1], size);
-        } else {
-            for (size_t i = 0; i < size; i++) out[1][i] = out[0][i];
-        }
 #else
         currentEffect_->ProcessStereo(in[0], in[1], out[0], out[1], size);
 #endif
@@ -158,7 +174,9 @@ void Perspective::AudioCallbackImpl(AudioHandle::InputBuffer in, AudioHandle::Ou
         // Bypass or fallback: pass input through unchanged
         for (size_t i = 0; i < size; i++){
             out[0][i] = in[0][i];
+#if !defined(PERSPECTIVE_PLATFORM_AMP)
             out[1][i] = in[1][i];
+#endif
         }
     }
 
@@ -166,7 +184,9 @@ void Perspective::AudioCallbackImpl(AudioHandle::InputBuffer in, AudioHandle::Ou
         float vol = volumeLevel_;
         for (size_t i = 0; i < size; i++) {
             out[0][i] *= vol;
+#if !defined(PERSPECTIVE_PLATFORM_AMP)
             out[1][i] *= vol;
+#endif
         }
     }
 
