@@ -40,7 +40,7 @@ static constexpr float kCutoffFraction = 0.30f;
 // sounding like a notch.
 static constexpr float kScoopQ = 0.70f;
 
-static const char* kStageNames[] = {"2", "3"};
+static const char* kStageNames[] = {"2", "3", "4"};
 
 } // namespace
 
@@ -77,11 +77,13 @@ void DriveEffect::Init(float sampleRate) {
     AddParameter(new PotentiometerParameter("K2 Gain", 0.0f, 48.0f, 32.0f, PotCurve::LIN, MACRO_KNOB_DEPTH_IDX));
     parameters_.back()->SetMacroRole(MacroRole::DEPTH);
 
-    // Stages — 2 is looser and more open, 3 is tighter and more compressed
+    // Stages — 2 is loosest and most open, 4 is tightest and most compressed.
+    // Default stays at 3 (value 1.0) rather than moving to the new max, so
+    // existing tunings (Sandman's own Stages macro among them) don't change.
     PotentiometerParameter* stagesParam =
-        new PotentiometerParameter("Stages", 0.0f, 1.0f, 1.0f, PotCurve::LIN, -1);
+        new PotentiometerParameter("Stages", 0.0f, 2.0f, 1.0f, PotCurve::LIN, -1);
     stagesParam->SetDisplayType(DisplayType::DISCRETE);
-    stagesParam->SetDiscreteValues(kStageNames, 2);
+    stagesParam->SetDiscreteValues(kStageNames, 3);
     AddParameter(stagesParam);
 
     // Asymmetry — DC offset into each shaper; drives the even harmonics
@@ -139,7 +141,10 @@ void DriveEffect::DesignScoop() {
 
 void DriveEffect::Update() {
     const float gain_db = parameters_[kParamGain]->GetValue();
-    stageCount_ = parameters_[kParamStages]->GetValue() >= 0.5f ? 3 : 2;
+    // Stages param range is [0, kMaxStages-2], one integer per discrete option
+    // ("2", "3", "4", ...), so the stage count is just that index plus 2.
+    stageCount_ = 2 + static_cast<size_t>(parameters_[kParamStages]->GetValueAsInt(
+        static_cast<int>(kMaxStages) - 2));
 
     const float asym = clamp(parameters_[kParamAsymmetry]->GetValue(), 0.0f, 1.0f);
     const float newScoopDb = parameters_[kParamScoop]->GetValue();

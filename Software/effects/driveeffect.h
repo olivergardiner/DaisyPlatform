@@ -8,7 +8,7 @@ namespace perspective {
 
 // Cascaded asymmetric-clipping preamp.
 //
-// Two or three identical soft-clip stages run in series at 2x the host sample
+// Two to four identical soft-clip stages run in series at 2x the host sample
 // rate, with a mid-scoop filter ahead of each one. Only the clipping cascade is
 // oversampled — the tone stack and cab sim downstream run at base rate, since
 // they add no harmonics of their own.
@@ -38,7 +38,7 @@ private:
         kParamLevel
     };
 
-    static constexpr size_t kMaxStages = 3;
+    static constexpr size_t kMaxStages = 4;
     static constexpr float kOversample = 2.0f;
 
     // Rational (Pade) approximation of tanh, saturating hard outside |x| > 3.
