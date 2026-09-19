@@ -14,8 +14,8 @@ CPP_SOURCES += dependencies/DaisySeedGFX2/TFT_SPI.cpp dependencies/DaisySeedGFX2
 OPT = -O3
 
 # Build target: 'stereo' for the stereo effects platform, 'amp' for the mono
-# FX + cab sim platform. See platform.h.
-# Set before including the core makefile, which declares C_DEFS with ?=.
+# FX + cab sim platform. See platform.h. This is the single point of control:
+# platform.h refuses to compile if neither define reaches it.
 PLATFORM ?= stereo
 
 ifeq ($(PLATFORM),stereo)
@@ -25,6 +25,24 @@ C_DEFS = -DPERSPECTIVE_PLATFORM_AMP
 else
 $(error PLATFORM must be 'stereo' or 'amp', got '$(PLATFORM)')
 endif
+
+# Each platform gets its own build directory, so switching PLATFORM cannot
+# leave objects from the other one behind.
+#
+# BUILD_DIR has to arrive as a command-line assignment: the core makefile sets
+# it with '=' (which would clobber anything we set before the include) and uses
+# it in rule targets, which expand at parse time (so setting it after is too
+# late). Only a command-line value beats both. When one has not been given we
+# re-invoke make once, supplying it.
+ifeq ($(origin BUILD_DIR),undefined)
+
+PERSPECTIVE_GOALS := $(or $(MAKECMDGOALS),all)
+
+.PHONY: $(PERSPECTIVE_GOALS)
+$(PERSPECTIVE_GOALS):
+	@$(MAKE) --no-print-directory PLATFORM=$(PLATFORM) BUILD_DIR=build-$(PLATFORM) $@
+
+else
 
 # Library Locations
 LIBDAISY_DIR ?= dependencies/libDaisy
@@ -52,16 +70,21 @@ C_INCLUDES += -I$(CMSIS_DSP_DIR)/Include
 # Build dependencies
 .PHONY: libdaisy daisysp daisysp-lgpl libs
 
+# BUILD_DIR reaches us as a command-line assignment, and make propagates those
+# to sub-makes, so the dependencies would try to build into our platform
+# directory. Pin each back to its own default.
 libdaisy:
-	$(MAKE) -C $(LIBDAISY_DIR)
+	$(MAKE) -C $(LIBDAISY_DIR) BUILD_DIR=build
 
 daisysp: libdaisy
-	$(MAKE) -C $(DAISYSP_DIR)
+	$(MAKE) -C $(DAISYSP_DIR) BUILD_DIR=build
 
 daisysp-lgpl: daisysp
-	$(MAKE) -C $(DAISYSP_LGPL_DIR)
+	$(MAKE) -C $(DAISYSP_LGPL_DIR) BUILD_DIR=build
 
 libs: libdaisy daisysp daisysp-lgpl
 
 # Make sure libraries are built before linking
 $(BUILD_DIR)/$(TARGET).elf: libs
+
+endif # BUILD_DIR supplied on the command line

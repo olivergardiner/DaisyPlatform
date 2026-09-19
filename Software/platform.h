@@ -25,8 +25,15 @@
 #endif
 
 #if !defined(PERSPECTIVE_PLATFORM_STEREO) && !defined(PERSPECTIVE_PLATFORM_AMP)
-// Default to the stereo platform so an unqualified build is unchanged.
+#if defined(__INTELLISENSE__)
+// Editor parsing only, never a real build: pick one so headers resolve.
 #define PERSPECTIVE_PLATFORM_STEREO 1
+#else
+// Deliberately fatal rather than defaulting. The Makefile is the single point
+// of platform control, and a build that silently fell back to a default here
+// could flash the wrong firmware to the pedal without anything looking wrong.
+#error "No platform defined. Build via the Makefile: make PLATFORM=stereo|amp"
+#endif
 #endif
 
 #endif // PERSPECTIVE_PLATFORM_H

@@ -9,7 +9,8 @@
                 "UNICODE",
                 "_UNICODE",
                 "STM32H750xx",
-                "USE_DAISYSP_LGPL=1"
+                "USE_DAISYSP_LGPL=1",
+                "PERSPECTIVE_PLATFORM_AMP"
             ],
             "includePath": [
                 "${workspaceFolder}/**",
