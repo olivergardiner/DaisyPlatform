@@ -8,7 +8,6 @@
 // Include all effect types
 #include "autowaheffect.h"
 #include "autowahv2effect.h"
-#include "cabsimeffect.h"
 #include "choruseffect.h"
 #include "compoundeffect.h"
 #include "compressoreffect.h"
@@ -114,10 +113,25 @@ inline void PopulateEffects(std::vector<Effect*>* effects, float sampleRate) {
     twelveStringEffect->Init(sampleRate);
     effects->push_back(twelveStringEffect);
 
+    // Add drive effect (cascaded asymmetric stages, 2x oversampled)
+    DriveEffect* driveEffect = new DriveEffect();
+    driveEffect->Init(sampleRate);
+    effects->push_back(driveEffect);
+
     // Add compressor effect
     CompressorEffect* compressorEffect = new CompressorEffect();
     compressorEffect->Init(sampleRate);
     effects->push_back(compressorEffect);
+
+    // Add noise gate effect
+    NoiseGateEffect* noiseGateEffect = new NoiseGateEffect();
+    noiseGateEffect->Init(sampleRate);
+    effects->push_back(noiseGateEffect);
+
+    // Add tone stack effect
+    ToneStackEffect* toneStackEffect = new ToneStackEffect();
+    toneStackEffect->Init(sampleRate);
+    effects->push_back(toneStackEffect);
 
     // --- Compound effects below this line ---
 
@@ -135,38 +149,6 @@ inline void PopulateEffects(std::vector<Effect*>* effects, float sampleRate) {
     MysteriousEffect* mysteriousEffect = new MysteriousEffect();
     mysteriousEffect->Init(sampleRate);
     effects->push_back(mysteriousEffect);
-
-    // --- Amp chain ---
-    // Available on both platforms. Each of these implements ProcessStereo with
-    // independent per-channel state, so they are safe in the stereo pedal.
-    //
-    // NB: presets are persisted to flash by effect index, so new effects must
-    // be appended here. Inserting one above this point would silently remap
-    // every saved preset to a different effect.
-
-    // Add noise gate effect
-    NoiseGateEffect* noiseGateEffect = new NoiseGateEffect();
-    noiseGateEffect->Init(sampleRate);
-    effects->push_back(noiseGateEffect);
-
-    // Add drive effect (cascaded asymmetric stages, 2x oversampled)
-    DriveEffect* driveEffect = new DriveEffect();
-    driveEffect->Init(sampleRate);
-    effects->push_back(driveEffect);
-
-    // Add tone stack effect
-    ToneStackEffect* toneStackEffect = new ToneStackEffect();
-    toneStackEffect->Init(sampleRate);
-    effects->push_back(toneStackEffect);
-
-#if !defined(PERSPECTIVE_PLATFORM_AMP)
-    // Cab sim is selectable only in the pedal. On the amp platform it is a
-    // fixture on channel 2, owned by Perspective and always in circuit, so
-    // registering it here as well would only let you cab the signal twice.
-    CabSimEffect* cabSimEffect = new CabSimEffect();
-    cabSimEffect->Init(sampleRate);
-    effects->push_back(cabSimEffect);
-#endif
 
     // Add Sandman compound effect
     SandmanEffect* sandmanEffect = new SandmanEffect();

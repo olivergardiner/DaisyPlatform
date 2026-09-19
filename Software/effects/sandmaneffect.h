@@ -5,16 +5,18 @@
 
 namespace perspective {
 
-// Sandman: cascaded asymmetric drive -> tone stack -> [cab sim] -> gate.
+// Sandman: cascaded asymmetric drive -> tone stack -> gate.
 //
 // A high-gain rhythm voice in the Enter Sandman mould. The children are held at
 // fixed, tuned values and only a handful of macros are exposed at the top level,
 // so the preset lands on the sound rather than on twenty knobs.
 //
-// The cab stage is present on the pedal platform only, where nothing else is
-// going to do it. On the amp platform it is omitted, because the cab sim sits
-// on channel 2 outside the chain and this effect is the signal that feeds a
-// real amp.
+// No cab stage on either platform: in the pedal, the Daisy sits in the FX loop
+// of a real amp into a real cab, so this chain's output goes on to be cabbed
+// downstream regardless. In amp mode the cab sim is the channel 2 DI fixture,
+// outside this chain entirely. CabSimEffect itself stays — it is still used
+// there, and is worth keeping as a lightweight alternative alongside a future
+// IR-convolution cab.
 class SandmanEffect : public CompoundEffect {
 public:
     SandmanEffect();
@@ -38,7 +40,6 @@ private:
     class NoiseGateEffect* gate_;
     class DriveEffect* drive_;
     class ToneStackEffect* tone_;
-    class CabSimEffect* cab_;   // pedal platform only; null in amp mode
 };
 
 } // namespace perspective
