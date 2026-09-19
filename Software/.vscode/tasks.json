@@ -40,7 +40,7 @@
     },
     {
       "command": "make PLATFORM=stereo program-dfu",
-      "label": "build_and_program_dfu (stereo)",
+      "label": "build and program dfu (stereo)",
       "options": {
         "cwd": "${workspaceFolder}"
       },
