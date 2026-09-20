@@ -1,9 +1,8 @@
 #include "perspective.h"
 #include "effects/effect.h"
 #include "parameters/effectparameter.h"
-#include "parameters/potentiometerparameter.h"
-#include "parameters/encoderparameter.h"
-#include "parameters/toggleparameter.h"
+#include "parameters/valueparameter.h"
+#include "parameters/enumparameter.h"
 #include "parameters/timeparameter.h"
 #include "effects/effectfactory.h"
 #include <cmath>
@@ -26,23 +25,26 @@ Perspective::Perspective()
     g_perspective = this;
 
     // Create settings parameters (unified model)
-    // Tuning reference (EncoderParameter, matches TunerEffect)
-    settingsParameters_.push_back(new EncoderParameter("E1 Tuner Ref", 420.0f, 460.0f, 440.0f, 0.5f, ENCODER_1_IDX, 2));
-    // Metronome volume (PotentiometerParameter, log taper)
-    settingsParameters_.push_back(new PotentiometerParameter("K1 Met Vol", 0.0f, 1.0f, 0.7f, PotCurve::LOG, KNOB_1_IDX, 0));
+    // Tuning reference (matches TunerEffect)
+    auto* tuningRef = new ValueParameter("E1 Tuner Ref", 420.0f, 460.0f, 440.0f, 2);
+    tuningRef->BindEncoder(ENCODER_1_IDX, 0.5f);
+    settingsParameters_.push_back(tuningRef);
 
-    // Metronome mode (PotentiometerParameter, discrete, knob 3)
+    // Metronome volume (log taper)
+    auto* metVol = new ValueParameter("K1 Met Vol", 0.0f, 1.0f, 0.7f, 0);
+    metVol->BindPotentiometer(KNOB_1_IDX, PotCurve::LOG);
+    settingsParameters_.push_back(metVol);
+
+    // Metronome mode (knob 2)
     static const char* kMetronomeModes[] = {"Bass", "Snare", "High", "Click"};
-    auto* modeParam = new PotentiometerParameter("K2 Met Mode", 0.0f, 3.0f, 0.0f, PotCurve::LIN, KNOB_2_IDX, 1);
-    modeParam->SetDisplayType(DisplayType::DISCRETE);
-    modeParam->SetDiscreteValues(kMetronomeModes, 4);
+    auto* modeParam = new EnumParameter("K2 Met Mode", kMetronomeModes, 4, 0, 1);
+    modeParam->BindPotentiometer(KNOB_2_IDX);
     settingsParameters_.push_back(modeParam);
 
-    // Bypass type (EncoderParameter, encoder 2)
+    // Bypass type (encoder 2)
     static const char* kBypassTypeLabels[] = {"Pass", "True"};
-    auto* bypassParam = new EncoderParameter("E2 Bypass", 0.0f, 1.0f, 0.0f, 1.0f, ENCODER_2_IDX, 3);
-    bypassParam->SetDisplayType(DisplayType::DISCRETE);
-    bypassParam->SetDiscreteValues(kBypassTypeLabels, 2);
+    auto* bypassParam = new EnumParameter("E2 Bypass", kBypassTypeLabels, 2, 0, 3);
+    bypassParam->BindEncoder(ENCODER_2_IDX);
     settingsParameters_.push_back(bypassParam);
 
 #if defined(PERSPECTIVE_PLATFORM_AMP)
@@ -50,9 +52,17 @@ Perspective::Perspective()
     // these are global settings rather than per-effect parameters. Low cut and
     // cone resonance are left at the cab's own defaults; these three are the
     // ones worth reaching for when matching a desk or a power amp.
-    settingsParameters_.push_back(new PotentiometerParameter("K3 Cab Roll", 2500.0f, 7000.0f, 4200.0f, PotCurve::LOG, KNOB_3_IDX, 4));
-    settingsParameters_.push_back(new PotentiometerParameter("K4 Cab Pres", -6.0f, 9.0f, 4.0f, PotCurve::LIN, KNOB_4_IDX, 5));
-    settingsParameters_.push_back(new PotentiometerParameter("K5 Cab Vol", -12.0f, 12.0f, 0.0f, PotCurve::LIN, KNOB_5_IDX, 6));
+    auto* cabRoll = new ValueParameter("K3 Cab Roll", 2500.0f, 7000.0f, 4200.0f, 4);
+    cabRoll->BindPotentiometer(KNOB_3_IDX, PotCurve::LOG);
+    settingsParameters_.push_back(cabRoll);
+
+    auto* cabPres = new ValueParameter("K4 Cab Pres", -6.0f, 9.0f, 4.0f, 5);
+    cabPres->BindPotentiometer(KNOB_4_IDX, PotCurve::LIN);
+    settingsParameters_.push_back(cabPres);
+
+    auto* cabVol = new ValueParameter("K5 Cab Vol", -12.0f, 12.0f, 0.0f, 6);
+    cabVol->BindPotentiometer(KNOB_5_IDX, PotCurve::LIN);
+    settingsParameters_.push_back(cabVol);
 #endif
 }
 
@@ -226,9 +236,8 @@ void Perspective::RegisterEventListeners() {
             for (size_t i = 0; i < currentEffect_->GetParameterCount(); i++) {
                 EffectParameter* param = currentEffect_->GetParameter(i);
                 if (param && param->GetIndex() == event.controlIndex) {
-                    // Update parameter based on type
-                    if (param->GetType() == ParameterType::POTENTIOMETER) {
-                        PotentiometerParameter* potParam = static_cast<PotentiometerParameter*>(param);
+                    // Update parameter based on control binding
+                    if (param->GetControlBinding() == ControlBinding::POTENTIOMETER) {
                         Knob* knob = static_cast<Knob*>(event.source);
                         float normalizedValue = knob->Value(); // Get processed value from knob
 
@@ -246,14 +255,12 @@ void Perspective::RegisterEventListeners() {
                             }
                         }
 
-                        potParam->SetNormalizedValueWithCurve(normalizedValue);
-                        
+                        param->SetNormalizedValueWithCurve(normalizedValue);
+
                         // Update display (only if not hidden)
                         if (param->GetDisplayIndex() >= 0) {
                             UpdateParameterRow(param, param->GetDisplayIndex() + 1);
                         }
-                        
-                        //Hardware::PrintLine("%s: %d", potParam->GetName(), static_cast<int>(event.value * 100));
 
                         // Update effect with new parameter value
                         currentEffect_->Update();
@@ -304,15 +311,14 @@ void Perspective::RegisterEventListeners() {
             for (size_t i = 0; i < currentEffect_->GetParameterCount(); i++) {
                 EffectParameter* param = currentEffect_->GetParameter(i);
                 if (param && param->GetIndex() == event.controlIndex) {
-                    // Update parameter based on type
-                    if (param->GetType() == ParameterType::ENCODER) {
-                        EncoderParameter* encParam = static_cast<EncoderParameter*>(param);
+                    // Update parameter based on control binding
+                    if (param->GetControlBinding() == ControlBinding::ENCODER) {
                         if (event.value > 0) {
-                            encParam->Increment(event.value);
+                            param->Increment(event.value);
                         } else if (event.value < 0) {
-                            encParam->Decrement(-event.value);
+                            param->Decrement(-event.value);
                         }
-                        
+
                         // Update display (only if not hidden)
                         if (param->GetDisplayIndex() >= 0) {
                             UpdateParameterDisplay(param, param->GetDisplayIndex() + 1);
@@ -335,22 +341,14 @@ void Perspective::RegisterEventListeners() {
             if (mode_ != PerspectiveMode::SETTINGS) return;
             for (size_t i = 0; i < settingsParameters_.size(); i++) {
                 EffectParameter* param = settingsParameters_[i];
-                if (param && param->GetIndex() == event.controlIndex) {
-                    if (param->GetType() == ParameterType::ENCODER) {
-                        EncoderParameter* encParam = static_cast<EncoderParameter*>(param);
-                        if (event.value > 0) {
-                            encParam->Increment(event.value);
-                        } else if (event.value < 0) {
-                            encParam->Decrement(-event.value);
-                        }
-                    } else if (param->GetType() == ParameterType::POTENTIOMETER) {
-                        PotentiometerParameter* potParam = static_cast<PotentiometerParameter*>(param);
-                        Knob* knob = static_cast<Knob*>(event.source);
-                        float normalizedValue = knob->Value();
-                        potParam->SetNormalizedValueWithCurve(normalizedValue);
+                if (param && param->GetIndex() == event.controlIndex && param->GetControlBinding() == ControlBinding::ENCODER) {
+                    if (event.value > 0) {
+                        param->Increment(event.value);
+                    } else if (event.value < 0) {
+                        param->Decrement(-event.value);
                     }
-                    // Update display
                     UpdateParameterDisplay(param, param->GetDisplayIndex() + 1);
+                    break;
                 }
             }
         },
@@ -361,11 +359,10 @@ void Perspective::RegisterEventListeners() {
             if (mode_ != PerspectiveMode::SETTINGS) return;
             for (size_t i = 0; i < settingsParameters_.size(); i++) {
                 EffectParameter* param = settingsParameters_[i];
-                if (param && param->GetIndex() == event.controlIndex && param->GetType() == ParameterType::POTENTIOMETER) {
-                    PotentiometerParameter* potParam = static_cast<PotentiometerParameter*>(param);
+                if (param && param->GetIndex() == event.controlIndex && param->GetControlBinding() == ControlBinding::POTENTIOMETER) {
                     Knob* knob = static_cast<Knob*>(event.source);
                     float normalizedValue = knob->Value();
-                    potParam->SetNormalizedValueWithCurve(normalizedValue);
+                    param->SetNormalizedValueWithCurve(normalizedValue);
                     UpdateParameterDisplay(param, param->GetDisplayIndex() + 1);
                 }
             }
@@ -387,23 +384,24 @@ void Perspective::RegisterEventListeners() {
             for (size_t i = 0; i < currentEffect_->GetParameterCount(); i++) {
                 EffectParameter* param = currentEffect_->GetParameter(i);
                 if (param && param->GetIndex() == event.controlIndex) {
-                    // Update parameter based on type
-                    if (param->GetType() == ParameterType::TOGGLE) {
-                        ToggleParameter* toggleParam = static_cast<ToggleParameter*>(param);
-
-                        // Tempo Mode toggles only fire while their paired Time parameter is selected in edit mode
-                        if (mode_ == PerspectiveMode::EFFECT && strcmp(param->GetName(), "Tempo Mode") == 0
-                            && !IsSelectedParameterPairedTempoTime(param)) {
-                            break;
+                    // Update parameter based on control binding
+                    if (param->GetControlBinding() == ControlBinding::BUTTON) {
+                        // A time parameter's mode toggle only fires while that time
+                        // parameter is selected in edit mode.
+                        EffectParameter* pairedTime = FindTimeParameterForModeToggle(param);
+                        if (mode_ == PerspectiveMode::EFFECT && pairedTime != nullptr) {
+                            bool isSelected = selectedParamIndex_ >= 0
+                                && currentEffect_->GetParameter(static_cast<size_t>(selectedParamIndex_)) == pairedTime;
+                            if (!isSelected) break;
                         }
 
-                        toggleParam->Toggle();
-                        
+                        param->OnButtonPress();
+
                         // Update display (only if not hidden)
                         if (param->GetDisplayIndex() >= 0) {
                             UpdateParameterDisplay(param, param->GetDisplayIndex() + 1);
                         }
-                        
+
                         // Update effect with new parameter value
                         currentEffect_->Update();
                         break;
@@ -657,7 +655,7 @@ void Perspective::UpdateVolumeLevel() {
     float v = expKnob->Value(); // calibrated 0-1
     if (v < 0.0f) v = 0.0f;
     if (v > 1.0f) v = 1.0f;
-    volumeLevel_ = taperFunction(v, 0.12f); // LOG taper (ym=0.12)
+    volumeLevel_ = ApplyPotCurve(PotCurve::LOG, v); // LOG taper (ym=0.12)
 }
 
 bool Perspective::CanEnterVolumeMode() const {
@@ -689,7 +687,7 @@ void Perspective::LoadEffects() {
             if (mode_ == PerspectiveMode::PRESET) {
                 // In preset mode, only encoder 1 params on tempo effects are highlighted
                 bool controllable = currentEffect_ && currentEffect_->HasTempoMode()
-                    && param->GetType() == ParameterType::ENCODER
+                    && param->GetControlBinding() == ControlBinding::ENCODER
                     && param->GetIndex() == ENCODER_1_IDX;
                 if (controllable) {
                     this->UpdateParameterDisplayHighlighted(param, displayIndex + 1);
@@ -864,28 +862,21 @@ void Perspective::ToggleParameterEditMode() {
     RefreshParameterDisplays();
 }
 
-// Tempo Mode toggles are paired with the Nth TimeParameter by declaration order within the effect
-bool Perspective::IsSelectedParameterPairedTempoTime(EffectParameter* tempoModeToggle) const {
-    if (!currentEffect_ || !tempoModeToggle || selectedParamIndex_ < 0) return false;
-    EffectParameter* selected = currentEffect_->GetParameter(static_cast<size_t>(selectedParamIndex_));
-    if (!selected) return false;
-
-    int toggleOrdinal = -1;
-    int timeOrdinal = -1;
-    int toggleCount = 0;
-    int timeCount = 0;
+// Finds the TimeParameter (if any) in currentEffect_ whose mode toggle is
+// exactly this parameter, so button presses only fire while that time
+// parameter is selected.
+EffectParameter* Perspective::FindTimeParameterForModeToggle(EffectParameter* toggle) const {
+    if (!currentEffect_ || !toggle) return nullptr;
     for (size_t i = 0; i < currentEffect_->GetParameterCount(); i++) {
         EffectParameter* p = currentEffect_->GetParameter(i);
-        if (!p) continue;
-        if (p->GetType() == ParameterType::TOGGLE && strcmp(p->GetName(), "Tempo Mode") == 0) {
-            if (p == tempoModeToggle) toggleOrdinal = toggleCount;
-            toggleCount++;
-        } else if (p->IsTimeParameter()) {
-            if (p == selected) timeOrdinal = timeCount;
-            timeCount++;
+        if (p && p->GetKind() == ParameterKind::TIME) {
+            TimeParameter* timeParam = static_cast<TimeParameter*>(p);
+            if (timeParam->GetModeToggle() == toggle) {
+                return p;
+            }
         }
     }
-    return toggleOrdinal >= 0 && toggleOrdinal == timeOrdinal;
+    return nullptr;
 }
 
 void Perspective::AdjustSelectedParameter(int steps) {
@@ -893,27 +884,21 @@ void Perspective::AdjustSelectedParameter(int steps) {
     EffectParameter* param = currentEffect_->GetParameter(static_cast<size_t>(selectedParamIndex_));
     if (!param) return;
 
-    switch (param->GetType()) {
-        case ParameterType::ENCODER: {
-            EncoderParameter* encParam = static_cast<EncoderParameter*>(param);
-            if (steps > 0) encParam->Increment(steps);
-            else encParam->Decrement(-steps);
+    switch (param->GetKind()) {
+        case ParameterKind::VALUE: {
+            static constexpr float kStepPerTick = 0.01f; // 1% of range per encoder tick
+            float normalized = param->GetNormalizedValue() + (steps * kStepPerTick);
+            param->SetNormalizedValue(normalized);
             break;
         }
-        case ParameterType::POTENTIOMETER: {
-            if (param->GetDisplayType() == DisplayType::DISCRETE) {
-                // Discrete pots (e.g. Subdivision) step by one whole value per detent.
-                param->SetValue(param->GetValue() + steps);
-            } else {
-                static constexpr float kStepPerTick = 0.01f; // 1% of range per encoder tick
-                float normalized = param->GetNormalizedValue() + (steps * kStepPerTick);
-                param->SetNormalizedValue(normalized);
-            }
-            break;
-        }
-        case ParameterType::TOGGLE: {
-            ToggleParameter* toggleParam = static_cast<ToggleParameter*>(param);
-            toggleParam->Toggle();
+        case ParameterKind::ENUM:
+        case ParameterKind::TIME:
+        case ParameterKind::INTEGER: {
+            // Each kind's own Increment/Decrement already knows how to step
+            // itself sensibly (Enum cycles by option, Time is BPM-aware in
+            // tempo mode, Integer steps by a whole unit).
+            if (steps > 0) param->Increment(steps);
+            else param->Decrement(-steps);
             break;
         }
     }
@@ -1006,11 +991,13 @@ void Perspective::ExitSettingsMode() {
     }
     // Metronome mode
     if (settingsParameters_.size() > kSettingsParamMetronomeMode) {
-        metronomeMode_ = settingsParameters_[kSettingsParamMetronomeMode]->GetValueAsInt(3);
+        auto* modeParam = static_cast<EnumParameter*>(settingsParameters_[kSettingsParamMetronomeMode]);
+        metronomeMode_ = modeParam->GetSelectedIndex();
     }
     // Bypass type
     if (settingsParameters_.size() > kSettingsParamBypassType) {
-        int val = settingsParameters_[kSettingsParamBypassType]->GetValueAsInt(1);
+        auto* bypassParam = static_cast<EnumParameter*>(settingsParameters_[kSettingsParamBypassType]);
+        int val = bypassParam->GetSelectedIndex();
         bypassType_ = (val == 1) ? BypassType::TRUE_BYPASS : BypassType::PASSTHROUGH;
         // Re-apply relay state with new bypass type
         if (bypassMode_ && bypassType_ == BypassType::TRUE_BYPASS) {
@@ -1178,7 +1165,7 @@ void Perspective::UpdatePresetDisplay() {
             EffectParameter* param = currentEffect_->GetParameter(i);
             if (param && param->GetDisplayIndex() >= 0) {
                 size_t slot = param->GetDisplayIndex() + 1;
-                bool controllable = hasTempo && param->GetType() == ParameterType::ENCODER
+                bool controllable = hasTempo && param->GetControlBinding() == ControlBinding::ENCODER
                     && param->GetIndex() == ENCODER_1_IDX;
                 if (controllable) {
                     UpdateParameterDisplayHighlighted(param, slot);

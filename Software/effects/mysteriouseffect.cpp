@@ -13,10 +13,9 @@
 #include "reverbeffect.h"
 #include "twelvestringeffect.h"
 #include "../controls.h"
-#include "../parameters/encoderparameter.h"
-#include "../parameters/potentiometerparameter.h"
+#include "../parameters/valueparameter.h"
+#include "../parameters/enumparameter.h"
 #include "../parameters/timeparameter.h"
-#include "../parameters/toggleparameter.h"
 
 using namespace perspective;
 
@@ -54,32 +53,40 @@ MysteriousEffect::~MysteriousEffect() {
 void MysteriousEffect::Init(float sampleRate) {
     CompoundEffect::Init(sampleRate);
 
-    AddParameter(new PotentiometerParameter("K1 Wah Mix", 0.0f, 1.0f, 0.62f, PotCurve::LIN, MACRO_KNOB_MIX_IDX, 0));
-    parameters_.back()->SetDisplayType(DisplayType::SCALED);
-    parameters_.back()->SetScaleFactor(100.0f);
-    parameters_.back()->SetMacroRole(MacroRole::MIX);
+    auto* wahMixParam = new ValueParameter("K1 Wah Mix", 0.0f, 1.0f, 0.62f, 0);
+    wahMixParam->BindPotentiometer(MACRO_KNOB_MIX_IDX, PotCurve::LIN);
+    wahMixParam->SetDisplayType(DisplayType::SCALED);
+    wahMixParam->SetScaleFactor(100.0f);
+    wahMixParam->SetMacroRole(MacroRole::MIX);
+    AddParameter(wahMixParam);
 
-    AddParameter(new PotentiometerParameter("Sweep", 300.0f, 2600.0f, 1100.0f, PotCurve::LOG, -1, 1));
+    AddParameter(new ValueParameter("Sweep", 300.0f, 2600.0f, 1100.0f, 1));
 
-    AddParameter(new PotentiometerParameter("Flange", 0.0f, 1.0f, 0.20f, PotCurve::LIN, -1, 2));
-    parameters_.back()->SetDisplayType(DisplayType::SCALED);
-    parameters_.back()->SetScaleFactor(100.0f);
+    auto* flangeParam = new ValueParameter("Flange", 0.0f, 1.0f, 0.20f, 2);
+    flangeParam->SetDisplayType(DisplayType::SCALED);
+    flangeParam->SetScaleFactor(100.0f);
+    AddParameter(flangeParam);
 
-    AddParameter(new PotentiometerParameter("Motion", 0.05f, 0.8f, 0.14f, PotCurve::LOG, -1, 3));
+    AddParameter(new ValueParameter("Motion", 0.05f, 0.8f, 0.14f, 3));
 
-    AddParameter(new PotentiometerParameter("Echo", 0.0f, 0.65f, 0.22f, PotCurve::LIN, -1, 4));
-    parameters_.back()->SetDisplayType(DisplayType::SCALED);
-    parameters_.back()->SetScaleFactor(100.0f);
+    auto* echoParam = new ValueParameter("Echo", 0.0f, 0.65f, 0.22f, 4);
+    echoParam->SetDisplayType(DisplayType::SCALED);
+    echoParam->SetScaleFactor(100.0f);
+    AddParameter(echoParam);
 
-    AddParameter(new PotentiometerParameter("K6 Space", 0.0f, 0.75f, 0.34f, PotCurve::LIN, KNOB_6_IDX, 5));
-    parameters_.back()->SetDisplayType(DisplayType::SCALED);
-    parameters_.back()->SetScaleFactor(100.0f);
+    auto* spaceParam = new ValueParameter("K6 Space", 0.0f, 0.75f, 0.34f, 5);
+    spaceParam->BindPotentiometer(KNOB_6_IDX, PotCurve::LIN);
+    spaceParam->SetDisplayType(DisplayType::SCALED);
+    spaceParam->SetScaleFactor(100.0f);
+    AddParameter(spaceParam);
 
-    AddParameter(new TimeParameter("E1 Time", 80.0f, 450.0f, 230.0f, 1.0f, ENCODER_1_IDX, "E1 Tempo", 6));
+    auto* timeParam = new TimeParameter("E1 Time", 80.0f, 450.0f, 230.0f, "E1 Tempo", 6);
+    timeParam->BindEncoder(ENCODER_1_IDX, 1.0f);
+    AddParameter(timeParam);
 
-    AddParameter(new EncoderParameter("E2 Down+", 0.0f, 3.0f, 2.0f, 1.0f, ENCODER_2_IDX, 7));
-    parameters_.back()->SetDisplayType(DisplayType::DISCRETE);
-    parameters_.back()->SetDiscreteValues(kDownBoostLabels, 4);
+    auto* downBoostParam = new EnumParameter("E2 Down+", kDownBoostLabels, 4, 2, 7);
+    downBoostParam->BindEncoder(ENCODER_2_IDX);
+    AddParameter(downBoostParam);
 
     Update();
 }
@@ -158,18 +165,11 @@ void MysteriousEffect::Update() {
         delayEffect_->GetParameter(1)->SetValue(0.10f + (space * 0.70f));
         delayEffect_->GetParameter(2)->SetValue(3.0f);
 
-        EffectParameter* timeParam = delayEffect_->GetParameter(3);
-        if (timeParam && timeParam->GetType() == ParameterType::ENCODER) {
-            TimeParameter* delayTimeParam = static_cast<TimeParameter*>(timeParam);
-            delayTimeParam->SetValue(delayTime->GetValueAsMs());
-            delayTimeParam->SetDisplayMode(TimeDisplayMode::TIME_MS);
-        }
-
-        EffectParameter* tempoModeParam = delayEffect_->GetParameter(4);
-        if (tempoModeParam && tempoModeParam->GetType() == ParameterType::TOGGLE) {
-            ToggleParameter* toggleParam = static_cast<ToggleParameter*>(tempoModeParam);
-            toggleParam->SetState(false);
-        }
+        // Force the child delay to plain time mode (index 0 = Off) so it
+        // never drifts into tempo sync; its own TimeParameter is linked to
+        // this same toggle, so this also keeps that TimeParameter in TIME_MS.
+        delayEffect_->GetParameter(3)->SetValue(delayTime->GetValueAsMs());
+        delayEffect_->GetParameter(4)->SetValue(0.0f);
 
         delayEffect_->Update();
     }

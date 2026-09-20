@@ -1,6 +1,6 @@
 #include "twelvestringeffect.h"
 #include "../controls.h"
-#include "../parameters/potentiometerparameter.h"
+#include "../parameters/valueparameter.h"
 
 #include <cmath>
 #include <algorithm>
@@ -41,31 +41,39 @@ void TwelveStringEffect::Init(float sampleRate) {
     }
 
     // K1: Octave mix — how much of the +12 layer to blend in
-    AddParameter(new PotentiometerParameter("K1 Octave", 0.0f, 1.0f, 0.35f, PotCurve::LIN, MACRO_KNOB_MIX_IDX));
-    parameters_.back()->SetDisplayType(DisplayType::SCALED);
-    parameters_.back()->SetScaleFactor(100.0f);
-    parameters_.back()->SetMacroRole(MacroRole::MIX);
+    auto* octaveParam = new ValueParameter("K1 Octave", 0.0f, 1.0f, 0.35f);
+    octaveParam->BindPotentiometer(MACRO_KNOB_MIX_IDX, PotCurve::LIN);
+    octaveParam->SetDisplayType(DisplayType::SCALED);
+    octaveParam->SetScaleFactor(100.0f);
+    octaveParam->SetMacroRole(MacroRole::MIX);
+    AddParameter(octaveParam);
 
     // K2: Detune depth — chorus sweep width (gives the paired-string shimmer)
-    AddParameter(new PotentiometerParameter("K2 Detune", 0.0f, 1.0f, 0.6f, PotCurve::LIN, MACRO_KNOB_DEPTH_IDX));
-    parameters_.back()->SetDisplayType(DisplayType::SCALED);
-    parameters_.back()->SetScaleFactor(100.0f);
-    parameters_.back()->SetMacroRole(MacroRole::DEPTH);
+    auto* detuneDepthParam = new ValueParameter("K2 Detune", 0.0f, 1.0f, 0.6f);
+    detuneDepthParam->BindPotentiometer(MACRO_KNOB_DEPTH_IDX, PotCurve::LIN);
+    detuneDepthParam->SetDisplayType(DisplayType::SCALED);
+    detuneDepthParam->SetScaleFactor(100.0f);
+    detuneDepthParam->SetMacroRole(MacroRole::DEPTH);
+    AddParameter(detuneDepthParam);
 
     // K3: Detune rate — chorus LFO rate in Hz
-    AddParameter(new PotentiometerParameter("K3 Rate", 0.05f, 2.0f, 0.4f, PotCurve::LOG, MACRO_KNOB_RATE_IDX));
-    parameters_.back()->SetMacroRole(MacroRole::RATE);
+    auto* detuneRateParam = new ValueParameter("K3 Rate", 0.05f, 2.0f, 0.4f);
+    detuneRateParam->BindPotentiometer(MACRO_KNOB_RATE_IDX, PotCurve::LOG);
+    detuneRateParam->SetMacroRole(MacroRole::RATE);
+    AddParameter(detuneRateParam);
 
     // K4: Chorus mix — wet level of the detuned layer
-    AddParameter(new PotentiometerParameter("Chorus Mix", 0.0f, 1.0f, 0.6f, PotCurve::LIN, -1));
-    parameters_.back()->SetDisplayType(DisplayType::SCALED);
-    parameters_.back()->SetScaleFactor(100.0f);
-    parameters_.back()->SetMacroRole(MacroRole::MIX, /*isPrimary=*/false);
+    auto* chorusMixParam = new ValueParameter("Chorus Mix", 0.0f, 1.0f, 0.6f);
+    chorusMixParam->SetDisplayType(DisplayType::SCALED);
+    chorusMixParam->SetScaleFactor(100.0f);
+    chorusMixParam->SetMacroRole(MacroRole::MIX, /*isPrimary=*/false);
+    AddParameter(chorusMixParam);
 
     // K5: Output level trim
-    AddParameter(new PotentiometerParameter("Level", 0.0f, 1.0f, 0.85f, PotCurve::LIN, -1));
-    parameters_.back()->SetDisplayType(DisplayType::SCALED);
-    parameters_.back()->SetScaleFactor(100.0f);
+    auto* levelParam = new ValueParameter("Level", 0.0f, 1.0f, 0.85f);
+    levelParam->SetDisplayType(DisplayType::SCALED);
+    levelParam->SetScaleFactor(100.0f);
+    AddParameter(levelParam);
 
     Update();
 }

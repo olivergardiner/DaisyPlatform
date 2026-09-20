@@ -2,9 +2,6 @@
 #define PERSPECTIVE_EFFECT_H
 
 #include "../parameters/effectparameter.h"
-#include "../parameters/potentiometerparameter.h"
-#include "../parameters/encoderparameter.h"
-#include "../parameters/toggleparameter.h"
 #include <vector>
 #include <functional>
 //#include <memory>

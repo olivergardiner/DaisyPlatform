@@ -1,6 +1,7 @@
 #include "compressoreffect.h"
 
 #include "../controls.h"
+#include "../parameters/valueparameter.h"
 
 #include <algorithm>
 #include <cmath>
@@ -74,23 +75,25 @@ void CompressorEffect::Init(float sampleRate) {
     sampleRate_ = sampleRate;
 
     // Threshold — sets the level above which compression starts (-60 to 0 dB)
-    AddParameter(new PotentiometerParameter("Threshold", -60.0f, 0.0f, -20.0f, PotCurve::LIN, -1));
+    AddParameter(new ValueParameter("Threshold", -60.0f, 0.0f, -20.0f));
 
     // Ratio — compression ratio (1:1 = bypass, 20:1 ≈ limiting)
-    AddParameter(new PotentiometerParameter("Ratio", 1.0f, 20.0f, 4.0f, PotCurve::LOG, -1));
+    AddParameter(new ValueParameter("Ratio", 1.0f, 20.0f, 4.0f));
 
     // Attack — time for the compressor to engage (0.1 ms – 200 ms)
-    AddParameter(new PotentiometerParameter("Attack", 0.1f, 200.0f, 10.0f, PotCurve::LOG, -1));
+    AddParameter(new ValueParameter("Attack", 0.1f, 200.0f, 10.0f));
 
     // Release — time for the compressor to disengage (10 ms – 2000 ms)
-    AddParameter(new PotentiometerParameter("Release", 10.0f, 2000.0f, 100.0f, PotCurve::LOG, -1));
+    AddParameter(new ValueParameter("Release", 10.0f, 2000.0f, 100.0f));
 
     // K5: Makeup Gain — post-compression gain (0 – 30 dB)
-    AddParameter(new PotentiometerParameter("Makeup", 0.0f, 30.0f, 6.0f, PotCurve::LIN, -1));
+    AddParameter(new ValueParameter("Makeup", 0.0f, 30.0f, 6.0f));
 
     // Mix — wet/dry blend (0 = dry, 1 = full compression)
-    AddParameter(new PotentiometerParameter("K1 Mix", 0.0f, 1.0f, 1.0f, PotCurve::LIN, MACRO_KNOB_MIX_IDX));
-    parameters_.back()->SetMacroRole(MacroRole::MIX);
+    auto* mixParam = new ValueParameter("K1 Mix", 0.0f, 1.0f, 1.0f);
+    mixParam->BindPotentiometer(MACRO_KNOB_MIX_IDX, PotCurve::LIN);
+    mixParam->SetMacroRole(MacroRole::MIX);
+    AddParameter(mixParam);
 
     Update();
 }

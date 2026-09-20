@@ -1,6 +1,8 @@
 #include "motorwaheffect.h"
 
 #include "../controls.h"
+#include "../parameters/valueparameter.h"
+#include "../parameters/enumparameter.h"
 
 #include <cmath>
 
@@ -30,17 +32,27 @@ void MotorWahEffect::Init(float sampleRate) {
     lfo_.SetWaveform(Oscillator::WAVE_SIN);
     lfo_.SetFreq(0.8f);
 
-    AddParameter(new PotentiometerParameter("K1 Mix", 0.0f, 1.0f, 0.6f, PotCurve::LIN, MACRO_KNOB_MIX_IDX));
-    parameters_.back()->SetMacroRole(MacroRole::MIX);
-    AddParameter(new PotentiometerParameter("Resonance", 0.0f, 1.0f, 0.9f, PotCurve::LIN, -1));
-    AddParameter(new PotentiometerParameter("Frequency", 250.0f, 2000.0f, 850.0f, PotCurve::LOG, -1));
-    AddParameter(new PotentiometerParameter("K3 Rate Hz", 0.05f, 12.0f, 0.8f, PotCurve::LOG, MACRO_KNOB_RATE_IDX));
-    parameters_.back()->SetMacroRole(MacroRole::RATE);
-    AddParameter(new PotentiometerParameter("K2 Depth", 0.0f, 3000.0f, 1800.0f, PotCurve::LIN, MACRO_KNOB_DEPTH_IDX));
-    parameters_.back()->SetMacroRole(MacroRole::DEPTH);
-    AddParameter(new EncoderParameter("E2 Wave", 0.0f, static_cast<float>(Oscillator::WAVE_LAST - 1), 0.0f, 1.0f, ENCODER_2_IDX));
-    parameters_.back()->SetDisplayType(DisplayType::DISCRETE);
-    parameters_.back()->SetDiscreteValues(lfoWaveShapes, 8);
+    auto* mixParam = new ValueParameter("K1 Mix", 0.0f, 1.0f, 0.6f);
+    mixParam->BindPotentiometer(MACRO_KNOB_MIX_IDX, PotCurve::LIN);
+    mixParam->SetMacroRole(MacroRole::MIX);
+    AddParameter(mixParam);
+
+    AddParameter(new ValueParameter("Resonance", 0.0f, 1.0f, 0.9f));
+    AddParameter(new ValueParameter("Frequency", 250.0f, 2000.0f, 850.0f));
+
+    auto* rateParam = new ValueParameter("K3 Rate Hz", 0.05f, 12.0f, 0.8f);
+    rateParam->BindPotentiometer(MACRO_KNOB_RATE_IDX, PotCurve::LOG);
+    rateParam->SetMacroRole(MacroRole::RATE);
+    AddParameter(rateParam);
+
+    auto* depthParam = new ValueParameter("K2 Depth", 0.0f, 3000.0f, 1800.0f);
+    depthParam->BindPotentiometer(MACRO_KNOB_DEPTH_IDX, PotCurve::LIN);
+    depthParam->SetMacroRole(MacroRole::DEPTH);
+    AddParameter(depthParam);
+
+    auto* waveParam = new EnumParameter("E2 Wave", lfoWaveShapes, 8, 0);
+    waveParam->BindEncoder(ENCODER_2_IDX);
+    AddParameter(waveParam);
 
     Update();
 }

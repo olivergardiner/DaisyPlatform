@@ -5,7 +5,7 @@ APP_TYPE = BOOT_SRAM
 # Sources
 CPP_SOURCES = application.cpp hardware.cpp ui/knob.cpp ui/switch.cpp ui/encoder.cpp ui/uieventhandler.cpp ui/ui.cpp perspective.cpp preset.cpp
 CPP_SOURCES += effects/effect.cpp effects/tempoeffect.cpp effects/compoundeffect.cpp
-CPP_SOURCES += parameters/effectparameter.cpp parameters/potentiometerparameter.cpp parameters/encoderparameter.cpp parameters/toggleparameter.cpp parameters/timeparameter.cpp
+CPP_SOURCES += parameters/effectparameter.cpp parameters/valueparameter.cpp parameters/enumparameter.cpp parameters/timeparameter.cpp parameters/integerparameter.cpp
 CPP_SOURCES += effects/choruseffect.cpp effects/delayeffect.cpp effects/moddelayeffect.cpp effects/flangereffect.cpp effects/reverbeffect.cpp effects/waheffect.cpp
 CPP_SOURCES += effects/autowaheffect.cpp effects/autowahv2effect.cpp effects/motorwaheffect.cpp effects/mysteriouseffect.cpp effects/flyeffect.cpp effects/phasereffect.cpp effects/tremoloeffect.cpp effects/tunereffect.cpp effects/paralleldelayeffect.cpp effects/slapbackdelayeffect.cpp effects/streetseffect.cpp effects/twelvestringeffect.cpp effects/compressoreffect.cpp
 CPP_SOURCES += effects/noisegateeffect.cpp effects/driveeffect.cpp effects/tonestackeffect.cpp effects/cabsimeffect.cpp effects/sandmaneffect.cpp

@@ -1,9 +1,8 @@
 #include "paralleldelayeffect.h"
 #include "../controls.h"
-#include "../parameters/potentiometerparameter.h"
-#include "../parameters/encoderparameter.h"
+#include "../parameters/valueparameter.h"
+#include "../parameters/enumparameter.h"
 #include "../parameters/timeparameter.h"
-#include "../parameters/toggleparameter.h"
 
 using namespace perspective;
 
@@ -37,49 +36,65 @@ void ParallelDelayEffect::Init(float sampleRate) {
     if (delay2_) delay2_->SetWetOnly(true);
     
     // Add parameters for Delay 1
-    AddParameter(new PotentiometerParameter("K1 Mix", 0.0f, 1.0f, 0.50f, PotCurve::LIN, MACRO_KNOB_MIX_IDX));
-    parameters_.back()->SetDisplayType(DisplayType::SCALED);
-    parameters_.back()->SetScaleFactor(100.0f); // Display mix as percentage
-    parameters_.back()->SetMacroRole(MacroRole::MIX);
-    
-    AddParameter(new PotentiometerParameter("K4 Feedback", 0.0f, 0.95f, 0.5f, PotCurve::LIN, MACRO_KNOB_FEEDBACK_IDX));
-    parameters_.back()->SetDisplayType(DisplayType::SCALED);
-    parameters_.back()->SetScaleFactor(100.0f); // Display feedback as percentage
-    parameters_.back()->SetMacroRole(MacroRole::FEEDBACK);
-    
-    AddParameter(new PotentiometerParameter("K5 Subdivision 1", 0.0f, 7.0f, 3.0f, PotCurve::LIN, MACRO_KNOB_SUBDIVISION_IDX));
-    parameters_.back()->SetDisplayType(DisplayType::DISCRETE);
-    parameters_.back()->SetDiscreteValues(TempoEffect::kSubdivisionGlyphs, 8);
-    parameters_.back()->SetMacroRole(MacroRole::SUBDIVISION);
-    
+    auto* mix1Param = new ValueParameter("K1 Mix", 0.0f, 1.0f, 0.50f);
+    mix1Param->BindPotentiometer(MACRO_KNOB_MIX_IDX, PotCurve::LIN);
+    mix1Param->SetDisplayType(DisplayType::SCALED);
+    mix1Param->SetScaleFactor(100.0f); // Display mix as percentage
+    mix1Param->SetMacroRole(MacroRole::MIX);
+    AddParameter(mix1Param);
+
+    auto* feedback1Param = new ValueParameter("K4 Feedback", 0.0f, 0.95f, 0.5f);
+    feedback1Param->BindPotentiometer(MACRO_KNOB_FEEDBACK_IDX, PotCurve::LIN);
+    feedback1Param->SetDisplayType(DisplayType::SCALED);
+    feedback1Param->SetScaleFactor(100.0f); // Display feedback as percentage
+    feedback1Param->SetMacroRole(MacroRole::FEEDBACK);
+    AddParameter(feedback1Param);
+
+    auto* subdivision1Param = new EnumParameter("K5 Subdivision 1", TempoEffect::kSubdivisionGlyphs, 8, 3);
+    subdivision1Param->BindPotentiometer(MACRO_KNOB_SUBDIVISION_IDX);
+    subdivision1Param->SetMacroRole(MacroRole::SUBDIVISION);
+    AddParameter(subdivision1Param);
+
     // Add parameters for Delay 2 (second instance - not macro-pot controllable)
-    AddParameter(new PotentiometerParameter("Mix 2", 0.0f, 1.0f, 0.50f, PotCurve::LIN, -1));
-    parameters_.back()->SetDisplayType(DisplayType::SCALED);
-    parameters_.back()->SetScaleFactor(100.0f); // Display mix as percentage
-    parameters_.back()->SetMacroRole(MacroRole::MIX, /*isPrimary=*/false);
-    
-    AddParameter(new PotentiometerParameter("Feedback 2", 0.0f, 0.95f, 0.5f, PotCurve::LIN, -1));
-    parameters_.back()->SetDisplayType(DisplayType::SCALED);
-    parameters_.back()->SetScaleFactor(100.0f); // Display feedback as percentage
-    parameters_.back()->SetMacroRole(MacroRole::FEEDBACK, /*isPrimary=*/false);
-    
-    AddParameter(new PotentiometerParameter("K6 Subdivision 2", 0.0f, 7.0f, 3.0f, PotCurve::LIN, KNOB_6_IDX));
-    parameters_.back()->SetDisplayType(DisplayType::DISCRETE);
-    parameters_.back()->SetDiscreteValues(TempoEffect::kSubdivisionGlyphs, 8);
-    parameters_.back()->SetMacroRole(MacroRole::SUBDIVISION, /*isPrimary=*/false);
-    
+    auto* mix2Param = new ValueParameter("Mix 2", 0.0f, 1.0f, 0.50f);
+    mix2Param->SetDisplayType(DisplayType::SCALED);
+    mix2Param->SetScaleFactor(100.0f); // Display mix as percentage
+    mix2Param->SetMacroRole(MacroRole::MIX, /*isPrimary=*/false);
+    AddParameter(mix2Param);
+
+    auto* feedback2Param = new ValueParameter("Feedback 2", 0.0f, 0.95f, 0.5f);
+    feedback2Param->SetDisplayType(DisplayType::SCALED);
+    feedback2Param->SetScaleFactor(100.0f); // Display feedback as percentage
+    feedback2Param->SetMacroRole(MacroRole::FEEDBACK, /*isPrimary=*/false);
+    AddParameter(feedback2Param);
+
+    auto* subdivision2Param = new EnumParameter("K6 Subdivision 2", TempoEffect::kSubdivisionGlyphs, 8, 3);
+    subdivision2Param->BindPotentiometer(KNOB_6_IDX);
+    subdivision2Param->SetMacroRole(MacroRole::SUBDIVISION, /*isPrimary=*/false);
+    AddParameter(subdivision2Param);
+
     // Add delay 1 time parameter (Encoder 1) - TimeParameter with ms range (250-2000 ms = 240-30 BPM)
-    AddParameter(new TimeParameter("E1 Time 1", 250.0f, 2000.0f, 500.0f, 1.0f, ENCODER_1_IDX, "E1 Tempo 1"));
-    
+    auto* timeParam1 = new TimeParameter("E1 Time 1", 250.0f, 2000.0f, 500.0f, "E1 Tempo 1");
+    timeParam1->BindEncoder(ENCODER_1_IDX, 1.0f);
+    AddParameter(timeParam1);
+
     // Add delay 2 time parameter (Encoder 2) - TimeParameter with ms range (250-2000 ms = 240-30 BPM)
-    AddParameter(new TimeParameter("E2 Time 2", 250.0f, 2000.0f, 500.0f, 1.0f, ENCODER_2_IDX, "E2 Tempo 2"));
-    
+    auto* timeParam2 = new TimeParameter("E2 Time 2", 250.0f, 2000.0f, 500.0f, "E2 Tempo 2");
+    timeParam2->BindEncoder(ENCODER_2_IDX, 1.0f);
+    AddParameter(timeParam2);
+
     // Add delay 1 tempo mode toggle (Encoder 1 button)
-    AddParameter(new ToggleParameter("Tempo Mode", false, ENCODER_1_BUTTON_IDX, "On", "Off", -1));  // Hidden - tempo mode toggle
-    
+    auto* tempoMode1Param = new EnumParameter("Tempo Mode", {"Off", "On"}, 0, -1);  // Hidden - tempo mode toggle
+    tempoMode1Param->BindButton(ENCODER_1_BUTTON_IDX);
+    AddParameter(tempoMode1Param);
+    timeParam1->SetModeToggle(tempoMode1Param);
+
     // Add delay 2 tempo mode toggle (Encoder 2 button)
-    AddParameter(new ToggleParameter("Tempo Mode", false, ENCODER_2_BUTTON_IDX, "On", "Off", -1));  // Hidden - tempo mode toggle
-    
+    auto* tempoMode2Param = new EnumParameter("Tempo Mode", {"Off", "On"}, 0, -1);  // Hidden - tempo mode toggle
+    tempoMode2Param->BindButton(ENCODER_2_BUTTON_IDX);
+    AddParameter(tempoMode2Param);
+    timeParam2->SetModeToggle(tempoMode2Param);
+
     // Note: Metronome is now controlled globally by Perspective via SetMetronomeEnabled()
     
     // Set default parameters
@@ -108,52 +123,26 @@ void ParallelDelayEffect::Update() {
         TimeParameter* timeParam2 = static_cast<TimeParameter*>(parameters_[kParamD2Time]);
         float delayTime2 = timeParam2->GetValue();
         
-        // Delay 1 TempoMode toggle (index 8)
-        if (parameters_[kParamD1TempoMode]->GetType() == ParameterType::TOGGLE) {
-            ToggleParameter* toggleParam1 = static_cast<ToggleParameter*>(parameters_[kParamD1TempoMode]);
-            bool newTempoMode1 = toggleParam1->GetState();
-            
-            // Only update display if the mode actually changed
-            if (newTempoMode1 != tempoMode1_) {
-                tempoMode1_ = newTempoMode1;
-                
-                // Update TimeParameter display mode based on toggle
-                if (tempoMode1_) {
-                    timeParam1->SetDisplayMode(TimeDisplayMode::TEMPO_BPM);
-                } else {
-                    timeParam1->SetDisplayMode(TimeDisplayMode::TIME_MS);
-                }
-                
-                // Request display update since the parameter name changed
-                RequestParameterDisplayUpdate(6); // Index 6 is delay 1 time parameter
-                
-                // Force update of delay 1 when tempo mode changes
-                lastDelayTime1_ = -1.0f; // Force recalculation
-            }
+        // Delay 1 tempo mode comes from the linked mode toggle (index 8)
+        bool newTempoMode1 = timeParam1->GetDisplayMode() == TimeDisplayMode::TEMPO_BPM;
+        if (newTempoMode1 != tempoMode1_) {
+            tempoMode1_ = newTempoMode1;
+            // Request display update since the parameter name changed
+            RequestParameterDisplayUpdate(kParamD1Time); // Index 6 is delay 1 time parameter
+
+            // Force update of delay 1 when tempo mode changes
+            lastDelayTime1_ = -1.0f; // Force recalculation
         }
-        
-        // Delay 2 TempoMode toggle (index 9)
-        if (parameters_[kParamD2TempoMode]->GetType() == ParameterType::TOGGLE) {
-            ToggleParameter* toggleParam2 = static_cast<ToggleParameter*>(parameters_[kParamD2TempoMode]);
-            bool newTempoMode2 = toggleParam2->GetState();
-            
-            // Only update display if the mode actually changed
-            if (newTempoMode2 != tempoMode2_) {
-                tempoMode2_ = newTempoMode2;
-                
-                // Update TimeParameter display mode based on toggle
-                if (tempoMode2_) {
-                    timeParam2->SetDisplayMode(TimeDisplayMode::TEMPO_BPM);
-                } else {
-                    timeParam2->SetDisplayMode(TimeDisplayMode::TIME_MS);
-                }
-                
-                // Request display update since the parameter name changed
-                RequestParameterDisplayUpdate(7); // Index 7 is delay 2 time parameter
-                
-                // Force update of delay 2 when tempo mode changes
-                lastDelayTime2_ = -1.0f; // Force recalculation
-            }
+
+        // Delay 2 tempo mode comes from the linked mode toggle (index 9)
+        bool newTempoMode2 = timeParam2->GetDisplayMode() == TimeDisplayMode::TEMPO_BPM;
+        if (newTempoMode2 != tempoMode2_) {
+            tempoMode2_ = newTempoMode2;
+            // Request display update since the parameter name changed
+            RequestParameterDisplayUpdate(kParamD2Time); // Index 7 is delay 2 time parameter
+
+            // Force update of delay 2 when tempo mode changes
+            lastDelayTime2_ = -1.0f; // Force recalculation
         }
         
         // Update Delay 1 parameters only if they've changed

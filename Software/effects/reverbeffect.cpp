@@ -1,6 +1,7 @@
 #include "reverbeffect.h"
 
 #include "../controls.h"
+#include "../parameters/valueparameter.h"
 
 #include <algorithm>
 
@@ -77,11 +78,17 @@ void ReverbEffect::ReleaseReverb() {
 void ReverbEffect::Init(float sampleRate) {
     sampleRate_ = sampleRate;
 
-    AddParameter(new PotentiometerParameter("K1 Mix", 0.0f, 1.0f, 0.15f, PotCurve::LIN, MACRO_KNOB_MIX_IDX));
-    parameters_.back()->SetMacroRole(MacroRole::MIX);
-    AddParameter(new PotentiometerParameter("K4 Feedback", 0.0f, 1.0f, 0.82f, PotCurve::LIN, MACRO_KNOB_FEEDBACK_IDX));
-    parameters_.back()->SetMacroRole(MacroRole::FEEDBACK);
-    AddParameter(new PotentiometerParameter("Cutoff Hz", 200.0f, 12000.0f, 2800.0f, PotCurve::LOG, -1));
+    auto* mixParam = new ValueParameter("K1 Mix", 0.0f, 1.0f, 0.15f);
+    mixParam->BindPotentiometer(MACRO_KNOB_MIX_IDX, PotCurve::LIN);
+    mixParam->SetMacroRole(MacroRole::MIX);
+    AddParameter(mixParam);
+
+    auto* feedbackParam = new ValueParameter("K4 Feedback", 0.0f, 1.0f, 0.82f);
+    feedbackParam->BindPotentiometer(MACRO_KNOB_FEEDBACK_IDX, PotCurve::LIN);
+    feedbackParam->SetMacroRole(MacroRole::FEEDBACK);
+    AddParameter(feedbackParam);
+
+    AddParameter(new ValueParameter("Cutoff Hz", 200.0f, 12000.0f, 2800.0f));
 
     Update();
 }

@@ -1,29 +1,76 @@
 #include "effectparameter.h"
-#include <algorithm>
 #include <cmath>
 #include <cstring>
 #include <cstdio>
 
-#include "../hardware.h"
-
 using namespace daisy;
 using namespace perspective;
 
-// ========== EffectParameter Base Class ==========
+namespace {
 
-EffectParameter::EffectParameter(const char* name, float minValue, float maxValue, float defaultValue, int index, int displayIndex)
+// From: https://electronics.stackexchange.com/questions/304692/formula-for-logarithmic-audio-taper-pot
+float TaperFunction(float x, float ym) {
+    float c = ((1.0f / ym) - 1.0f);
+    float b = c * c;
+    float a = 1.0f / (b - 1.0f);
+    return a * std::pow(b, x) - a;
+}
+
+} // namespace
+
+float perspective::ApplyPotCurve(PotCurve curve, float normalizedValue) {
+    switch (curve) {
+        case PotCurve::LIN:
+            return normalizedValue;
+
+        case PotCurve::LOG:
+            return TaperFunction(normalizedValue, 0.12f);
+
+        case PotCurve::REVERSE_LOG:
+            return TaperFunction(normalizedValue, 0.88f);
+
+        case PotCurve::LOG_A:
+            return TaperFunction(normalizedValue, 0.25f);
+
+        case PotCurve::W_TAPER:
+            // Dual curve for blend/crossfade controls - equal power transition.
+            if (normalizedValue < 0.5f) {
+                return 2.0f * normalizedValue * normalizedValue;
+            } else {
+                float inverse = 1.0f - normalizedValue;
+                return 1.0f - (2.0f * inverse * inverse);
+            }
+
+        case PotCurve::SQUARED:
+            return normalizedValue * normalizedValue;
+
+        case PotCurve::CUBED:
+            return normalizedValue * normalizedValue * normalizedValue;
+
+        default:
+            return normalizedValue;
+    }
+}
+
+// ========== EffectParameter ==========
+
+EffectParameter::EffectParameter(const char* name, float minValue, float maxValue, float defaultValue, int displayIndex)
     : name_(nullptr)
     , minValue_(minValue)
     , maxValue_(maxValue)
     , currentValue_(defaultValue)
-    , index_(index)
     , displayIndex_(displayIndex)
     , displayType_(DisplayType::DEFAULT)
     , scaleFactor_(1.0f)
-    , discreteValues_(nullptr)
-    , discreteValueCount_(0)
     , macroRole_(MacroRole::NONE)
     , macroPrimary_(true)
+    , controlBinding_(ControlBinding::NONE)
+    , controlIndex_(-1)
+    , curve_(PotCurve::LIN)
+    , stepSize_(0.01f)
+    , reversed_(false)
+    , lastTurnTime_(0)
+    , accelerationMultiplier_(1.0f)
 {
     if (name) {
         size_t len = strlen(name);
@@ -62,10 +109,6 @@ float EffectParameter::GetMax() const {
     return maxValue_;
 }
 
-int EffectParameter::GetIndex() const {
-    return index_;
-}
-
 int EffectParameter::GetDisplayIndex() const {
     return displayIndex_;
 }
@@ -74,8 +117,21 @@ DisplayType EffectParameter::GetDisplayType() const {
     return displayType_;
 }
 
-int EffectParameter::GetDiscreteValueCount() const {
-    return discreteValueCount_;
+void EffectParameter::SetDisplayType(DisplayType type) {
+    displayType_ = type;
+}
+
+void EffectParameter::SetScaleFactor(float scaleFactor) {
+    scaleFactor_ = scaleFactor;
+}
+
+void EffectParameter::SetRange(float minValue, float maxValue) {
+    if (maxValue <= minValue) {
+        return;
+    }
+    minValue_ = minValue;
+    maxValue_ = maxValue;
+    currentValue_ = clamp(currentValue_, minValue_, maxValue_);
 }
 
 void EffectParameter::SetValue(float value) {
@@ -85,10 +141,6 @@ void EffectParameter::SetValue(float value) {
 void EffectParameter::SetNormalizedValue(float normalizedValue) {
     float clampedNormalized = clamp(normalizedValue, 0.0f, 1.0f);
     currentValue_ = minValue_ + (clampedNormalized * (maxValue_ - minValue_));
-}
-
-void EffectParameter::SetIndex(int index) {
-    index_ = index;
 }
 
 void EffectParameter::SetDisplayIndex(int displayIndex) {
@@ -108,72 +160,106 @@ bool EffectParameter::IsMacroPrimary() const {
     return macroPrimary_;
 }
 
-void EffectParameter::SetDisplayType(DisplayType type) {
-    displayType_ = type;
+void EffectParameter::BindPotentiometer(int index, PotCurve curve) {
+    controlBinding_ = ControlBinding::POTENTIOMETER;
+    controlIndex_ = index;
+    curve_ = curve;
 }
 
-void EffectParameter::SetScaleFactor(float scaleFactor) {
-    scaleFactor_ = scaleFactor;
+void EffectParameter::BindEncoder(int index, float stepSize, bool reversed) {
+    controlBinding_ = ControlBinding::ENCODER;
+    controlIndex_ = index;
+    stepSize_ = stepSize;
+    reversed_ = reversed;
 }
 
-void EffectParameter::SetDiscreteValues(const char** values, int count) {
-    for (int i = 0; i < count; ++i) {
-        Hardware::PrintLine("EffectParameter '%s' discrete value %d: %s", GetName(), i, values[i]);
+void EffectParameter::BindButton(int index) {
+    controlBinding_ = ControlBinding::BUTTON;
+    controlIndex_ = index;
+}
+
+ControlBinding EffectParameter::GetControlBinding() const {
+    return controlBinding_;
+}
+
+int EffectParameter::GetIndex() const {
+    return controlIndex_;
+}
+
+PotCurve EffectParameter::GetCurve() const {
+    return curve_;
+}
+
+void EffectParameter::SetCurve(PotCurve curve) {
+    curve_ = curve;
+}
+
+float EffectParameter::GetStepSize() const {
+    return stepSize_;
+}
+
+void EffectParameter::SetStepSize(float stepSize) {
+    stepSize_ = stepSize;
+}
+
+bool EffectParameter::IsReversed() const {
+    return reversed_;
+}
+
+void EffectParameter::SetReversed(bool reversed) {
+    reversed_ = reversed;
+}
+
+float EffectParameter::NextAcceleratedStep() {
+    uint32_t now = System::GetNow();
+    if (lastTurnTime_ > 0 && now - lastTurnTime_ <= ACCELERATION_THRESHOLD_MS) {
+        accelerationMultiplier_ += ACCELERATION_INCREMENT;
+        if (accelerationMultiplier_ > MAX_ACCELERATION) {
+            accelerationMultiplier_ = MAX_ACCELERATION;
+        }
+    } else {
+        accelerationMultiplier_ = 1.0f;
     }
-    discreteValues_ = values;
-    discreteValueCount_ = count;
+    lastTurnTime_ = now;
+    return stepSize_ * accelerationMultiplier_;
 }
 
-void EffectParameter::SetRange(float minValue, float maxValue) {
-    if (maxValue <= minValue) {
-        return;
-    }
+void EffectParameter::SetNormalizedValueWithCurve(float normalizedValue) {
+    float curved = ApplyPotCurve(curve_, clamp(normalizedValue, 0.0f, 1.0f));
+    currentValue_ = minValue_ + (curved * (maxValue_ - minValue_));
+}
 
-    minValue_ = minValue;
-    maxValue_ = maxValue;
+void EffectParameter::Increment(int steps) {
+    float delta = static_cast<float>(steps) * NextAcceleratedStep();
+    currentValue_ += reversed_ ? -delta : delta;
     currentValue_ = clamp(currentValue_, minValue_, maxValue_);
 }
 
-int EffectParameter::GetValueAsInt(int maxInt) const {
-    // Get normalized value (0.0 to 1.0)
-    float normalized = GetNormalizedValue();
-    
-    // Scale to integer range (0 to maxInt)
-    // Add 0.5 for proper rounding
-    int intValue = static_cast<int>(normalized * maxInt + 0.5f);
-    
-    // Clamp to ensure we stay within bounds
-    return clamp(intValue, 0, maxInt);
+void EffectParameter::Decrement(int steps) {
+    float delta = static_cast<float>(steps) * NextAcceleratedStep();
+    currentValue_ += reversed_ ? delta : -delta;
+    currentValue_ = clamp(currentValue_, minValue_, maxValue_);
+}
+
+void EffectParameter::OnButtonPress() {
+    // No-op by default; Enum overrides to cycle to the next option.
 }
 
 void EffectParameter::GetValueAsString(char* buffer, size_t bufferSize) const {
     if (buffer == nullptr || bufferSize == 0) {
         return;
     }
-    
+
     switch (displayType_) {
         case DisplayType::SCALED: {
             float scaledValue = GetValue() * scaleFactor_;
             snprintf(buffer, bufferSize, "%.2f", scaledValue);
             break;
         }
-        
-        case DisplayType::DISCRETE: {
-            if (discreteValues_ != nullptr && discreteValueCount_ > 0) {
-                int index = GetValueAsInt(discreteValueCount_ - 1);
-                index = clamp(index, 0, discreteValueCount_ - 1);
-                Hardware::PrintLine("EffectParameter '%s' discrete value index: %d", GetName(), index);
-                snprintf(buffer, bufferSize, "%s", discreteValues_[index]);
-            } else {
-                snprintf(buffer, bufferSize, "--");
-            }
-            break;
-        }
-        
+
         case DisplayType::DEFAULT:
         default: {
-            float value = GetValue();
-            snprintf(buffer, bufferSize, "%.2f", value);
+            snprintf(buffer, bufferSize, "%.2f", GetValue());
             break;
         }
     }

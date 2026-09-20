@@ -1,5 +1,7 @@
 #include "delayeffect.h"
 #include "../controls.h"
+#include "../parameters/valueparameter.h"
+#include "../parameters/enumparameter.h"
 #include "../parameters/timeparameter.h"
 #include <cmath>
 
@@ -112,28 +114,37 @@ void DelayEffect::Init(float sampleRate) {
     samplesUntilNextBeat_ = 0.0f;
     
     // Add parameters: Mix, Feedback, Subdivision, Time, TempoToggle
-    AddParameter(new PotentiometerParameter("K1 Mix", 0.0f, 1.0f, 0.50f, PotCurve::LIN, MACRO_KNOB_MIX_IDX));
-    parameters_.back()->SetDisplayType(DisplayType::SCALED);
-    parameters_.back()->SetScaleFactor(100.0f); // Display mix as percentage
-    parameters_.back()->SetMacroRole(MacroRole::MIX);
-    
-    AddParameter(new PotentiometerParameter("K4 Feedback", 0.0f, 0.95f, 0.5f, PotCurve::LIN, MACRO_KNOB_FEEDBACK_IDX));
-    parameters_.back()->SetDisplayType(DisplayType::SCALED);
-    parameters_.back()->SetScaleFactor(100.0f); // Display feedback as percentage
-    parameters_.back()->SetMacroRole(MacroRole::FEEDBACK);
-    
-    AddParameter(new PotentiometerParameter("K5 Subdivision", 0.0f, 7.0f, 3.0f, PotCurve::LIN, MACRO_KNOB_SUBDIVISION_IDX));
-    parameters_.back()->SetDisplayType(DisplayType::DISCRETE);
-    parameters_.back()->SetDiscreteValues(kSubdivisionGlyphs, 8);
-    parameters_.back()->SetMacroRole(MacroRole::SUBDIVISION);
+    auto* mixParam = new ValueParameter("K1 Mix", 0.0f, 1.0f, 0.50f);
+    mixParam->BindPotentiometer(MACRO_KNOB_MIX_IDX, PotCurve::LIN);
+    mixParam->SetDisplayType(DisplayType::SCALED);
+    mixParam->SetScaleFactor(100.0f); // Display mix as percentage
+    mixParam->SetMacroRole(MacroRole::MIX);
+    AddParameter(mixParam);
+
+    auto* feedbackParam = new ValueParameter("K4 Feedback", 0.0f, 0.95f, 0.5f);
+    feedbackParam->BindPotentiometer(MACRO_KNOB_FEEDBACK_IDX, PotCurve::LIN);
+    feedbackParam->SetDisplayType(DisplayType::SCALED);
+    feedbackParam->SetScaleFactor(100.0f); // Display feedback as percentage
+    feedbackParam->SetMacroRole(MacroRole::FEEDBACK);
+    AddParameter(feedbackParam);
+
+    auto* subdivisionParam = new EnumParameter("K5 Subdivision", kSubdivisionGlyphs, 8, 3);
+    subdivisionParam->BindPotentiometer(MACRO_KNOB_SUBDIVISION_IDX);
+    subdivisionParam->SetMacroRole(MacroRole::SUBDIVISION);
+    AddParameter(subdivisionParam);
     subdivisionParamIndex_ = 2;  // Track subdivision parameter index
-    
+
     // TimeParameter with milliseconds range (10-2000 ms), 1ms step in time mode, 0.5 BPM in tempo mode
-    AddParameter(new TimeParameter("E1 Time", 10.0f, 2000.0f, 500.0f, 1.0f, ENCODER_1_IDX, "E1 Tempo"));
+    auto* timeParam = new TimeParameter("E1 Time", 10.0f, 2000.0f, 500.0f, "E1 Tempo");
+    timeParam->BindEncoder(ENCODER_1_IDX, 1.0f);
+    AddParameter(timeParam);
     timeParamIndex_ = 3;  // Track time parameter index
-    
-    AddParameter(new ToggleParameter("Tempo Mode", false, ENCODER_1_BUTTON_IDX, "On", "Off", -1));  // Hidden - tempo mode toggle
-    
+
+    auto* tempoModeParam = new EnumParameter("Tempo Mode", {"Off", "On"}, 0, -1);  // Hidden - tempo mode toggle
+    tempoModeParam->BindButton(ENCODER_1_BUTTON_IDX);
+    AddParameter(tempoModeParam);
+    timeParam->SetModeToggle(tempoModeParam);
+
     // Set default delay parameters
     Update();
 }
@@ -204,28 +215,15 @@ void DelayEffect::Update() {
         // Time parameter (index 3) - TimeParameter stores value in milliseconds
         TimeParameter* timeParam = static_cast<TimeParameter*>(parameters_[kParamTime]);
         baseDelayTime_ = timeParam->GetValueAsMs() / 1000.0f; // Convert ms to seconds
-        
-        // TempoMode toggle (index 4)
-        if (parameters_[kParamTempoMode]->GetType() == ParameterType::TOGGLE) {
-            ToggleParameter* toggleParam = static_cast<ToggleParameter*>(parameters_[kParamTempoMode]);
-            bool newTempoMode = toggleParam->GetState();
-            
-            // Only update display if the mode actually changed
-            if (newTempoMode != tempoMode_) {
-                tempoMode_ = newTempoMode;
-                
-                // Update TimeParameter display mode based on toggle
-                if (tempoMode_) {
-                    timeParam->SetDisplayMode(TimeDisplayMode::TEMPO_BPM);
-                } else {
-                    timeParam->SetDisplayMode(TimeDisplayMode::TIME_MS);
-                }
-                
-                // Request display update since the parameter name changed
-                RequestParameterDisplayUpdate(3); // Index 3 is the time parameter
-            }
+
+        // Tempo mode comes from the linked mode toggle (TempoMode, index 4)
+        bool newTempoMode = timeParam->GetDisplayMode() == TimeDisplayMode::TEMPO_BPM;
+        if (newTempoMode != tempoMode_) {
+            tempoMode_ = newTempoMode;
+            // Request display update since the parameter name changed
+            RequestParameterDisplayUpdate(kParamTime);
         }
-        
+
         // Note: metronomeEnabled_ is now set globally by Perspective via SetMetronomeEnabled()
         
         // Calculate effective delay time based on mode

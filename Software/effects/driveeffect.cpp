@@ -1,6 +1,8 @@
 #include "driveeffect.h"
 
 #include "../controls.h"
+#include "../parameters/valueparameter.h"
+#include "../parameters/enumparameter.h"
 
 #include <algorithm>
 #include <cmath>
@@ -74,29 +76,27 @@ void DriveEffect::Init(float sampleRate) {
     sampleRate_ = sampleRate;
 
     // K2: Gain — total pre-gain into the cascade, split across the stages
-    AddParameter(new PotentiometerParameter("K2 Gain", 0.0f, 48.0f, 32.0f, PotCurve::LIN, MACRO_KNOB_DEPTH_IDX));
-    parameters_.back()->SetMacroRole(MacroRole::DEPTH);
+    auto* gainParam = new ValueParameter("K2 Gain", 0.0f, 48.0f, 32.0f);
+    gainParam->BindPotentiometer(MACRO_KNOB_DEPTH_IDX, PotCurve::LIN);
+    gainParam->SetMacroRole(MacroRole::DEPTH);
+    AddParameter(gainParam);
 
     // Stages — 2 is loosest and most open, 4 is tightest and most compressed.
-    // Default stays at 3 (value 1.0) rather than moving to the new max, so
+    // Default stays at 3 (index 1) rather than moving to the new max, so
     // existing tunings (Sandman's own Stages macro among them) don't change.
-    PotentiometerParameter* stagesParam =
-        new PotentiometerParameter("Stages", 0.0f, 2.0f, 1.0f, PotCurve::LIN, -1);
-    stagesParam->SetDisplayType(DisplayType::DISCRETE);
-    stagesParam->SetDiscreteValues(kStageNames, 3);
-    AddParameter(stagesParam);
+    AddParameter(new EnumParameter("Stages", kStageNames, 3, 1));
 
     // Asymmetry — DC offset into each shaper; drives the even harmonics
-    AddParameter(new PotentiometerParameter("Asym", 0.0f, 1.0f, 0.45f, PotCurve::LIN, -1));
+    AddParameter(new ValueParameter("Asym", 0.0f, 1.0f, 0.45f));
 
     // Scoop — depth of the mid dip ahead of each stage
-    AddParameter(new PotentiometerParameter("Scoop", 0.0f, 18.0f, 9.0f, PotCurve::LIN, -1));
+    AddParameter(new ValueParameter("Scoop", 0.0f, 18.0f, 9.0f));
 
     // Scoop Freq — where the dip sits
-    AddParameter(new PotentiometerParameter("Scoop Hz", 300.0f, 1200.0f, 650.0f, PotCurve::LOG, -1));
+    AddParameter(new ValueParameter("Scoop Hz", 300.0f, 1200.0f, 650.0f));
 
     // Level — output trim, compensates for the gain the cascade adds
-    AddParameter(new PotentiometerParameter("Level", -24.0f, 12.0f, -6.0f, PotCurve::LIN, -1));
+    AddParameter(new ValueParameter("Level", -24.0f, 12.0f, -6.0f));
 
     DesignFilters();
     Update();
@@ -141,10 +141,9 @@ void DriveEffect::DesignScoop() {
 
 void DriveEffect::Update() {
     const float gain_db = parameters_[kParamGain]->GetValue();
-    // Stages param range is [0, kMaxStages-2], one integer per discrete option
-    // ("2", "3", "4", ...), so the stage count is just that index plus 2.
-    stageCount_ = 2 + static_cast<size_t>(parameters_[kParamStages]->GetValueAsInt(
-        static_cast<int>(kMaxStages) - 2));
+    // Stages has one option per discrete choice ("2", "3", "4", ...), so the
+    // stage count is just that option's index plus 2.
+    stageCount_ = 2 + static_cast<size_t>(static_cast<EnumParameter*>(parameters_[kParamStages])->GetSelectedIndex());
 
     const float asym = clamp(parameters_[kParamAsymmetry]->GetValue(), 0.0f, 1.0f);
     const float newScoopDb = parameters_[kParamScoop]->GetValue();

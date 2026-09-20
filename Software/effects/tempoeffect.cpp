@@ -2,7 +2,7 @@
 extern perspective::Perspective* g_perspective;
 #include "tempoeffect.h"
 #include "../parameters/timeparameter.h"
-#include "../parameters/potentiometerparameter.h"
+#include "../parameters/enumparameter.h"
 
 using namespace perspective;
 
@@ -50,14 +50,14 @@ float TempoEffect::CalculateDelayTimeFromTempo() {
 }
 
 float TempoEffect::GetSubdivisionMultiplier() const {
-    if (subdivisionParamIndex_ < 0 || 
+    if (subdivisionParamIndex_ < 0 ||
         static_cast<size_t>(subdivisionParamIndex_) >= parameters_.size() ||
-        parameters_[subdivisionParamIndex_]->GetType() != ParameterType::POTENTIOMETER) {
+        parameters_[subdivisionParamIndex_]->GetKind() != ParameterKind::ENUM) {
         return SUBDIVISION_4_16TH; // Default to quarter note (4 sixteenths)
     }
-    
-    PotentiometerParameter* subdivParam = static_cast<PotentiometerParameter*>(parameters_[subdivisionParamIndex_]);
-    int subdivIndex = subdivParam->GetValueAsInt(7); // 0-7 for 8 subdivisions
+
+    EnumParameter* subdivParam = static_cast<EnumParameter*>(parameters_[subdivisionParamIndex_]);
+    int subdivIndex = subdivParam->GetSelectedIndex(); // 0-7 for 8 subdivisions
     
     switch (subdivIndex) {
         case 0: return SUBDIVISION_1_16TH;  // 1 sixteenth

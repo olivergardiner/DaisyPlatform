@@ -4,7 +4,8 @@
 #include "driveeffect.h"
 #include "tonestackeffect.h"
 #include "../controls.h"
-#include "../parameters/potentiometerparameter.h"
+#include "../parameters/valueparameter.h"
+#include "../parameters/enumparameter.h"
 
 using namespace perspective;
 
@@ -64,29 +65,29 @@ void SandmanEffect::Init(float sampleRate) {
     CompoundEffect::Init(sampleRate);
 
     // K1: Level — output trim
-    AddParameter(new PotentiometerParameter("K1 Level", -18.0f, 6.0f, -3.0f, PotCurve::LIN, MACRO_KNOB_MIX_IDX));
-    parameters_.back()->SetMacroRole(MacroRole::MIX);
+    auto* levelParam = new ValueParameter("K1 Level", -18.0f, 6.0f, -3.0f);
+    levelParam->BindPotentiometer(MACRO_KNOB_MIX_IDX, PotCurve::LIN);
+    levelParam->SetMacroRole(MacroRole::MIX);
+    AddParameter(levelParam);
 
     // K2: Gain — total pre-gain into the cascade
-    AddParameter(new PotentiometerParameter("K2 Gain", 12.0f, 48.0f, 34.0f, PotCurve::LIN, MACRO_KNOB_DEPTH_IDX));
-    parameters_.back()->SetMacroRole(MacroRole::DEPTH);
+    auto* gainParam = new ValueParameter("K2 Gain", 12.0f, 48.0f, 34.0f);
+    gainParam->BindPotentiometer(MACRO_KNOB_DEPTH_IDX, PotCurve::LIN);
+    gainParam->SetMacroRole(MacroRole::DEPTH);
+    AddParameter(gainParam);
 
     // Gate threshold — the muted chugs live or die on this one
-    AddParameter(new PotentiometerParameter("Gate", -80.0f, -20.0f, -50.0f, PotCurve::LIN, -1));
+    AddParameter(new ValueParameter("Gate", -80.0f, -20.0f, -50.0f));
 
     // Scoop — mid dip ahead of each clipping stage
-    AddParameter(new PotentiometerParameter("Scoop", 0.0f, 18.0f, 10.0f, PotCurve::LIN, -1));
+    AddParameter(new ValueParameter("Scoop", 0.0f, 18.0f, 10.0f));
 
     // Treble — tone stack high shelf. Cab presence is a global setting now,
     // so top-end shaping inside the preset happens here.
-    AddParameter(new PotentiometerParameter("Treble", -15.0f, 15.0f, 3.5f, PotCurve::LIN, -1));
+    AddParameter(new ValueParameter("Treble", -15.0f, 15.0f, 3.5f));
 
     // Stages — 3 for the album grind, 2 if it feels too compressed
-    PotentiometerParameter* stagesParam =
-        new PotentiometerParameter("Stages", 0.0f, 2.0f, 1.0f, PotCurve::LIN, -1);
-    stagesParam->SetDisplayType(DisplayType::DISCRETE);
-    stagesParam->SetDiscreteValues(kStageNames, 3);
-    AddParameter(stagesParam);
+    AddParameter(new EnumParameter("Stages", kStageNames, 3, 1));
 
     Update();
 }

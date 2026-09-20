@@ -1,5 +1,6 @@
 #include "waheffect.h"
 #include "../controls.h"
+#include "../parameters/valueparameter.h"
 
 using namespace perspective;
 using namespace daisysp;
@@ -19,12 +20,19 @@ void WahEffect::Init(float sampleRate) {
     filterR_.Init(sampleRate);
 
     // Add parameters: Mix, Resonance, EP sweep, Low Freq, High Freq
-    AddParameter(new PotentiometerParameter("K1 Mix", 0.0f, 1.0f, 0.5f, PotCurve::LIN, MACRO_KNOB_MIX_IDX, 0));
-    parameters_.back()->SetMacroRole(MacroRole::MIX);
-    AddParameter(new PotentiometerParameter("Resonance", 0.0f, 1.0f, 0.85f, PotCurve::LIN, -1, 1));
-    AddParameter(new PotentiometerParameter("EP Sweep", 0.0f, 1.0f, 0.5f, PotCurve::REVERSE_LOG, KNOB_EXP_IDX, 4));
-    AddParameter(new PotentiometerParameter("Low Freq", 80.0f, 2000.0f, 400.0f, PotCurve::LOG, -1, 2));
-    AddParameter(new PotentiometerParameter("High Freq", 200.0f, 5000.0f, 2000.0f, PotCurve::LOG, -1, 3));
+    auto* mixParam = new ValueParameter("K1 Mix", 0.0f, 1.0f, 0.5f, 0);
+    mixParam->BindPotentiometer(MACRO_KNOB_MIX_IDX, PotCurve::LIN);
+    mixParam->SetMacroRole(MacroRole::MIX);
+    AddParameter(mixParam);
+
+    AddParameter(new ValueParameter("Resonance", 0.0f, 1.0f, 0.85f, 1));
+
+    auto* sweepParam = new ValueParameter("EP Sweep", 0.0f, 1.0f, 0.5f, 4);
+    sweepParam->BindPotentiometer(KNOB_EXP_IDX, PotCurve::REVERSE_LOG);
+    AddParameter(sweepParam);
+
+    AddParameter(new ValueParameter("Low Freq", 80.0f, 2000.0f, 400.0f, 2));
+    AddParameter(new ValueParameter("High Freq", 200.0f, 5000.0f, 2000.0f, 3));
 
     // Set default filter parameters
     Update();

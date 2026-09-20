@@ -1,5 +1,6 @@
 #include "autowaheffect.h"
 #include "../controls.h"
+#include "../parameters/valueparameter.h"
 #include <cmath>
 
 using namespace perspective;
@@ -33,17 +34,27 @@ void AutowahEffect::Init(float sampleRate) {
     filterR_.Init(sampleRate);
     
     // Add parameters: Mix, Resonance, Frequency, Attack, Release, Sensitivity (signed Hz offset)
-    AddParameter(new PotentiometerParameter("K1 Mix", 0.0f, 1.0f, 0.5f, PotCurve::LIN, MACRO_KNOB_MIX_IDX));
-    parameters_.back()->SetMacroRole(MacroRole::MIX);
-    AddParameter(new PotentiometerParameter("Resonance", 0.0f, 1.0f, 0.85f, PotCurve::LIN, -1));
-    AddParameter(new PotentiometerParameter("Frequency", 400.0f, 2000.0f, 1000.0f, PotCurve::LOG, -1));
-    AddParameter(new PotentiometerParameter("Attack ms", 0.001f, 1.0f, 0.2f, PotCurve::LOG, -1));
-    parameters_.back()->SetDisplayType(DisplayType::SCALED);
-    parameters_.back()->SetScaleFactor(1000.0f);
-    AddParameter(new PotentiometerParameter("Release ms", 0.001f, 0.5f, 0.01f, PotCurve::LOG, -1));
-    parameters_.back()->SetDisplayType(DisplayType::SCALED);
-    parameters_.back()->SetScaleFactor(1000.0f);
-    AddParameter(new PotentiometerParameter("K6 Sensitivity", -3000.0f, 3000.0f, 1600.0f, PotCurve::LIN, KNOB_6_IDX));
+    auto* mixParam = new ValueParameter("K1 Mix", 0.0f, 1.0f, 0.5f);
+    mixParam->BindPotentiometer(MACRO_KNOB_MIX_IDX, PotCurve::LIN);
+    mixParam->SetMacroRole(MacroRole::MIX);
+    AddParameter(mixParam);
+
+    AddParameter(new ValueParameter("Resonance", 0.0f, 1.0f, 0.85f));
+    AddParameter(new ValueParameter("Frequency", 400.0f, 2000.0f, 1000.0f));
+
+    auto* attackParam = new ValueParameter("Attack ms", 0.001f, 1.0f, 0.2f);
+    attackParam->SetDisplayType(DisplayType::SCALED);
+    attackParam->SetScaleFactor(1000.0f);
+    AddParameter(attackParam);
+
+    auto* releaseParam = new ValueParameter("Release ms", 0.001f, 0.5f, 0.01f);
+    releaseParam->SetDisplayType(DisplayType::SCALED);
+    releaseParam->SetScaleFactor(1000.0f);
+    AddParameter(releaseParam);
+
+    auto* sensitivityParam = new ValueParameter("K6 Sensitivity", -3000.0f, 3000.0f, 1600.0f);
+    sensitivityParam->BindPotentiometer(KNOB_6_IDX, PotCurve::LIN);
+    AddParameter(sensitivityParam);
     
     // Set default filter parameters
     Update();

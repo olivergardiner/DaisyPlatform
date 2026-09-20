@@ -1,6 +1,7 @@
 #include "noisegateeffect.h"
 
 #include "../controls.h"
+#include "../parameters/valueparameter.h"
 
 #include <algorithm>
 #include <cmath>
@@ -48,19 +49,19 @@ void NoiseGateEffect::Init(float sampleRate) {
     sampleRate_ = sampleRate;
 
     // Threshold — level at which the gate opens
-    AddParameter(new PotentiometerParameter("Threshold", -80.0f, -20.0f, -52.0f, PotCurve::LIN, -1));
+    AddParameter(new ValueParameter("Threshold", -80.0f, -20.0f, -52.0f));
 
     // Hysteresis — how far below the open threshold the gate closes again
-    AddParameter(new PotentiometerParameter("Hyst", 0.0f, 18.0f, 6.0f, PotCurve::LIN, -1));
+    AddParameter(new ValueParameter("Hyst", 0.0f, 18.0f, 6.0f));
 
     // Attack — how fast the gate opens once triggered
-    AddParameter(new PotentiometerParameter("Attack", 0.1f, 20.0f, 1.0f, PotCurve::LOG, -1));
+    AddParameter(new ValueParameter("Attack", 0.1f, 20.0f, 1.0f));
 
     // Hold — minimum time the gate stays open after falling below threshold
-    AddParameter(new PotentiometerParameter("Hold", 0.0f, 250.0f, 40.0f, PotCurve::LIN, -1));
+    AddParameter(new ValueParameter("Hold", 0.0f, 250.0f, 40.0f));
 
     // Release — how fast the gate closes; short for tight chugs
-    AddParameter(new PotentiometerParameter("Release", 5.0f, 500.0f, 80.0f, PotCurve::LOG, -1));
+    AddParameter(new ValueParameter("Release", 5.0f, 500.0f, 80.0f));
 
     Update();
 }

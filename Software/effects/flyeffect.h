@@ -21,6 +21,7 @@ private:
     class DelayEffect* delayEffect_;
     int timeParamIndex_;  // Track time parameter for tempo updates
     int tempoModeParamIndex_;  // Track tempo mode toggle parameter
+    bool tempoModeCached_ = true;  // Detects mode-toggle changes to refresh the E1 display
 };
 
 } // namespace perspective

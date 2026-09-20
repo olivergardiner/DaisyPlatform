@@ -1,6 +1,7 @@
 #include "tonestackeffect.h"
 
 #include "../controls.h"
+#include "../parameters/valueparameter.h"
 
 #include <algorithm>
 #include <cmath>
@@ -39,14 +40,14 @@ ToneStackEffect::~ToneStackEffect() {
 void ToneStackEffect::Init(float sampleRate) {
     sampleRate_ = sampleRate;
 
-    AddParameter(new PotentiometerParameter("Bass", -15.0f, 15.0f, 0.0f, PotCurve::LIN, -1));
-    AddParameter(new PotentiometerParameter("Mid", -15.0f, 15.0f, 0.0f, PotCurve::LIN, -1));
-    AddParameter(new PotentiometerParameter("Mid Hz", 300.0f, 2000.0f, 800.0f, PotCurve::LOG, -1));
-    AddParameter(new PotentiometerParameter("Treble", -15.0f, 15.0f, 0.0f, PotCurve::LIN, -1));
+    AddParameter(new ValueParameter("Bass", -15.0f, 15.0f, 0.0f));
+    AddParameter(new ValueParameter("Mid", -15.0f, 15.0f, 0.0f));
+    AddParameter(new ValueParameter("Mid Hz", 300.0f, 2000.0f, 800.0f));
+    AddParameter(new ValueParameter("Treble", -15.0f, 15.0f, 0.0f));
     // Wide trim range: as the last stage of a high-gain chain this carries the
     // whole preset's output level, so it needs to cut further than a tone
     // control normally would.
-    AddParameter(new PotentiometerParameter("Level", -24.0f, 12.0f, 0.0f, PotCurve::LIN, -1));
+    AddParameter(new ValueParameter("Level", -24.0f, 12.0f, 0.0f));
 
     // Force an initial design pass
     bass_db_ = mid_db_ = treble_db_ = 1e9f;

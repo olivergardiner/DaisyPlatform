@@ -1,6 +1,9 @@
 #include "phasereffect.h"
 
 #include "../controls.h"
+#include "../parameters/valueparameter.h"
+#include "../parameters/enumparameter.h"
+#include "../parameters/integerparameter.h"
 
 #include <algorithm>
 #include <cmath>
@@ -72,21 +75,36 @@ void PhaserEffect::Init(float sampleRate) {
         stagesR_[i].z1 = 0.0f;
     }
 
-    AddParameter(new PotentiometerParameter("K1 Mix", 0.0f, 1.0f, 0.5f, PotCurve::LIN, MACRO_KNOB_MIX_IDX));
-    parameters_.back()->SetMacroRole(MacroRole::MIX);
-    AddParameter(new PotentiometerParameter("K2 Depth", 0.0f, 1.0f, 0.75f, PotCurve::LIN, MACRO_KNOB_DEPTH_IDX));
-    parameters_.back()->SetMacroRole(MacroRole::DEPTH);
-    AddParameter(new PotentiometerParameter("K3 Rate", 0.02f, 4.0f, 0.3f, PotCurve::LOG, MACRO_KNOB_RATE_IDX));
-    parameters_.back()->SetMacroRole(MacroRole::RATE);
-    AddParameter(new PotentiometerParameter("K4 Feedback", -0.95f, 0.95f, 0.35f, PotCurve::LIN, MACRO_KNOB_FEEDBACK_IDX));
-    parameters_.back()->SetMacroRole(MacroRole::FEEDBACK);
-    AddParameter(new PotentiometerParameter("Center Hz", 150.0f, 1200.0f, 450.0f, PotCurve::LOG, -1));
-    AddParameter(new EncoderParameter("E1 Stages", 2.0f, 8.0f, 4.0f, 1.0f, ENCODER_1_IDX));
-    AddParameter(new EncoderParameter("E2 Wave", 0.0f, 3.0f, 0.0f, 1.0f, ENCODER_2_IDX));
+    auto* mixParam = new ValueParameter("K1 Mix", 0.0f, 1.0f, 0.5f);
+    mixParam->BindPotentiometer(MACRO_KNOB_MIX_IDX, PotCurve::LIN);
+    mixParam->SetMacroRole(MacroRole::MIX);
+    AddParameter(mixParam);
+
+    auto* depthParam = new ValueParameter("K2 Depth", 0.0f, 1.0f, 0.75f);
+    depthParam->BindPotentiometer(MACRO_KNOB_DEPTH_IDX, PotCurve::LIN);
+    depthParam->SetMacroRole(MacroRole::DEPTH);
+    AddParameter(depthParam);
+
+    auto* rateParam = new ValueParameter("K3 Rate", 0.02f, 4.0f, 0.3f);
+    rateParam->BindPotentiometer(MACRO_KNOB_RATE_IDX, PotCurve::LOG);
+    rateParam->SetMacroRole(MacroRole::RATE);
+    AddParameter(rateParam);
+
+    auto* feedbackParam = new ValueParameter("K4 Feedback", -0.95f, 0.95f, 0.35f);
+    feedbackParam->BindPotentiometer(MACRO_KNOB_FEEDBACK_IDX, PotCurve::LIN);
+    feedbackParam->SetMacroRole(MacroRole::FEEDBACK);
+    AddParameter(feedbackParam);
+
+    AddParameter(new ValueParameter("Center Hz", 150.0f, 1200.0f, 450.0f));
+
+    auto* stagesParam = new IntegerParameter("E1 Stages", 2, 8, 4);
+    stagesParam->BindEncoder(ENCODER_1_IDX);
+    AddParameter(stagesParam);
 
     static const char* kWaveNames[] = {"Sine", "Tri", "Saw", "Square"};
-    parameters_.back()->SetDisplayType(DisplayType::DISCRETE);
-    parameters_.back()->SetDiscreteValues(kWaveNames, 4);
+    auto* waveParam = new EnumParameter("E2 Wave", kWaveNames, 4, 0);
+    waveParam->BindEncoder(ENCODER_2_IDX);
+    AddParameter(waveParam);
 
     Update();
 }

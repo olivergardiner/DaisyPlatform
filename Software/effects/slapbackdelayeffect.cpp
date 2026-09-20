@@ -1,7 +1,6 @@
 #include "slapbackdelayeffect.h"
 #include "../controls.h"
-#include "../parameters/potentiometerparameter.h"
-#include "../parameters/encoderparameter.h"
+#include "../parameters/valueparameter.h"
 #include <cmath>
 
 using namespace perspective;
@@ -30,22 +29,28 @@ void SlapbackDelayEffect::Init(float sampleRate) {
     
     // Add parameters: Mix, Feedback, Time
     // Mix: 0-100%
-    AddParameter(new PotentiometerParameter("K1 Mix", 0.0f, 1.0f, 0.50f, PotCurve::LIN, MACRO_KNOB_MIX_IDX));
-    parameters_.back()->SetDisplayType(DisplayType::SCALED);
-    parameters_.back()->SetScaleFactor(100.0f);
-    parameters_.back()->SetMacroRole(MacroRole::MIX);
-    
+    auto* mixParam = new ValueParameter("K1 Mix", 0.0f, 1.0f, 0.50f);
+    mixParam->BindPotentiometer(MACRO_KNOB_MIX_IDX, PotCurve::LIN);
+    mixParam->SetDisplayType(DisplayType::SCALED);
+    mixParam->SetScaleFactor(100.0f);
+    mixParam->SetMacroRole(MacroRole::MIX);
+    AddParameter(mixParam);
+
     // Feedback: 0-70% (slapback typically has minimal feedback)
-    AddParameter(new PotentiometerParameter("K4 Feedback", 0.0f, 0.70f, 0.25f, PotCurve::LIN, MACRO_KNOB_FEEDBACK_IDX));
-    parameters_.back()->SetDisplayType(DisplayType::SCALED);
-    parameters_.back()->SetScaleFactor(100.0f);
-    parameters_.back()->SetMacroRole(MacroRole::FEEDBACK);
-    
+    auto* feedbackParam = new ValueParameter("K4 Feedback", 0.0f, 0.70f, 0.25f);
+    feedbackParam->BindPotentiometer(MACRO_KNOB_FEEDBACK_IDX, PotCurve::LIN);
+    feedbackParam->SetDisplayType(DisplayType::SCALED);
+    feedbackParam->SetScaleFactor(100.0f);
+    feedbackParam->SetMacroRole(MacroRole::FEEDBACK);
+    AddParameter(feedbackParam);
+
     // Time: 50-300ms (typical slapback range)
-    AddParameter(new EncoderParameter("E1 Time", 10.0f, 200.0f, 50.0f, 1.0f, ENCODER_1_IDX));
-    parameters_.back()->SetDisplayType(DisplayType::SCALED);
-    parameters_.back()->SetScaleFactor(1.0f);
-    
+    auto* timeParam = new ValueParameter("E1 Time", 10.0f, 200.0f, 50.0f);
+    timeParam->BindEncoder(ENCODER_1_IDX, 1.0f);
+    timeParam->SetDisplayType(DisplayType::SCALED);
+    timeParam->SetScaleFactor(1.0f);
+    AddParameter(timeParam);
+
     Update();
 }
 

@@ -1,6 +1,8 @@
 #include "autowahv2effect.h"
 
 #include "../controls.h"
+#include "../parameters/valueparameter.h"
+#include "../parameters/enumparameter.h"
 
 #include <cmath>
 
@@ -149,28 +151,35 @@ void AutowahV2Effect::ProcessWahStereoSample(float inputL, float inputR, float m
 void AutowahV2Effect::Init(float sampleRate) {
     InitFilterState(sampleRate, 1000.0f);
 
-    AddParameter(new PotentiometerParameter("K1 Mix", 0.0f, 1.0f, 0.5f, PotCurve::LIN, MACRO_KNOB_MIX_IDX));
-    parameters_.back()->SetMacroRole(MacroRole::MIX);
-    AddParameter(new PotentiometerParameter("Resonance", 0.0f, 1.0f, 0.85f, PotCurve::LIN, -1));
-    AddParameter(new PotentiometerParameter("Frequency", 400.0f, 2000.0f, 1000.0f, PotCurve::LOG, -1));
+    auto* mixParam = new ValueParameter("K1 Mix", 0.0f, 1.0f, 0.5f);
+    mixParam->BindPotentiometer(MACRO_KNOB_MIX_IDX, PotCurve::LIN);
+    mixParam->SetMacroRole(MacroRole::MIX);
+    AddParameter(mixParam);
 
-    AddParameter(new PotentiometerParameter("Attack ms", 0.001f, 1.0f, 0.2f, PotCurve::LOG, -1));
-    parameters_.back()->SetDisplayType(DisplayType::SCALED);
-    parameters_.back()->SetScaleFactor(1000.0f);
+    AddParameter(new ValueParameter("Resonance", 0.0f, 1.0f, 0.85f));
+    AddParameter(new ValueParameter("Frequency", 400.0f, 2000.0f, 1000.0f));
 
-    AddParameter(new PotentiometerParameter("Release ms", 0.001f, 0.5f, 0.01f, PotCurve::LOG, -1));
-    parameters_.back()->SetDisplayType(DisplayType::SCALED);
-    parameters_.back()->SetScaleFactor(1000.0f);
+    auto* attackParam = new ValueParameter("Attack ms", 0.001f, 1.0f, 0.2f);
+    attackParam->SetDisplayType(DisplayType::SCALED);
+    attackParam->SetScaleFactor(1000.0f);
+    AddParameter(attackParam);
 
-    AddParameter(new PotentiometerParameter("K6 Sensitivity", -3000.0f, 3000.0f, 1600.0f, PotCurve::LIN, KNOB_6_IDX));
+    auto* releaseParam = new ValueParameter("Release ms", 0.001f, 0.5f, 0.01f);
+    releaseParam->SetDisplayType(DisplayType::SCALED);
+    releaseParam->SetScaleFactor(1000.0f);
+    AddParameter(releaseParam);
 
-    AddParameter(new EncoderParameter("E1 Voice", 0.0f, 3.0f, static_cast<float>(kVoiceRefined), 1.0f, ENCODER_1_IDX));
-    parameters_.back()->SetDisplayType(DisplayType::DISCRETE);
-    parameters_.back()->SetDiscreteValues(kVoiceLabels, 4);
+    auto* sensitivityParam = new ValueParameter("K6 Sensitivity", -3000.0f, 3000.0f, 1600.0f);
+    sensitivityParam->BindPotentiometer(KNOB_6_IDX, PotCurve::LIN);
+    AddParameter(sensitivityParam);
 
-    AddParameter(new EncoderParameter("E2 Down+", 0.0f, 3.0f, 1.0f, 1.0f, ENCODER_2_IDX));
-    parameters_.back()->SetDisplayType(DisplayType::DISCRETE);
-    parameters_.back()->SetDiscreteValues(kDownBoostLabels, 4);
+    auto* voiceParam = new EnumParameter("E1 Voice", kVoiceLabels, 4, kVoiceRefined);
+    voiceParam->BindEncoder(ENCODER_1_IDX);
+    AddParameter(voiceParam);
+
+    auto* downBoostParam = new EnumParameter("E2 Down+", kDownBoostLabels, 4, 1);
+    downBoostParam->BindEncoder(ENCODER_2_IDX);
+    AddParameter(downBoostParam);
 
     Update();
 }

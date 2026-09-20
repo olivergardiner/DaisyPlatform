@@ -1,55 +1,61 @@
 #include "timeparameter.h"
+#include "enumparameter.h"
 #include <cstdio>
 #include <cstring>
 
 using namespace perspective;
 
-TimeParameter::TimeParameter(const char* name, float minValue, float maxValue, float defaultValue, float stepSize, int index, const char* tempoModeName, int displayIndex)
-    : EncoderParameter(name, minValue, maxValue, defaultValue, stepSize, index, displayIndex)
-    , displayMode_(TimeDisplayMode::TIME_MS)
+TimeParameter::TimeParameter(const char* name, float minMs, float maxMs, float defaultMs, const char* tempoModeName, int displayIndex)
+    : EffectParameter(name, minMs, maxMs, defaultMs, displayIndex)
+    , modeToggle_(nullptr)
     , timeModeName_(nullptr)
     , tempoModeName_(nullptr)
 {
-    // Store the original name as the time mode name
     if (name) {
         size_t len = strlen(name);
         timeModeName_ = new char[len + 1];
         strcpy(timeModeName_, name);
     }
-    
-    // Store optional tempo mode name if provided
     if (tempoModeName) {
         size_t len = strlen(tempoModeName);
         tempoModeName_ = new char[len + 1];
         strcpy(tempoModeName_, tempoModeName);
     }
-    
-    // Initialize name based on default mode
-    UpdateNameForMode();
 }
 
 TimeParameter::~TimeParameter() {
-    if (timeModeName_) {
-        delete[] timeModeName_;
-        timeModeName_ = nullptr;
-    }
-    if (tempoModeName_) {
-        delete[] tempoModeName_;
-        tempoModeName_ = nullptr;
-    }
+    delete[] timeModeName_;
+    delete[] tempoModeName_;
 }
 
-void TimeParameter::SetDisplayMode(TimeDisplayMode mode) {
-    displayMode_ = mode;
-    UpdateNameForMode();
+ParameterKind TimeParameter::GetKind() const {
+    return ParameterKind::TIME;
+}
+
+void TimeParameter::SetModeToggle(EnumParameter* modeToggle) {
+    modeToggle_ = modeToggle;
+}
+
+EnumParameter* TimeParameter::GetModeToggle() const {
+    return modeToggle_;
 }
 
 TimeDisplayMode TimeParameter::GetDisplayMode() const {
-    return displayMode_;
+    if (modeToggle_ != nullptr && modeToggle_->GetSelectedIndex() == 1) {
+        return TimeDisplayMode::TEMPO_BPM;
+    }
+    return TimeDisplayMode::TIME_MS;
+}
+
+const char* TimeParameter::GetName() const {
+    if (GetDisplayMode() == TimeDisplayMode::TEMPO_BPM && tempoModeName_) {
+        return tempoModeName_;
+    }
+    return timeModeName_ ? timeModeName_ : EffectParameter::GetName();
 }
 
 void TimeParameter::Increment(int steps) {
-    if (displayMode_ == TimeDisplayMode::TEMPO_BPM) {
+    if (GetDisplayMode() == TimeDisplayMode::TEMPO_BPM) {
         float currentBpm = GetValueAsBPM();
         // Reversed: CW increases BPM; normal: CW decreases BPM (increases ms)
         float newBpm = IsReversed()
@@ -58,13 +64,12 @@ void TimeParameter::Increment(int steps) {
         newBpm = clamp(newBpm, 30.0f, 200.0f);
         SetValue(60000.0f / newBpm);
     } else {
-        // In time mode, base class handles reversed_ flag
-        EncoderParameter::Increment(steps);
+        EffectParameter::Increment(steps);
     }
 }
 
 void TimeParameter::Decrement(int steps) {
-    if (displayMode_ == TimeDisplayMode::TEMPO_BPM) {
+    if (GetDisplayMode() == TimeDisplayMode::TEMPO_BPM) {
         float currentBpm = GetValueAsBPM();
         // Reversed: CCW decreases BPM; normal: CCW increases BPM (decreases ms)
         float newBpm = IsReversed()
@@ -73,8 +78,7 @@ void TimeParameter::Decrement(int steps) {
         newBpm = clamp(newBpm, 30.0f, 200.0f);
         SetValue(60000.0f / newBpm);
     } else {
-        // In time mode, base class handles reversed_ flag
-        EncoderParameter::Decrement(steps);
+        EffectParameter::Decrement(steps);
     }
 }
 
@@ -82,66 +86,25 @@ void TimeParameter::GetValueAsString(char* buffer, size_t bufferSize) const {
     if (buffer == nullptr || bufferSize == 0) {
         return;
     }
-    
+
     float value = GetValue();
-    
-    switch (displayMode_) {
-        case TimeDisplayMode::TIME_MS:
-            // Display as milliseconds
-            snprintf(buffer, bufferSize, "%.0f", value);
-            break;
-            
-        case TimeDisplayMode::TEMPO_BPM: {
-            // Convert milliseconds to BPM (quarter note basis: BPM = 60000 / ms)
-            if (value > 0.0f) {
-                float bpm = 60000.0f / value;
-                snprintf(buffer, bufferSize, "%.1f", bpm);
-            } else {
-                snprintf(buffer, bufferSize, "--");
-            }
-            break;
+
+    if (GetDisplayMode() == TimeDisplayMode::TEMPO_BPM) {
+        if (value > 0.0f) {
+            snprintf(buffer, bufferSize, "%.1f", 60000.0f / value);
+        } else {
+            snprintf(buffer, bufferSize, "--");
         }
-        
-        default:
-            // Fallback to milliseconds
-            snprintf(buffer, bufferSize, "%.0f ms", value);
-            break;
+    } else {
+        snprintf(buffer, bufferSize, "%.0f", value);
     }
 }
 
 float TimeParameter::GetValueAsBPM() const {
     float ms = GetValue();
-    if (ms > 0.0f) {
-        return 60000.0f / ms;
-    }
-    return 0.0f;
+    return ms > 0.0f ? 60000.0f / ms : 0.0f;
 }
 
 float TimeParameter::GetValueAsMs() const {
-    // Value is already stored as milliseconds
     return GetValue();
-}
-
-void TimeParameter::UpdateNameForMode() {
-    const char* newName = nullptr;
-    
-    // Determine which name to use based on mode
-    if (displayMode_ == TimeDisplayMode::TIME_MS) {
-        // Use original time mode name
-        newName = timeModeName_;
-    } else if (displayMode_ == TimeDisplayMode::TEMPO_BPM) {
-        // Use tempo mode name if provided, otherwise fall back to time mode name
-        newName = tempoModeName_ ? tempoModeName_ : timeModeName_;
-    }
-    
-    // Update the base class name if we have a name for this mode
-    if (newName && name_) {
-        // Free existing name
-        delete[] name_;
-        
-        // Allocate and copy new name
-        size_t len = strlen(newName);
-        name_ = new char[len + 1];
-        strcpy(name_, newName);
-    }
 }

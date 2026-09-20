@@ -1,8 +1,8 @@
 #include "streetseffect.h"
 #include "../controls.h"
-#include "../parameters/potentiometerparameter.h"
+#include "../parameters/valueparameter.h"
+#include "../parameters/enumparameter.h"
 #include "../parameters/timeparameter.h"
-#include "../parameters/toggleparameter.h"
 
 #include <algorithm>
 #include <cmath>
@@ -39,55 +39,69 @@ void StreetsEffect::Init(float sampleRate) {
     
     // Add top-level controls.
     // Delay 1 controls
-    AddParameter(new PotentiometerParameter("K1 Mix", 0.0f, 1.0f, 0.50f, PotCurve::LIN, MACRO_KNOB_MIX_IDX, 0));
-    parameters_.back()->SetDisplayType(DisplayType::SCALED);
-    parameters_.back()->SetScaleFactor(100.0f);
-    parameters_.back()->SetMacroRole(MacroRole::MIX);
-    
-    AddParameter(new PotentiometerParameter("K4 Feedback", 0.0f, 0.95f, 0.5f, PotCurve::LIN, MACRO_KNOB_FEEDBACK_IDX, 1));
-    parameters_.back()->SetDisplayType(DisplayType::SCALED);
-    parameters_.back()->SetScaleFactor(100.0f);
-    parameters_.back()->SetMacroRole(MacroRole::FEEDBACK);
-    
-    AddParameter(new PotentiometerParameter("K5 Subdivision 1", 0.0f, 7.0f, 2.0f, PotCurve::LIN, MACRO_KNOB_SUBDIVISION_IDX, 2));
-    parameters_.back()->SetDisplayType(DisplayType::DISCRETE);
-    parameters_.back()->SetDiscreteValues(TempoEffect::kSubdivisionGlyphs, 8);
-    parameters_.back()->SetMacroRole(MacroRole::SUBDIVISION);
-    
+    auto* mixParam = new ValueParameter("K1 Mix", 0.0f, 1.0f, 0.50f, 0);
+    mixParam->BindPotentiometer(MACRO_KNOB_MIX_IDX, PotCurve::LIN);
+    mixParam->SetDisplayType(DisplayType::SCALED);
+    mixParam->SetScaleFactor(100.0f);
+    mixParam->SetMacroRole(MacroRole::MIX);
+    AddParameter(mixParam);
+
+    auto* feedbackParam = new ValueParameter("K4 Feedback", 0.0f, 0.95f, 0.5f, 1);
+    feedbackParam->BindPotentiometer(MACRO_KNOB_FEEDBACK_IDX, PotCurve::LIN);
+    feedbackParam->SetDisplayType(DisplayType::SCALED);
+    feedbackParam->SetScaleFactor(100.0f);
+    feedbackParam->SetMacroRole(MacroRole::FEEDBACK);
+    AddParameter(feedbackParam);
+
+    auto* subdivisionParam = new EnumParameter("K5 Subdivision 1", TempoEffect::kSubdivisionGlyphs, 8, 2, 2);
+    subdivisionParam->BindPotentiometer(MACRO_KNOB_SUBDIVISION_IDX);
+    subdivisionParam->SetMacroRole(MacroRole::SUBDIVISION);
+    AddParameter(subdivisionParam);
+
     // Delay 2 controls (second instance - not macro-pot controllable)
-    AddParameter(new PotentiometerParameter("Mix 2", 0.0f, 1.0f, 0.35f, PotCurve::LIN, -1, 4));
-    parameters_.back()->SetDisplayType(DisplayType::SCALED);
-    parameters_.back()->SetScaleFactor(100.0f);
-    parameters_.back()->SetMacroRole(MacroRole::MIX, /*isPrimary=*/false);
-    
-    AddParameter(new PotentiometerParameter("Feedback 2", 0.0f, 0.95f, 0.5f, PotCurve::LIN, -1, 5));
-    parameters_.back()->SetDisplayType(DisplayType::SCALED);
-    parameters_.back()->SetScaleFactor(100.0f);
-    parameters_.back()->SetMacroRole(MacroRole::FEEDBACK, /*isPrimary=*/false);
-    
+    auto* mix2Param = new ValueParameter("Mix 2", 0.0f, 1.0f, 0.35f, 4);
+    mix2Param->SetDisplayType(DisplayType::SCALED);
+    mix2Param->SetScaleFactor(100.0f);
+    mix2Param->SetMacroRole(MacroRole::MIX, /*isPrimary=*/false);
+    AddParameter(mix2Param);
+
+    auto* feedback2Param = new ValueParameter("Feedback 2", 0.0f, 0.95f, 0.5f, 5);
+    feedback2Param->SetDisplayType(DisplayType::SCALED);
+    feedback2Param->SetScaleFactor(100.0f);
+    feedback2Param->SetMacroRole(MacroRole::FEEDBACK, /*isPrimary=*/false);
+    AddParameter(feedback2Param);
+
     // Slapback blend
-    AddParameter(new PotentiometerParameter("K6 Slap Mix", 0.0f, 0.75f, 0.50f, PotCurve::LIN, KNOB_6_IDX, 6));
-    parameters_.back()->SetDisplayType(DisplayType::SCALED);
-    parameters_.back()->SetScaleFactor(100.0f);
-    parameters_.back()->SetMacroRole(MacroRole::MIX, /*isPrimary=*/false);
+    auto* slapMixParam = new ValueParameter("K6 Slap Mix", 0.0f, 0.75f, 0.50f, 6);
+    slapMixParam->BindPotentiometer(KNOB_6_IDX, PotCurve::LIN);
+    slapMixParam->SetDisplayType(DisplayType::SCALED);
+    slapMixParam->SetScaleFactor(100.0f);
+    slapMixParam->SetMacroRole(MacroRole::MIX, /*isPrimary=*/false);
+    AddParameter(slapMixParam);
 
     // Delay 1 time parameter (Encoder 1) — reversed so CW increases BPM / decreases delay time
-    AddParameter(new TimeParameter("E1 Time", 250.0f, 2000.0f, 500.0f, 1.0f, ENCODER_1_IDX, "E1 Tempo", 3));
-    static_cast<EncoderParameter*>(parameters_.back())->SetReversed(true);
-    
+    auto* timeParam1 = new TimeParameter("E1 Time", 250.0f, 2000.0f, 500.0f, "E1 Tempo", 3);
+    timeParam1->BindEncoder(ENCODER_1_IDX, 1.0f, /*reversed=*/true);
+    AddParameter(timeParam1);
+
     // Delay 2 time parameter (Encoder 2)
-    AddParameter(new TimeParameter("E2 Perc", 250.0f, 2000.0f, 510.0f, 1.0f, ENCODER_2_IDX, "E2 Perc", 7));
-    
+    auto* timeParam2 = new TimeParameter("E2 Perc", 250.0f, 2000.0f, 510.0f, "E2 Perc", 7);
+    timeParam2->BindEncoder(ENCODER_2_IDX, 1.0f);
+    AddParameter(timeParam2);
+
     // Delay 1 tempo mode toggle (Encoder 1 button)
-    AddParameter(new ToggleParameter("Tempo Mode", false, ENCODER_1_BUTTON_IDX, "On", "Off",-1));  // Hidden - tempo mode toggle
+    auto* tempoModeParam = new EnumParameter("Tempo Mode", {"Off", "On"}, 0, -1);  // Hidden - tempo mode toggle
+    tempoModeParam->BindButton(ENCODER_1_BUTTON_IDX);
+    AddParameter(tempoModeParam);
+    timeParam1->SetModeToggle(tempoModeParam);
 
     // Initialize startup timing modes/values:
     // Delay 1: tempo mode at reference BPM.
-    parameters_[kParamTempoMode]->SetValue(1.0f);
-    parameters_[kParamTime1]->SetValue(60000.0f / kReferenceBpm);
+    tempoModeParam->SetSelectedIndex(1);
+    timeParam1->SetValue(60000.0f / kReferenceBpm);
 
     // Delay 2 starts at 510ms.
-    parameters_[kParamTime2]->SetValue(510.0f);
+    timeParam2->SetValue(510.0f);
 
     // Note: Metronome is now controlled globally by Perspective via SetMetronomeEnabled()
     
@@ -107,21 +121,21 @@ void StreetsEffect::Init(float sampleRate) {
 void StreetsEffect::Update() {
     // Update parallel delay parameters from our parameters
     if (parameters_.size() >= 9 && parallelDelay_ && parallelDelay_->GetParameterCount() >= 10) {
-        if (parameters_[kParamTime1]->GetType() != ParameterType::ENCODER ||
-            parameters_[kParamTime2]->GetType() != ParameterType::ENCODER ||
-            parameters_[kParamTempoMode]->GetType() != ParameterType::TOGGLE) {
+        if (parameters_[kParamTime1]->GetKind() != ParameterKind::TIME ||
+            parameters_[kParamTime2]->GetKind() != ParameterKind::TIME ||
+            parameters_[kParamTempoMode]->GetKind() != ParameterKind::ENUM) {
             return;
         }
 
         TimeParameter* timeParam1 = static_cast<TimeParameter*>(parameters_[kParamTime1]);
         TimeParameter* timeParam2 = static_cast<TimeParameter*>(parameters_[kParamTime2]);
-        ToggleParameter* tempoToggle1 = static_cast<ToggleParameter*>(parameters_[kParamTempoMode]);
+        bool tempoOn = timeParam1->GetDisplayMode() == TimeDisplayMode::TEMPO_BPM;
 
         // Delay 1: pass the raw beat period to the child delay so it can apply
         // subdivision itself — this keeps the metronome at the correct BPM.
         // (Pre-multiplying by kPrimarySubdivision here caused the child delay to
         // double-apply subdivision, making the metronome run 33% too fast.)
-        float beatPeriodMs = tempoToggle1->GetState()
+        float beatPeriodMs = tempoOn
             ? (60000.0f / timeParam1->GetValueAsBPM())
             : timeParam1->GetValueAsMs();
         beatPeriodMs = std::max(80.0f, std::min(beatPeriodMs, 2000.0f));
@@ -132,26 +146,23 @@ void StreetsEffect::Update() {
         // Explicitly map streets controls into parallel delay controls.
         parallelDelay_->GetParameter(0)->SetValue(parameters_[kParamMix]->GetValue());
         parallelDelay_->GetParameter(1)->SetValue(parameters_[kParamFeedback]->GetValue());
-        parallelDelay_->GetParameter(2)->SetValue(tempoToggle1->GetState() ? 2.0f : parameters_[kParamSubdivision]->GetValue());
+        parallelDelay_->GetParameter(2)->SetValue(tempoOn ? 2.0f : parameters_[kParamSubdivision]->GetValue());
         parallelDelay_->GetParameter(3)->SetValue(parameters_[kParamMix2]->GetValue());
         parallelDelay_->GetParameter(4)->SetValue(parameters_[kParamFeedback2]->GetValue());
         parallelDelay_->GetParameter(5)->SetValue(3.0f);    // fixed quarter multiplier in time mode
         parallelDelay_->GetParameter(6)->SetValue(beatPeriodMs); // raw beat period; child applies subdivision
         parallelDelay_->GetParameter(7)->SetValue(delay2Ms);
-        parallelDelay_->GetParameter(8)->SetValue(tempoToggle1->GetState() ? 1.0f : 0.0f);
+        parallelDelay_->GetParameter(8)->SetValue(tempoOn ? 1.0f : 0.0f);
         parallelDelay_->GetParameter(9)->SetValue(0.0f);    // Delay 2 always time mode
-        
+
         // Detect tempo mode changes for Delay 1 (toggle index 8) and update our own TimeParameter
-        bool newTempoMode1 = tempoToggle1->GetState();
-        if (newTempoMode1 != tempoMode1_) {
-            tempoMode1_ = newTempoMode1;
-            timeParam1->SetDisplayMode(tempoMode1_ ? TimeDisplayMode::TEMPO_BPM : TimeDisplayMode::TIME_MS);
-            RequestParameterDisplayUpdate(6);
+        if (tempoOn != tempoMode1_) {
+            tempoMode1_ = tempoOn;
+            RequestParameterDisplayUpdate(kParamTime1);
         }
 
-        // Delay 2 is always linked milliseconds (not tempo-mode user-controlled).
-        timeParam2->SetDisplayMode(TimeDisplayMode::TIME_MS);
-        
+        // Delay 2 has no mode toggle linked, so it always reads as TIME_MS.
+
         // Update the parallel delay
         parallelDelay_->Update();
     }

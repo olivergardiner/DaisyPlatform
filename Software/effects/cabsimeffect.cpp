@@ -1,6 +1,7 @@
 #include "cabsimeffect.h"
 
 #include "../controls.h"
+#include "../parameters/valueparameter.h"
 
 #include <algorithm>
 #include <cmath>
@@ -38,11 +39,11 @@ CabSimEffect::~CabSimEffect() {
 void CabSimEffect::Init(float sampleRate) {
     sampleRate_ = sampleRate;
 
-    AddParameter(new PotentiometerParameter("Low Cut", 40.0f, 200.0f, 85.0f, PotCurve::LOG, -1));
-    AddParameter(new PotentiometerParameter("Reso", -6.0f, 9.0f, 3.0f, PotCurve::LIN, -1));
-    AddParameter(new PotentiometerParameter("Presence", -6.0f, 9.0f, 4.0f, PotCurve::LIN, -1));
-    AddParameter(new PotentiometerParameter("Rolloff", 2500.0f, 7000.0f, 4200.0f, PotCurve::LOG, -1));
-    AddParameter(new PotentiometerParameter("Level", -12.0f, 12.0f, 0.0f, PotCurve::LIN, -1));
+    AddParameter(new ValueParameter("Low Cut", 40.0f, 200.0f, 85.0f));
+    AddParameter(new ValueParameter("Reso", -6.0f, 9.0f, 3.0f));
+    AddParameter(new ValueParameter("Presence", -6.0f, 9.0f, 4.0f));
+    AddParameter(new ValueParameter("Rolloff", 2500.0f, 7000.0f, 4200.0f));
+    AddParameter(new ValueParameter("Level", -12.0f, 12.0f, 0.0f));
 
     // Force an initial design pass
     lowCut_hz_ = resonance_db_ = presence_db_ = rolloff_hz_ = 1e9f;

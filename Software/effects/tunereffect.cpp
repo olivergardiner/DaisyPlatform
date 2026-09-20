@@ -1,5 +1,6 @@
 #include "tunereffect.h"
 #include "../controls.h"
+#include "../parameters/valueparameter.h"
 #include <cmath>
 
 using namespace perspective;
@@ -41,7 +42,9 @@ void TunerEffect::Init(float sampleRate) {
     noteHoldFrames_    = 0;
 
     if (parameters_.empty()) {
-        AddParameter(new EncoderParameter("Tuner Ref", 420.0f, 460.0f, 440.0f, 0.5f, ENCODER_1_IDX, 0));
+        auto* tuningRefParam = new ValueParameter("Tuner Ref", 420.0f, 460.0f, 440.0f, 0);
+        tuningRefParam->BindEncoder(ENCODER_1_IDX, 0.5f);
+        AddParameter(tuningRefParam);
     }
 
     Update();

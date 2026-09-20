@@ -2,9 +2,9 @@
 #include "autowahv2effect.h"
 #include "delayeffect.h"
 #include "../controls.h"
+#include "../parameters/valueparameter.h"
+#include "../parameters/enumparameter.h"
 #include "../parameters/timeparameter.h"
-#include "../parameters/potentiometerparameter.h"
-#include "../parameters/toggleparameter.h"
 
 using namespace perspective;
 
@@ -35,57 +35,54 @@ void FlyEffect::Init(float sampleRate) {
     CompoundEffect::Init(sampleRate);
     
     // Top-level macros tuned for external drive before the loop.
-    AddParameter(new PotentiometerParameter("K1 Wah Mix", 0.0f, 1.0f, 0.88f, PotCurve::LIN, MACRO_KNOB_MIX_IDX));
-    parameters_.back()->SetMacroRole(MacroRole::MIX);
-    AddParameter(new PotentiometerParameter("Sweep Hz", 250.0f, 1600.0f, 680.0f, PotCurve::LOG, -1));
-    AddParameter(new PotentiometerParameter("Sens", 300.0f, 2200.0f, 1200.0f, PotCurve::LIN, -1));
-    AddParameter(new PotentiometerParameter("Echo Mix", 0.0f, 0.8f, 0.58f, PotCurve::LIN, -1));
-    parameters_.back()->SetMacroRole(MacroRole::MIX, /*isPrimary=*/false);
-    AddParameter(new PotentiometerParameter("Echo Fdbk", 0.0f, 0.65f, 0.26f, PotCurve::LIN, -1));
+    auto* wahMixParam = new ValueParameter("K1 Wah Mix", 0.0f, 1.0f, 0.88f);
+    wahMixParam->BindPotentiometer(MACRO_KNOB_MIX_IDX, PotCurve::LIN);
+    wahMixParam->SetMacroRole(MacroRole::MIX);
+    AddParameter(wahMixParam);
+
+    AddParameter(new ValueParameter("Sweep Hz", 250.0f, 1600.0f, 680.0f));
+    AddParameter(new ValueParameter("Sens", 300.0f, 2200.0f, 1200.0f));
+
+    auto* echoMixParam = new ValueParameter("Echo Mix", 0.0f, 0.8f, 0.58f);
+    echoMixParam->SetMacroRole(MacroRole::MIX, /*isPrimary=*/false);
+    AddParameter(echoMixParam);
+
+    AddParameter(new ValueParameter("Echo Fdbk", 0.0f, 0.65f, 0.26f));
 
     // Add E1 Time/Tempo parameter (defaults to 556ms ≈ 108 BPM)
     // TimeParameter with milliseconds range (10-2000 ms), 1ms step in time mode, 0.5 BPM in tempo mode
-    TimeParameter* timeParam = new TimeParameter("E1 Time", 10.0f, 2000.0f, 556.0f, 1.0f, ENCODER_1_IDX, "E1 Tempo");
-    // Start in tempo mode (true)
-    timeParam->SetDisplayMode(TimeDisplayMode::TEMPO_BPM);
-    timeParam->SetReversed(true);
+    TimeParameter* timeParam = new TimeParameter("E1 Time", 10.0f, 2000.0f, 556.0f, "E1 Tempo");
+    timeParam->BindEncoder(ENCODER_1_IDX, 1.0f, /*reversed=*/true);
     AddParameter(timeParam);
     timeParamIndex_ = 5;
-    
-    // Add E1 Button toggle for Tempo Mode (starts in tempo mode = true)
-    AddParameter(new ToggleParameter("Tempo Mode", true, ENCODER_1_BUTTON_IDX, "Tempo", "Time", -1));
+
+    // Add E1 Button toggle for Tempo Mode (starts in tempo mode = index 1)
+    auto* tempoModeParam = new EnumParameter("Tempo Mode", {"Time", "Tempo"}, 1, -1);
+    tempoModeParam->BindButton(ENCODER_1_BUTTON_IDX);
+    AddParameter(tempoModeParam);
+    // TimeParameter's display mode derives from this toggle, so linking it
+    // also puts timeParam in tempo mode immediately (toggle defaults to index 1).
+    timeParam->SetModeToggle(tempoModeParam);
     tempoModeParamIndex_ = 6;
-    
+
     // Set subdivision parameter on delay effect to 3/16ths (index 2)
     // The delay effect has its own parameter indices, so we need to access it directly
     if (delayEffect_ && delayEffect_->GetParameterCount() >= 3) {
         // DelayEffect has: [0]=Mix, [1]=Feedback, [2]=Subdivision, [3]=Time, [4]=TempoToggle
         // Set subdivision to index 2 (3/16ths)
         EffectParameter* subdivParam = delayEffect_->GetParameter(2);
-        if (subdivParam && subdivParam->GetType() == ParameterType::POTENTIOMETER) {
-            PotentiometerParameter* potParam = static_cast<PotentiometerParameter*>(subdivParam);
-            // Set to 2.0 out of 6.0 max = 33.33% normalized value
-            potParam->SetNormalizedValueWithCurve(2.0f / 6.0f);
+        if (subdivParam && subdivParam->GetKind() == ParameterKind::ENUM) {
+            static_cast<EnumParameter*>(subdivParam)->SetSelectedIndex(2);
         }
     }
 
-    // Set tempo mode on delay effect
+    // Set tempo mode on delay effect. The child DelayEffect's own TimeParameter
+    // is already linked to its own tempo mode toggle (index 4) internally, so
+    // setting that toggle here is enough to put the child in tempo mode too.
     if (delayEffect_ && delayEffect_->GetParameterCount() >= 5) {
-        // DelayEffect tempo mode toggle is at index 4
-        EffectParameter* tempoModeParam = delayEffect_->GetParameter(4);
-        if (tempoModeParam && tempoModeParam->GetType() == ParameterType::TOGGLE) {
-            ToggleParameter* toggleParam = static_cast<ToggleParameter*>(tempoModeParam);
-            // Set to tempo mode (true)
-            toggleParam->SetState(true);
-        }
-        
-        // Also set the DelayEffect's TimeParameter to tempo mode
-        if (delayEffect_->GetParameterCount() >= 4) {
-            EffectParameter* timeParam = delayEffect_->GetParameter(3);
-            if (timeParam && timeParam->GetType() == ParameterType::ENCODER) {
-                TimeParameter* delayTimeParam = static_cast<TimeParameter*>(timeParam);
-                delayTimeParam->SetDisplayMode(TimeDisplayMode::TEMPO_BPM);
-            }
+        EffectParameter* childTempoModeParam = delayEffect_->GetParameter(4);
+        if (childTempoModeParam && childTempoModeParam->GetKind() == ParameterKind::ENUM) {
+            static_cast<EnumParameter*>(childTempoModeParam)->SetSelectedIndex(1);
         }
     }
 
@@ -94,13 +91,13 @@ void FlyEffect::Init(float sampleRate) {
 
 void FlyEffect::Update() {
     TimeParameter* flyTimeParam = nullptr;
-    ToggleParameter* flyTempoModeParam = nullptr;
+    EnumParameter* flyTempoModeParam = nullptr;
     float tempoHz = 2.0f;
 
     if (timeParamIndex_ >= 0 && timeParamIndex_ < static_cast<int>(GetParameterCount()) &&
         tempoModeParamIndex_ >= 0 && tempoModeParamIndex_ < static_cast<int>(GetParameterCount())) {
         flyTimeParam = static_cast<TimeParameter*>(GetParameter(timeParamIndex_));
-        flyTempoModeParam = static_cast<ToggleParameter*>(GetParameter(tempoModeParamIndex_));
+        flyTempoModeParam = static_cast<EnumParameter*>(GetParameter(tempoModeParamIndex_));
     }
 
     if (GetParameterCount() >= 7) {
@@ -132,38 +129,28 @@ void FlyEffect::Update() {
             delayEffect_->GetParameter(2)->SetValue(2.0f); // 3/16 subdivision
 
             if (flyTimeParam && delayEffect_->GetParameterCount() >= 4) {
-                EffectParameter* delayTimeParam = delayEffect_->GetParameter(3);
-                if (delayTimeParam && delayTimeParam->GetType() == ParameterType::ENCODER) {
-                    TimeParameter* childTime = static_cast<TimeParameter*>(delayTimeParam);
-                    childTime->SetValue(flyTimeParam->GetValueAsMs());
-                }
+                delayEffect_->GetParameter(3)->SetValue(flyTimeParam->GetValueAsMs());
             }
 
             if (flyTempoModeParam && delayEffect_->GetParameterCount() >= 5) {
-                EffectParameter* delayTempoModeParam = delayEffect_->GetParameter(4);
-                if (delayTempoModeParam && delayTempoModeParam->GetType() == ParameterType::TOGGLE) {
-                    ToggleParameter* childTempoToggle = static_cast<ToggleParameter*>(delayTempoModeParam);
-                    childTempoToggle->SetState(flyTempoModeParam->GetState());
-                }
+                // Both are 2-option enums with the same Off/On (0/1) encoding.
+                delayEffect_->GetParameter(4)->SetValue(flyTempoModeParam->GetValue());
             }
         }
     }
 
-    // Handle tempo mode toggle from E1 Button
+    // Handle tempo mode toggle from E1 Button. TimeParameter's display mode
+    // is derived live from the linked toggle, so just detect the change to
+    // refresh the visible E1 display.
     if (flyTimeParam && flyTempoModeParam) {
-        TimeParameter* timeParam = flyTimeParam;
-        ToggleParameter* tempoModeParam = flyTempoModeParam;
-        
-        // Update TimeParameter's display mode based on toggle state
-        TimeDisplayMode newMode = tempoModeParam->GetState() ? TimeDisplayMode::TEMPO_BPM : TimeDisplayMode::TIME_MS;
-        if (timeParam->GetDisplayMode() != newMode) {
-            timeParam->SetDisplayMode(newMode);
-            // Ensure the visible E1 parameter display updates when mode toggles.
+        bool tempoOn = flyTimeParam->GetDisplayMode() == TimeDisplayMode::TEMPO_BPM;
+        if (tempoOn != tempoModeCached_) {
+            tempoModeCached_ = tempoOn;
             RequestParameterDisplayUpdate(timeParamIndex_);
         }
-        
+
         // Convert BPM to Hz for SetTempo (SetTempo expects Hz)
-        float bpm = timeParam->GetValueAsBPM();
+        float bpm = flyTimeParam->GetValueAsBPM();
         tempoHz = bpm / 60.0f;
     }
 

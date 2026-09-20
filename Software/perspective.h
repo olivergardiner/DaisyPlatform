@@ -4,10 +4,8 @@
 
 #include "platform.h"
 #include "hardware.h"
+#include "controls.h"
 #include "parameters/effectparameter.h"
-#include "parameters/potentiometerparameter.h"
-#include "parameters/encoderparameter.h"
-#include "parameters/toggleparameter.h"
 #include "ui/ui.h"
 #include "effects/tunereffect.h"
 #if defined(PERSPECTIVE_PLATFORM_AMP)
@@ -88,7 +86,10 @@ protected:
     void AdjustSelectedParameter(int steps);
     void RefreshParameterDisplays();
     void ResetParameterSelection();
-    bool IsSelectedParameterPairedTempoTime(EffectParameter* tempoModeToggle) const;
+    // Finds the TimeParameter (if any) in currentEffect_ whose mode toggle is
+    // exactly this parameter, so button presses only fire while that time
+    // parameter is selected.
+    EffectParameter* FindTimeParameterForModeToggle(EffectParameter* toggle) const;
 
     // Macro knob (Mix/Depth/Rate/Feedback) soft take-over
     void ArmMacroKnobCatch();
