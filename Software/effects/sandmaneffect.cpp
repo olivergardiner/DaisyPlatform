@@ -10,7 +10,7 @@ using namespace perspective;
 
 namespace {
 
-static const char* kStageNames[] = {"2", "3"};
+static const char* kStageNames[] = {"2", "3", "4"};
 
 // Child parameter indices, mirroring each child's own ParamIndex enum.
 enum GateParam { kGateThreshold = 0, kGateHysteresis, kGateAttack, kGateHold, kGateRelease };
@@ -83,9 +83,9 @@ void SandmanEffect::Init(float sampleRate) {
 
     // Stages — 3 for the album grind, 2 if it feels too compressed
     PotentiometerParameter* stagesParam =
-        new PotentiometerParameter("Stages", 0.0f, 1.0f, 1.0f, PotCurve::LIN, -1);
+        new PotentiometerParameter("Stages", 0.0f, 2.0f, 1.0f, PotCurve::LIN, -1);
     stagesParam->SetDisplayType(DisplayType::DISCRETE);
-    stagesParam->SetDiscreteValues(kStageNames, 2);
+    stagesParam->SetDiscreteValues(kStageNames, 3);
     AddParameter(stagesParam);
 
     Update();
